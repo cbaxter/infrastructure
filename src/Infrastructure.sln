@@ -17,7 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{7B1219
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{84EEABF1-72A4-4BD8-8879-17F035425347}"
 	ProjectSection(SolutionItems) = preProject
+		.shared\Infrastructure.snk = .shared\Infrastructure.snk
 		.shared\ProductInfo.cs = .shared\ProductInfo.cs
+		.shared\PublicKey.txt = .shared\PublicKey.txt
 		.shared\VersionInfo.cs = .shared\VersionInfo.cs
 	EndProjectSection
 EndProject
