@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Spark.Infrastructure</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Common</AssemblyName>
+    <AssemblyName>Spark.Infrastructure.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
