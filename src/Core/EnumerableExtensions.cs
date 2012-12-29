@@ -29,7 +29,7 @@ namespace Spark.Infrastructure
         /// <param name="source">The <see cref="IEnumerable{T}"/> to cast as an <see cref="IList{T}"/> or create a <see cref="List{T}"/> from.</param>
         public static IList<T> AsList<T>(this IEnumerable<T> source)
         {
-            return source == null ? null : source as IList<T> ?? new List<T>(source);
+            return source as IList<T> ?? new List<T>(source.EmptyIfNull());
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Spark.Infrastructure
         /// <param name="source">The <see cref="IEnumerable{T}"/> to cast as an <see cref="IReadOnlyList{T}"/> or create a <see cref="ReadOnlyCollection{T}"/> from.</param>
         public static IReadOnlyList<T> AsReadOnly<T>(this IEnumerable<T> source)
         {
-            return source == null ? null : source as IReadOnlyList<T> ?? new ReadOnlyCollection<T>(source.AsList());
+            return source as IReadOnlyList<T> ?? new ReadOnlyCollection<T>(source.AsList());
         }
 
         /// <summary>

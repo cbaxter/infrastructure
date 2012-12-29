@@ -22,6 +22,26 @@ namespace Spark.Infrastructure
     public static class ObjectExtensions
     {
         /// <summary>
+        /// Returns true if a specified value is null; otherwise false.
+        /// </summary>
+        /// <param name="value">The string to test.</param>
+        public static Boolean IsNull<T>(this T value)
+            where T : class
+        {
+            return value == null;
+        }
+
+        /// <summary>
+        /// Returns true if a specified value is not null; otherwise false.
+        /// </summary>
+        /// <param name="value">The string to test.</param>
+        public static Boolean IsNotNull<T>(this T value)
+            where T : class
+        {
+            return value != null;
+        }
+        
+        /// <summary>
         /// Creates a new <see cref="Array"/> containing <paramref name="item"/>.
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
