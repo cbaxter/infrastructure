@@ -70,20 +70,29 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext..
+        ///   Looks up a localized string similar to Value must be greater than {0}..
         /// </summary>
-        internal static string OperationIdModifiedInsideScope {
+        internal static string ArgumentNotGreaterThanValue {
             get {
-                return ResourceManager.GetString("OperationIdModifiedInsideScope", resourceCulture);
+                return ResourceManager.GetString("ArgumentNotGreaterThanValue", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Value must contain at least one non-whitespace character..
         /// </summary>
-        internal static string VerifyNotWhitespace {
+        internal static string MustContainOneNonWhitespaceCharacter {
             get {
-                return ResourceManager.GetString("VerifyNotWhitespace", resourceCulture);
+                return ResourceManager.GetString("MustContainOneNonWhitespaceCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext..
+        /// </summary>
+        internal static string OperationIdModifiedInsideScope {
+            get {
+                return ResourceManager.GetString("OperationIdModifiedInsideScope", resourceCulture);
             }
         }
     }

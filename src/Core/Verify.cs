@@ -20,8 +20,22 @@ namespace Spark.Infrastructure
     /// <summary>
     /// Code contract utility class.
     /// </summary>
-    internal static class Verify
+    public static class Verify
     {
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is less than or equal to <paramref name="exclusiveLowerBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> amd <paramref name="exclusiveLowerBound"/>.</typeparam>
+        /// <param name="actual">The value to check if less than or equal to <paramref name="exclusiveLowerBound"/>.</param>
+        /// <param name="exclusiveLowerBound">The exlusive lower bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void GreaterThan<T>(T exclusiveLowerBound, T actual, [InvokerParameterName]String paramName)
+          where T : struct, IComparable
+        {
+            if (exclusiveLowerBound.CompareTo(actual) >= 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanValue.FormatWith(exclusiveLowerBound));
+        }
+
         /// <summary>
         /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if <paramref name="value"/> is <value>null</value>.
         /// </summary>
@@ -49,7 +63,7 @@ namespace Spark.Infrastructure
                 throw new ArgumentNullException(paramName);
   
             if(String.IsNullOrWhiteSpace(value))
-                throw new ArgumentException(Messages.MustContainOneNonWhitespaceCharacter, paramName);
+                throw new ArgumentException(Exceptions.MustContainOneNonWhitespaceCharacter, paramName);
         }
     }
 }

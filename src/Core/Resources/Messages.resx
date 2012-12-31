@@ -126,7 +126,4 @@
   <data name="LogicalOperationTransfered" xml:space="preserve">
     <value>Transfer from {0} to {1}.</value>
   </data>
-  <data name="MustContainOneNonWhitespaceCharacter" xml:space="preserve">
-    <value>Value must contain at least one non-whitespace character.</value>
-  </data>
 </root>

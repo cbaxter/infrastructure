@@ -120,10 +120,13 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="ArgumentNotGreaterThanValue" xml:space="preserve">
+    <value>Value must be greater than {0}.</value>
+  </data>
+  <data name="MustContainOneNonWhitespaceCharacter" xml:space="preserve">
+    <value>Value must contain at least one non-whitespace character.</value>
+  </data>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
-  </data>
-  <data name="VerifyNotWhitespace" xml:space="preserve">
-    <value>Value must contain at least one non-whitespace character.</value>
   </data>
 </root>

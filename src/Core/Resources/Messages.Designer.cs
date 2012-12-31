@@ -86,14 +86,5 @@ namespace Spark.Infrastructure.Resources {
                 return ResourceManager.GetString("LogicalOperationTransfered", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value must contain at least one non-whitespace character..
-        /// </summary>
-        internal static string MustContainOneNonWhitespaceCharacter {
-            get {
-                return ResourceManager.GetString("MustContainOneNonWhitespaceCharacter", resourceCulture);
-            }
-        }
     }
 }
