@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{76DE91
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{7B1219D8-005E-4A65-BE2B-050077236655}"
@@ -23,6 +24,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{84EE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{DFD230FA-76D5-4EF4-8035-80E848CF798B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{CFF3E57D-1325-4E10-8E14-4898814487BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +38,15 @@ Global
 		{DFD230FA-76D5-4EF4-8035-80E848CF798B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFD230FA-76D5-4EF4-8035-80E848CF798B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFD230FA-76D5-4EF4-8035-80E848CF798B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CFF3E57D-1325-4E10-8E14-4898814487BE} = {569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}
 	EndGlobalSection
 EndGlobal

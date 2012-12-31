@@ -234,22 +234,19 @@ namespace Spark.Infrastructure.Threading
                     Task queuedTask;
                     while (partition.TryDequeue(out queuedTask) && !taskExecuted)
                     {
-                        taskExecuted = queuedTask.Id == task.Id;
-                        TryExecuteTask(queuedTask);
                         queuedTasksExecuted++;
+                        TryExecuteTask(queuedTask);
+                        taskExecuted = queuedTask.Id == task.Id;
                     }
 
                     if (!taskExecuted)
-                    {
                         TryExecuteTask(task);
-                        taskExecuted = true;
-                    }
                 }
             }
 
             Pulse(queuedTasksExecuted);
 
-            return taskExecuted;
+            return true;
         }
 
         /// <summary>

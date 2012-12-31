@@ -69,6 +69,8 @@ namespace Spark.Infrastructure.Logging
         /// <param name="level">The log level of the logger.</param>
         public Logger(String name, SourceLevels level)
         {
+            Verify.NotNullOrWhiteSpace(name, "name");
+
             traceSource = new TraceSource(name, level);
             fatalEnabled = (level & SourceLevels.Critical) == SourceLevels.Critical;
             errorEnabled = (level & SourceLevels.Error) == SourceLevels.Error;

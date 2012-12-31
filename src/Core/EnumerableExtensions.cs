@@ -23,6 +23,16 @@ namespace Spark.Infrastructure
     public static class EnumerableExtensions
     {
         /// <summary>
+        /// Cast <paramref name="source"/> as an array of <typeparamref name="T"/> if possible; otherwise create a new array of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of items in <paramref name="source"/>.</typeparam>
+        /// <param name="source">The <see cref="IEnumerable{T}"/> to cast as an <see cref="IList{T}"/> or create a <see cref="List{T}"/> from.</param>
+        public static T[] AsArray<T>(this IEnumerable<T> source)
+        {
+            return source as T[] ?? source.EmptyIfNull().ToArray();
+        }
+
+        /// <summary>
         /// Cast <paramref name="source"/> as an <see cref="IList{T}"/> if possible; otherwise create a new <see cref="List{T}"/> wrapper.
         /// </summary>
         /// <typeparam name="T">The type of the elements of source.</typeparam>

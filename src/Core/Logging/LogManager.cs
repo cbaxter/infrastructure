@@ -97,8 +97,9 @@ namespace Spark.Infrastructure.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
-            var switchName = name;
+            Verify.NotNullOrWhiteSpace(name, "name");
 
+            var switchName = name;
             do
             {
                 if (ConfiguredSwitches.ContainsKey(switchName))

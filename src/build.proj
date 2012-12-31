@@ -1,15 +1,17 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Compile">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
 
     <Import Project="..\lib\MSBuild\MSBuild.Community.Tasks\MSBuild.Community.Tasks.Targets"/>
+    <UsingTask AssemblyFile="packages\xunit.runners.2.0.0-alpha-build1611\tools\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
 
     <PropertyGroup>
-        <NuGetExe>".nuget/nuget.exe"</NuGetExe>
+        <SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>
         <Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <MajorVersion Condition="'$(MajorVersion)' == ''">0</MajorVersion>
         <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
         <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
         <Commit Condition="'$(Commit)' == ''">Unknown</Commit>
+        <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
     </PropertyGroup>
 
     <Target Name="Clean">
@@ -52,7 +54,17 @@
     </Target>
 
     <Target Name="Compile" DependsOnTargets="StampVersionInfo">
+        <MSBuild Projects=".nuget\NuGet.Targets" Targets="RestorePackages" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
         <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    </Target>
+
+    <Target Name="Test" DependsOnTargets="Compile">
+        <ItemGroup>
+            <TestAssemblies Include="**\bin\$(Configuration)\*.Tests.dll" />
+            <TestAssemblies Include="**\bin\*.Tests.dll" />
+        </ItemGroup>
+
+        <xunit Assemblies="@(TestAssemblies)" />
     </Target>
 
 </Project>
