@@ -123,7 +123,7 @@ namespace Spark.Infrastructure.Threading
             var partition = GetOrCreatePartition(task);
 
             WaitIfRequired();
-            using (Log.PushContext("Task", task.Id, partition.Id))
+            using (Log.PushContext("Task", task.Id))
             {
                 if (partition.Enqueue(task) != 1)
                     return;
@@ -154,6 +154,8 @@ namespace Spark.Infrastructure.Threading
             var partitionId = partitionHash(task);
             var partition = partitions.GetOrAdd(partitionId, id => new Partition(partitionId));
 
+            Log.DebugFormat("Task {0} mapped to partition {1}.", task.Id, partition.Id);
+
             return partition;
         }
 
@@ -172,7 +174,7 @@ namespace Spark.Infrastructure.Threading
                     if (!partition.TryDequeue(out task))
                         break;
 
-                    using (Log.PushContext("Task", task.Id, partition.Id))
+                    using (Log.PushContext("Task", task.Id))
                         TryExecuteTask(task);
                 }
 
@@ -203,10 +205,10 @@ namespace Spark.Infrastructure.Threading
         {
             lock (syncLock)
             {
+                Log.TraceFormat("*** PULSE {0} ***", count);
+
                 for (var i = 0; i < count; i++)
                 {
-                    Log.Trace("*** PULSE ONE ***");
-
                     queuedTasks--;
 
                     Monitor.Pulse(syncLock);
@@ -225,7 +227,7 @@ namespace Spark.Infrastructure.Threading
             var queuedTasksExecuted = 0;
             var partition = GetOrCreatePartition(task);
 
-            using (Log.PushContext("Task", task.Id, partition.Id))
+            using (Log.PushContext("Task", task.Id))
             {
                 lock (partition)
                 {

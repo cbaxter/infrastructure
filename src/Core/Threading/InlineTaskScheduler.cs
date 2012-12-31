@@ -2,6 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Spark.Infrastructure.Logging;
+
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
 
 namespace Spark.Infrastructure.Threading
 {
@@ -10,6 +24,8 @@ namespace Spark.Infrastructure.Threading
     /// </summary>
     public sealed class InlineTaskScheduler : TaskScheduler
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Indicates the maximum concurrency level this <see cref="TaskScheduler"/> is able to support.
         /// </summary>
@@ -21,7 +37,8 @@ namespace Spark.Infrastructure.Threading
         /// <param name="task">The <see cref="Task"/> to be executed.</param>
         protected override void QueueTask(Task task)
         {
-            TryExecuteTask(task);
+            using (Log.PushContext("Task", task.Id))
+                TryExecuteTask(task);
         }
 
         /// <summary>
@@ -31,7 +48,8 @@ namespace Spark.Infrastructure.Threading
         /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
         protected override Boolean TryExecuteTaskInline(Task task, Boolean taskWasPreviouslyQueued)
         {
-            return TryExecuteTask(task);
+            using (Log.PushContext("Task", task.Id))
+                return TryExecuteTask(task);
         }
 
         /// <summary>
