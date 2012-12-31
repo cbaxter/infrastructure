@@ -132,13 +132,13 @@ namespace Spark.Infrastructure.Threading
                 {
                     var longRunningThread = new Thread(state => ExecutePartitionedTasks((Partition)state)) { IsBackground = true };
 
-                    Log.Trace("Queuing new user work item on long running thread.");
+                    Log.Trace("Queuing new user work item on long running thread");
 
                     longRunningThread.Start(partition);
                 }
                 else
                 {
-                    Log.Trace("Queuing new user work item on thread-pool.");
+                    Log.Trace("Queuing new user work item on thread-pool");
 
                     ThreadPool.UnsafeQueueUserWorkItem(state => ExecutePartitionedTasks((Partition)state), partition);
                 }
@@ -154,7 +154,7 @@ namespace Spark.Infrastructure.Threading
             var partitionId = partitionHash(task);
             var partition = partitions.GetOrAdd(partitionId, id => new Partition(partitionId));
 
-            Log.DebugFormat("Task {0} mapped to partition {1}.", task.Id, partition.Id);
+            Log.DebugFormat("Task {0} mapped to partition {1}", task.Id, partition.Id);
 
             return partition;
         }

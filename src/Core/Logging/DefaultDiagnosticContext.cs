@@ -71,10 +71,10 @@ namespace Spark.Infrastructure.Logging
         /// </summary>
         protected virtual void Dispose(Boolean disposing)
         {
-            if (disposing || disposed)
+            if (!disposing || disposed)
                 return;
 
-            if (Trace.CorrelationManager.LogicalOperationStack.Peek() != this)
+            if (!name.Equals(Trace.CorrelationManager.LogicalOperationStack.Peek()))
                 throw new InvalidOperationException(Exceptions.OperationIdModifiedInsideScope);
 
             if (Trace.CorrelationManager.ActivityId != currentActivityId)
@@ -133,7 +133,10 @@ namespace Spark.Infrastructure.Logging
         /// <param name="to">The new/target activity id.</param>
         private void Transfer(Guid from, Guid to)
         {
-            OnTransfer(from, to);
+            if (from == to) 
+                return;
+
+            OnTransfer(@from, to);
             Trace.CorrelationManager.ActivityId = to;
         }
 

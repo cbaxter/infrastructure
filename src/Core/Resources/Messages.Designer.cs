@@ -61,7 +61,7 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Logical operation {0} started..
+        ///   Looks up a localized string similar to Logical operation {0} started.
         /// </summary>
         internal static string LogicalOperationStarted {
             get {
@@ -70,7 +70,7 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Logical operation {0} stopped after {2}..
+        ///   Looks up a localized string similar to Logical operation {0} stopped after {1}.
         /// </summary>
         internal static string LogicalOperationStopped {
             get {
@@ -79,7 +79,7 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transfer from {0} to {1}..
+        ///   Looks up a localized string similar to Transfer from {0} to {1}.
         /// </summary>
         internal static string LogicalOperationTransfered {
             get {

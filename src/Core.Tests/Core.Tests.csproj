@@ -56,6 +56,10 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Logging\DebugDiagnosticContextTests.cs" />
+    <Compile Include="Logging\DefaultDiagnosticContextTests.cs" />
+    <Compile Include="Logging\DisabledDiagnosticContextTests.cs" />
+    <Compile Include="Logging\FakeTraceListener.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>

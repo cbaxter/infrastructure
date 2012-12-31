@@ -30,7 +30,6 @@ namespace Spark.Infrastructure.Logging
         private readonly Boolean warnEnabled;
         private readonly Boolean debugEnabled;
         private readonly Boolean traceEnabled;
-        private volatile Boolean disposed;
 
         /// <summary>
         /// Returns <value>true</value> if logging is enabled for <value>FATAL</value> level messages; otherwise <value>false</value>.
@@ -92,37 +91,6 @@ namespace Spark.Infrastructure.Logging
                 diagnosticContextBuilder = (source, context, data, correlationId) => new DefaultDiagnosticContext(source, context, data, correlationId);
             else
                 diagnosticContextBuilder = (source, context, data, correlationId) => DisabledDiagnosticContext.Instance;
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="Logger"/> class.
-        /// </summary>
-        ~Logger()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="Logger"/> class.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        ///  Releases all resources used by the current instance of the <see cref="Logger"/> class.
-        /// </summary>
-        /// <param name="disposing"></param>
-        private void Dispose(Boolean disposing)
-        {
-            if (!disposing || disposed)
-                return;
-
-            traceSource.Flush();
-            traceSource.Close();
-            disposed = true;
         }
 
         /// <summary>

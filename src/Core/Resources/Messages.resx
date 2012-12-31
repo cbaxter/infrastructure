@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LogicalOperationStarted" xml:space="preserve">
-    <value>Logical operation {0} started.</value>
+    <value>Logical operation {0} started</value>
   </data>
   <data name="LogicalOperationStopped" xml:space="preserve">
-    <value>Logical operation {0} stopped after {2}.</value>
+    <value>Logical operation {0} stopped after {1}</value>
   </data>
   <data name="LogicalOperationTransfered" xml:space="preserve">
-    <value>Transfer from {0} to {1}.</value>
+    <value>Transfer from {0} to {1}</value>
   </data>
 </root>

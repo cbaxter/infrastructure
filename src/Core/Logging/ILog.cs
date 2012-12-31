@@ -18,7 +18,7 @@ namespace Spark.Infrastructure.Logging
     /// <summary>
     /// Provides logging interface.
     /// </summary>
-    public interface ILog : IDisposable
+    public interface ILog
     {
         /// <summary>
         /// Returns <value>true</value> if logging is enabled for <value>FATAL</value> level messages; otherwise <value>false</value>.

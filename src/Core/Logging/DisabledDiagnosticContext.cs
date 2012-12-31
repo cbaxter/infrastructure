@@ -26,6 +26,12 @@ namespace Spark.Infrastructure.Logging
         public static readonly IDisposable Instance = new DisabledDiagnosticContext();
 
         /// <summary>
+        /// Initialize a new instance of <see cref="DisabledDiagnosticContext"/>.
+        /// </summary>
+        private DisabledDiagnosticContext()
+        { }
+
+        /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="DisabledDiagnosticContext"/> class.
         /// </summary>
         public void Dispose()
