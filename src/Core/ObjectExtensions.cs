@@ -46,7 +46,7 @@ namespace Spark.Infrastructure
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
         /// <param name="item">The singleton element to be added to the <see cref="Array"/>.</param>
-        public static T[] ToArray<T>(this T item)
+        public static T[] AsArray<T>(this T item)
         {
             return new[] { item };
         }
@@ -56,7 +56,7 @@ namespace Spark.Infrastructure
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
         /// <param name="item">The singleton element to be added to the <see cref="List{T}"/>.</param>
-        public static List<T> ToList<T>(this T item)
+        public static List<T> AsList<T>(this T item)
         {
             return new List<T> { item };
         }
