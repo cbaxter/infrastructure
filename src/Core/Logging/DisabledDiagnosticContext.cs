@@ -16,17 +16,17 @@
 namespace Spark.Infrastructure.Logging
 {
     /// <summary>
-    /// Null diagnostics context for use when suppressing activity tracking.
+    /// Disabled diagnostics context for use when suppressing activity tracking.
     /// </summary>
-    internal sealed class NullDiagnosticContext : IDisposable
+    public sealed class DisabledDiagnosticContext : IDisposable
     {
         /// <summary>
-        /// <see cref="NullDiagnosticContext" /> singleton  instance.
+        /// <see cref="DisabledDiagnosticContext" /> singleton  instance.
         /// </summary>
-        public static readonly IDisposable Instance = new NullDiagnosticContext();
+        public static readonly IDisposable Instance = new DisabledDiagnosticContext();
 
         /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="NullDiagnosticContext"/> class.
+        /// Releases all managed resources used by the current instance of the <see cref="DisabledDiagnosticContext"/> class.
         /// </summary>
         public void Dispose()
         { }

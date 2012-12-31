@@ -5,6 +5,19 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
 namespace Spark.Infrastructure.Logging
 {
     /// <summary>
@@ -84,14 +97,16 @@ namespace Spark.Infrastructure.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
+            var switchName = name;
+
             do
             {
-                if (ConfiguredSwitches.ContainsKey(name))
-                    return new Logger(name, ConfiguredSwitches[name]);
+                if (ConfiguredSwitches.ContainsKey(switchName))
+                    return new Logger(name, ConfiguredSwitches[switchName]);
 
                 // Use `.` as a hierarchical separator and travel up the name looking for a match.
-                name = name.Substring(0, Math.Max(0, name.LastIndexOf('.'))); 
-            } while (!String.IsNullOrWhiteSpace(name));
+                switchName = switchName.Substring(0, Math.Max(0, switchName.LastIndexOf('.')));
+            } while (!String.IsNullOrWhiteSpace(switchName));
 
             return new Logger(name, DefaultLevel);
         }

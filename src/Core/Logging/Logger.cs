@@ -22,6 +22,7 @@ namespace Spark.Infrastructure.Logging
     internal sealed class Logger : ILog
     {
         private const Int32 NoIdentifier = 0;
+        private readonly Func<TraceSource, String, Object, Guid, IDisposable> diagnosticContextBuilder;
         private readonly TraceSource traceSource;
         private readonly Boolean fatalEnabled;
         private readonly Boolean errorEnabled;
@@ -71,10 +72,24 @@ namespace Spark.Infrastructure.Logging
             traceSource = new TraceSource(name, level);
             fatalEnabled = (level & SourceLevels.Critical) == SourceLevels.Critical;
             errorEnabled = (level & SourceLevels.Error) == SourceLevels.Error;
-            infoEnabled = (level & SourceLevels.Warning) == SourceLevels.Warning;
             warnEnabled = (level & SourceLevels.Information) == SourceLevels.Information;
+            infoEnabled = (level & SourceLevels.Warning) == SourceLevels.Warning;
             debugEnabled = (level & SourceLevels.Verbose) == SourceLevels.Verbose;
             traceEnabled = (level & SourceLevels.All) == SourceLevels.All;
+
+            // Determine the diagnostic context that should be used if a context is pushed on to the logical call stack.
+            // 
+            // Benchmark to log 100,000 string messages (i.e., no formatting) with single context data parameter:
+            //      NoContext (baseline)        -   ~1ms
+            //      DisabledDiagnosticContext   -   ~3ms
+            //      DefaultDiagnosticContext    -  ~80ms
+            //      DebugDiagnosticContext      - ~260ms
+            if ((level & SourceLevels.All) == SourceLevels.All)
+                diagnosticContextBuilder = (source, context, data, correlationId) => new DebugDiagnosticContext(source, context, data, correlationId);
+            else if ((level & SourceLevels.Verbose) == SourceLevels.Verbose || (level & SourceLevels.ActivityTracing) == SourceLevels.ActivityTracing)
+                diagnosticContextBuilder = (source, context, data, correlationId) => new DefaultDiagnosticContext(source, context, data, correlationId);
+            else
+                diagnosticContextBuilder = (source, context, data, correlationId) => DisabledDiagnosticContext.Instance;
         }
 
         /// <summary>
@@ -571,31 +586,64 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Start a new logical operation on thread if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Start a new named logical operation.
         /// </summary>
-        /// <param name="activityId">The correlation id.</param>
-        public IDisposable PushContext(Guid activityId)
+        /// <param name="name">The logical operation name.</param>
+        public IDisposable PushContext(String name)
         {
-            return traceEnabled ? new NestedDiagnosticContext(traceSource, activityId, activityId) : NullDiagnosticContext.Instance;
+            return diagnosticContextBuilder(traceSource, name, null, Guid.Empty);
         }
 
         /// <summary>
-        /// Start a new logical operation on thread if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Start a new named logical operation.
         /// </summary>
-        /// <param name="operationId">An <see cref="Object"/> identifying the operation.</param>
-        public IDisposable PushContext(Object operationId)
+        /// <param name="name">The logical operation name.</param>
+        /// <param name="data">The logical operation context.</param>
+        public IDisposable PushContext(String name, Object data)
         {
-            return traceEnabled ? new NestedDiagnosticContext(traceSource, Guid.NewGuid(), operationId) : NullDiagnosticContext.Instance;
+            return diagnosticContextBuilder(traceSource, name, data, Guid.Empty);
         }
 
         /// <summary>
-        /// Start a new logical operation on thread if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Start a new named logical operation.
         /// </summary>
-        /// <param name="activityId">The correlation id.</param>
-        /// <param name="operationId">An <see cref="Object"/> identifying the operation.</param>
-        public IDisposable PushContext(Guid activityId, Object operationId)
+        /// <param name="name">The logical operation name.</param>
+        /// <param name="data">The logical operation context.</param>
+        public IDisposable PushContext(String name, params Object[] data)
         {
-            return traceEnabled ? new NestedDiagnosticContext(traceSource, activityId, operationId) : NullDiagnosticContext.Instance;
+            return diagnosticContextBuilder(traceSource, name, data, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
+        /// </summary>
+        /// <param name="correlationId">The logical operation correlation id.</param>
+        /// <param name="name">The logical operation name.</param>
+        public IDisposable PushContext(Guid correlationId, String name)
+        {
+            return diagnosticContextBuilder(traceSource, name, null, correlationId);
+        }
+
+        /// <summary>
+        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
+        /// </summary>
+        /// <param name="correlationId">The logical operation correlation id.</param>
+        /// <param name="name">The logical operation name.</param>
+        /// <param name="data">The logical operation context.</param>
+        public IDisposable PushContext(Guid correlationId, String name, Object data)
+        {
+            return diagnosticContextBuilder(traceSource, name, data, correlationId);
+        }
+
+        /// <summary>
+        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
+        /// </summary>
+        /// <param name="correlationId">The logical operation correlation id.</param>
+        /// <param name="name">The logical operation name.</param>
+        /// <param name="data">The logical operation context.</param>
+        public IDisposable PushContext(Guid correlationId, String name, params Object[] data)
+        {
+            return diagnosticContextBuilder(traceSource, name, data, correlationId);
         }
     }
 }
