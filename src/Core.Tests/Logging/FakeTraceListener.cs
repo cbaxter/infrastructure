@@ -19,9 +19,11 @@ namespace Spark.Infrastructure.Tests.Logging
 {
     internal sealed class FakeTraceListener : TraceListener
     {
+        public static readonly FakeTraceListener Instance = new FakeTraceListener();
+
         private readonly IList<String> messages = new List<String>();
 
-        public IEnumerable<String> Messages { get { return messages; } } 
+        public IEnumerable<String> Messages { get { return messages; } }
 
         public override void Write(String message)
         {
@@ -31,6 +33,11 @@ namespace Spark.Infrastructure.Tests.Logging
         public override void WriteLine(String message)
         {
             Write(message + Environment.NewLine);
+        }
+
+        public void Clear()
+        {
+            messages.Clear();
         }
     }
 }

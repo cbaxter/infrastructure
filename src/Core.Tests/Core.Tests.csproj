@@ -61,6 +61,7 @@
     <Compile Include="Logging\DefaultDiagnosticContextTests.cs" />
     <Compile Include="Logging\DisabledDiagnosticContextTests.cs" />
     <Compile Include="Logging\FakeTraceListener.cs" />
+    <Compile Include="Logging\LoggerTests.cs" />
     <Compile Include="Logging\LogManagerTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

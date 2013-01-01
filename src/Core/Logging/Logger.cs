@@ -17,6 +17,13 @@ using System.Diagnostics;
 namespace Spark.Infrastructure.Logging
 {
     /// <summary>
+    /// Replaces the format item in a specified string with the string representation of a corresponding object in a specified array.
+    /// </summary>
+    /// <param name="format">A composite format <see cref="String"/>.</param>
+    /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
+    public delegate String FormatMessageHandler(String format, params Object[] args);
+
+    /// <summary>
     /// A <see cref="System.Diagnostics.Trace"/> based implementation of <see cref="ILog"/>.
     /// </summary>
     internal sealed class Logger : ILog
@@ -65,6 +72,11 @@ namespace Spark.Infrastructure.Logging
         /// Returns <value>true</value> if logging is enabled for <value>TRACE</value> level messages; otherwise <value>false</value>.
         /// </summary>
         public Boolean IsTraceEnabled { get { return traceEnabled; } }
+
+        /// <summary>
+        /// Gets the underlying trace source.
+        /// </summary>
+        internal TraceSource TraceSource { get { return traceSource; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <see cref="level"/>.
@@ -176,6 +188,16 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
+        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Fatal(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (fatalEnabled && messageBuilder != null)
+                traceSource.TraceEvent(TraceEventType.Critical, NoIdentifier, messageBuilder(String.Format));
+        }
+
+        /// <summary>
         /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -250,6 +272,16 @@ namespace Spark.Infrastructure.Logging
         {
             if (errorEnabled && messageBuilder != null)
                 traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, messageBuilder());
+        }
+
+        /// <summary>
+        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Error(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (errorEnabled && messageBuilder != null)
+                traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, messageBuilder(String.Format));
         }
 
         /// <summary>
@@ -330,6 +362,16 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
+        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Warn(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (warnEnabled && messageBuilder != null)
+                traceSource.TraceEvent(TraceEventType.Warning, NoIdentifier, messageBuilder(String.Format));
+        }
+
+        /// <summary>
         /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -404,6 +446,16 @@ namespace Spark.Infrastructure.Logging
         {
             if (infoEnabled && messageBuilder != null)
                 traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, messageBuilder());
+        }
+
+        /// <summary>
+        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Info(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (infoEnabled && messageBuilder != null)
+                traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, messageBuilder(String.Format));
         }
 
         /// <summary>
@@ -484,6 +536,16 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
+        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Debug(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (debugEnabled && messageBuilder != null)
+                traceSource.TraceEvent(TraceEventType.Verbose, NoIdentifier, messageBuilder(String.Format));
+        }
+
+        /// <summary>
         /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -558,6 +620,16 @@ namespace Spark.Infrastructure.Logging
         {
             if (traceEnabled && messageBuilder != null)
                 System.Diagnostics.Trace.WriteLine(messageBuilder(), traceSource.Name);
+        }
+
+        /// <summary>
+        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        public void Trace(Func<FormatMessageHandler, String> messageBuilder)
+        {
+            if (traceEnabled && messageBuilder != null)
+                System.Diagnostics.Trace.WriteLine(messageBuilder(String.Format), traceSource.Name);
         }
 
         /// <summary>

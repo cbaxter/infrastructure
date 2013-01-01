@@ -105,6 +105,12 @@ namespace Spark.Infrastructure.Logging
         void Fatal(Func<String> messageBuilder);
 
         /// <summary>
+        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Fatal(Func<FormatMessageHandler, String> messageBuilder);
+
+        /// <summary>
         /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -152,6 +158,12 @@ namespace Spark.Infrastructure.Logging
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Error(Func<String> messageBuilder);
+
+        /// <summary>
+        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Error(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
         /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
@@ -203,6 +215,12 @@ namespace Spark.Infrastructure.Logging
         void Warn(Func<String> messageBuilder);
 
         /// <summary>
+        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Warn(Func<FormatMessageHandler, String> messageBuilder);
+
+        /// <summary>
         /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -250,6 +268,12 @@ namespace Spark.Infrastructure.Logging
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Info(Func<String> messageBuilder);
+
+        /// <summary>
+        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Info(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
         /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
@@ -301,6 +325,12 @@ namespace Spark.Infrastructure.Logging
         void Debug(Func<String> messageBuilder);
 
         /// <summary>
+        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Debug(Func<FormatMessageHandler, String> messageBuilder);
+
+        /// <summary>
         /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
@@ -348,6 +378,12 @@ namespace Spark.Infrastructure.Logging
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Trace(Func<String> messageBuilder);
+
+        /// <summary>
+        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// </summary>
+        /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
+        void Trace(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
         /// Start a new named logical operation.
