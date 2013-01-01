@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="xunit">
@@ -60,6 +61,7 @@
     <Compile Include="Logging\DefaultDiagnosticContextTests.cs" />
     <Compile Include="Logging\DisabledDiagnosticContextTests.cs" />
     <Compile Include="Logging\FakeTraceListener.cs" />
+    <Compile Include="Logging\LogManagerTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>

@@ -32,6 +32,11 @@ namespace Spark.Infrastructure.Logging
         private readonly Boolean traceEnabled;
 
         /// <summary>
+        /// Returns the name of this <see cref="Logger"/> instance.
+        /// </summary>
+        public String Name { get { return traceSource.Name; } }
+
+        /// <summary>
         /// Returns <value>true</value> if logging is enabled for <value>FATAL</value> level messages; otherwise <value>false</value>.
         /// </summary>
         public Boolean IsFatalEnabled { get { return fatalEnabled; } }
@@ -73,8 +78,8 @@ namespace Spark.Infrastructure.Logging
             traceSource = new TraceSource(name, level);
             fatalEnabled = (level & SourceLevels.Critical) == SourceLevels.Critical;
             errorEnabled = (level & SourceLevels.Error) == SourceLevels.Error;
-            warnEnabled = (level & SourceLevels.Information) == SourceLevels.Information;
-            infoEnabled = (level & SourceLevels.Warning) == SourceLevels.Warning;
+            warnEnabled = (level & SourceLevels.Warning) == SourceLevels.Warning;
+            infoEnabled = (level & SourceLevels.Information) == SourceLevels.Information;
             debugEnabled = (level & SourceLevels.Verbose) == SourceLevels.Verbose;
             traceEnabled = (level & SourceLevels.All) == SourceLevels.All;
 

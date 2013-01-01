@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -23,32 +24,24 @@ namespace Spark.Infrastructure.Logging
     /// <summary>
     /// Creates new instances of <see cref="ILog"/> objects.
     /// </summary>
-    public static class LogManager
+    public sealed class LogManager
     {
-        private static readonly IReadOnlyDictionary<String, SourceLevels> ConfiguredSwitches;
-        private static readonly SourceLevels DefaultLevel;
+        private static readonly LogManager Instance = new LogManager(ConfigurationManager.GetSection("system.diagnostics") as ConfigurationSection);
+        private readonly IReadOnlyDictionary<String, SourceLevels> configuredSwitches;
+        private readonly SourceLevels defaultLevel;
 
         /// <summary>
         /// Initializes the configured switches for <see cref="LogManager"/>.
         /// </summary>
-        static LogManager()
+        /// <param name="diagnosticsSection">The system.diagnostics configuration section.</param>
+        internal LogManager(ConfigurationSection diagnosticsSection)
         {
-            const String defaultSwitchName = "default";
+            var switchSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["switches"] : null;
+            var switches = switchSection != null && switchSection.Value is IEnumerable ? (IEnumerable)switchSection.Value : Enumerable.Empty<ConfigurationElement>();
 
-            var diagnosticsSection = (ConfigurationSection)ConfigurationManager.GetSection("system.diagnostics");
-            if (diagnosticsSection == null)
-                return;
-
-            var switchSection = diagnosticsSection.ElementInformation.Properties["switches"];
-            if (switchSection == null)
-                return;
-
-            var switches = switchSection.Value as ConfigurationElementCollection;
-            if (switches == null)
-                return;
-
-            ConfiguredSwitches = GetConfiguredSwitches(switches.OfType<ConfigurationElement>());
-            DefaultLevel = ConfiguredSwitches.ContainsKey(defaultSwitchName) ? ConfiguredSwitches[defaultSwitchName] : SourceLevels.Warning;
+            configuredSwitches = GetConfiguredSwitches(switches.OfType<ConfigurationElement>());
+            if (!configuredSwitches.TryGetValue("default", out defaultLevel))
+                defaultLevel = SourceLevels.Warning;
         }
 
         /// <summary>
@@ -61,34 +54,48 @@ namespace Spark.Infrastructure.Logging
 
             foreach (var element in switchElements)
             {
-                var nameAttribute = element.ElementInformation.Properties["name"];
-                var valueAttribute = element.ElementInformation.Properties["value"];
-
-                if (nameAttribute == null || valueAttribute == null)
-                    continue;
-
-                var name = nameAttribute.Value as String;
+                var level = default(SourceLevels);
+                var name = GetPropertyValue(element, "name");
+                var value = GetPropertyValue(element, "value");
+                
                 if (String.IsNullOrWhiteSpace(name))
                     continue;
 
-                SourceLevels level;
-                if (!Enum.TryParse(valueAttribute.Value as String ?? String.Empty, true, out level))
+                if (!Enum.TryParse(value, true, out level))
                     continue;
-                
+
                 configuredSwitches[name] = level;
             }
 
             return new ReadOnlyDictionary<String, SourceLevels>(configuredSwitches);
         }
 
-        /// <summary>
-        /// Gets a <see cref="ILog"/> instance named after the caller's declaring or reflected type.
-        /// </summary>
-        public static ILog GetCurrentClassLogger()
+        private static String GetPropertyValue(ConfigurationElement element, String name)
         {
-            var caller = new StackFrame(1, false).GetMethod();
+            var property = element.ElementInformation.Properties[name];
 
-            return GetLogger((caller.DeclaringType ?? caller.ReflectedType).FullName);
+            return property == null ? String.Empty : property.Value as String ?? String.Empty;
+        }
+
+        /// <summary>
+        /// Gets the specified named <see cref="ILog"/> instance.
+        /// </summary>
+        /// <param name="name">The name of the logger.</param>
+        internal ILog CreateLogger(String name)
+        {
+            Verify.NotNullOrWhiteSpace(name, "name");
+
+            var switchName = name;
+            do
+            {
+                if (configuredSwitches.ContainsKey(switchName))
+                    return new Logger(name, configuredSwitches[switchName]);
+
+                // Use `.` as a hierarchical separator and travel up the name looking for a match.
+                switchName = switchName.Substring(0, Math.Max(0, switchName.LastIndexOf('.')));
+            } while (!String.IsNullOrWhiteSpace(switchName));
+
+            return new Logger(name, defaultLevel);
         }
 
         /// <summary>
@@ -97,19 +104,18 @@ namespace Spark.Infrastructure.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
+            return Instance.CreateLogger(name);
+        }
 
-            var switchName = name;
-            do
-            {
-                if (ConfiguredSwitches.ContainsKey(switchName))
-                    return new Logger(name, ConfiguredSwitches[switchName]);
+        /// <summary>
+        /// Gets a <see cref="ILog"/> instance named after the caller's declaring or reflected type.
+        /// </summary>
+        public static ILog GetCurrentClassLogger()
+        {
+            var caller = new StackFrame(1, false).GetMethod();
+            var name = (caller.DeclaringType ?? caller.ReflectedType).FullName;
 
-                // Use `.` as a hierarchical separator and travel up the name looking for a match.
-                switchName = switchName.Substring(0, Math.Max(0, switchName.LastIndexOf('.')));
-            } while (!String.IsNullOrWhiteSpace(switchName));
-
-            return new Logger(name, DefaultLevel);
+            return Instance.CreateLogger(name);
         }
     }
 }

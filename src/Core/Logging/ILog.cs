@@ -21,6 +21,11 @@ namespace Spark.Infrastructure.Logging
     public interface ILog
     {
         /// <summary>
+        /// Returns the name of this <see cref="Logger"/> instance.
+        /// </summary>
+        String Name { get; }
+
+        /// <summary>
         /// Returns <value>true</value> if logging is enabled for <value>FATAL</value> level messages; otherwise <value>false</value>.
         /// </summary>
         Boolean IsFatalEnabled { get; }
