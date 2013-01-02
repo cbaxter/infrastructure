@@ -48,6 +48,9 @@ namespace Spark.Infrastructure.Threading
         /// </summary>
         internal IEnumerable<Task> ScheduledTasks { get { return GetScheduledTasks(); } }
 
+        /// <summary>
+        /// Initializes all static read-only members of <see cref="BlockingThreadPoolTaskScheduler"/>.
+        /// </summary>
         static BlockingThreadPoolTaskScheduler()
         {
             Int32 workerThreads, completionPortThreads;
@@ -58,14 +61,27 @@ namespace Spark.Infrastructure.Threading
             Log.InfoFormat("MaximumConcurrencyLevel={0}, DefaultMaximumQueuedTasks={1}", MaximumWorkerThreads, DefaultMaximumQueuedTasks);
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <see cref="DefaultMaximumQueuedTasks"/> as the bounded capacity.
+        /// </summary>
         public BlockingThreadPoolTaskScheduler()
             : this(DefaultMaximumQueuedTasks)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <paramref name="boundedCapacity"/> as the bounded capacity.
+        /// </summary>
+        /// <param name="boundedCapacity"></param>
         public BlockingThreadPoolTaskScheduler(Int32 boundedCapacity)
             : this(boundedCapacity, ThreadPoolWrapper.Instance, MonitorWrapper.Instance)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <paramref name="boundedCapacity"/> as the bounded capacity with an overriden thread pool and monitor class.
+        /// </summary>
+        /// <param name="boundedCapacity">The bounded size of the task queue.</param>
+        /// <param name="threadPool">The thread pool implementation on which to schedule tasks.</param>
+        /// <param name="monitor">The monitor implementation used to synchronize object access.</param>
         internal BlockingThreadPoolTaskScheduler(Int32 boundedCapacity, IQueueUserWorkItems threadPool, ISynchronizeAccess monitor)
         {
             Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
@@ -76,6 +92,10 @@ namespace Spark.Infrastructure.Threading
             this.boundedCapacity = boundedCapacity;
         }
 
+        /// <summary>
+        /// Queues a <see cref="Task"/> to the scheduler.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be queued.</param>
         protected override void QueueTask(Task task)
         {
             using (Log.PushContext("Task", task.Id))
@@ -102,6 +122,11 @@ namespace Spark.Infrastructure.Threading
             }
         }
 
+        /// <summary>
+        /// Determines whether the provided <see cref="Task"/> can be executed synchronously in this call, and if it can, executes it.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be executed.</param>
+        /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
         protected override Boolean TryExecuteTaskInline(Task task, Boolean taskWasPreviouslyQueued)
         {
             using (Log.PushContext("Task", task.Id))
@@ -133,6 +158,9 @@ namespace Spark.Infrastructure.Threading
             }
         }
 
+        /// <summary>
+        /// For debugger support only, generates an enumerable of <see cref="Task"/> instances currently queued to the scheduler waiting to be executed.
+        /// </summary>
         protected override IEnumerable<Task> GetScheduledTasks()
         {
             Task[] tasks;
