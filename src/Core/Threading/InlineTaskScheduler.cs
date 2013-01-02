@@ -27,9 +27,19 @@ namespace Spark.Infrastructure.Threading
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// Default instance of <see cref="InlineTaskScheduler"/>.
+        /// </summary>
+        public static readonly InlineTaskScheduler Instance = new InlineTaskScheduler();
+
+        /// <summary>
         /// Indicates the maximum concurrency level this <see cref="TaskScheduler"/> is able to support.
         /// </summary>
         public override int MaximumConcurrencyLevel { get { return 1; } }
+
+        /// <summary>
+        /// For debugger support only, generates an enumerable of <see cref="Task"/> instances currently queued to the scheduler waiting to be executed.
+        /// </summary>
+        internal IEnumerable<Task> ScheduledTasks { get { return GetScheduledTasks(); } }
 
         /// <summary>
         /// Attempts to execute the provided <see cref="Task"/> on this scheduler.
