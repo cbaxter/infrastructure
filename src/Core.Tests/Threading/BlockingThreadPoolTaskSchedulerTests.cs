@@ -1,6 +1,5 @@
 ﻿using Spark.Infrastructure.Threading;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,12 +34,12 @@ namespace Spark.Infrastructure.Tests.Threading
             }
 
             [Fact]
-            public void DefaultMaximumQueuedTasksToFiveTimesNumberOfWorkerThreads()
+            public void DefaultMaximumQueuedTasksToNumberOfWorkerThreads()
             {
                 Int32 workerThreads, completionPortThreads;
                 ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
 
-                Assert.Equal(workerThreads * 5, new BlockingThreadPoolTaskScheduler().BoundedCapacity);
+                Assert.Equal(workerThreads, new BlockingThreadPoolTaskScheduler().BoundedCapacity);
             }
         }
 

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Spark.Infrastructure.Threading;
+﻿using Spark.Infrastructure.Threading;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -22,7 +20,7 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests.Threading
 {
-    public static class UsingInlineTaskScheduler
+    public static class UsingSynchronousTaskScheduler
     {
         public class WhenQueuingTasks
         {
@@ -31,7 +29,7 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 Int32? managedThreadId = null;
 
-                Task.Factory.StartNew(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None, InlineTaskScheduler.Instance);
+                Task.Factory.StartNew(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None, SynchronousTaskScheduler.Instance);
 
                 Assert.True(managedThreadId.HasValue);
                 Assert.Equal(Thread.CurrentThread.ManagedThreadId, managedThreadId.Value);
@@ -40,13 +38,13 @@ namespace Spark.Infrastructure.Tests.Threading
             [Fact]
             public void MaximumConcurrencyLevelIsOne()
             {
-                Assert.Equal(1, InlineTaskScheduler.Instance.MaximumConcurrencyLevel);
+                Assert.Equal(1, SynchronousTaskScheduler.Instance.MaximumConcurrencyLevel);
             }
 
             [Fact]
             public void ScheduledTasksAlwaysEmpty()
             {
-                Assert.Equal(0, InlineTaskScheduler.Instance.ScheduledTasks.Count());
+                Assert.Equal(0, SynchronousTaskScheduler.Instance.ScheduledTasks.Count());
             }
         }
 
@@ -57,7 +55,7 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 Int32? managedThreadId = null;
 
-                new Task(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None).RunSynchronously(InlineTaskScheduler.Instance);
+                new Task(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None).RunSynchronously(SynchronousTaskScheduler.Instance);
 
                 Assert.True(managedThreadId.HasValue);
                 Assert.Equal(Thread.CurrentThread.ManagedThreadId, managedThreadId.Value);

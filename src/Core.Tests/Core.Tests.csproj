@@ -72,7 +72,7 @@
     <Compile Include="Threading\BlockingThreadPoolTaskSchedulerTests.cs" />
     <Compile Include="Threading\FakeMonitor.cs" />
     <Compile Include="Threading\FakeThreadPool.cs" />
-    <Compile Include="Threading\InlineTaskSchedulerTests.cs" />
+    <Compile Include="Threading\SynchronousTaskSchedulerTests.cs" />
     <Compile Include="Threading\MonitorWrapperTests.cs" />
     <Compile Include="Threading\ThreadPoolWrapperTests.cs" />
     <Compile Include="VerifyTests.cs" />

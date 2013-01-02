@@ -71,7 +71,7 @@
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Threading\BlockingThreadPoolTaskScheduler.cs" />
     <Compile Include="Threading\ISynchronizeAccess.cs" />
-    <Compile Include="Threading\InlineTaskScheduler.cs" />
+    <Compile Include="Threading\SynchronousTaskScheduler.cs" />
     <Compile Include="Threading\IQueueUserWorkItems.cs" />
     <Compile Include="Threading\MonitorWrapper.cs" />
     <Compile Include="Threading\PartitionedTaskScheduler.cs" />

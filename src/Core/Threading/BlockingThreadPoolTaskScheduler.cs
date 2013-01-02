@@ -22,13 +22,9 @@ namespace Spark.Infrastructure.Threading
 {
     public sealed class BlockingThreadPoolTaskScheduler : TaskScheduler
     {
-        public const Int32 ConcurrencyLevelMultiplier = 3;
-        public static readonly Int32 DefaultMaximumQueuedTasks;
-        public static readonly Int32 MaximumWorkerThreads;
-
+        private static readonly Int32 MaximumWorkerThreads;
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IDictionary<Int32, Task> queuedTasks = new Dictionary<Int32, Task>();
-        private readonly Object syncLock = new Object();
         private readonly IQueueUserWorkItems threadPool;
         private readonly ISynchronizeAccess monitor;
         private readonly Int32 boundedCapacity;
@@ -42,7 +38,7 @@ namespace Spark.Infrastructure.Threading
         /// Indicates the maximum concurrency level this <see cref="TaskScheduler"/> is able to support.
         /// </summary>
         public override Int32 MaximumConcurrencyLevel { get { return MaximumWorkerThreads; } }
-        
+
         /// <summary>
         /// For debugger support only, generates an enumerable of <see cref="Task"/> instances currently queued to the scheduler waiting to be executed.
         /// </summary>
@@ -57,21 +53,19 @@ namespace Spark.Infrastructure.Threading
             ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
 
             MaximumWorkerThreads = workerThreads;
-            DefaultMaximumQueuedTasks = workerThreads * 5;
-            Log.InfoFormat("MaximumConcurrencyLevel={0}, DefaultMaximumQueuedTasks={1}", MaximumWorkerThreads, DefaultMaximumQueuedTasks);
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <see cref="DefaultMaximumQueuedTasks"/> as the bounded capacity.
+        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <see cref="MaximumConcurrencyLevel"/> as the bounded capacity.
         /// </summary>
         public BlockingThreadPoolTaskScheduler()
-            : this(DefaultMaximumQueuedTasks)
+            : this(MaximumWorkerThreads)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <paramref name="boundedCapacity"/> as the bounded capacity.
         /// </summary>
-        /// <param name="boundedCapacity"></param>
+        /// <param name="boundedCapacity">The bounded size of the task queue.</param>
         public BlockingThreadPoolTaskScheduler(Int32 boundedCapacity)
             : this(boundedCapacity, ThreadPoolWrapper.Instance, MonitorWrapper.Instance)
         { }
@@ -87,6 +81,8 @@ namespace Spark.Infrastructure.Threading
             Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
             Verify.NotNull(threadPool, "threadPool");
 
+            Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, MaximumConcurrencyLevel);
+
             this.monitor = monitor;
             this.threadPool = threadPool;
             this.boundedCapacity = boundedCapacity;
@@ -101,14 +97,14 @@ namespace Spark.Infrastructure.Threading
             using (Log.PushContext("Task", task.Id))
             {
                 Log.Trace("Acquiring lock");
-                lock (syncLock)
+                lock (queuedTasks)
                 {
                     Log.Trace("Lock acquired");
 
                     while (queuedTasks.Count >= boundedCapacity)
                     {
                         Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
-                        monitor.Wait(syncLock);
+                        monitor.Wait(queuedTasks);
                     }
 
                     Log.Trace("Adding task to queue");
@@ -132,7 +128,7 @@ namespace Spark.Infrastructure.Threading
             using (Log.PushContext("Task", task.Id))
             {
                 Log.Trace("Acquiring lock");
-                lock (syncLock)
+                lock (queuedTasks)
                 {
                     Log.Trace("Lock acquired");
 
@@ -140,7 +136,7 @@ namespace Spark.Infrastructure.Threading
                     {
                         Log.Trace("Removed task from queue");
                         Log.Trace("Pusling");
-                        monitor.Pulse(syncLock);
+                        monitor.Pulse(queuedTasks);
                     }
                     else
                     {
@@ -166,7 +162,7 @@ namespace Spark.Infrastructure.Threading
             Task[] tasks;
 
             Log.Trace("Acquiring lock");
-            lock (syncLock)
+            lock (queuedTasks)
             {
                 Log.Trace("Lock acquired");
 
