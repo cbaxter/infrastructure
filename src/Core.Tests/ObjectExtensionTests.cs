@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -18,6 +14,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1720
 namespace Spark.Infrastructure.Tests
 {
     public static class UsingObjectExtensions
@@ -79,3 +76,4 @@ namespace Spark.Infrastructure.Tests
         }
     }
 }
+#pragma warning restore 1720

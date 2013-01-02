@@ -16,6 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1720
 namespace Spark.Infrastructure.Tests
 {
     public static class UsingEnumerableExtensions
@@ -129,3 +130,4 @@ namespace Spark.Infrastructure.Tests
         }
     }
 }
+#pragma warning restore 1720
