@@ -108,6 +108,45 @@ namespace Spark.Infrastructure.Tests.Threading
                 Assert.Equal(1, executions);
                 Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
             }
+
+            [Fact]
+            public void RunOnDedicatedThreadIfLongRunning()
+            {
+                var isThreadPool = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new BlockingThreadPoolTaskScheduler(1);
+
+                Task.Factory.StartNew(() => { isThreadPool = Thread.CurrentThread.IsThreadPoolThread; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.False(isThreadPool);
+            }
+
+            [Fact]
+            public void RunOnBackgroundThreadIfLongRunning()
+            {
+                var isBackground = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new BlockingThreadPoolTaskScheduler(1);
+
+                Task.Factory.StartNew(() => { isBackground = Thread.CurrentThread.IsBackground; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.True(isBackground);
+            }
+
+            [Fact]
+            public void RunOnThreadPoolThreadIfNotLongRunning()
+            {
+                var isThreadPool = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new BlockingThreadPoolTaskScheduler(1);
+
+                Task.Factory.StartNew(() => { isThreadPool = Thread.CurrentThread.IsThreadPoolThread; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.True(isThreadPool);
+            }
         }
 
         public class WhenRunningTaskSynchronously

@@ -20,6 +20,9 @@ using System.Threading.Tasks;
 
 namespace Spark.Infrastructure.Threading
 {
+    /// <summary>
+    /// Blocking <see cref="TaskScheduler"/> if number of queued tasks exceeds <see cref="BoundedCapacity"/>.
+    /// </summary>
     public sealed class BlockingThreadPoolTaskScheduler : TaskScheduler
     {
         private static readonly Int32 MaximumWorkerThreads;
@@ -96,25 +99,45 @@ namespace Spark.Infrastructure.Threading
         {
             using (Log.PushContext("Task", task.Id))
             {
-                Log.Trace("Acquiring lock");
-                lock (queuedTasks)
+                WaitIfRequired(task);
+
+                if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
                 {
-                    Log.Trace("Lock acquired");
+                    var longRunningThread = new Thread(state => TryExecuteTaskInline((Task)state, true)) { IsBackground = true };
 
-                    while (queuedTasks.Count >= boundedCapacity)
-                    {
-                        Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
-                        monitor.Wait(queuedTasks);
-                    }
+                    Log.Trace("Scheduling task executor on long running thread");
 
-                    Log.Trace("Adding task to queue");
-                    queuedTasks.Add(task.Id, task);
+                    longRunningThread.Start(task);
+                }
+                else
+                {
+                    Log.Trace("Scheduling task executor on thread pool");
 
-                    Log.Trace("Releasing lock");
+                    threadPool.UnsafeQueueUserWorkItem(state => TryExecuteTaskInline(state, true), task);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If the set of currently queued tasks exceeds <see cref="boundedCapacity"/> wait for a slot to be freed before proceeding; otherwise proceed immediately.
+        /// </summary>
+        private void WaitIfRequired(Task task)
+        {
+            Log.Trace("Acquiring lock");
+            lock (queuedTasks)
+            {
+                Log.Trace("Lock acquired");
+
+                while (queuedTasks.Count >= boundedCapacity)
+                {
+                    Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
+                    monitor.Wait(queuedTasks);
                 }
 
-                Log.Trace("Scheduling user work item on thread pool");
-                threadPool.UnsafeQueueUserWorkItem(state => TryExecuteTaskInline(state, true), task);
+                Log.Trace("Adding task to queue");
+                queuedTasks.Add(task.Id, task);
+
+                Log.Trace("Releasing lock");
             }
         }
 
@@ -127,30 +150,37 @@ namespace Spark.Infrastructure.Threading
         {
             using (Log.PushContext("Task", task.Id))
             {
-                Log.Trace("Acquiring lock");
-                lock (queuedTasks)
-                {
-                    Log.Trace("Lock acquired");
-
-                    if (queuedTasks.Remove(task.Id))
-                    {
-                        Log.Trace("Removed task from queue");
-                        Log.Trace("Pusling");
-                        monitor.Pulse(queuedTasks);
-                    }
-                    else
-                    {
-                        if (taskWasPreviouslyQueued)
-                            Log.Trace("Task already removed from queue");
-                        else
-                            Log.Trace("Task not previously queued");
-                    }
-
-                    Log.Trace("Releasing lock");
-                }
+                PulseIfRequired(task, taskWasPreviouslyQueued);
 
                 Log.Trace("Executing task");
                 return TryExecuteTask(task);
+            }
+        }
+
+        /// <summary>
+        /// Notify a thread in the waiting queue that a <see cref="Task"/> execution slot has been made available.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be executed.</param>
+        /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
+        private void PulseIfRequired(Task task, Boolean taskWasPreviouslyQueued)
+        {
+            Log.Trace("Acquiring lock");
+            lock (queuedTasks)
+            {
+                Log.Trace("Lock acquired");
+
+                if (queuedTasks.Remove(task.Id))
+                {
+                    Log.Trace("Removed task from queue");
+                    Log.Trace("Pusling");
+                    monitor.Pulse(queuedTasks);
+                }
+                else
+                {
+                    Log.Trace(taskWasPreviouslyQueued ? "Task already removed from queue" : "Task not previously queued");
+                }
+
+                Log.Trace("Releasing lock");
             }
         }
 
