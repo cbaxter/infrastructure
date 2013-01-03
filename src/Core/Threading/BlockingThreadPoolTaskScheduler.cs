@@ -150,10 +150,16 @@ namespace Spark.Infrastructure.Threading
         {
             using (Log.PushContext("Task", task.Id))
             {
-                PulseIfRequired(task, taskWasPreviouslyQueued);
-
                 Log.Trace("Executing task");
-                return TryExecuteTask(task);
+
+                try
+                {
+                    return TryExecuteTask(task);
+                }
+                finally
+                {
+                    PulseIfRequired(task, taskWasPreviouslyQueued);
+                }
             }
         }
 
