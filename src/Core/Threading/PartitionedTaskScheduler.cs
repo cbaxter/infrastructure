@@ -235,11 +235,7 @@ namespace Spark.Infrastructure.Threading
                         break;
                     }
 
-                    using (Log.PushContext("Task", task.Id))
-                    {
-                        Log.Trace("Executing task");
-                        TryExecuteTask(task);
-                    }
+                    ExecuteTask(task);
 
                     Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
                 }
