@@ -57,7 +57,7 @@ namespace Spark.Infrastructure.Logging
                 var level = default(SourceLevels);
                 var name = GetPropertyValue(element, "name");
                 var value = GetPropertyValue(element, "value");
-                
+
                 if (String.IsNullOrWhiteSpace(name))
                     continue;
 
@@ -70,6 +70,11 @@ namespace Spark.Infrastructure.Logging
             return new ReadOnlyDictionary<String, SourceLevels>(configuredSwitches);
         }
 
+        /// <summary>
+        /// Gets a <see cref="ConfigurationElement"/> property value.
+        /// </summary>
+        /// <param name="element">The <see cref="ConfigurationElement"/> on which the desired property is defined.</param>
+        /// <param name="name">The <see cref="String"/> name of the property to access on <paramref name="element"/>.</param>
         private static String GetPropertyValue(ConfigurationElement element, String name)
         {
             var property = element.ElementInformation.Properties[name];

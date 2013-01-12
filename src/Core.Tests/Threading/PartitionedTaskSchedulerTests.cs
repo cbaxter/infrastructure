@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Threading;
+﻿using Spark.Infrastructure.Threading;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -23,128 +21,238 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests.Threading
 {
-    public class PartitionedTaskSchedulerTests
+    public static class UsingPartitionedTaskScheduler
     {
-        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-
-        [Fact]
-        public void Test()
+        public class WhenInitializing
         {
-            var scheduler = new PartitionedTaskScheduler(t => t.Id.GetHashCode(), 10, 50);
-            var tasks = new Task[1000];
-
-            for (var i = 0; i < tasks.Length; i++)
+            [Fact]
+            public void SetMaximumConcurrencyLevelToNumberOfWorkerThreads()
             {
-                tasks[i] = Task.Factory.StartNew(() =>
+                Int32 workerThreads, completionPortThreads;
+                ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+
+                Assert.Equal(workerThreads, new PartitionedTaskScheduler().MaximumConcurrencyLevel);
+            }
+
+            [Fact]
+            public void DefaultMaximumQueuedTasksToNumberOfWorkerThreads()
+            {
+                Int32 workerThreads, completionPortThreads;
+                ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+
+                Assert.Equal(workerThreads, new PartitionedTaskScheduler().BoundedCapacity);
+            }
+        }
+
+        public class WhenQueuingTask
+        {
+            [Fact]
+            public void QueueImmediatelyIfBelowBoundedCapacity()
+            {
+                var taskScheduler = new PartitionedTaskScheduler(_ => 0, 1);
+                var task = Task.Factory.StartNew(() =>
                     {
-                        var inline = new Task(() =>
-                            {
-                                Console.WriteLine("Synchronous..." + Thread.CurrentThread.ManagedThreadId); Thread.Sleep(1);
-                            });
+                        Task.Factory.StartNew(() => { }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                    });
 
-                        inline.RunSynchronously();
-                        Console.WriteLine(Thread.CurrentThread.ManagedThreadId); Thread.Sleep(1);
-                    }, CancellationToken.None, TaskCreationOptions.None, scheduler).ContinueWith(t => { Console.WriteLine("Continued..." + Thread.CurrentThread.ManagedThreadId); Thread.Sleep(1); }, TaskContinuationOptions.None);
+                Assert.True(task.Wait(TimeSpan.FromMilliseconds(100)));
+                Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
             }
 
-            Task.WaitAll(tasks);
-
-            new Task(() => { Console.WriteLine(Thread.CurrentThread.ManagedThreadId); Thread.Sleep(1); }).RunSynchronously(scheduler);
-        }
-
-
-        [Fact]
-        public void TestExampleWithRunSynchronously()//Bad
-        {
-            var scheduler = new PartitionedTaskScheduler(t => t.Id.GetHashCode(), 10, 50);
-            var tasks = new Task[1000];
-
-            for (var i = 0; i < tasks.Length; i++)
+            [Fact]
+            public void BlockQueueUntilBelowBoundedCapacity()
             {
-                tasks[i] = Task.Factory.StartNew(() => new Task(() => Thread.Sleep(1)).RunSynchronously(), CancellationToken.None, TaskCreationOptions.None, scheduler);
-            }
+                var monitor = new FakeMonitor();
+                var threadPool = new FakeThreadPool();
+                var blocked = new ManualResetEvent(false);
+                var released = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler(_ => 0, 1, 1, threadPool, monitor);
 
-            Task.WaitAll(tasks);
-        }
+                monitor.BeforeWait = () => blocked.Set();
+                monitor.AfterPulse = () => released.Set();
 
-        [Fact]
-        public void TestExampleWithWait()//Bad
-        {
-            var scheduler = new PartitionedTaskScheduler(t => t.Id.GetHashCode(), 100, 500);
-            var tasks = new Task[1000];
-
-            for (var i = 0; i < tasks.Length; i++)
-            {
-                tasks[i] = Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
-                    var task = new Task(() => Thread.Sleep(1));
-                    task.Start();
-                    Thread.Sleep(1);
-                    task.Wait();
-                }, CancellationToken.None, TaskCreationOptions.None, scheduler);
-            }
+                    // Schedule first task (non-blocking).
+                    Task.Factory.StartNew(() => { }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
 
-            Task.WaitAll(tasks);
-        }
-
-        [Fact]
-        public void TestExampleWithParentWait() //Good
-        {
-            var scheduler = new PartitionedTaskScheduler(t => t.Id.GetHashCode(), 10, 50);
-            var task = Task.Factory.StartNew(() =>
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        var x = i;
-                        Task.Factory.StartNew(() => { Console.WriteLine(x); Thread.Sleep(1); }, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, scheduler);
-                    }
+                    // Schedule second task (blocking).
+                    Task.Factory.StartNew(() => { }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
                 });
 
+                // Wait for second task to be blocked.
+                Assert.True(blocked.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.Equal(1, threadPool.UserWorkItems.Count);
 
+                threadPool.RunNext();
 
-            Object value = new Func<String>(() => "");
+                // Wait for second task to be released.
+                Assert.True(released.WaitOne(TimeSpan.FromMilliseconds(100)));
 
-            value = UnwrapIfRequired(value);
+                threadPool.RunNext();
 
-            task.Wait();
-        }
-
-        [Fact]
-        public void Benchmark()
-        {
-            Verify.GreaterThan(1, 1, "test");
-
-            var start = DateTime.Now;
-            var x = new List<String>();
-            var data = new object[] {1, 2};
-            var name = "Task";
-
-            for (var i = 0; i < 100000; i++)
-            {
-                // NONE             -> 00:00:00.0010001
-                // NULL SINGLETON   -> 00:00:00.0030001
-                // NULL INSTANCE    -> 00:00:00.0050003
-                // ACTIVITY ID      -> 00:00:00.0420024
-                // LOGICAL OPS      -> 00:00:00.0840048
-                // FULL             -> 00:00:00.2820161
-
-                using (Log.PushContext("Task", i, i))
-                {
-                    Log.Trace("Queuing user work item on thread-pool.");
-                }
+                Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
             }
 
-            var elapsed = DateTime.Now.Subtract(start);
+            [Fact]
+            public void RunOnDedicatedThreadIfLongRunning()
+            {
+                var isThreadPool = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler();
 
-            Console.WriteLine(elapsed);
+                Task.Factory.StartNew(() => { isThreadPool = Thread.CurrentThread.IsThreadPoolThread; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.False(isThreadPool);
+            }
+
+            [Fact]
+            public void RunOnBackgroundThreadIfLongRunning()
+            {
+                var isBackground = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler();
+
+                Task.Factory.StartNew(() => { isBackground = Thread.CurrentThread.IsBackground; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.True(isBackground);
+            }
+
+            [Fact]
+            public void RunOnThreadPoolThreadIfNotLongRunning()
+            {
+                var isThreadPool = false;
+                var taskComplete = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler();
+
+                Task.Factory.StartNew(() => { isThreadPool = Thread.CurrentThread.IsThreadPoolThread; taskComplete.Set(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+
+                Assert.True(taskComplete.WaitOne(TimeSpan.FromMilliseconds(100)));
+                Assert.True(isThreadPool);
+            }
+
+            [Fact]
+            public void RunOnSameThreadIfAdditionalTaskQueuedOnSamePartition()
+            {
+                var threadIds = new List<Int32>();
+                var tasksQueued = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler();
+
+                var task1 = Task.Factory.StartNew(() => { threadIds.Add(Thread.CurrentThread.ManagedThreadId); tasksQueued.WaitOne(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                var task2 = Task.Factory.StartNew(() => threadIds.Add(Thread.CurrentThread.ManagedThreadId), CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+
+                tasksQueued.Set();
+
+                Task.WaitAll(task1, task2);
+                Assert.Equal(1, threadIds.Distinct().Count());
+            }
+
+            [Fact]
+            public void RunAllTasksOnSamePartitionInOrder()
+            {
+                var tasks = new Task[200];
+                var taskGroup1Order = new List<Int32>();
+                var taskGroup2Order = new List<Int32>();
+                var tasksQueued = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, tasks.Length);
+
+                for (var i = 0; i < 200; i++)
+                {
+                    var taskGroupOrder = i % 2 == 0 ? taskGroup1Order : taskGroup2Order;
+                    var taskId = i;
+
+                    tasks[taskId] = Task.Factory.StartNew(state =>
+                        {
+                            taskGroupOrder.Add(taskId);
+                            tasksQueued.WaitOne();
+                            Thread.Sleep(1);
+                        }, taskId, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+                }
+
+                tasksQueued.Set();
+
+                Task.WaitAll(tasks);
+                Assert.Equal(tasks.Length / 2, taskGroup1Order.Where((ordinal, index) => ordinal == (index * 2)).Count());
+                Assert.Equal(tasks.Length / 2, taskGroup2Order.Where((ordinal, index) => ordinal == (index * 2) + 1).Count());
+            }
+
+            [Fact]
+            public void RunTasksOnDifferentPartitionsInParallel()
+            {
+                var tasks = new Task[200];
+                var taskOrder = new List<Int32>();
+                var tasksQueued = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, tasks.Length);
+
+                for (var i = 0; i < 200; i++)
+                {
+                    var taskId = i;
+
+                    tasks[taskId] = Task.Factory.StartNew(state =>
+                        {
+                            taskOrder.Add(taskId);
+                            tasksQueued.WaitOne();
+                            Thread.Sleep(taskId % 3);
+                        }, taskId, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+                }
+
+                tasksQueued.Set();
+
+                Task.WaitAll(tasks);
+                Assert.NotEqual(tasks.Length, taskOrder.Where((ordinal, index) => ordinal == index).Count());
+            }
+
+            [Fact]
+            public void WillDeadlockIfForceSynchronousExecutionsAcrossPartitions()
+            {
+                var tasksQueued = new ManualResetEvent(false);
+                var task1 = new Task(_ => { }, 1, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
+                var task2 = new Task(_ => { }, 2, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
+                var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, 4);
+
+                var task3 = Task.Factory.StartNew(_ => { tasksQueued.WaitOne(); task1.RunSynchronously(); }, 2, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
+                var task4 = Task.Factory.StartNew(_ => { tasksQueued.WaitOne(); task2.RunSynchronously(); }, 1, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
+
+                tasksQueued.Set();
+
+                Assert.False(Task.WaitAll(new[] { task1, task2, task3, task4 }, 100));
+            }
         }
 
-
-        private Object UnwrapIfRequired<T>(T value)
+        public class WhenRunningTaskSynchronously
         {
-            var wrappedValue = value as Func<Object>;
+            [Fact]
+            public void AllowsInlineExecutionAfterBeingQueued()
+            {
+                var executions = 0;
+                var taskScheduler = new PartitionedTaskScheduler();
+                var task = new Task(() => { executions++; }, CancellationToken.None, TaskCreationOptions.AttachedToParent);
 
-            return wrappedValue == null ? value : wrappedValue();
+                task.RunSynchronously(taskScheduler);
+
+                Assert.Equal(1, executions);
+                Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
+            }
+
+            [Fact]
+            public void WaitForPreceedingTasksIfRequired()
+            {
+                var executionOrder = new List<Int32>();
+                var tasksQueued = new ManualResetEvent(false);
+                var taskScheduler = new PartitionedTaskScheduler();
+
+                Task.Factory.StartNew(() => { executionOrder.Add(0); tasksQueued.WaitOne(); Thread.Sleep(25); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                Task.Factory.StartNew(() => executionOrder.Add(1), CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+
+                var synchronousTask = new Task(() => executionOrder.Add(2), CancellationToken.None, TaskCreationOptions.AttachedToParent);
+
+                tasksQueued.Set();
+                synchronousTask.RunSynchronously(taskScheduler);
+
+                Assert.Equal(3, executionOrder.Where((value, index) => value == index).Count());
+            }
         }
     }
 }

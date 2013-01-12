@@ -1,6 +1,5 @@
 ﻿using Spark.Infrastructure.Logging;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,22 +45,30 @@ namespace Spark.Infrastructure.Threading
     /// </remarks>
     public sealed class PartitionedTaskScheduler : TaskScheduler
     {
-        public const Int32 ConcurrencyLevelMultiplier = 3;
-        public static readonly Int32 DefaultMaximumQueuedTasks;
-        public static readonly Int32 DefaultMaximumConcurrencyLevel;
-
+        private static readonly Int32 MaximumWorkerThreads;
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly ConcurrentDictionary<Int32, Partition> partitions = new ConcurrentDictionary<Int32, Partition>();
-        private readonly Object syncLock = new Object();
+        private readonly Dictionary<Int32, Partition> partitions = new Dictionary<Int32, Partition>();
+        private readonly ISynchronizeAccess monitor;
+        private readonly IQueueUserWorkItems threadPool;
         private readonly Func<Task, Int32> partitionHash;
         private readonly Int32 maximumConcurrencyLevel;
-        private readonly Int32 maximumQueuedTasks;
+        private readonly Int32 boundedCapacity;
         private Int32 queuedTasks;
+
+        /// <summary>
+        /// Gets the bounded capacity of this <see cref="BlockingThreadPoolTaskScheduler"/> instance.
+        /// </summary>
+        public Int32 BoundedCapacity { get { return boundedCapacity; } }
 
         /// <summary>
         /// Indicates the maximum concurrency level this <see cref="TaskScheduler"/> is able to support.
         /// </summary>
-        public override int MaximumConcurrencyLevel { get { return maximumConcurrencyLevel; } }
+        public override Int32 MaximumConcurrencyLevel { get { return maximumConcurrencyLevel; } }
+
+        /// <summary>
+        /// For debugger support only, generates an enumerable of <see cref="Task"/> instances currently queued to the scheduler waiting to be executed.
+        /// </summary>
+        internal IEnumerable<Task> ScheduledTasks { get { return GetScheduledTasks(); } }
 
         /// <summary>
         /// Initializes all static read-only members of <see cref="PartitionedTaskScheduler"/>.
@@ -72,46 +79,71 @@ namespace Spark.Infrastructure.Threading
             Int32 workerThreads, completionPortThreads;
             ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
 
-            DefaultMaximumConcurrencyLevel = workerThreads;
-            DefaultMaximumQueuedTasks = DefaultMaximumConcurrencyLevel * ConcurrencyLevelMultiplier;
-            Log.InfoFormat("DefaultMaximumConcurrencyLevel={0}, DefaultMaximumQueuedTasks={1}", DefaultMaximumConcurrencyLevel, DefaultMaximumQueuedTasks);
+            MaximumWorkerThreads = workerThreads;
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with a maximum concurrency level of <see cref="DefaultMaximumConcurrencyLevel"/> 
-        /// and <see cref="DefaultMaximumQueuedTasks"/> maximum queued tasks.
+        /// Initializes a deafult instance of <see cref="PartitionedTaskScheduler"/> with <see cref="BoundedCapacity"/> and <see cref="MaximumConcurrencyLevel"/> based on the maximum 
+        /// number of thread thread pool worker threads.
         /// </summary>
-        /// <param name="hash">The <see cref="Task"/> hash function used to determine the executor partition.</param>
-        public PartitionedTaskScheduler(Func<Task, Int32> hash)
-            : this(hash, DefaultMaximumConcurrencyLevel, DefaultMaximumQueuedTasks)
+        public PartitionedTaskScheduler()
+            : this(_ => 0)
         { }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with a maximum concurrency level of <see cref="maximumConcurrencyLevel"/> 
-        /// and <value><paramref name="maximumConcurrencyLevel"/> * <see cref="ConcurrencyLevelMultiplier"/></value> maximum queued tasks.
+        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with <see cref="BoundedCapacity"/> and <see cref="MaximumConcurrencyLevel"/> based on the maximum 
+        /// number of thread thread pool worker threads.
         /// </summary>
         /// <param name="hash">The <see cref="Task"/> hash function used to determine the executor partition.</param>
-        /// <param name="maximumConcurrencyLevel">The maximum number of concurrently executing tasks.</param>
-        public PartitionedTaskScheduler(Func<Task, Int32> hash, Int32 maximumConcurrencyLevel)
-            : this(hash, maximumConcurrencyLevel, maximumConcurrencyLevel * ConcurrencyLevelMultiplier)
+        public PartitionedTaskScheduler(Func<Task, Object> hash)
+            : this(hash, MaximumWorkerThreads)
         { }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with a maximum concurrency level of <paramref name="maximumConcurrencyLevel"/> 
-        /// and <paramref name="maximumQueuedTasks"/> maximum queued tasks.
+        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with the specified maximum concurrency level of <see cref="maximumConcurrencyLevel"/> 
+        /// and <see cref="BoundedCapacity"/> based on the maximum number of thread thread pool worker threads.
         /// </summary>
         /// <param name="hash">The <see cref="Task"/> hash function used to determine the executor partition.</param>
         /// <param name="maximumConcurrencyLevel">The maximum number of concurrently executing tasks.</param>
-        /// <param name="maximumQueuedTasks">The maximum number of queued and/or executing tasks.</param>
-        public PartitionedTaskScheduler(Func<Task, Int32> hash, Int32 maximumConcurrencyLevel, Int32 maximumQueuedTasks)
+        public PartitionedTaskScheduler(Func<Task, Object> hash, Int32 maximumConcurrencyLevel)
+            : this(hash, maximumConcurrencyLevel, maximumConcurrencyLevel)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with the specified maximum concurrency level of <see cref="maximumConcurrencyLevel"/> 
+        /// and a bounded capacity of <see cref="boundedCapacity"/>.
+        /// </summary>
+        /// <param name="hash">The <see cref="Task"/> hash function used to determine the executor partition.</param>
+        /// <param name="maximumConcurrencyLevel">The maximum number of concurrently executing tasks.</param>
+        /// <param name="boundedCapacity">The bounded size of the task queue.</param>
+        public PartitionedTaskScheduler(Func<Task, Object> hash, Int32 maximumConcurrencyLevel, Int32 boundedCapacity)
+            : this(hash, maximumConcurrencyLevel, boundedCapacity, ThreadPoolWrapper.Instance, MonitorWrapper.Instance)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="PartitionedTaskScheduler"/> with the specified maximum concurrency level of <see cref="maximumConcurrencyLevel"/> 
+        /// and a bounded capacity of <see cref="boundedCapacity"/>.
+        /// </summary>
+        /// <param name="hash">The <see cref="Task"/> hash function used to determine the executor partition.</param>
+        /// <param name="maximumConcurrencyLevel">The maximum number of concurrently executing tasks.</param>
+        /// <param name="boundedCapacity">The bounded size of the task queue.</param>
+        /// <param name="threadPool">The thread pool implementation on which to schedule tasks.</param>
+        /// <param name="monitor">The monitor implementation used to synchronize object access.</param>
+        internal PartitionedTaskScheduler(Func<Task, Object> hash, Int32 maximumConcurrencyLevel, Int32 boundedCapacity, IQueueUserWorkItems threadPool, ISynchronizeAccess monitor)
         {
             Verify.NotNull(hash, "hash");
-            Verify.GreaterThan(0, maximumQueuedTasks, "maximumConcurrencyLevel");
+            Verify.NotNull(monitor, "monitor");
+            Verify.NotNull(threadPool, "threadPool");
+            Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
             Verify.GreaterThan(0, maximumConcurrencyLevel, "maximumConcurrencyLevel");
 
-            this.maximumQueuedTasks = maximumQueuedTasks;
+            Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, maximumConcurrencyLevel);
+
+            this.monitor = monitor;
+            this.threadPool = threadPool;
+            this.boundedCapacity = boundedCapacity;
             this.maximumConcurrencyLevel = maximumConcurrencyLevel;
-            this.partitionHash = task => Math.Abs(hash(task)) % maximumConcurrencyLevel;
+            this.partitionHash = task => Math.Abs((hash(task) ?? 0).GetHashCode()) % maximumConcurrencyLevel;
         }
 
         /// <summary>
@@ -120,27 +152,30 @@ namespace Spark.Infrastructure.Threading
         /// <param name="task">The <see cref="Task"/> to be queued.</param>
         protected override void QueueTask(Task task)
         {
-            var partition = GetOrCreatePartition(task);
-
-            WaitIfRequired();
             using (Log.PushContext("Task", task.Id))
             {
+                WaitIfRequired();
+
+                var partition = GetOrCreatePartition(task);
                 if (partition.Enqueue(task) != 1)
+                {
+                    Log.Trace("Task executor already scheduled");
                     return;
+                }
 
                 if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
                 {
                     var longRunningThread = new Thread(state => ExecutePartitionedTasks((Partition)state)) { IsBackground = true };
 
-                    Log.Trace("Queuing new user work item on long running thread");
+                    Log.Trace("Scheduling task executor on long running thread");
 
                     longRunningThread.Start(partition);
                 }
                 else
                 {
-                    Log.Trace("Queuing new user work item on thread-pool");
+                    Log.Trace("Scheduling task executor on thread pool");
 
-                    ThreadPool.UnsafeQueueUserWorkItem(state => ExecutePartitionedTasks((Partition)state), partition);
+                    threadPool.UnsafeQueueUserWorkItem(ExecutePartitionedTasks, partition);
                 }
             }
         }
@@ -152,9 +187,29 @@ namespace Spark.Infrastructure.Threading
         private Partition GetOrCreatePartition(Task task)
         {
             var partitionId = partitionHash(task);
-            var partition = partitions.GetOrAdd(partitionId, id => new Partition(partitionId));
+            var partition = default(Partition);
 
-            Log.DebugFormat("Task {0} mapped to partition {1}", task.Id, partition.Id);
+            Log.TraceFormat("Getting partition {0}", partitionId);
+
+            if (!partitions.TryGetValue(partitionId, out partition))
+            {
+                Log.Trace("Acquiring lock: partitions");
+                lock (partitions)
+                {
+                    Log.Trace("Lock acquired: partitions");
+
+                    if (!partitions.TryGetValue(partitionId, out partition))
+                    {
+                        Log.TraceFormat("Creating partition {0}", partitionId);
+
+                        partitions.Add(partitionId, partition = new Partition(partitionId));
+                    }
+
+                    Log.Trace("Releasing lock: partitions");
+                }
+            }
+
+            Log.DebugFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
 
             return partition;
         }
@@ -167,15 +222,26 @@ namespace Spark.Infrastructure.Threading
         {
             while (true)
             {
+                Log.TraceFormat("Acquiring lock: partition {0}", partition.Id);
                 lock (partition)
                 {
                     Task task;
 
+                    Log.TraceFormat("Lock acquired: partition {0}", partition.Id);
+
                     if (!partition.TryDequeue(out task))
+                    {
+                        Log.Trace("All queued tasks executed");
                         break;
+                    }
 
                     using (Log.PushContext("Task", task.Id))
+                    {
+                        Log.Trace("Executing task");
                         TryExecuteTask(task);
+                    }
+
+                    Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
                 }
 
                 Pulse(1);
@@ -183,17 +249,25 @@ namespace Spark.Infrastructure.Threading
         }
 
         /// <summary>
-        /// If the set of currently queued tasks exceeds <value>maximumQueuedTasks</value> wait for a slot to be freed before proceeding; otherwise exit immediately.
+        /// If the set of currently queued tasks exceeds <see cref="boundedCapacity"/> wait for a slot to be freed before proceeding; otherwise exit immediately.
         /// </summary>
         private void WaitIfRequired()
         {
-            lock (syncLock)
+            Log.Trace("Acquiring lock: partitions");
+            lock (partitions)
             {
-                if (++queuedTasks > maximumQueuedTasks)
+                Log.Trace("Lock acquired: partitions");
+
+                while (queuedTasks >= boundedCapacity)
                 {
-                    Log.Trace("*** WAIT ***");
-                    Monitor.Wait(syncLock);
+                    Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
+                    monitor.Wait(partitions);
                 }
+
+                Log.Trace("Adding task to queue");
+                queuedTasks++;
+
+                Log.Trace("Releasing lock: partitions");
             }
         }
 
@@ -203,16 +277,21 @@ namespace Spark.Infrastructure.Threading
         /// <param name="count">The number of threads to notify.</param>
         private void Pulse(Int32 count)
         {
-            lock (syncLock)
+            Log.Trace("Acquiring lock: partitions");
+            lock (partitions)
             {
-                Log.TraceFormat("*** PULSE {0} ***", count);
+                Log.Trace("Lock acquired: partitions");
 
                 for (var i = 0; i < count; i++)
                 {
                     queuedTasks--;
 
-                    Monitor.Pulse(syncLock);
+                    Log.Trace("Pulsing");
+
+                    monitor.Pulse(partitions);
                 }
+
+                Log.Trace("Releasing lock: partitions");
             }
         }
 
@@ -225,28 +304,45 @@ namespace Spark.Infrastructure.Threading
         {
             var taskExecuted = false;
             var queuedTasksExecuted = 0;
+
             var partition = GetOrCreatePartition(task);
 
-            using (Log.PushContext("Task", task.Id))
+            Log.TraceFormat("Acquiring lock: partition {0}", partition.Id);
+            lock (partition)
             {
-                lock (partition)
-                {
-                    Task queuedTask;
-                    while (partition.TryDequeue(out queuedTask) && !taskExecuted)
-                    {
-                        queuedTasksExecuted++;
-                        TryExecuteTask(queuedTask);
-                        taskExecuted = queuedTask.Id == task.Id;
-                    }
+                Log.TraceFormat("Lock acquired: partition {0}", partition.Id);
 
-                    if (!taskExecuted)
-                        TryExecuteTask(task);
+                Task queuedTask;
+                while (partition.TryDequeue(out queuedTask) && !taskExecuted)
+                {
+                    ExecuteTask(queuedTask);
+                    taskExecuted = queuedTask.Id == task.Id;
+                    queuedTasksExecuted++;
                 }
+
+                if (!taskExecuted)
+                    taskExecuted = ExecuteTask(task);
+
+                Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
             }
 
             Pulse(queuedTasksExecuted);
 
-            return true;
+            return taskExecuted;
+        }
+
+        /// <summary>
+        /// Attempts to execute the provided <see cref="Task"/> on this scheduler.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be executed.</param>
+        private Boolean ExecuteTask(Task task)
+        {
+            using (Log.PushContext("Task", task.Id))
+            {
+                Log.Trace("Executing task");
+
+                return TryExecuteTask(task);
+            }
         }
 
         /// <summary>
@@ -254,7 +350,19 @@ namespace Spark.Infrastructure.Threading
         /// </summary>
         protected override IEnumerable<Task> GetScheduledTasks()
         {
-            return partitions.ToArray().SelectMany(kvp => kvp.Value.Tasks);
+            Task[] result;
+
+            Log.Trace("Acquiring lock: partitions");
+            lock (partitions)
+            {
+                Log.Trace("Lock acquired: partitions");
+
+                result = partitions.ToArray().SelectMany(kvp => kvp.Value.Tasks).ToArray();
+
+                Log.Trace("Releasing lock: partitions");
+            }
+
+            return result;
         }
 
         /// <summary>

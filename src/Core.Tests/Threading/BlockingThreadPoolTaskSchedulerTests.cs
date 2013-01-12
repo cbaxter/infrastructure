@@ -152,7 +152,7 @@ namespace Spark.Infrastructure.Tests.Threading
         public class WhenRunningTaskSynchronously
         {
             [Fact]
-            public void AllowsInlineExecutionAfterBeingQueued2()
+            public void AllowsInlineExecutionAfterBeingQueued()
             {
                 var executions = 0;
                 var taskScheduler = new BlockingThreadPoolTaskScheduler();
