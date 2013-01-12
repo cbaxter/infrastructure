@@ -33,7 +33,7 @@ namespace Spark.Infrastructure.Threading
     ///     new PartitionedTaskScheduler(task => task.Id.GetHashCode());
     /// 
     ///     // Better Hash Function
-    ///     new PartitionedTaskScheduler(task => ((MyIdentifiableObject)task.AsyncState).Id.GetHashCode());
+    ///     new PartitionedTaskScheduler(task => ((MyIdentifiableObject)task.AsyncState).Id);
     /// </code>
     /// </example>
     /// <remarks>
