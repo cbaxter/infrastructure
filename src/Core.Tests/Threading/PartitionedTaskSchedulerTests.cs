@@ -208,12 +208,26 @@ namespace Spark.Infrastructure.Tests.Threading
             public void WillDeadlockIfForceSynchronousExecutionsAcrossPartitions()
             {
                 var tasksQueued = new ManualResetEvent(false);
+                var partition1Active = new ManualResetEvent(false);
+                var partition2Active = new ManualResetEvent(false);
                 var task1 = new Task(_ => { }, 1, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
                 var task2 = new Task(_ => { }, 2, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
                 var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, 4);
 
-                var task3 = Task.Factory.StartNew(_ => { tasksQueued.WaitOne(); task1.RunSynchronously(); }, 2, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
-                var task4 = Task.Factory.StartNew(_ => { tasksQueued.WaitOne(); task2.RunSynchronously(); }, 1, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
+                var task3 = Task.Factory.StartNew(_ =>
+                    {
+                        tasksQueued.WaitOne(); 
+                        partition1Active.Set();
+                        partition2Active.WaitOne();
+                        task1.RunSynchronously();
+                    }, 2, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
+                var task4 = Task.Factory.StartNew(_ =>
+                    {
+                        tasksQueued.WaitOne();
+                        partition2Active.Set();
+                        partition1Active.WaitOne(); 
+                        task2.RunSynchronously();
+                    }, 1, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
 
                 tasksQueued.Set();
 
