@@ -111,7 +111,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Fatal(Exception ex)
@@ -121,7 +121,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Fatal(String message)
@@ -131,7 +131,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -142,7 +142,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -154,7 +154,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -167,7 +167,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -178,7 +178,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Fatal(Func<String> messageBuilder)
@@ -188,7 +188,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Fatal(Func<FormatMessageHandler, String> messageBuilder)
@@ -198,7 +198,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Error(Exception ex)
@@ -208,7 +208,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Error(String message)
@@ -218,7 +218,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -229,7 +229,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -241,7 +241,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -254,7 +254,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -265,7 +265,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Error(Func<String> messageBuilder)
@@ -275,7 +275,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Error(Func<FormatMessageHandler, String> messageBuilder)
@@ -285,7 +285,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Warn(Exception ex)
@@ -295,7 +295,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Warn(String message)
@@ -305,7 +305,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -316,7 +316,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -328,7 +328,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -341,7 +341,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -352,7 +352,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Warn(Func<String> messageBuilder)
@@ -362,7 +362,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Warn(Func<FormatMessageHandler, String> messageBuilder)
@@ -372,7 +372,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Info(Exception ex)
@@ -382,7 +382,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Info(String message)
@@ -392,7 +392,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -403,7 +403,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -415,7 +415,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -428,7 +428,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -439,7 +439,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Info(Func<String> messageBuilder)
@@ -449,7 +449,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Info(Func<FormatMessageHandler, String> messageBuilder)
@@ -459,7 +459,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Debug(Exception ex)
@@ -469,7 +469,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Debug(String message)
@@ -479,7 +479,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -490,7 +490,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -502,7 +502,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -515,7 +515,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -526,7 +526,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Debug(Func<String> messageBuilder)
@@ -536,7 +536,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Debug(Func<FormatMessageHandler, String> messageBuilder)
@@ -546,7 +546,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         public void Trace(Exception ex)
@@ -556,7 +556,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         public void Trace(String message)
@@ -566,7 +566,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
@@ -577,7 +577,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -589,7 +589,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -602,7 +602,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
@@ -613,7 +613,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Trace(Func<String> messageBuilder)
@@ -623,7 +623,7 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         public void Trace(Func<FormatMessageHandler, String> messageBuilder)

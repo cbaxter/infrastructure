@@ -74,7 +74,7 @@ namespace Spark.Infrastructure.Threading
         { }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <paramref name="boundedCapacity"/> as the bounded capacity with an overriden thread pool and monitor class.
+        /// Initializes a new instance of <see cref="BlockingThreadPoolTaskScheduler"/> using <paramref name="boundedCapacity"/> as the bounded capacity with an overridden thread pool and monitor class.
         /// </summary>
         /// <param name="boundedCapacity">The bounded size of the task queue.</param>
         /// <param name="threadPool">The thread pool implementation on which to schedule tasks.</param>

@@ -56,26 +56,26 @@ namespace Spark.Infrastructure.Logging
         Boolean IsTraceEnabled { get; }
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Fatal(Exception ex);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Fatal(String message);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void FatalFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -83,7 +83,7 @@ namespace Spark.Infrastructure.Logging
         void FatalFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -92,45 +92,45 @@ namespace Spark.Infrastructure.Logging
         void FatalFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void FatalFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Fatal(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>FATAL</value> diagostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Fatal(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Error(Exception ex);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Error(String message);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void ErrorFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -138,7 +138,7 @@ namespace Spark.Infrastructure.Logging
         void ErrorFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -147,45 +147,45 @@ namespace Spark.Infrastructure.Logging
         void ErrorFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void ErrorFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Error(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes an <value>ERROR</value> diagostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Error(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Warn(Exception ex);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Warn(String message);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void WarnFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -193,7 +193,7 @@ namespace Spark.Infrastructure.Logging
         void WarnFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -202,45 +202,45 @@ namespace Spark.Infrastructure.Logging
         void WarnFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void WarnFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Warn(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>WARN</value> diagostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Warn(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Info(Exception ex);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Info(String message);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void InfoFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -248,7 +248,7 @@ namespace Spark.Infrastructure.Logging
         void InfoFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -257,45 +257,45 @@ namespace Spark.Infrastructure.Logging
         void InfoFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void InfoFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Info(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes an <value>INFO</value> diagostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Info(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Debug(Exception ex);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Debug(String message);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void DebugFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -303,7 +303,7 @@ namespace Spark.Infrastructure.Logging
         void DebugFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -312,45 +312,45 @@ namespace Spark.Infrastructure.Logging
         void DebugFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void DebugFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Debug(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>DEBUG</value> diagostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Debug(Func<FormatMessageHandler, String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
         void Trace(Exception ex);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="message">The message to log.</param>
         void Trace(String message);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
         void TraceFormat(String format, Object arg);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -358,7 +358,7 @@ namespace Spark.Infrastructure.Logging
         void TraceFormat(String format, Object arg0, Object arg1);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
@@ -367,20 +367,20 @@ namespace Spark.Infrastructure.Logging
         void TraceFormat(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
         void TraceFormat(String format, params Object[] args);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Trace(Func<String> messageBuilder);
 
         /// <summary>
-        /// Writes a <value>TRACE</value> diagostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
+        /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="messageBuilder">A <see cref="Func{String}"/> message builder.</param>
         void Trace(Func<FormatMessageHandler, String> messageBuilder);

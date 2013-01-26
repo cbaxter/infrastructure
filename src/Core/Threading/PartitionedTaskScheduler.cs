@@ -24,7 +24,7 @@ namespace Spark.Infrastructure.Threading
     /// An ordered limited-concurrency task scheduler that ensures a given task partition is only active on a single 
     /// thread at a given time. This task scheduler is intended to maximize concurrent processing while ensuring that a
     /// given object (if hashed properly) is only processed by a single thread at a time. This task scheduler will also
-    /// limit the maximium number of queued tasks if desired to ensure the thread pool is left available for other work.
+    /// limit the maximum number of queued tasks if desired to ensure the thread pool is left available for other work.
     /// </summary>
     /// <example>
     /// Sample Hash Functions:
@@ -381,7 +381,7 @@ namespace Spark.Infrastructure.Threading
             public IEnumerable<Task> Tasks { get { lock (tasks) { return tasks.AsReadOnly(); } } }
 
             /// <summary>
-            /// Intializes a new insance of <see cref="Partition"/> identified by <paramref name="id"/>.
+            /// Initializes a new instance of <see cref="Partition"/> identified by <paramref name="id"/>.
             /// </summary>
             /// <param name="id">The unique identifier for this <see cref="Partition"/> instance.</param>
             public Partition(Int32 id)

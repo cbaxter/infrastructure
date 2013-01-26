@@ -52,7 +52,7 @@ namespace Spark.Infrastructure.Threading
         }
 
         /// <summary>
-        /// Determines whether the provided System.Threading.Tasks.Task can be executed synchronously in this call, and if it can, executes it.
+        /// Determines whether the provided <see cref="Task"/> can be executed synchronously in this call, and if it can, executes it.
         /// </summary>
         /// <param name="task">The <see cref="Task"/> to be executed.</param>
         /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>

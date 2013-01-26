@@ -21,7 +21,7 @@ namespace Spark.Infrastructure.Logging
     public sealed class DisabledDiagnosticContext : IDisposable
     {
         /// <summary>
-        /// <see cref="DisabledDiagnosticContext" /> singleton  instance.
+        /// <see cref="DisabledDiagnosticContext" /> singleton instance.
         /// </summary>
         public static readonly IDisposable Instance = new DisabledDiagnosticContext();
 
