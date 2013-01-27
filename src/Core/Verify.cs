@@ -1,5 +1,5 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
+using JetBrains.Annotations;
 using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -23,9 +23,61 @@ namespace Spark.Infrastructure
     public static class Verify
     {
         /// <summary>
+        /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="condition"/> is <value>false</value>.
+        /// </summary>
+        /// <param name="condition">The <see cref="Boolean"/> condition to check.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        /// <param name="message">The exception message if <paramref name="condition"/> is <value>false</value>.</param>
+        public static void True(Boolean condition, [InvokerParameterName] String paramName, String message)
+        {
+            if (!condition)
+                throw new ArgumentException(message, paramName);
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="condition"/> is <value>true</value>.
+        /// </summary>
+        /// <param name="condition">The <see cref="Boolean"/> condition to check.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        /// <param name="message">The exception message if <paramref name="condition"/> is <value>true</value>.</param>
+        public static void False(Boolean condition, [InvokerParameterName] String paramName, String message)
+        {
+            if (condition)
+                throw new ArgumentException(message, paramName);
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is not equal to <paramref name="expected"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="expected"/> and <paramref name="actual"/>.</typeparam>
+        /// <param name="expected">The value that <paramref name="actual"/> must equal.</param>
+        /// <param name="actual">The value to check if not equal to <paramref name="expected"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void Equal<T>(T expected, T actual, [InvokerParameterName]String paramName)
+          where T : IComparable
+        {
+            if (!Equals(expected, actual))
+                throw new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(expected), paramName);
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is equal to <paramref name="notExpected"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="notExpected"/> and <paramref name="actual"/>.</typeparam>
+        /// <param name="notExpected">The value that <paramref name="actual"/> can not equal.</param>
+        /// <param name="actual">The value to check if equal to <paramref name="notExpected"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void NotEqual<T>(T notExpected, T actual, [InvokerParameterName]String paramName)
+          where T : IComparable
+        {
+            if (Equals(notExpected, actual))
+                throw new ArgumentException(Exceptions.ArgumentEqualToValue.FormatWith(notExpected), paramName);
+        }
+
+        /// <summary>
         /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is less than or equal to <paramref name="exclusiveLowerBound"/>.
         /// </summary>
-        /// <typeparam name="T">The type of <paramref name="actual"/> amd <paramref name="exclusiveLowerBound"/>.</typeparam>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="exclusiveLowerBound"/>.</typeparam>
         /// <param name="actual">The value to check if less than or equal to <paramref name="exclusiveLowerBound"/>.</param>
         /// <param name="exclusiveLowerBound">The exlusive lower bound for <paramref name="actual"/>.</param>
         /// <param name="paramName">The name of the parameter being checked.</param>
@@ -54,8 +106,8 @@ namespace Spark.Infrastructure
         /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if <paramref name="value"/> is <value>null</value> 
         /// or an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="value"/> is empty or whitespace only.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="paramName"></param>
+        /// <param name="value">The value to check if null, empty or white-space only.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
         [ContractAnnotation("value: null => halt")]
         public static void NotNullOrWhiteSpace(String value, [InvokerParameterName]String paramName)
         {

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CFF3E57D-1325-4E10-8E14-4898814487BE}</ProjectGuid>
+    <ProjectGuid>{D60406DD-C73C-4CA2-8B26-1583E1DD992F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure.Tests</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Core.Tests</AssemblyName>
+    <RootNamespace>Spark.Infrastructure.Serialization.Json</RootNamespace>
+    <AssemblyName>Spark.Infrastructure.Serialization.Json</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -38,18 +38,13 @@
     <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.XML" />
-    <Reference Include="xunit">
-      <HintPath>..\packages\xunit.2.0.0-alpha-build1611\lib\net45\xunit.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.extensions">
-      <HintPath>..\packages\xunit.extensions.2.0.0-alpha-build1611\lib\net45\xunit.extensions.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\.shared\ProductInfo.cs">
@@ -58,38 +53,16 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="EnumerableExtensionTests.cs" />
-    <Compile Include="EventStore\CommitTests.cs" />
-    <Compile Include="Logging\DebugDiagnosticContextTests.cs" />
-    <Compile Include="Logging\DefaultDiagnosticContextTests.cs" />
-    <Compile Include="Logging\DisabledDiagnosticContextTests.cs" />
-    <Compile Include="Logging\FakeTraceListener.cs" />
-    <Compile Include="Logging\LoggerTests.cs" />
-    <Compile Include="Logging\LogManagerTests.cs" />
-    <Compile Include="ObjectExtensionTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>
-      </SubType>
-    </Compile>
-    <Compile Include="StringExtensionTests.cs" />
-    <Compile Include="SystemTimeTests.cs" />
-    <Compile Include="Threading\BlockingThreadPoolTaskSchedulerTests.cs" />
-    <Compile Include="Threading\FakeMonitor.cs" />
-    <Compile Include="Threading\FakeThreadPool.cs" />
-    <Compile Include="Threading\PartitionedTaskSchedulerTests.cs" />
-    <Compile Include="Threading\SynchronousTaskSchedulerTests.cs" />
-    <Compile Include="Threading\MonitorWrapperTests.cs" />
-    <Compile Include="Threading\ThreadPoolWrapperTests.cs" />
-    <Compile Include="TypeExtensionTests.cs" />
-    <Compile Include="VerifyTests.cs" />
+    <Compile Include="HeaderCollectionConverter.cs" />
+    <Compile Include="EventCollectionConverter.cs" />
+    <Compile Include="JsonSerializer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.shared\Infrastructure.snk">
       <Link>Properties\Infrastructure.snk</Link>
     </None>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

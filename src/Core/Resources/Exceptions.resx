@@ -120,6 +120,12 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="ArgumentEqualToValue" xml:space="preserve">
+    <value>Value must not equal {0}.</value>
+  </data>
+  <data name="ArgumentNotEqualToValue" xml:space="preserve">
+    <value>Value must equal {0}.</value>
+  </data>
   <data name="ArgumentNotGreaterThanValue" xml:space="preserve">
     <value>Value must be greater than {0}.</value>
   </data>
@@ -128,5 +134,8 @@
   </data>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
+  </data>
+  <data name="TypeArgumentMustNotBeAnInterface" xml:space="preserve">
+    <value>Type cannot be an interface.</value>
   </data>
 </root>

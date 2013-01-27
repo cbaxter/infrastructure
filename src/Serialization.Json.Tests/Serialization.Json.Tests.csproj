@@ -4,13 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DFD230FA-76D5-4EF4-8035-80E848CF798B}</ProjectGuid>
+    <ProjectGuid>{2A7FB309-F412-44D0-9C80-087A40F6C287}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Core</AssemblyName>
+    <RootNamespace>Serialization.Json.Tests</RootNamespace>
+    <AssemblyName>Serialization.Json.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,14 +38,23 @@
     <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit">
+      <HintPath>..\packages\xunit.2.0.0-alpha-build1611\lib\net45\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>..\packages\xunit.extensions.2.0.0-alpha-build1611\lib\net45\xunit.extensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\.shared\ProductInfo.cs">
@@ -52,66 +63,29 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Annotations.cs" />
-    <Compile Include="Domain\Aggregate.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="EventStore\Commit.cs" />
-    <Compile Include="EventStore\EventCollection.cs" />
-    <Compile Include="EventStore\HeaderCollection.cs" />
-    <Compile Include="EventStore\Snapshot.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Logging\DebugDiagnosticContext.cs" />
-    <Compile Include="Logging\ILog.cs" />
-    <Compile Include="Logging\DefaultDiagnosticContext.cs" />
-    <Compile Include="Logging\DisabledDiagnosticContext.cs" />
-    <Compile Include="Logging\Logger.cs" />
-    <Compile Include="Logging\LogManager.cs" />
-    <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="CommitTests.cs" />
+    <Compile Include="EventCollectionConverterTests.cs" />
+    <Compile Include="HeaderCollectionConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\Exceptions.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Exceptions.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Resources\Messages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Messages.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Serialization\BinarySerializer.cs" />
-    <Compile Include="Serialization\ISerializeObjects.cs" />
-    <Compile Include="StringExtensions.cs" />
-    <Compile Include="SystemTime.cs" />
-    <Compile Include="Threading\BlockingThreadPoolTaskScheduler.cs" />
-    <Compile Include="Threading\ISynchronizeAccess.cs" />
-    <Compile Include="Threading\SynchronousTaskScheduler.cs" />
-    <Compile Include="Threading\IQueueUserWorkItems.cs" />
-    <Compile Include="Threading\MonitorWrapper.cs" />
-    <Compile Include="Threading\PartitionedTaskScheduler.cs" />
-    <Compile Include="Threading\ThreadPoolWrapper.cs" />
-    <Compile Include="TypeExtensions.cs" />
-    <Compile Include="Verify.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.shared\Infrastructure.snk">
       <Link>Properties\Infrastructure.snk</Link>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Exceptions.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Messages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{DFD230FA-76D5-4EF4-8035-80E848CF798B}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serialization.Json\Serialization.Json.csproj">
+      <Project>{D60406DD-C73C-4CA2-8B26-1583E1DD992F}</Project>
+      <Name>Serialization.Json</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

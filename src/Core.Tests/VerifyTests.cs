@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Spark.Infrastructure.Resources;
-using System;
 using Xunit;
 using Xunit.Extensions;
 
@@ -22,6 +22,78 @@ namespace Spark.Infrastructure.Tests
     // ReSharper disable NotResolvedInText
     public static class UsingVerify
     {
+        public class WhenCheckingForTrueCondition
+        {
+            [Fact]
+            public void TrueDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.True(true, "paramName", "Custom Message"));
+            }
+
+            [Fact]
+            public void FalseThrowsArgumentException()
+            {
+                var expectedEx = new ArgumentException("Custom Message", "paramName");
+                var actualEx = Assert.Throws<ArgumentException>(() => Verify.True(false, "paramName", "Custom Message"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+        }
+
+        public class WhenCheckingForFalseCondition
+        {
+            [Fact]
+            public void FalseDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.False(false, "paramName", "Custom Message"));
+            }
+
+            [Fact]
+            public void TrueThrowsArgumentException()
+            {
+                var expectedEx = new ArgumentException("Custom Message", "paramName");
+                var actualEx = Assert.Throws<ArgumentException>(() => Verify.False(true, "paramName", "Custom Message"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+        }
+
+        public class WhenCheckingForEquality
+        {
+            [Fact]
+            public void EqualValueDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.Equal(Guid.Empty, Guid.Empty, "paramName"));
+            }
+
+            [Fact]
+            public void NotEqualThrowsArgumentException()
+            {
+                var expectedEx = new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(Guid.Empty), "paramName");
+                var actualEx = Assert.Throws<ArgumentException>(() => Verify.Equal(Guid.Empty, Guid.NewGuid(), "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+        }
+
+        public class WhenCheckingForInequality
+        {
+            [Fact]
+            public void NotEqualValueDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.NotEqual(Guid.Empty, Guid.NewGuid(), "paramName"));
+            }
+
+            [Fact]
+            public void EqualThrowsArgumentException()
+            {
+                var expectedEx = new ArgumentException(Exceptions.ArgumentEqualToValue.FormatWith(Guid.Empty), "paramName");
+                var actualEx = Assert.Throws<ArgumentException>(() => Verify.NotEqual(Guid.Empty, Guid.Empty, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+        }
+
         public class WhenCheckingForGreaterThan
         {
             [Fact]

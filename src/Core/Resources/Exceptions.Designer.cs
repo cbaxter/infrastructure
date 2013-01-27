@@ -70,6 +70,24 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value must not equal {0}..
+        /// </summary>
+        internal static string ArgumentEqualToValue {
+            get {
+                return ResourceManager.GetString("ArgumentEqualToValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must equal {0}..
+        /// </summary>
+        internal static string ArgumentNotEqualToValue {
+            get {
+                return ResourceManager.GetString("ArgumentNotEqualToValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value must be greater than {0}..
         /// </summary>
         internal static string ArgumentNotGreaterThanValue {
@@ -93,6 +111,15 @@ namespace Spark.Infrastructure.Resources {
         internal static string OperationIdModifiedInsideScope {
             get {
                 return ResourceManager.GetString("OperationIdModifiedInsideScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type cannot be an interface..
+        /// </summary>
+        internal static string TypeArgumentMustNotBeAnInterface {
+            get {
+                return ResourceManager.GetString("TypeArgumentMustNotBeAnInterface", resourceCulture);
             }
         }
     }

@@ -6,7 +6,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{76DE91
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
-		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{7B1219D8-005E-4A65-BE2B-050077236655}"
@@ -28,6 +27,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{569A5CD0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{CFF3E57D-1325-4E10-8E14-4898814487BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization.Json", "Serialization.Json\Serialization.Json.csproj", "{D60406DD-C73C-4CA2-8B26-1583E1DD992F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization.Json.Tests", "Serialization.Json.Tests\Serialization.Json.Tests.csproj", "{2A7FB309-F412-44D0-9C80-087A40F6C287}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,11 +45,20 @@ Global
 		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF3E57D-1325-4E10-8E14-4898814487BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60406DD-C73C-4CA2-8B26-1583E1DD992F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60406DD-C73C-4CA2-8B26-1583E1DD992F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60406DD-C73C-4CA2-8B26-1583E1DD992F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60406DD-C73C-4CA2-8B26-1583E1DD992F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A7FB309-F412-44D0-9C80-087A40F6C287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7FB309-F412-44D0-9C80-087A40F6C287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7FB309-F412-44D0-9C80-087A40F6C287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7FB309-F412-44D0-9C80-087A40F6C287}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CFF3E57D-1325-4E10-8E14-4898814487BE} = {569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}
+		{2A7FB309-F412-44D0-9C80-087A40F6C287} = {569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}
 	EndGlobalSection
 EndGlobal
