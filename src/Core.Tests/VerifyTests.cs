@@ -170,6 +170,79 @@ namespace Spark.Infrastructure.Tests
             }
         }
 
+        public class WhenCheckingForGreaterThanOrEqual
+        {
+            [Fact]
+            public void NullValuesThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(String.Empty));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.GreaterThanOrEqual(default(IComparable), null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void NullActualValueThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(0));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.GreaterThanOrEqual((Comparable)0, null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void NullExpectedValueDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(null, (Comparable)1, "paramName"));
+            }
+
+            [Fact]
+            public void ActualLessThanExpectedThrowsArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", 0, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(1));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.GreaterThanOrEqual(1, 0, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualEqualToExpectedDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(1, 1, "paramName"));
+            }
+
+            [Fact]
+            public void ActualGreaterThanExpectedDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(1, 2, "paramName"));
+            }
+
+            private class Comparable : IComparable
+            {
+                private readonly Int32 value;
+
+                private Comparable(Int32 value)
+                {
+                    this.value = value;
+                }
+
+                public Int32 CompareTo(Object obj)
+                {
+                    return value.CompareTo(obj);
+                }
+
+                public override string ToString()
+                {
+                    return value.ToString(CultureInfo.InvariantCulture);
+                }
+
+                public static implicit operator Comparable(Int32 value)
+                {
+                    return new Comparable(value);
+                }
+            }
+        }
+
         public class WhenCheckingForNull
         {
             [Fact]

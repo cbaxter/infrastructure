@@ -88,11 +88,61 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value must be greater than or equal to {0}..
+        /// </summary>
+        internal static string ArgumentNotGreaterThanOrEqualToValue {
+            get {
+                return ResourceManager.GetString("ArgumentNotGreaterThanOrEqualToValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value must be greater than {0}..
         /// </summary>
         internal static string ArgumentNotGreaterThanValue {
             get {
                 return ResourceManager.GetString("ArgumentNotGreaterThanValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Concurrency Exception.
+        ///Stream Id: {0}
+        ///Version: {1}.
+        /// </summary>
+        internal static string ConcurrencyException {
+            get {
+                return ResourceManager.GetString("ConcurrencyException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection string not found.
+        ///Name: {0}.
+        /// </summary>
+        internal static string ConnectionNotFound {
+            get {
+                return ResourceManager.GetString("ConnectionNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection string provider not specified.
+        ///Name: {0}.
+        /// </summary>
+        internal static string ConnectionProviderNotSpecified {
+            get {
+                return ResourceManager.GetString("ConnectionProviderNotSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate commit.
+        ///Commit Id: {0}.
+        /// </summary>
+        internal static string DuplicateCommitException {
+            get {
+                return ResourceManager.GetString("DuplicateCommitException", resourceCulture);
             }
         }
         
@@ -115,11 +165,30 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum page size of {0} has been exceeded..
+        /// </summary>
+        internal static string PageSizeExceeded {
+            get {
+                return ResourceManager.GetString("PageSizeExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type cannot be an interface..
         /// </summary>
         internal static string TypeArgumentMustNotBeAnInterface {
             get {
                 return ResourceManager.GetString("TypeArgumentMustNotBeAnInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown database dialect.
+        ///Provider Name: {0}.
+        /// </summary>
+        internal static string UnknownDialect {
+            get {
+                return ResourceManager.GetString("UnknownDialect", resourceCulture);
             }
         }
     }

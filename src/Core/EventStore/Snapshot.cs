@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -19,57 +18,37 @@ namespace Spark.Infrastructure.EventStore
     /// <summary>
     /// Represents a point in time snapshot of an event stream.
     /// </summary>
-    [DataContract, Serializable]
-    public class Snapshot
+    public sealed class Snapshot
     {
-        /// <summary>
-        /// The unique identifier associated with this commit.
-        /// </summary>
-        [DataMember(Name = "c")]
-        public Guid CommitId { get; protected set; }
-
         /// <summary>
         /// The stream identifier associated with this commit.
         /// </summary>
-        [DataMember(Name = "s")]
-        public Guid StreamId { get; protected set; }
+        public Guid StreamId { get; private set; }
 
         /// <summary>
-        /// Gets the current revision of the event stream.
+        /// Gets the current version of the event stream.
         /// </summary>
-        [DataMember(Name = "r")]
-        public Int32 Revision { get; protected set; }
-
-        /// <summary>
-        /// Gets the time when the commit was persisted to the database.
-        /// </summary>
-        [DataMember(Name = "t")]
-        public DateTime Timestamp { get; protected set; }
+        public Int32 Version { get; private set; }
 
         /// <summary>
         /// Gets the set of events associated with this commit.
         /// </summary>
-        [DataMember(Name = "d")]
-        public Object State { get; protected set; }
+        public Object State { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Commit"/>.
         /// </summary>
-        /// <param name="commitId">The unique commit id.</param>
-        /// <param name="streamId">The event stream id.</param>
-        /// <param name="revision">The event stream revision.</param>
-        /// <param name="state">The optional set of events associated with this commit.</param>
-        public Snapshot(Guid commitId, Guid streamId, Int32 revision, Object state)
-        {
-            Verify.NotEqual(Guid.Empty, commitId, "commitId");
+        /// <param name="streamId">The stream id.</param>
+        /// <param name="version">The stream state version.</param>
+        /// <param name="state">The stream state.</param>
+        public Snapshot(Guid streamId, Int32 version, Object state)
+        { 
             Verify.NotEqual(Guid.Empty, streamId, "streamId");
-            Verify.GreaterThan(0, revision, "revision");
+            Verify.GreaterThan(0, version, "version");
             Verify.NotNull(state, "state");
 
-            Timestamp = SystemTime.Now;
-            CommitId = commitId;
             StreamId = streamId;
-            Revision = revision;
+            Version = version;
             State = state;
         }
     }

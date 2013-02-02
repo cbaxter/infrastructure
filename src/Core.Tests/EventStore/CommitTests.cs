@@ -1,9 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Serialization;
 using Xunit;
+
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
 
 namespace Spark.Infrastructure.Tests.EventStore
 {
@@ -14,7 +24,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void CommitIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, Guid.NewGuid(), 1, null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), 1, Guid.Empty, null, null));
 
                 Assert.Equal("commitId", ex.ParamName);
             }
@@ -22,7 +32,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void StreamIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), Guid.Empty, 1, null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, 1, Guid.NewGuid(), null, null));
 
                 Assert.Equal("streamId", ex.ParamName);
             }
@@ -30,7 +40,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void RevisionGreaterThanZero()
             {
-                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), Guid.NewGuid(), 0, null, null));
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), 0, Guid.NewGuid(), null, null));
 
                 Assert.Equal("revision", ex.ParamName);
             }
@@ -38,7 +48,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void HeadersCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
+                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
 
                 Assert.NotNull(commit.Headers);
             }
@@ -46,33 +56,9 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void EventsCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
+                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
 
                 Assert.NotNull(commit.Events);
-            }
-        }
-
-        public class WhenUsingBinarySerializer
-        {
-            [Fact]
-            public void CanSerializeAndDeserializeCommit()
-            {
-                var originalCommit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, new EventCollection(new[] { new Object() }), new HeaderCollection(new Dictionary<String, Object> { { "Name", null } }));
-                var serializer = new BinarySerializer();
-                var binaryData = default(Byte[]);
-
-                using (var stream = new MemoryStream())
-                {
-                    serializer.Serialize(stream, originalCommit);
-                    binaryData = stream.ToArray();
-                }
-
-                using (var stream = new MemoryStream(binaryData, writable: false))
-                {
-                    var deserializedCommit = (Commit)serializer.Deserialize(stream);
-
-                    Assert.Equal(originalCommit.CommitId, deserializedCommit.CommitId);
-                }
             }
         }
     }

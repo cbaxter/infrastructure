@@ -89,6 +89,20 @@ namespace Spark.Infrastructure
         }
 
         /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is less than <paramref name="inclusiveLowerBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="inclusiveLowerBound"/>.</typeparam>
+        /// <param name="actual">The value to check if less than <paramref name="inclusiveLowerBound"/>.</param>
+        /// <param name="inclusiveLowerBound">The inclusive lower bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void GreaterThanOrEqual<T>(T inclusiveLowerBound, T actual, [InvokerParameterName]String paramName)
+          where T : IComparable
+        {
+            if (ReferenceEquals(actual, null) || actual.CompareTo(inclusiveLowerBound) < 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(inclusiveLowerBound));
+        }
+
+        /// <summary>
         /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if <paramref name="value"/> is <value>null</value>.
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>

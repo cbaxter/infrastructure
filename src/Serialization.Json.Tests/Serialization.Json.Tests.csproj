@@ -63,7 +63,6 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="CommitTests.cs" />
     <Compile Include="EventCollectionConverterTests.cs" />
     <Compile Include="HeaderCollectionConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
