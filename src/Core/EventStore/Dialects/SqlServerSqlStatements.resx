@@ -120,7 +120,7 @@
   <data name="DeleteStream" xml:space="preserve">
     <value>DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;</value>
   </data>
-  <data name="EnsureCommitTableExists" xml:space="preserve">
+  <data name="EnsureCommitTableCreated" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Commit')
 BEGIN
     CREATE TABLE [dbo].[Commit] (
@@ -134,11 +134,11 @@ BEGIN
         CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED ([StreamId],[Version])
     );
     
-    CREATE UNIQUE INDEX [UQ_Commit] ON [dbo].[Commit]([CommitId])
-    CREATE INDEX [IX_Commit_Timestamp] ON [dbo].[Commit]([Timestamp], [CommitId])
+    CREATE UNIQUE INDEX [UQ_Commit] ON [dbo].[Commit]([CommitId]);
+    CREATE INDEX [IX_Commit_Timestamp] ON [dbo].[Commit]([Timestamp], [CommitId]);
 END;</value>
   </data>
-  <data name="EnsureSnapshotTableExists" xml:space="preserve">
+  <data name="EnsureSnapshotTableCreated" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Snapshot')
 BEGIN
     CREATE TABLE [dbo].[Snapshot] (
@@ -171,7 +171,7 @@ END;</value>
  WHERE [RANK] BETWEEN (@skip + 1) AND (@skip + @take)</value>
   </data>
   <data name="InsertCommit" xml:space="preserve">
-    <value>INSERT INTO [dbo].[Commit] VALUES([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) (@streamId, @version, @timestamp, @commitId, @headers, @events);</value>
+    <value>INSERT INTO [dbo].[Commit] ([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) VALUES(@streamId, @version, @timestamp, @commitId, @headers, @events);</value>
   </data>
   <data name="InsertSnapshot" xml:space="preserve">
     <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>

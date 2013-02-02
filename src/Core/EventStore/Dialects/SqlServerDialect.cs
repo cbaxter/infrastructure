@@ -37,14 +37,14 @@ namespace Spark.Infrastructure.EventStore.Dialects
         public String UpdateCommitStatement { get { return SqlServerSqlStatements.UpdateCommit; } }
         public String DeleteStreamStatement { get { return SqlServerSqlStatements.DeleteStream; } }
         public String DeleteStreamsStatement { get { return SqlServerSqlStatements.PurgeCommits; } }
-        public String CreateCommitTableStatement { get { return SqlServerSqlStatements.EnsureCommitTableExists; } }
+        public String EnsureCommitTableCreatedStatement { get { return SqlServerSqlStatements.EnsureCommitTableCreated; } }
 
         // ISnapshotStoreDialect
         public String GetSnapshotStatement { get { return SqlServerSqlStatements.GetSnapshot; } }
         public String InsertSnapshotStatement { get { return SqlServerSqlStatements.InsertSnapshot; } }
         public String ReplaceSnapshotStatement { get { return SqlServerSqlStatements.ReplaceSnapshot; } }
         public String DeleteSnapshotsStatement { get { return SqlServerSqlStatements.PurgeSnapshots; } }
-        public String CreateSnapshotTableStatement { get { return SqlServerSqlStatements.EnsureSnapshotTableExists; } }
+        public String EnsureSnapshotTableCreatedStatement { get { return SqlServerSqlStatements.EnsureSnapshotTableCreated; } }
 
         /// <summary>
         /// Initializes a default instance of <see cref="SqlServerDialect"/>.
@@ -84,14 +84,14 @@ namespace Spark.Infrastructure.EventStore.Dialects
             if (sqlException == null)
                 return ex;
 
-            if (sqlException.ErrorCode == UniqueIndexViolation)
+            if (sqlException.Number == UniqueIndexViolation)
             {
                 var commitId = command.GetParameterValue("@commitId");
 
                 return new DuplicateCommitException(Exceptions.DuplicateCommitException.FormatWith(commitId));
             }
 
-            if (sqlException.ErrorCode == UniqueConstraintViolation)
+            if (sqlException.Number == UniqueConstraintViolation)
             {
                 var streamId = command.GetParameterValue("@streamId");
                 var version =command.GetParameterValue("@version");

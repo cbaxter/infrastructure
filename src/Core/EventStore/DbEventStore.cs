@@ -67,9 +67,9 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         public void Initialize()
         {
-            using (var command = CreateCommand(dialect.CreateCommitTableStatement))
+            using (var command = CreateCommand(dialect.EnsureCommitTableCreatedStatement))
             {
-                Log.TraceFormat("Initializing event store: {0}", command.CommandText);
+                Log.Trace("Initializing event store");
 
                 ExecuteNonQuery(command);
             }
@@ -102,6 +102,8 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.GetCommits))
             {
+                Log.TraceFormat("Getting commits since {0} ({1})", startTime, page);
+
                 command.Parameters.Add(dialect.CreateTimestampParameter(startTime));
                 command.Parameters.Add(dialect.CreateSkipParameter(page.Skip));
                 command.Parameters.Add(dialect.CreateTakeParameter(page.Take));
@@ -139,6 +141,8 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.GetStream))
             {
+                Log.TraceFormat("Getting stream {0} commits from version {0} ({1})", streamId, minimumVersion, page);
+
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(minimumVersion));
                 command.Parameters.Add(dialect.CreateSkipParameter(page.Skip));
@@ -156,6 +160,8 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.InsertCommitStatement))
             {
+                Log.TraceFormat("Inserting stream {0} commit for version {1}", commit.StreamId, commit.Version);
+
                 command.Parameters.Add(dialect.CreateStreamIdParameter(commit.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(commit.Version));
                 command.Parameters.Add(dialect.CreateTimestampParameter(commit.Timestamp));
@@ -177,6 +183,8 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.UpdateCommitStatement))
             {
+                Log.TraceFormat("Updating commit {0}", commitId);
+
                 command.Parameters.Add(dialect.CreateCommitIdParameter(commitId));
                 command.Parameters.Add(dialect.CreateHeadersParameter(Serialize(headers)));
                 command.Parameters.Add(dialect.CreateEventsParameter(Serialize(events)));
@@ -193,6 +201,8 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.DeleteStreamStatement))
             {
+                Log.TraceFormat("Purging stream {0}", streamId);
+
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
 
                 ExecuteNonQuery(command);
@@ -206,6 +216,7 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = new SqlCommand(dialect.DeleteStreamsStatement))
             {
+                Log.Trace("Purging event store");
 
                 ExecuteNonQuery(command);
             }

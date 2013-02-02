@@ -25,7 +25,7 @@ namespace Spark.Infrastructure.EventStore.Dialects
         String InsertSnapshotStatement { get; }
         String ReplaceSnapshotStatement { get; }
         String DeleteSnapshotsStatement { get; }
-        String CreateSnapshotTableStatement { get; }
+        String EnsureSnapshotTableCreatedStatement { get; }
         
         DbParameter CreateStreamIdParameter(Guid streamId);
         DbParameter CreateVersionParameter(Int32 version);

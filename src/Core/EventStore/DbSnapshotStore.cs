@@ -61,9 +61,9 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         public void Initialize()
         {
-            using (var command = CreateCommand(dialect.CreateSnapshotTableStatement))
+            using (var command = CreateCommand(dialect.EnsureSnapshotTableCreatedStatement))
             {
-                Log.TraceFormat("Initializing snapshot store: {0}", command.CommandText);
+                Log.Trace("Initializing snapshot store");
 
                 ExecuteNonQuery(command);
             }
@@ -87,7 +87,7 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = CreateCommand(dialect.GetSnapshotStatement))
             {
-                Log.TraceFormat("Getting stream {0} snapshot with version less than or equal to {1}: {2}", streamId, maximumVersion, command.CommandText);
+                Log.TraceFormat("Getting stream {0} snapshot with version less than or equal to {1}", streamId, maximumVersion);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(maximumVersion));
@@ -104,11 +104,13 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = CreateCommand(dialect.InsertSnapshotStatement))
             {
-                Log.TraceFormat("Inserting stream {0} snapshot for version {1}: {2}", snapshot.StreamId, snapshot.Version, command.CommandText);
+                Log.TraceFormat("Inserting stream {0} snapshot for version {1}", snapshot.StreamId, snapshot.Version);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(snapshot.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(snapshot.Version));
                 command.Parameters.Add(dialect.CreateStateParameter(Serialize(snapshot.State)));
+
+                ExecuteNonQuery(command);
             }
         }
 
@@ -120,11 +122,13 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = CreateCommand(dialect.ReplaceSnapshotStatement))
             {
-                Log.TraceFormat("Updating stream {0} snapshot to version {1}: {2}", snapshot.StreamId, snapshot.Version, command.CommandText);
+                Log.TraceFormat("Updating stream {0} snapshot to version {1}", snapshot.StreamId, snapshot.Version);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(snapshot.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(snapshot.Version));
                 command.Parameters.Add(dialect.CreateStateParameter(Serialize(snapshot.State)));
+
+                ExecuteNonQuery(command);
             }
         }
 
@@ -135,7 +139,7 @@ namespace Spark.Infrastructure.EventStore
         {
             using (var command = CreateCommand(dialect.DeleteSnapshotsStatement))
             {
-                Log.TraceFormat("Purging snapshot store: {0}", command.CommandText);
+                Log.Trace("Purging snapshot store");
 
                 ExecuteNonQuery(command);
             }

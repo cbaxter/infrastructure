@@ -82,9 +82,9 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         ///     
         ///        CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED ([StreamId], [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string EnsureCommitTableExists {
+        internal static string EnsureCommitTableCreated {
             get {
-                return ResourceManager.GetString("EnsureCommitTableExists", resourceCulture);
+                return ResourceManager.GetString("EnsureCommitTableCreated", resourceCulture);
             }
         }
         
@@ -100,9 +100,9 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         ///    );
         ///END;.
         /// </summary>
-        internal static string EnsureSnapshotTableExists {
+        internal static string EnsureSnapshotTableCreated {
             get {
-                return ResourceManager.GetString("EnsureSnapshotTableExists", resourceCulture);
+                return ResourceManager.GetString("EnsureSnapshotTableCreated", resourceCulture);
             }
         }
         
@@ -145,7 +145,7 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] VALUES([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) (@streamId, @version, @timestamp, @commitId, @headers, @events);.
+        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) VALUES(@streamId, @version, @timestamp, @commitId, @headers, @events);.
         /// </summary>
         internal static string InsertCommit {
             get {
