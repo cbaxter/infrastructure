@@ -111,6 +111,35 @@ namespace Spark.Infrastructure.Tests
             }
         }
 
+        public class WhenGettingDistinctValues
+        {
+            [Fact]
+            public void ReturnFirstInstanceOfKey()
+            {
+                var items = new[] { new Item { Key = "Key1" }, new Item { Key = "Key2" }, new Item { Key = "Key1" } };
+                var distinct = items.Distinct(item => item.Key);
+
+                Assert.Same(items[0], items.First());
+            }
+
+            [Fact]
+            public void RemoveDuplicateKeys()
+            {
+                var items = new[] { new Item { Key = "Key1" }, new Item { Key = "Key2" }, new Item { Key = "Key1" }, new Item { Key = "Key3" } };
+                var distinctItems = items.Distinct(item => item.Key).ToArray();
+
+                Assert.Equal(3, distinctItems.Count());
+                Assert.Same(items[0], distinctItems[0]);
+                Assert.Same(items[1], distinctItems[1]);
+                Assert.Same(items[3], distinctItems[2]);
+            }
+
+            private class Item
+            {
+                public String Key { get; set; }
+            }
+        }
+
         public class WhenEnsuringNotNull
         {
             [Fact]

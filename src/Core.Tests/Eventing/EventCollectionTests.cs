@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Spark.Infrastructure.EventStore;
+﻿using System.Collections.Generic;
+using Spark.Infrastructure.Eventing;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -16,7 +15,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore
+namespace Spark.Infrastructure.Tests.Eventing
 {
     public static class UsingEventCollection
     {
@@ -29,18 +28,21 @@ namespace Spark.Infrastructure.Tests.EventStore
             }
         }
 
-        public class WhenCreatingHeaderCollection
+        public class WhenCreatingEventCollection
         {
             [Fact]
             public void CanMutateUnderlyingCollection()
             {
-                var dictionary = new List<Object>();
-                var headers = new EventCollection(dictionary);
+                var list = new List<Event>();
+                var events = new EventCollection(list);
 
-                dictionary.Add(new Object());
+                list.Add(new FakeEvent());
 
-                Assert.Equal(1, headers.Count);
+                Assert.Equal(1, events.Count);
             }
+
+            private sealed class FakeEvent : Event
+            { }
         }
     }
 }

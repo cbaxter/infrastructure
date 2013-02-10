@@ -20,7 +20,7 @@ namespace Spark.Infrastructure.EventStore
     /// Represents errors that occur when a snapshot or commit version already exists.
     /// </summary>
     [Serializable]
-    public class ConcurrencyException : Exception
+    public sealed class ConcurrencyException : Exception
     {
         /// <summary>
         /// Initializes a new instance of <see cref="ConcurrencyException"/> with the default message.
@@ -46,11 +46,11 @@ namespace Spark.Infrastructure.EventStore
         { }
 
         /// <summary>
-        /// Initializes a new instance of the System.Exception class with serialized data.
+        /// Initializes a new instance of the <see cref="ConcurrencyException"/> class with serialized data.
         /// </summary>
         /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
-        protected ConcurrencyException(SerializationInfo info, StreamingContext context)
+        private ConcurrencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
     }

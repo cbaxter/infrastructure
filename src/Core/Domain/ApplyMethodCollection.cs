@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Spark.Infrastructure.Eventing;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,25 +16,29 @@ using System.Collections.ObjectModel;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.Infrastructure.Domain
 {
     /// <summary>
-    /// A read-only collection of named values (headers).
+    /// A read-only mapping of aggregate type to event apply methods.
     /// </summary>
-    [Serializable]
-    public sealed class HeaderCollection : ReadOnlyDictionary<String, Object>
+    public sealed class ApplyMethodCollection : ReadOnlyDictionary<Type, Action<Aggregate, Event>>
     {
-        /// <summary>
-        /// Represents an empty <see cref="HeaderCollection"/>. This field is read-only.
-        /// </summary>
-        public static readonly HeaderCollection Empty = new HeaderCollection(new Dictionary<String, Object>());
+        private readonly Boolean applyOptional;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EventCollection"/>.
+        /// True if an event apply method is optional; otherwise false.
         /// </summary>
-        /// <param name="dictionary">The set of named values used to populate this <see cref="HeaderCollection"/>.</param>
-        public HeaderCollection(IDictionary<String, Object> dictionary)
+        public Boolean ApplyOptional { get { return applyOptional; } }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ApplyMethodCollection"/>.
+        /// </summary>
+        /// <param name="applyOptional">Flag indicating if an exception should be thrown if an event apply method is not found.</param>
+        /// <param name="dictionary">The underlying dictionary map of event type to aggregate apply method.</param>
+        public ApplyMethodCollection(Boolean applyOptional, IDictionary<Type, Action<Aggregate, Event>> dictionary)
             : base(dictionary)
-        { }
+        {
+            this.applyOptional = applyOptional;
+        }
     }
 }

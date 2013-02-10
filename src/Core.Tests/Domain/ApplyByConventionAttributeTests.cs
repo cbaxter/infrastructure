@@ -1,0 +1,117 @@
+﻿using System;
+using System.Linq;
+using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Eventing;
+using Xunit;
+using Xunit.Extensions;
+
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
+namespace Spark.Infrastructure.Tests.Domain
+{
+    public static class UsingApplyByConventionAttribute
+    {
+        public class WhenUsingDefaultApplyMethodMappingAttribute
+        {
+            [Fact]
+            public void DefaultIsApplyByConventionAttribute()
+            {
+                Assert.IsType(typeof(ApplyByConventionAttribute), ApplyLocatorAttribute.Default);
+            }
+        }
+
+        public class WhenCustomMethodNameSpecified
+        {
+            [Fact]
+            public void MethodsNamedApplyAreIgnored()
+            {
+                var attribute = new ApplyByConventionAttribute { MethodName = "Custom" };
+                var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
+                var applyMethod = applyMethods.Single().Value;
+
+                Assert.DoesNotThrow(() => applyMethod(new FakeAggregate(), new FakeEvent()));
+            }
+
+            [Fact]
+            public void MethodsMatchingCustomNameAreIncluded()
+            {
+                var attribute = new ApplyByConventionAttribute { MethodName = "Custom" };
+                var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
+                var applyMethod = applyMethods.Single().Value;
+
+                Assert.DoesNotThrow(() => applyMethod(new FakeAggregate(), new FakeEvent()));
+            }
+
+            protected class FakeAggregate : Aggregate
+            {
+                public void Apply(FakeEvent e)
+                {
+                    throw new MethodAccessException();
+                }
+
+                public void Custom(FakeEvent e)
+                { }
+            }
+
+            protected class FakeEvent : Event
+            { }
+        }
+
+
+        public class WhenPublicOnlySpecified
+        {
+            [Fact]
+            public void MethodsNamedApplyAreIgnored()
+            {
+                var attribute = new ApplyByConventionAttribute { PublicOnly = true };
+                var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
+
+                Assert.Equal(0, applyMethods.Count);
+            }
+
+            [Fact]
+            public void MethodsMatchingCustomNameAreIncluded()
+            {
+                var attribute = new ApplyByConventionAttribute { PublicOnly = false };
+                var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
+
+                Assert.Equal(1, applyMethods.Count);
+            }
+
+            protected class FakeAggregate : Aggregate
+            {
+                protected void Apply(FakeEvent e)
+                { }
+            }
+
+            protected class FakeEvent : Event
+            { }
+        }
+
+        public class WhenApplyOptionalSpecified
+        {
+            [Theory, InlineData(true), InlineData(false)]
+            public void PropagateSettingToApplyMethodCollection(Boolean applyOptional)
+            {
+                var attribute = new ApplyByConventionAttribute { ApplyOptional = applyOptional };
+                var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
+
+                Assert.Equal(applyOptional, applyMethods.ApplyOptional);
+            }
+
+            private sealed class FakeAggregate : Aggregate
+            { }
+        }
+    }
+}

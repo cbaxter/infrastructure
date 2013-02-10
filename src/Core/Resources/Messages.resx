@@ -126,4 +126,8 @@
   <data name="LogicalOperationTransfered" xml:space="preserve">
     <value>Transfer from {0} to {1}</value>
   </data>
+  <data name="TypeMustDeriveFromAggregate" xml:space="preserve">
+    <value>Type must derive from {0}.
+Type: {1}</value>
+  </data>
 </root>

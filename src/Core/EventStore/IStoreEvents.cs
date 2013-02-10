@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.Messaging;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 

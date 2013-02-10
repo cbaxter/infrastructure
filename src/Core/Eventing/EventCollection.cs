@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Spark.Infrastructure.EventStore;
-using Xunit;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -16,31 +16,25 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore
+namespace Spark.Infrastructure.Eventing
 {
-    public static class UsingHeaderCollection
+    /// <summary>
+    /// A read-only collection of events.
+    /// </summary>
+    [Serializable]
+    public sealed class EventCollection : ReadOnlyCollection<Event>
     {
-        public class WhenReferencingEmptyHeaders
-        {
-            [Fact]
-            public void AlwaysReturnSameInstance()
-            {
-                Assert.Same(HeaderCollection.Empty, HeaderCollection.Empty);
-            }
-        }
+        /// <summary>
+        /// Represents an empty <see cref="EventCollection"/>. This field is read-only.
+        /// </summary>
+        public static readonly EventCollection Empty = new EventCollection(Enumerable.Empty<Event>());
 
-        public class WhenCreatingHeaderCollection
-        {
-            [Fact]
-            public void CanMutateUnderlyingCollection()
-            {
-                var dictionary = new Dictionary<String, Object>();
-                var headers = new HeaderCollection(dictionary);
-
-                dictionary.Add("MyTestKey", new Object());
-
-                Assert.Equal(1, headers.Count);
-            }
-        }
+        /// <summary>
+        /// Initializes a new instance of <see cref="EventCollection"/>.
+        /// </summary>
+        /// <param name="events">The set of events used to populate this <see cref="EventCollection"/>.</param>
+        public EventCollection(IEnumerable<Event> events)
+            : base(events.AsList())
+        { }
     }
 }

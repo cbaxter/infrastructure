@@ -44,6 +44,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -54,10 +55,31 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Commanding\CommandReceiver.cs" />
+    <Compile Include="Commanding\IPublishCommands.cs" />
+    <Compile Include="Eventing\EventCollection.cs" />
+    <Compile Include="Commanding\Command.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commanding\CommandPublisher.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Domain\Aggregate.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Domain\AggregateException.cs" />
+    <Compile Include="Domain\AggregateUpdater.cs" />
+    <Compile Include="Domain\ApplyByReflectionAttribute.cs" />
+    <Compile Include="Domain\ApplyMethodAttribute.cs" />
+    <Compile Include="Domain\ApplyByAttributeAttribute.cs" />
+    <Compile Include="Domain\ApplyByConventionAttribute.cs" />
+    <Compile Include="Domain\ApplyByRegistrationAttribute.cs" />
+    <Compile Include="Domain\ApplyLocatorAttribute.cs" />
+    <Compile Include="Domain\ApplyMethodCollection.cs" />
+    <Compile Include="Domain\ApplyMethodMapping.cs" />
+    <Compile Include="Domain\IApplyEvents.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Eventing\Event.cs" />
     <Compile Include="EventStore\Commit.cs" />
     <Compile Include="EventStore\ConcurrencyException.cs" />
     <Compile Include="EventStore\Dialects\DbCommandExtensions.cs" />
@@ -76,8 +98,6 @@
     <Compile Include="EventStore\PagedResult.cs" />
     <Compile Include="EventStore\DbSnapshotStore.cs" />
     <Compile Include="EventStore\DbStore.cs" />
-    <Compile Include="EventStore\EventCollection.cs" />
-    <Compile Include="EventStore\HeaderCollection.cs" />
     <Compile Include="EventStore\IStoreEvents.cs" />
     <Compile Include="EventStore\IStoreSnapshots.cs" />
     <Compile Include="EventStore\Snapshot.cs">
@@ -92,6 +112,16 @@
     <Compile Include="Logging\DisabledDiagnosticContext.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Messaging\Header.cs" />
+    <Compile Include="Messaging\HeaderCollection.cs" />
+    <Compile Include="Messaging\ICreateMessages.cs" />
+    <Compile Include="Messaging\IReceiveMessages.cs" />
+    <Compile Include="Messaging\ISendMessages.cs" />
+    <Compile Include="Messaging\Message.cs" />
+    <Compile Include="Messaging\MessageFactory.cs" />
+    <Compile Include="Messaging\ServiceMessageFactory.cs" />
+    <Compile Include="Messaging\BlockingCollectionMessageBus.cs" />
+    <Compile Include="Messaging\WebMessageFactory.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Exceptions.Designer.cs">
@@ -104,6 +134,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
+    <Compile Include="SequentialGuid.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\ISerializeObjects.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -116,6 +147,7 @@
     <Compile Include="Threading\PartitionedTaskScheduler.cs" />
     <Compile Include="Threading\ThreadPoolWrapper.cs" />
     <Compile Include="TypeExtensions.cs" />
+    <Compile Include="TypeLocator.cs" />
     <Compile Include="Verify.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +169,7 @@
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

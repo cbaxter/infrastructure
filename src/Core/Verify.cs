@@ -47,6 +47,18 @@ namespace Spark.Infrastructure
         }
 
         /// <summary>
+        /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="type"/> does not derive from <paramref name="baseType"/>.
+        /// </summary>
+        /// <param name="baseType">The expected base type.</param>
+        /// <param name="type">The type being checked.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void TypeDerivesFrom(Type baseType, Type type, [InvokerParameterName] String paramName)
+        {
+            if(!type.DerivesFrom(baseType))
+                throw new ArgumentException(Exceptions.TypeDoesNotDeriveFromBase.FormatWith(baseType, type), paramName);
+        }
+
+        /// <summary>
         /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is not equal to <paramref name="expected"/>.
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="expected"/> and <paramref name="actual"/>.</typeparam>

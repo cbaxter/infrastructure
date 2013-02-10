@@ -38,12 +38,16 @@
     <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.XML" />
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.2.0.0-alpha-build1611\lib\net45\xunit.dll</HintPath>
@@ -59,13 +63,18 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Domain\ApplyByAttributeAttributeTests.cs" />
+    <Compile Include="Domain\ApplyByConventionAttributeTests.cs" />
+    <Compile Include="Domain\ApplyByRegistrationAttributeTests.cs" />
+    <Compile Include="Domain\ApplyMethodMappingTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
-    <Compile Include="EventStore\EventCollectionTests.cs" />
-    <Compile Include="EventStore\HeaderCollectionTests.cs" />
+    <Compile Include="Eventing\EventCollectionTests.cs" />
+    <Compile Include="Messaging\WebMessageFactoryTests.cs" />
+    <Compile Include="Messaging\HeaderCollectionTests.cs" />
     <Compile Include="EventStore\PagedResultTests.cs" />
     <Compile Include="EventStore\PageTests.cs" />
     <Compile Include="EventStore\SnapshotTests.cs" />
@@ -75,6 +84,11 @@
     <Compile Include="Logging\FakeTraceListener.cs" />
     <Compile Include="Logging\LoggerTests.cs" />
     <Compile Include="Logging\LogManagerTests.cs" />
+    <Compile Include="Messaging\HeaderTests.cs" />
+    <Compile Include="Messaging\MessageFactoryTests.cs" />
+    <Compile Include="Messaging\MessageTests.cs" />
+    <Compile Include="Messaging\BlockingCollectionMessageBusTests.cs" />
+    <Compile Include="Messaging\ServiceMessageFactoryTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>

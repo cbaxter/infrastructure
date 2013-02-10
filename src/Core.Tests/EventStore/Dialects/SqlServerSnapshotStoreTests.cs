@@ -26,7 +26,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
         {
             protected readonly IStoreSnapshots SnapshotStore;
 
-            protected UsingInitializedSnapshotStore()
+            internal UsingInitializedSnapshotStore()
             {
                 SnapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5));
                 SnapshotStore.Initialize();

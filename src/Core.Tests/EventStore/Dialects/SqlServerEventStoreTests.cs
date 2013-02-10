@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.EventStore.Dialects;
+using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 using Xunit;
 
@@ -28,7 +30,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
         {
             protected readonly IStoreEvents EventStore;
 
-            protected UsingInitializedEventStore()
+            internal UsingInitializedEventStore()
             {
                 EventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5));
                 EventStore.Initialize();
@@ -144,10 +146,14 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
 
                 EventStore.SaveCommit(commit);
-                EventStore.Migrate(commit.CommitId, HeaderCollection.Empty, new EventCollection(new Object[] { 1 }));
+                EventStore.Migrate(commit.CommitId, HeaderCollection.Empty, new EventCollection(new[] { new FakeEvent() }));
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Events.Count);
             }
+
+            [Serializable]
+            private sealed class FakeEvent : Event
+            { }
         }
 
         public class WhenPurgingStreams : UsingInitializedEventStore

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -50,6 +51,17 @@ namespace Spark.Infrastructure
         public static IReadOnlyList<T> AsReadOnly<T>(this IEnumerable<T> source)
         {
             return source as IReadOnlyList<T> ?? new ReadOnlyCollection<T>(source.AsList());
+        }
+
+        /// <summary>
+        /// Returns distinct elements from a sequence by using the the default equality comparer to compare <paramref name="keySelector"/> values.
+        /// </summary>
+        /// <param name="source">The sequence of elements to make distinct.</param>
+        /// <param name="keySelector">The key selector on which to base distinct values.</param>
+        public static IEnumerable<TItem> Distinct<TItem, TKey>(this IEnumerable<TItem> source, Func<TItem, TKey> keySelector)
+        {
+            var unique = new HashSet<TKey>();
+            return (source ?? Enumerable.Empty<TItem>()).Where(item => unique.Add(keySelector(item)));
         }
 
         /// <summary>

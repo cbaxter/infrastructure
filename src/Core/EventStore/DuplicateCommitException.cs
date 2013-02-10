@@ -20,7 +20,7 @@ namespace Spark.Infrastructure.EventStore
     /// Represents errors that occur when a specific stream version already exists.
     /// </summary>
     [Serializable]
-    public class DuplicateCommitException : Exception
+    public sealed class DuplicateCommitException : Exception
     {
         /// <summary>
         /// Initializes a new instance of <see cref="DuplicateCommitException"/> with the default message.
@@ -46,11 +46,11 @@ namespace Spark.Infrastructure.EventStore
         { }
 
         /// <summary>
-        /// Initializes a new instance of the System.Exception class with serialized data.
+        /// Initializes a new instance of the <see cref="DuplicateCommitException"/> class with serialized data.
         /// </summary>
         /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
-        protected DuplicateCommitException(SerializationInfo info, StreamingContext context)
+        private DuplicateCommitException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
     }

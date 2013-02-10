@@ -140,8 +140,8 @@ namespace Spark.Infrastructure.Tests.Threading
                 var tasksQueued = new ManualResetEvent(false);
                 var taskScheduler = new PartitionedTaskScheduler();
 
-                var task1 = Task.Factory.StartNew(() => { threadIds.Add(Thread.CurrentThread.ManagedThreadId); tasksQueued.WaitOne(); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
-                var task2 = Task.Factory.StartNew(() => threadIds.Add(Thread.CurrentThread.ManagedThreadId), CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                var task1 = Task.Factory.StartNew(() => { tasksQueued.WaitOne(); threadIds.Add(Thread.CurrentThread.ManagedThreadId); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                var task2 = Task.Factory.StartNew(() => { tasksQueued.WaitOne(); threadIds.Add(Thread.CurrentThread.ManagedThreadId); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
 
                 tasksQueued.Set();
 
@@ -186,16 +186,15 @@ namespace Spark.Infrastructure.Tests.Threading
                 var tasksQueued = new ManualResetEvent(false);
                 var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, tasks.Length);
 
-                for (var i = 0; i < 200; i++)
+                for (var i = 0; i < tasks.Length; i++)
                 {
-                    var taskId = i;
-
-                    tasks[taskId] = Task.Factory.StartNew(state =>
+                    tasks[i] = Task.Factory.StartNew(state =>
                         {
+                            var taskId = (Int32) state;
                             taskOrder.Add(taskId);
                             tasksQueued.WaitOne();
                             Thread.Sleep(taskId % 3);
-                        }, taskId, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
+                        }, i, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
                 }
 
                 tasksQueued.Set();

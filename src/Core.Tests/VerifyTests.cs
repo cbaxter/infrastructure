@@ -58,6 +58,24 @@ namespace Spark.Infrastructure.Tests
             }
         }
 
+        public class WhenCheckingTypeDerivesFromBase
+        {
+            [Fact]
+            public void BaseTypeFoundDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.TypeDerivesFrom(typeof(Exception), typeof(ArgumentException), "paramName"));
+            }
+
+            [Fact]
+            public void BaseTypeNotFoundThrowsArgumentException()
+            {
+                var expectedEx = new ArgumentException(Exceptions.TypeDoesNotDeriveFromBase.FormatWith(typeof(Exception), typeof(Object)), "paramName");
+                var actualEx = Assert.Throws<ArgumentException>(() => Verify.TypeDerivesFrom(typeof(Exception), typeof(Object), "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+        }
+
         public class WhenCheckingForEquality
         {
             [Fact]

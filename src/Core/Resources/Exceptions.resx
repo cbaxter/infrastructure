@@ -120,6 +120,16 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="ApplyMethodMustHaveSingleEventParameter" xml:space="preserve">
+    <value>A method marked with ApplyMethodAttribute must have a single input parameter that derives from {0}.
+Reflected Type: {1}
+Method Name: {2}</value>
+  </data>
+  <data name="ApplyMethodMustHaveVoidReturn" xml:space="preserve">
+    <value>A method marked with ApplyMethodAttribute must return void.
+Reflected Type: {0}
+Method Name: {1}</value>
+  </data>
   <data name="ArgumentEqualToValue" xml:space="preserve">
     <value>Value must not equal {0}.</value>
   </data>
@@ -149,6 +159,9 @@ Name: {0}</value>
     <value>Duplicate commit.
 Commit Id: {0}</value>
   </data>
+  <data name="HttpContextNotAvailable" xml:space="preserve">
+    <value>The current HTTP context is not available on this thread.</value>
+  </data>
   <data name="MustContainOneNonWhitespaceCharacter" xml:space="preserve">
     <value>Value must contain at least one non-whitespace character.</value>
   </data>
@@ -158,8 +171,16 @@ Commit Id: {0}</value>
   <data name="PageSizeExceeded" xml:space="preserve">
     <value>Maximum page size of {0} has been exceeded.</value>
   </data>
+  <data name="ReservedHeaderName" xml:space="preserve">
+    <value>Reserved system header.
+Name: {0}</value>
+  </data>
   <data name="TypeArgumentMustNotBeAnInterface" xml:space="preserve">
     <value>Type cannot be an interface.</value>
+  </data>
+  <data name="TypeDoesNotDeriveFromBase" xml:space="preserve">
+    <value>Type does not derive from {0}.
+Type: {1}</value>
   </data>
   <data name="UnknownDialect" xml:space="preserve">
     <value>Unknown database dialect.

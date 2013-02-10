@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Spark.Infrastructure.EventStore.Dialects;
+using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Logging;
+using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -234,7 +236,7 @@ namespace Spark.Infrastructure.EventStore
                 record.GetDateTime(Column.Timestamp),
                 record.GetGuid(Column.CommitId),
                 new HeaderCollection((IDictionary<String, Object>)Deserialize(record, Column.Headers)),
-                new EventCollection((IList<Object>)Deserialize(record, Column.Events))
+                new EventCollection((IList<Event>)Deserialize(record, Column.Events))
             );
         }
     }

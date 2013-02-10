@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -16,25 +13,12 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.Infrastructure.Eventing
 {
     /// <summary>
-    /// A read-only collection of events.
+    /// Base class for an event.
     /// </summary>
     [Serializable]
-    public sealed class EventCollection : ReadOnlyCollection<Object>
-    {
-        /// <summary>
-        /// Represents an empty <see cref="EventCollection"/>. This field is read-only.
-        /// </summary>
-        public static readonly EventCollection Empty = new EventCollection(Enumerable.Empty<Object>());
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="EventCollection"/>.
-        /// </summary>
-        /// <param name="events">The set of events used to populate this <see cref="EventCollection"/>.</param>
-        public EventCollection(IEnumerable<Object> events)
-            : base(events.AsList())
-        { }
-    }
+    public abstract class Event
+    { }
 }
