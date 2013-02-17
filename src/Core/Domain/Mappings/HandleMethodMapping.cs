@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Eventing;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -15,28 +16,36 @@ using Spark.Infrastructure.Eventing;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Domain.Mappings
 {
     /// <summary>
     /// Represents an explicit <see cref="Aggregate"/> apply method mapping.
     /// </summary>
-    public abstract class ApplyMethodMapping
+    public abstract class HandleMethodMapping
     {
         /// <summary>
         /// Apply method mapping builder.
         /// </summary>
-        protected sealed class ApplyMethodMappingBuilder
+        protected sealed class HandleMethodMappingBuilder
         {
-            private readonly IDictionary<Type, Action<Aggregate, Event>> applyMethods = new Dictionary<Type, Action<Aggregate, Event>>();
+            private readonly IDictionary<Type, Action<Aggregate, Command>> applyMethods = new Dictionary<Type, Action<Aggregate, Command>>();
+            private readonly IServiceProvider serviceProvider;
 
-            internal IDictionary<Type, Action<Aggregate, Event>> Mappings { get { return applyMethods; } }
+            internal IDictionary<Type, Action<Aggregate, Command>> Mappings { get { return applyMethods; } }
+
+            internal HandleMethodMappingBuilder(IServiceProvider serviceProvider)
+            {
+                Verify.NotNull(serviceProvider, "serviceProvider");
+
+                this.serviceProvider = serviceProvider;
+            }
 
             /// <summary>
             /// Register the apply method for the specified <paramref name="eventType"/>.
             /// </summary>
             /// <param name="eventType">The event type associated with the specified <paramref name="applyMethod"/>.</param>
             /// <param name="applyMethod">The apply method to be invoked for events of <paramref name="eventType"/>.</param>
-            public void Register(Type eventType, Action<Aggregate, Event> applyMethod)
+            public void Register(Type eventType, Action<Aggregate, Command> applyMethod)
             {
                 Verify.NotNull(eventType, "eventType");
                 Verify.NotNull(applyMethod, "applyMethod");
@@ -44,14 +53,26 @@ namespace Spark.Infrastructure.Domain
 
                 applyMethods.Add(eventType, applyMethod);
             }
+
+            public T GetService<T>()
+            {
+                return (T)GetService(typeof(T));
+            }
+
+            public Object GetService(Type type)
+            {
+                Verify.NotNull(type, "type");
+
+                return serviceProvider.GetService(type);
+            }
         }
 
         /// <summary>
         /// Gets the explicitly registered apply methods.
         /// </summary>
-        internal IDictionary<Type, Action<Aggregate, Event>> GetMappings()
+        internal IDictionary<Type, Action<Aggregate, Command>> GetMappings(IServiceProvider serviceProvider)
         {
-            var builder = new ApplyMethodMappingBuilder();
+            var builder = new HandleMethodMappingBuilder(serviceProvider);
 
             RegisterMappings(builder);
 
@@ -61,7 +82,7 @@ namespace Spark.Infrastructure.Domain
         /// <summary>
         /// Register the event type apply methods for a given aggregate type.
         /// </summary>
-        /// <param name="builder">The <see cref="ApplyMethodMappingBuilder"/> for the underlying aggregate type.</param>
-        protected abstract void RegisterMappings(ApplyMethodMappingBuilder builder);
+        /// <param name="builder">The <see cref="HandleMethodMappingBuilder"/> for the underlying aggregate type.</param>
+        protected abstract void RegisterMappings(HandleMethodMappingBuilder builder);
     }
 }

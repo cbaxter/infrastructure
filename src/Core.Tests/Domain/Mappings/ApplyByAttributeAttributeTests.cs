@@ -1,5 +1,6 @@
 ﻿using System;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Domain.Mappings;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Resources;
 using Xunit;
@@ -18,7 +19,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Infrastructure.Tests.Domain.Mappings
 {
     public static class UsingApplyByAttributeAttribute
     {
@@ -37,27 +38,27 @@ namespace Spark.Infrastructure.Tests.Domain
             public void MethodMustHaveVoidReturn()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.AggregateException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithReturn)));
+                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithReturn)));
 
-                Assert.Equal(Exceptions.ApplyMethodMustHaveVoidReturn.FormatWith(typeof(FakeAggregateWithReturn), "OnFakeEvent"), ex.Message);
+                Assert.Equal(Exceptions.AggregateApplyMethodMustHaveVoidReturn.FormatWith(typeof(FakeAggregateWithReturn), "OnFakeEvent"), ex.Message);
             }
 
             [Fact]
             public void MethodMustHaveSingleEventParameter()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.AggregateException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithNoParameters)));
+                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithNoParameters)));
 
-                Assert.Equal(Exceptions.ApplyMethodMustHaveSingleEventParameter.FormatWith(typeof(Event), typeof(FakeAggregateWithNoParameters), "OnFakeEvent"), ex.Message);
+                Assert.Equal(Exceptions.AggregateApplyMethodInvalidParameters.FormatWith(typeof(Event), typeof(FakeAggregateWithNoParameters), "OnFakeEvent"), ex.Message);
             }
 
             [Fact]
             public void MethodNotMustHaveMultipleEventParameter()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.AggregateException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithMultipleParameters)));
+                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithMultipleParameters)));
 
-                Assert.Equal(Exceptions.ApplyMethodMustHaveSingleEventParameter.FormatWith(typeof(Event), typeof(FakeAggregateWithMultipleParameters), "OnFakeEvent"), ex.Message);
+                Assert.Equal(Exceptions.AggregateApplyMethodInvalidParameters.FormatWith(typeof(Event), typeof(FakeAggregateWithMultipleParameters), "OnFakeEvent"), ex.Message);
             }
 
             protected class FakeAggregateWithNoAttribute : Aggregate

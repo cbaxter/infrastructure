@@ -54,6 +54,20 @@ namespace Spark.Infrastructure
         }
 
         /// <summary>
+        /// Appends the <paramref name="item"/> to the end of the existing <paramref name="source"/> set.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements of source.</typeparam>
+        /// <param name="source">The <see cref="IEnumerable{T}"/> set on which to append <paramref name="item"/>.</param>
+        /// <param name="item">The item to append to <paramref name="source"/>.</param>
+        public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T item)
+        {
+            foreach (var value in source ?? Enumerable.Empty<T>())
+                yield return value;
+
+            yield return item;
+        }
+        
+        /// <summary>
         /// Returns distinct elements from a sequence by using the the default equality comparer to compare <paramref name="keySelector"/> values.
         /// </summary>
         /// <param name="source">The sequence of elements to make distinct.</param>

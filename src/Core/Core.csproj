@@ -55,8 +55,27 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Commanding\CommandContext.cs" />
+    <Compile Include="Commanding\CommandHandler.cs" />
+    <Compile Include="Commanding\CommandHandlerRegistry.cs" />
+    <Compile Include="Commanding\CommandProcessor.cs" />
     <Compile Include="Commanding\CommandReceiver.cs" />
+    <Compile Include="Commanding\IProcessCommands.cs" />
     <Compile Include="Commanding\IPublishCommands.cs" />
+    <Compile Include="Commanding\IRetrieveCommandHandlers.cs" />
+    <Compile Include="Configuration\CommandProcessorElement.cs" />
+    <Compile Include="Configuration\ConfigurationSettings.cs" />
+    <Compile Include="Configuration\CommandReceiverElement.cs" />
+    <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Domain\AggregateRepository.cs" />
+    <Compile Include="Domain\Mappings\HandleMethodCollection.cs" />
+    <Compile Include="Domain\Mappings\HandleByAttributeAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleByConventionAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleByReflectionAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleByRegistrationAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleByStrategyAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleMethodAttribute.cs" />
+    <Compile Include="Domain\Mappings\HandleMethodMapping.cs" />
     <Compile Include="Eventing\EventCollection.cs" />
     <Compile Include="Commanding\Command.cs">
       <SubType>Code</SubType>
@@ -67,16 +86,16 @@
     <Compile Include="Domain\Aggregate.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\AggregateException.cs" />
+    <Compile Include="Domain\MappingException.cs" />
     <Compile Include="Domain\AggregateUpdater.cs" />
-    <Compile Include="Domain\ApplyByReflectionAttribute.cs" />
-    <Compile Include="Domain\ApplyMethodAttribute.cs" />
-    <Compile Include="Domain\ApplyByAttributeAttribute.cs" />
-    <Compile Include="Domain\ApplyByConventionAttribute.cs" />
-    <Compile Include="Domain\ApplyByRegistrationAttribute.cs" />
-    <Compile Include="Domain\ApplyLocatorAttribute.cs" />
-    <Compile Include="Domain\ApplyMethodCollection.cs" />
-    <Compile Include="Domain\ApplyMethodMapping.cs" />
+    <Compile Include="Domain\Mappings\ApplyByReflectionAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyMethodAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyByAttributeAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyByConventionAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyByRegistrationAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyByStrategyAttribute.cs" />
+    <Compile Include="Domain\Mappings\ApplyMethodCollection.cs" />
+    <Compile Include="Domain\Mappings\ApplyMethodMapping.cs" />
     <Compile Include="Domain\IApplyEvents.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Eventing\Event.cs" />

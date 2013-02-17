@@ -17,10 +17,10 @@ using Spark.Infrastructure.Eventing;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Domain.Mappings
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public abstract class ApplyByReflectionAttribute : ApplyLocatorAttribute
+    public abstract class ApplyByReflectionAttribute : ApplyByStrategyAttribute
     {
         /// <summary>
         /// Gets or sets whether non-public apply methods will be included in apply method search.

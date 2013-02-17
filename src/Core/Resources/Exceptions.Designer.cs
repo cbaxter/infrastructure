@@ -74,9 +74,9 @@ namespace Spark.Infrastructure.Resources {
         ///Reflected Type: {1}
         ///Method Name: {2}.
         /// </summary>
-        internal static string ApplyMethodMustHaveSingleEventParameter {
+        internal static string AggregateApplyMethodInvalidParameters {
             get {
-                return ResourceManager.GetString("ApplyMethodMustHaveSingleEventParameter", resourceCulture);
+                return ResourceManager.GetString("AggregateApplyMethodInvalidParameters", resourceCulture);
             }
         }
         
@@ -85,9 +85,41 @@ namespace Spark.Infrastructure.Resources {
         ///Reflected Type: {0}
         ///Method Name: {1}.
         /// </summary>
-        internal static string ApplyMethodMustHaveVoidReturn {
+        internal static string AggregateApplyMethodMustHaveVoidReturn {
             get {
-                return ResourceManager.GetString("ApplyMethodMustHaveVoidReturn", resourceCulture);
+                return ResourceManager.GetString("AggregateApplyMethodMustHaveVoidReturn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous command handler maping strategy,
+        ///Aggregate Type: {0}.
+        /// </summary>
+        internal static string AggregateHandleByStrategyAmbiguous {
+            get {
+                return ResourceManager.GetString("AggregateHandleByStrategyAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
+        ///Reflected Type: {1}
+        ///Method Name: {2}.
+        /// </summary>
+        internal static string AggregateHandleMethodInvalidParameters {
+            get {
+                return ResourceManager.GetString("AggregateHandleMethodInvalidParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method marked with ApplyMethodAttribute must return void.
+        ///Reflected Type: {0}
+        ///Method Name: {1}.
+        /// </summary>
+        internal static string AggregateHandleMethodMustHaveVoidReturn {
+            get {
+                return ResourceManager.GetString("AggregateHandleMethodMustHaveVoidReturn", resourceCulture);
             }
         }
         
@@ -124,6 +156,52 @@ namespace Spark.Infrastructure.Resources {
         internal static string ArgumentNotGreaterThanValue {
             get {
                 return ResourceManager.GetString("ArgumentNotGreaterThanValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must be less than or equal to {0}..
+        /// </summary>
+        internal static string ArgumentNotLessThanOrEqualToValue {
+            get {
+                return ResourceManager.GetString("ArgumentNotLessThanOrEqualToValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must be less than {0}..
+        /// </summary>
+        internal static string ArgumentNotLessThanValue {
+            get {
+                return ResourceManager.GetString("ArgumentNotLessThanValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This CommandContext is being disposed on a different thread than it was created..
+        /// </summary>
+        internal static string CommandContextInterleaved {
+            get {
+                return ResourceManager.GetString("CommandContextInterleaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This CommandContext is being disposed out of order..
+        /// </summary>
+        internal static string CommandContextInvalidThread {
+            get {
+                return ResourceManager.GetString("CommandContextInvalidThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command not handled by any known aggregate type.
+        ///Command Type: {0}.
+        /// </summary>
+        internal static string CommandHandlerNotFound {
+            get {
+                return ResourceManager.GetString("CommandHandlerNotFound", resourceCulture);
             }
         }
         
@@ -165,6 +243,17 @@ namespace Spark.Infrastructure.Resources {
         internal static string DuplicateCommitException {
             get {
                 return ResourceManager.GetString("DuplicateCommitException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A command may only be handled by a single aggregate type.
+        ///Aggregate Type: {0}
+        ///Command Type: {1}.
+        /// </summary>
+        internal static string HandleMethodMustBeAssociatedWithSingleAggregate {
+            get {
+                return ResourceManager.GetString("HandleMethodMustBeAssociatedWithSingleAggregate", resourceCulture);
             }
         }
         

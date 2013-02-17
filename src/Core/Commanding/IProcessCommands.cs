@@ -1,4 +1,5 @@
 ﻿using System;
+using Spark.Infrastructure.Messaging;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -13,12 +14,19 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Commanding
 {
     /// <summary>
-    /// Apply method marker attribute for <see cref="ApplyByAttributeAttribute"/>.
+    /// <see cref="Command"/> processor instance.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public sealed class ApplyMethodAttribute : Attribute
-    { }
+    public interface IProcessCommands
+    {
+        /// <summary>
+        /// Processes a given <see cref="Command"/> instance.
+        /// </summary>
+        /// <param name="commandId">The unique <paramref name="command"/> instance id.</param>
+        /// <param name="headers">The message headers associated with the <paramref name="command"/>.</param>
+        /// <param name="command">The <see cref="Command"/> to process.</param>
+        void Process(Guid commandId, HeaderCollection headers, Command command);
+    }
 }

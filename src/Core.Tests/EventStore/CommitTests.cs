@@ -42,7 +42,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             {
                 var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), 0, Guid.NewGuid(), null, null));
 
-                Assert.Equal("revision", ex.ParamName);
+                Assert.Equal("version", ex.ParamName);
             }
 
             [Fact]

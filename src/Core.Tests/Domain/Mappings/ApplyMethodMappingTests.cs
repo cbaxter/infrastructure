@@ -1,5 +1,5 @@
 ﻿using System;
-using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Domain.Mappings;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Resources;
 using Xunit;
@@ -17,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Infrastructure.Tests.Domain.Mappings
 {
     public static class ApplyMethodMappingTests
     {

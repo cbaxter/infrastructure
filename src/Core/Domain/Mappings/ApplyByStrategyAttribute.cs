@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -17,15 +16,15 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Domain.Mappings
 {
     /// <summary>
     /// Base attribute for indicating apply method mapping strategy.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public abstract class ApplyLocatorAttribute : Attribute
+    public abstract class ApplyByStrategyAttribute : Attribute
     {
-        public static readonly ApplyLocatorAttribute Default = new ApplyByConventionAttribute();
+        public static readonly ApplyByStrategyAttribute Default = new ApplyByConventionAttribute();
 
         /// <summary>
         /// Gets or sets whether or not an event apply method is optional (Default is <value>true</value>).
@@ -33,9 +32,9 @@ namespace Spark.Infrastructure.Domain
         public Boolean ApplyOptional { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ApplyLocatorAttribute"/>.
+        /// Initializes a new instance of <see cref="ApplyByStrategyAttribute"/>.
         /// </summary>
-        protected ApplyLocatorAttribute()
+        protected ApplyByStrategyAttribute()
         {
             ApplyOptional = true;
         }

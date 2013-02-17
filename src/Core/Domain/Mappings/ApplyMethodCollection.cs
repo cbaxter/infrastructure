@@ -16,7 +16,7 @@ using Spark.Infrastructure.Eventing;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Domain.Mappings
 {
     /// <summary>
     /// A read-only mapping of aggregate type to event apply methods.

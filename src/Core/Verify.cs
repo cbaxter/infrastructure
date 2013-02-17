@@ -54,7 +54,7 @@ namespace Spark.Infrastructure
         /// <param name="paramName">The name of the parameter being checked.</param>
         public static void TypeDerivesFrom(Type baseType, Type type, [InvokerParameterName] String paramName)
         {
-            if(!type.DerivesFrom(baseType))
+            if (!type.DerivesFrom(baseType))
                 throw new ArgumentException(Exceptions.TypeDoesNotDeriveFromBase.FormatWith(baseType, type), paramName);
         }
 
@@ -69,7 +69,7 @@ namespace Spark.Infrastructure
           where T : IComparable
         {
             if (!Equals(expected, actual))
-                throw new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(expected), paramName);
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotEqualToValue.FormatWith(expected, actual));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Spark.Infrastructure
           where T : IComparable
         {
             if (ReferenceEquals(actual, null) || actual.CompareTo(exclusiveLowerBound) <= 0)
-                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanValue.FormatWith(exclusiveLowerBound));
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanValue.FormatWith(exclusiveLowerBound, actual));
         }
 
         /// <summary>
@@ -111,7 +111,35 @@ namespace Spark.Infrastructure
           where T : IComparable
         {
             if (ReferenceEquals(actual, null) || actual.CompareTo(inclusiveLowerBound) < 0)
-                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(inclusiveLowerBound));
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(inclusiveLowerBound, actual));
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is greater than or equal to <paramref name="exclusiveUpperBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="exclusiveUpperBound"/>.</typeparam>
+        /// <param name="actual">The value to check if greater than or equal to <paramref name="exclusiveUpperBound"/>.</param>
+        /// <param name="exclusiveUpperBound">The exlusive upper bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void LessThan<T>(T exclusiveUpperBound, T actual, [InvokerParameterName]String paramName)
+          where T : IComparable
+        {
+            if (ReferenceEquals(actual, null) || actual.CompareTo(exclusiveUpperBound) >= 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotLessThanValue.FormatWith(exclusiveUpperBound, actual));
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is greater than <paramref name="inclusiveUpperBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="inclusiveUpperBound"/>.</typeparam>
+        /// <param name="actual">The value to check if greater than <paramref name="inclusiveUpperBound"/>.</param>
+        /// <param name="inclusiveUpperBound">The inclusive upper bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void LessThanOrEqual<T>(T inclusiveUpperBound, T actual, [InvokerParameterName]String paramName)
+          where T : IComparable
+        {
+            if (ReferenceEquals(actual, null) || actual.CompareTo(inclusiveUpperBound) > 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotLessThanOrEqualToValue.FormatWith(inclusiveUpperBound, actual));
         }
 
         /// <summary>

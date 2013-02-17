@@ -13,13 +13,14 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure.Domain.Mappings
 {
     /// <summary>
     /// Indicates that aggregate event apply methods are explicitly mapped by specified <see cref="ApplyMethodMapping"/> type.
     /// </summary>
+    /// <remarks>Indented for use in medium trust environments while maintaining non-public apply methods.</remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public sealed class ApplyByRegistrationAttribute : ApplyLocatorAttribute
+    public sealed class ApplyByRegistrationAttribute : ApplyByStrategyAttribute
     {
         private readonly Type applyMethodMappingType;
 

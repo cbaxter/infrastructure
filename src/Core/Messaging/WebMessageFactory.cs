@@ -81,7 +81,7 @@ namespace Spark.Infrastructure.Messaging
             if (!result.ContainsKey(Header.UserName))
             {
                 var httpContext = GetHttpContext();
-                if (httpContext.User != null)
+                if (httpContext.User != null && httpContext.User.Identity.Name.IsNotNullOrWhiteSpace())
                     result[Header.UserName] = httpContext.User.Identity.Name;
             }
 

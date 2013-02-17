@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Domain.Mappings;
 using Spark.Infrastructure.Eventing;
 using Xunit;
 using Xunit.Extensions;
@@ -18,7 +19,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Infrastructure.Tests.Domain.Mappings
 {
     public static class UsingApplyByRegistrationAttribute
     {

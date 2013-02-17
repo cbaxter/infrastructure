@@ -63,10 +63,17 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Domain\ApplyByAttributeAttributeTests.cs" />
-    <Compile Include="Domain\ApplyByConventionAttributeTests.cs" />
-    <Compile Include="Domain\ApplyByRegistrationAttributeTests.cs" />
-    <Compile Include="Domain\ApplyMethodMappingTests.cs" />
+    <Compile Include="Commanding\CommandContextTests.cs" />
+    <Compile Include="Commanding\CommandHandlerRegistryTests.cs" />
+    <Compile Include="Commanding\CommandHandlerTests.cs" />
+    <Compile Include="Commanding\CommandProcessorTests.cs" />
+    <Compile Include="Commanding\CommandPublisherTests.cs" />
+    <Compile Include="Commanding\CommandReceiverTests.cs" />
+    <Compile Include="Commanding\CommandTests.cs" />
+    <Compile Include="Domain\Mappings\ApplyByAttributeAttributeTests.cs" />
+    <Compile Include="Domain\Mappings\ApplyByConventionAttributeTests.cs" />
+    <Compile Include="Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
+    <Compile Include="Domain\Mappings\ApplyMethodMappingTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />

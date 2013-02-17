@@ -87,13 +87,13 @@ namespace Spark.Infrastructure.Tests.Messaging
         public class WhenReceivingMessage
         {
             [Fact]
-            public void CannotReceiveAfterDispose()
+            public void AlwaysReturnNullAfterDispose()
             {
                 var bus = new BlockingCollectionMessageBus<Object>();
 
                 bus.Dispose();
 
-                Assert.Throws<ObjectDisposedException>(() => bus.Receive());
+                Assert.Null(bus.Receive());
             }
 
             [Fact]

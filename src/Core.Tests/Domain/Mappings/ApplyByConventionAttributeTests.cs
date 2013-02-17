@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Domain.Mappings;
 using Spark.Infrastructure.Eventing;
 using Xunit;
 using Xunit.Extensions;
@@ -18,7 +19,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Infrastructure.Tests.Domain.Mappings
 {
     public static class UsingApplyByConventionAttribute
     {
@@ -27,7 +28,7 @@ namespace Spark.Infrastructure.Tests.Domain
             [Fact]
             public void DefaultIsApplyByConventionAttribute()
             {
-                Assert.IsType(typeof(ApplyByConventionAttribute), ApplyLocatorAttribute.Default);
+                Assert.IsType(typeof(ApplyByConventionAttribute), ApplyByStrategyAttribute.Default);
             }
         }
 

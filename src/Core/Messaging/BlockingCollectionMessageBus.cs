@@ -146,7 +146,7 @@ namespace Spark.Infrastructure.Messaging
             Message<T> message;
 
             if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+                return null;
 
             if (messageQueue.IsCompleted)
                 drained.Set();

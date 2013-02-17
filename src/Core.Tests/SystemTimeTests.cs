@@ -31,8 +31,8 @@ namespace Spark.Infrastructure.Tests
             [Fact]
             public void MustOverrideWithUtcTime()
             {
-                var expectedEx = new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(DateTimeKind.Utc), "timeRetriever");
-                var actualEx = Assert.Throws<ArgumentException>(() => SystemTime.OverrideWith(() => DateTime.Now));
+                var expectedEx = new ArgumentOutOfRangeException("timeRetriever", DateTimeKind.Local, Exceptions.ArgumentNotEqualToValue.FormatWith(DateTimeKind.Utc));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => SystemTime.OverrideWith(() => DateTime.Now));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }

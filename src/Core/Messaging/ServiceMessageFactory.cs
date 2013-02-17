@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Messaging
             if (!result.ContainsKey(Header.UserName))
             {
                 var principal = Thread.CurrentPrincipal;
-                if (principal != null)
+                if (principal != null && principal.Identity.Name.IsNotNullOrWhiteSpace())
                     result[Header.UserName] = principal.Identity.Name;
             }
 

@@ -57,11 +57,11 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         /// <param name="commitId">The unique commit id.</param>
         /// <param name="streamId">The event stream id.</param>
-        /// <param name="revision">The event stream revision.</param>
+        /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
-        public Commit(Guid streamId, Int32 revision, Guid commitId, HeaderCollection headers, EventCollection events)
-            : this(streamId, revision, SystemTime.Now, commitId, headers, events)
+        public Commit(Guid streamId, Int32 version, Guid commitId, HeaderCollection headers, EventCollection events)
+            : this(streamId, version, SystemTime.Now, commitId, headers, events)
         { }
 
         /// <summary>
@@ -69,19 +69,19 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         /// <param name="commitId">The unique commit id.</param>
         /// <param name="streamId">The event stream id.</param>
-        /// <param name="revision">The event stream revision.</param>
+        /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
         /// <param name="timestamp">The <see cref="DateTime"/> when the snapshot was persisted.</param>
-        internal Commit(Guid streamId, Int32 revision, DateTime timestamp, Guid commitId, HeaderCollection headers, EventCollection events)
+        internal Commit(Guid streamId, Int32 version, DateTime timestamp, Guid commitId, HeaderCollection headers, EventCollection events)
         {
             Verify.NotEqual(Guid.Empty, commitId, "commitId");
             Verify.NotEqual(Guid.Empty, streamId, "streamId");
-            Verify.GreaterThan(0, revision, "revision");
+            Verify.GreaterThan(0, version, "version");
 
             CommitId = commitId;
             StreamId = streamId;
-            Version = revision;
+            Version = version;
             Timestamp = timestamp;
             Events = events ?? EventCollection.Empty;
             Headers = headers ?? HeaderCollection.Empty;

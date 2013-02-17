@@ -111,6 +111,32 @@ namespace Spark.Infrastructure.Tests
             }
         }
 
+        public class WhenAppendingItemToSet
+        {
+            [Fact]
+            public void CanAppendItemToNullSet()
+            {
+                var item = new Object();
+
+                Assert.Same(item, ((IEnumerable<Object>)null).Concat(item).Single());
+            }
+
+            [Fact]
+            public void CanAppendNullItemToExistingSet()
+            {
+                Assert.Null(Enumerable.Empty<Object>().Concat(null).Single());
+            }
+
+            [Fact]
+            public void ItemAlwaysAddedToEndOfSet()
+            {
+                var item = new Object();
+                var items = new[] { new Object(), new Object(), new Object(), };
+
+                Assert.Same(item, items.Concat(item).Last());
+            }
+        }
+
         public class WhenGettingDistinctValues
         {
             [Fact]

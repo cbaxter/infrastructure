@@ -87,8 +87,9 @@ namespace Spark.Infrastructure.Tests
             [Fact]
             public void NotEqualThrowsArgumentException()
             {
-                var expectedEx = new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(Guid.Empty), "paramName");
-                var actualEx = Assert.Throws<ArgumentException>(() => Verify.Equal(Guid.Empty, Guid.NewGuid(), "paramName"));
+                var actual = Guid.NewGuid();
+                var expectedEx = new ArgumentOutOfRangeException("paramName", actual,Exceptions.ArgumentNotEqualToValue.FormatWith(Guid.Empty));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.Equal(Guid.Empty, actual, "paramName"));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }
@@ -233,6 +234,143 @@ namespace Spark.Infrastructure.Tests
             public void ActualGreaterThanExpectedDoesNotThrowException()
             {
                 Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(1, 2, "paramName"));
+            }
+
+            private class Comparable : IComparable
+            {
+                private readonly Int32 value;
+
+                private Comparable(Int32 value)
+                {
+                    this.value = value;
+                }
+
+                public Int32 CompareTo(Object obj)
+                {
+                    return value.CompareTo(obj);
+                }
+
+                public override string ToString()
+                {
+                    return value.ToString(CultureInfo.InvariantCulture);
+                }
+
+                public static implicit operator Comparable(Int32 value)
+                {
+                    return new Comparable(value);
+                }
+            }
+        }
+
+        public class WhenCheckingForLessThan
+        {
+            [Fact]
+            public void NullValuesThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotLessThanValue.FormatWith(String.Empty));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThan(default(IComparable), null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void NullActualValueThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotLessThanValue.FormatWith(0));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThan((Comparable)0, null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualGreaterThanExpectedThrowsArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", 1, Exceptions.ArgumentNotLessThanValue.FormatWith(0, 1));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThan(0, 1, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualEqualToExpectedThrowsArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", 1, Exceptions.ArgumentNotLessThanValue.FormatWith(1));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThan(1, 1, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualLessThanExpectedDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.LessThan(2, 1, "paramName"));
+            }
+
+            private class Comparable : IComparable
+            {
+                private readonly Int32 value;
+
+                private Comparable(Int32 value)
+                {
+                    this.value = value;
+                }
+
+                public Int32 CompareTo(Object obj)
+                {
+                    return value.CompareTo(obj);
+                }
+
+                public override string ToString()
+                {
+                    return value.ToString(CultureInfo.InvariantCulture);
+                }
+
+                public static implicit operator Comparable(Int32 value)
+                {
+                    return new Comparable(value);
+                }
+            }
+        }
+
+        public class WhenCheckingForLessThanOrEqual
+        {
+            [Fact]
+            public void NullValuesThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotLessThanOrEqualToValue.FormatWith(String.Empty));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThanOrEqual(default(IComparable), null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void NullActualValueThrowArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", Exceptions.ArgumentNotLessThanOrEqualToValue.FormatWith(0));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThanOrEqual((Comparable)0, null, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualGreaterThanExpectedThrowsArgumentOutOfRangeException()
+            {
+                var expectedEx = new ArgumentOutOfRangeException("paramName", 2, Exceptions.ArgumentNotLessThanOrEqualToValue.FormatWith(1));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.LessThanOrEqual(1, 2, "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void ActualEqualToExpectedDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.LessThanOrEqual(1, 1, "paramName"));
+            }
+
+            [Fact]
+            public void ActualLessThanExpectedDoesNotThrowException()
+            {
+                Assert.DoesNotThrow(() => Verify.LessThanOrEqual(2, 1, "paramName"));
             }
 
             private class Comparable : IComparable
