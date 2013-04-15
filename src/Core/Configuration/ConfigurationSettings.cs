@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Spark.Infrastructure.Domain;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -20,6 +21,12 @@ namespace Spark.Infrastructure.Configuration
     /// </summary>
     internal sealed class SparkConfigurationSection : ConfigurationSection
     {
+        /// <summary>
+        /// The <see cref="AggregateRepository"/> configuration settings.
+        /// </summary>
+        [ConfigurationProperty("aggregateRepository", IsRequired = false)]
+        public AggregateRepositoryElement AggregateRepository { get { return (AggregateRepositoryElement)base["aggregateRepository"]; } }
+
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.
         /// </summary>

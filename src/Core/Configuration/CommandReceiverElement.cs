@@ -24,15 +24,15 @@ namespace Spark.Infrastructure.Configuration
     internal sealed class CommandReceiverElement : ConfigurationElement
     {
         /// <summary>
-        /// The maximum concurrency level associated with the <see cref="CommandReceiver"/>'s <see cref="PartitionedTaskScheduler"/> (default 25).
+        /// The maximum concurrency level associated with the <see cref="CommandReceiver"/>'s <see cref="PartitionedTaskScheduler"/> (default 47).
         /// </summary>
-        [ConfigurationProperty("maximumConcurrencyLevel", IsRequired = false, DefaultValue = 25)]
+        [ConfigurationProperty("maximumConcurrencyLevel", IsRequired = false, DefaultValue = 47)]
         public Int32 MaximumConcurrencyLevel { get { return (Int32)base["maximumConcurrencyLevel"]; } }
 
         /// <summary>
-        /// The bounded capacity associated with the <see cref="CommandReceiver"/>'s <see cref="PartitionedTaskScheduler"/> (default 100).
+        /// The bounded capacity associated with the <see cref="CommandReceiver"/>'s <see cref="PartitionedTaskScheduler"/> (default 1000).
         /// </summary>
-        [ConfigurationProperty("boundedCapacity", IsRequired = false, DefaultValue = 100)]
+        [ConfigurationProperty("boundedCapacity", IsRequired = false, DefaultValue = 1000)]
         public Int32 BoundedCapacity { get { return (Int32)base["boundedCapacity"]; } }
     }
 }

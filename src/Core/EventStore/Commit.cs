@@ -86,5 +86,13 @@ namespace Spark.Infrastructure.EventStore
             Events = events ?? EventCollection.Empty;
             Headers = headers ?? HeaderCollection.Empty;
         }
+
+        /// <summary>
+        /// Returns the description for this instance.
+        /// </summary>
+        public override string ToString()
+        {
+            return String.Format("{0} - {1}", GetType(), CommitId);
+        }
     }
 }

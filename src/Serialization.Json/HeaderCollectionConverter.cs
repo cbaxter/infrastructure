@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Spark.Infrastructure.EventStore;
-using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
+using Spark.Infrastructure.Messaging;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -22,15 +21,17 @@ namespace Spark.Infrastructure.Serialization.Json
     /// <summary>
     /// Converts a <see cref="HeaderCollection"/> to and from JSON.
     /// </summary>
-    public class HeaderCollectionConverter : JsonConverter
+    public sealed class HeaderCollectionConverter : JsonConverter
     {
+        private static readonly Type HeaderCollectionType = typeof(HeaderCollection);
+
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
         /// </summary>
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == typeof(HeaderCollection);
+            return objectType == HeaderCollectionType;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Spark.Infrastructure.Serialization.Json
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, Object value, NewtonsoftJsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Object value, Newtonsoft.Json.JsonSerializer serializer)
         {
             var items = (HeaderCollection)value;
 
@@ -61,7 +62,7 @@ namespace Spark.Infrastructure.Serialization.Json
         /// <param name="objectType">The type of object.</param>
         /// <param name="existingValue">The existing value of the object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, NewtonsoftJsonSerializer serializer)
+        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             var dictionary = new Dictionary<String, Object>();
 

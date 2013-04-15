@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Configuration;
-using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,17 +13,18 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Configuration
+namespace Spark.Infrastructure.Domain
 {
     /// <summary>
-    /// <see cref="CommandProcessor"/> configuration settings.
+    /// Retrieves an aggregate from the underlying event store.
     /// </summary>
-    internal sealed class CommandProcessorElement : ConfigurationElement
+    public interface IRetrieveAggregates
     {
         /// <summary>
-        /// The maximum numbert of attempts when trying to process a command (default 5).
+        /// Retrieve the aggregate of the specified <paramref name="aggregateType"/> and aggregate <paramref name="id"/>.
         /// </summary>
-        [ConfigurationProperty("maximumRetries", IsRequired = false, DefaultValue = "5")]
-        public Int32 MaximumRetries { get { return (Int32)base["maximumRetries"]; } }
+        /// <param name="aggregateType">The type of aggregate to retrieve.</param>
+        /// <param name="id">The unique aggregate id.</param>
+        Aggregate Get(Type aggregateType, Guid id);
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Eventing;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -33,7 +32,8 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// Gets the handle method collection associated with the given aggregate type.
         /// </summary>
         /// <param name="aggregateType">The aggregate type.</param>
-        internal HandleMethodCollection GetHandleMethods(Type aggregateType, IServiceProvider serviceProvider) //TODO: Pass in service provideR?
+        /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
+        internal HandleMethodCollection GetHandleMethods(Type aggregateType, IServiceProvider serviceProvider)
         {
             Verify.NotNull(aggregateType, "aggregateType");
             Verify.NotNull(serviceProvider, "serviceProvider");
@@ -46,13 +46,15 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// Creates the handle method collection for a given aggregate type.
         /// </summary>
         /// <param name="aggregateType">The aggregate type.</param>
+        /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
         protected abstract HandleMethodCollection MapHandleMethodsFor(Type aggregateType, IServiceProvider serviceProvider);
 
         /// <summary>
         /// Compiles a handle method in to an invokable action.
         /// </summary>
-        /// <param name="applyMethod">The reflected handle method.</param>
+        /// <param name="handleMethod">The reflected handle method.</param>
         /// <param name="commandType">The command type handled.</param>
+        /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
         protected Action<Aggregate, Command> CompileAction(MethodInfo handleMethod, Type commandType, IServiceProvider serviceProvider)
         {
             var commandParameter = Expression.Parameter(typeof(Command), "command");
@@ -63,7 +65,13 @@ namespace Spark.Infrastructure.Domain.Mappings
             return expression.Compile();
         }
 
-        private IEnumerable<Expression> GetMethodArguments(MethodInfo method, ParameterExpression commandParameter, IServiceProvider serviceProvider)
+        /// <summary>
+        /// Get the set of method arguments to pass in to the underlying call expression.
+        /// </summary>
+        /// <param name="method">The method definition.</param>
+        /// <param name="commandParameter">The command parameter reference.</param>
+        /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
+        private static IEnumerable<Expression> GetMethodArguments(MethodInfo method, ParameterExpression commandParameter, IServiceProvider serviceProvider)
         {
             var parameters = method.GetParameters();
 

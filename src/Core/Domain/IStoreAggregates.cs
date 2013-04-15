@@ -1,6 +1,4 @@
-﻿using System;
-using System.Configuration;
-using Spark.Infrastructure.Commanding;
+﻿using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,17 +13,18 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Configuration
+namespace Spark.Infrastructure.Domain
 {
     /// <summary>
-    /// <see cref="CommandProcessor"/> configuration settings.
+    /// Saves aggregate changes to the underlying event store.
     /// </summary>
-    internal sealed class CommandProcessorElement : ConfigurationElement
+    public interface IStoreAggregates : IRetrieveAggregates
     {
         /// <summary>
-        /// The maximum numbert of attempts when trying to process a command (default 5).
+        /// Save the specified <paramref name="context"/> changes for the given aggregate.
         /// </summary>
-        [ConfigurationProperty("maximumRetries", IsRequired = false, DefaultValue = "5")]
-        public Int32 MaximumRetries { get { return (Int32)base["maximumRetries"]; } }
+        /// <param name="aggregate">The current aggregate version for which the context applies.</param>
+        /// <param name="context">The command context containing the aggregate changes to be applied.</param>
+        void Save(Aggregate aggregate, CommandContext context);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Spark.Infrastructure.EventStore;
-using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
+using Spark.Infrastructure.Eventing;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -22,15 +21,17 @@ namespace Spark.Infrastructure.Serialization.Json
     /// <summary>
     /// Converts a <see cref="EventCollection"/> to and from JSON.
     /// </summary>
-    public class EventCollectionConverter : JsonConverter
+    public sealed class EventCollectionConverter : JsonConverter
     {
+        private static readonly Type EventCollectionType = typeof (EventCollection);
+
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
         /// </summary>
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == typeof(EventCollection);
+            return objectType == EventCollectionType;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Spark.Infrastructure.Serialization.Json
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, Object value, NewtonsoftJsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Object value, Newtonsoft.Json.JsonSerializer serializer)
         {
             var items = (EventCollection)value;
 
@@ -58,15 +59,15 @@ namespace Spark.Infrastructure.Serialization.Json
         /// <param name="objectType">The type of object.</param>
         /// <param name="existingValue">The existing value of the object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, NewtonsoftJsonSerializer serializer)
+        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
-            var list = new List<Object>();
+            var list = new List<Event>();
 
             if (reader.TokenType == JsonToken.None)
                 reader.Read();
 
             while (reader.Read() && reader.TokenType != JsonToken.EndArray)
-                list.Add(reader.Value);
+                list.Add((Event)serializer.Deserialize(reader, reader.ValueType));
 
             return new EventCollection(list);
         }

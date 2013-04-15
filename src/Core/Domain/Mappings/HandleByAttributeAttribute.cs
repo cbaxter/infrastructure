@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -27,8 +26,8 @@ namespace Spark.Infrastructure.Serialization.Json
     public class JsonSerializer : ISerializeObjects
     {
         private static readonly IReadOnlyList<JsonConverter> KnownJsonConverters;
-        private readonly NewtonsoftJsonSerializer untypedJsonSerializer;
-        private readonly NewtonsoftJsonSerializer typedJsonSerializer;
+        private readonly Newtonsoft.Json.JsonSerializer untypedJsonSerializer;
+        private readonly Newtonsoft.Json.JsonSerializer typedJsonSerializer;
         private readonly HashSet<Type> knownTypes;
 
         //TODO: Untested and Incomplete implementation...
@@ -56,18 +55,18 @@ namespace Spark.Infrastructure.Serialization.Json
             return new[] { typeof(List<Object>), typeof(Dictionary<String, Object>) };
         }
 
-        protected virtual NewtonsoftJsonSerializer GetJsonSerializer()
+        protected virtual Newtonsoft.Json.JsonSerializer GetJsonSerializer()
         {
-            var serializer = new NewtonsoftJsonSerializer
+            var serializer = new Newtonsoft.Json.JsonSerializer
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                    MissingMemberHandling = MissingMemberHandling.Ignore, 
-                    DefaultValueHandling = DefaultValueHandling.Ignore, 
+                    MissingMemberHandling = MissingMemberHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore,
                     NullValueHandling = NullValueHandling.Ignore
                 };
-            
-            foreach(var jsonConverter in KnownJsonConverters)
+
+            foreach (var jsonConverter in KnownJsonConverters)
                 serializer.Converters.Add(jsonConverter);
 
             return serializer;
@@ -84,9 +83,9 @@ namespace Spark.Infrastructure.Serialization.Json
 
         public Object Deserialize(Stream stream)
         {
-            using (var streamWriter = new StreamReader(stream, Encoding.UTF8))
-            using (var jsonWriter = new JsonTextReader(streamWriter))
-                return typedJsonSerializer.Deserialize(jsonWriter);
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+            using (var jsonReader = new JsonTextReader(streamReader))
+                return typedJsonSerializer.Deserialize(jsonReader);
         }
     }
 }

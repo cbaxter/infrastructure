@@ -63,11 +63,15 @@
     <Compile Include="Commanding\IProcessCommands.cs" />
     <Compile Include="Commanding\IPublishCommands.cs" />
     <Compile Include="Commanding\IRetrieveCommandHandlers.cs" />
+    <Compile Include="Configuration\AggregateRepositoryElement.cs" />
     <Compile Include="Configuration\CommandProcessorElement.cs" />
     <Compile Include="Configuration\ConfigurationSettings.cs" />
     <Compile Include="Configuration\CommandReceiverElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Domain\AggregateRepository.cs" />
+    <Compile Include="Domain\AggregateRepositoryExtensions.cs" />
+    <Compile Include="Domain\IRetrieveAggregates.cs" />
+    <Compile Include="Domain\IStoreAggregates.cs" />
     <Compile Include="Domain\Mappings\HandleMethodCollection.cs" />
     <Compile Include="Domain\Mappings\HandleByAttributeAttribute.cs" />
     <Compile Include="Domain\Mappings\HandleByConventionAttribute.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="Domain\IApplyEvents.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Eventing\Event.cs" />
+    <Compile Include="Eventing\Thoughts.cs" />
     <Compile Include="EventStore\Commit.cs" />
     <Compile Include="EventStore\ConcurrencyException.cs" />
     <Compile Include="EventStore\Dialects\DbCommandExtensions.cs" />
@@ -141,6 +146,7 @@
     <Compile Include="Messaging\ServiceMessageFactory.cs" />
     <Compile Include="Messaging\BlockingCollectionMessageBus.cs" />
     <Compile Include="Messaging\WebMessageFactory.cs" />
+    <Compile Include="ObjectCopier.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Exceptions.Designer.cs">

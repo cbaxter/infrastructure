@@ -52,7 +52,7 @@ namespace Spark.Infrastructure
         /// <param name="assemblies">The set of assemblies from which types are located.</param>
         public TypeLocator(params Assembly[] assemblies)
         {
-            this.assemblies = assemblies == null ? new Assembly[0] : assemblies.ToArray();
+            this.assemblies = assemblies == null || assemblies.Length == 0 ? AppDomain.CurrentDomain.GetAssemblies() : assemblies.ToArray();
         }
 
         /// <summary>

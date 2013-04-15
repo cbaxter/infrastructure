@@ -1,44 +1,35 @@
 ﻿using System;
-using System.Linq;
+using System.Threading;
 using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Configuration;
+using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
 
 namespace Spark.Infrastructure.Domain
 {
-    public static class AggregateRepositoryExtensions
-    {
-        public static TAggregate Get<TAggregate>(this IRetrieveAggregates aggregateRepository, Guid id)
-            where TAggregate : Aggregate
-        {
-            Verify.NotNull(aggregateRepository, "aggregateRepository");
-
-            return (TAggregate)aggregateRepository.Get(typeof(TAggregate), id);
-        }
-    }
-
-    public interface IRetrieveAggregates
-    {
-        Aggregate Get(Type aggregateType, Guid id);
-    }
-
-    public interface IStoreAggregates : IRetrieveAggregates
-    {
-        void Save(Aggregate aggregate, CommandContext context);
-    }
+    //TODO: Reminder when creating cached implementation, create ability to verify aggregate state before returning cached object... thus won't throw on violation of modifying state when it happens, but on next use...
 
     public class AggregateRepository : IStoreAggregates
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IApplyEvents aggregateUpdater;
         private readonly IStoreSnapshots snapshotStore;
         private readonly IStoreEvents eventStore;
+        private readonly TimeSpan retryTimeout;
 
         public AggregateRepository(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore)
+            : this(aggregateUpdater, snapshotStore, eventStore, Settings.AggregateRepository.RetryTimeout)
+        { }
+
+        internal AggregateRepository(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, TimeSpan retryTimeout)
         {
             Verify.NotNull(aggregateUpdater, "aggregateUpdater");
             Verify.NotNull(snapshotStore, "snapshotStore");
             Verify.NotNull(eventStore, "eventStore");
 
+            this.retryTimeout = retryTimeout;
             this.aggregateUpdater = aggregateUpdater;
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
@@ -56,7 +47,6 @@ namespace Spark.Infrastructure.Domain
                 ApplyCommitToAggregate(commit, aggregate);
 
             return aggregate;
-            // make thread static context?... allows two threads to be stupid and track commands/events separately.
         }
 
         private Aggregate GetOrCreate(Type aggregateType, Guid id)
@@ -74,7 +64,7 @@ namespace Spark.Infrastructure.Domain
                 aggregate = (Aggregate)snapshot.State;
                 aggregate.Id = id;
                 aggregate.Version = snapshot.Version;
-                aggregate.SnapshotVersion = snapshot.Version;
+                aggregate.SnapshotVersion = snapshot.Version; //TODO: Snapshot on load rather than save (might not be saved)?
             }
 
             return aggregate;
@@ -82,29 +72,107 @@ namespace Spark.Infrastructure.Domain
 
         public void Save(Aggregate aggregate, CommandContext context)
         {
-            var events = context.GetRaisedEvents();
-            var headers = aggregate.Version == 0 ? new HeaderCollection(context.Headers.Concat(new Header())) : context.Headers; //TODO: Set _a header as resvered header for aggregate type.
-            var commit = new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
-         
+            Verify.NotNull(aggregate, "aggregate");
+            Verify.NotNull(context, "context");
 
-            //TODO: clone
+            var commit = CreateCommit(aggregate, context);
+            var endTime = default(DateTime?);
+            var timeout = TimeSpan.Zero;
+            var saved = false;
 
-            //TODO: Might schedule task on get... have all the right info there...
-            //if ((aggregate.Version - aggregate.SnapshotVersion) > 50) //TODO: Config option
-            //{
-            //    //TODO: Confic options for threshold and save or replace behaviors
-            //    snapshotStore.SaveSnapshot(new Snapshot(aggregate.Id, aggregate.Version, aggregate)); //TODO: Suppress concurrency exception etc
-            //    aggregate.SnapshotVersion = aggregate.Version;
-            //}
+            do
+            {
+                try
+                {
+                    eventStore.SaveCommit(commit);
+                    saved = true;
+                }
+                catch (DuplicateCommitException)
+                {
+                    Log.WarnFormat("Duplicate commit: {0}", commit);
+                    saved = true;
+                }
+                catch (ConcurrencyException)
+                {
+                    Log.WarnFormat("Concurrency conflict: {0}", commit);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    if (CanRetry(ref endTime, ref timeout))
+                    {
+                        Log.Warn(ex.Message);
+                        Log.TraceFormat("Waiting {0}", timeout);
 
-            eventStore.SaveCommit(commit);
+                        Thread.Sleep(timeout);
+                    }
+                    else
+                    {
+                        Log.Error(ex);
+                        saved = true;
+                    }
+                }
+            } while (!saved);
+        }
+        
+        private static Commit CreateCommit(Aggregate aggregate, CommandContext context)
+        {
+            EventCollection events = context.GetRaisedEvents();
+            HeaderCollection headers;
 
-            //TODO: Purge from cache if cached impl on concurrencyexception and then rethrow (doesn't app[ly here, but CachedAggregateRepository impl)
+            if (aggregate.Version == 0)
+            {
+                var typeHeader = new Header(Header.Aggregate, aggregate.GetType(), checkReservedNames: false);
+
+                headers = new HeaderCollection(context.Headers.Concat(typeHeader));
+            }
+            else
+            {
+                headers = context.Headers;
+            }
+
+            return new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
+        }
+        
+        /// <summary>
+        /// Determine if another attempt should be made to process the command. 
+        /// </summary>
+        /// <param name="endTime">The absolute end time to stop processing this command.</param>
+        /// <param name="timeout">The timeout between processing attempts.</param>
+        private Boolean CanRetry(ref DateTime? endTime, ref TimeSpan timeout)
+        {
+            var now = SystemTime.Now;
+            var canRetry = false;
+
+            if (!endTime.HasValue)
+                endTime = now.Add(retryTimeout);
+
+            if (now < endTime)
+            {
+                if (timeout == TimeSpan.Zero)
+                {
+                    timeout = TimeSpan.FromMilliseconds(5);
+                }
+                else
+                {
+                    timeout = TimeSpan.FromMilliseconds(timeout.TotalMilliseconds * 2);
+
+                    var timeRemaining = endTime.Value.Subtract(now);
+                    if (timeout > timeRemaining)
+                        timeout = timeRemaining;
+                }
+
+                canRetry = true;
+            }
+
+            return canRetry;
         }
 
-        private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
+
+        private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate) //TODO: likely need to make protected
         {
             //TODO: EventContext
+
             aggregate.Version = commit.Version;
 
             foreach (var e in commit.Events)
@@ -114,6 +182,7 @@ namespace Spark.Infrastructure.Domain
         }
     }
 
+    //TODO: Implement
     //public class HookableAggregateRepository : IStoreAggregates
     //{
     //    public Aggregate Get(Type aggregateType, Guid id)
@@ -127,6 +196,10 @@ namespace Spark.Infrastructure.Domain
     //    }
     //}
 
+    //TODO: Implement
+    //TODO: Purge from cache if cached impl on concurrencyexception and then rethrow (doesn't apply here, but CachedAggregateRepository impl)
+    //TODO: Cached impl must work on copy of aggregate
+    //TODO: Cached impl should gaurd against illegal state modification
     //public class CacheableAggregateRepository : IStoreAggregates
     //{
     //    public Aggregate Get(Type aggregateType, Guid id)

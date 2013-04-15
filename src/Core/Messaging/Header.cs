@@ -22,6 +22,7 @@ namespace Spark.Infrastructure.Messaging
     /// </summary>
     public struct Header : IEquatable<Header>
     {
+        public const String Aggregate = "_a";
         public const String Origin = "_o";
         public const String Timestamp = "_t";
         public const String RemoteAddress = "_r";
