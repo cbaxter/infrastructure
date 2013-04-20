@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests.Threading
 {
-    public static class MonitorWrapperTests
+    public static class UsingSMonitorWrapper
     {
         public class WhenWaiting
         {

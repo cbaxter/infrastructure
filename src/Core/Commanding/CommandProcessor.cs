@@ -4,6 +4,7 @@ using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -28,7 +29,7 @@ namespace Spark.Infrastructure.Commanding
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IRetrieveCommandHandlers commandHandlerRegistry;
         private readonly IStoreAggregates aggregateStore;
-        private readonly Int32 maximumRetries;
+        private readonly TimeSpan retryTimeout;
 
         /// <summary>
         /// Creates a new instance of the <see cref="CommandProcessor"/> using the specified <see cref="IRetrieveCommandHandlers"/> and <see cref="IStoreAggregates"/> instances.
@@ -36,7 +37,7 @@ namespace Spark.Infrastructure.Commanding
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
         /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
         public CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore)
-            : this(commandHandlerRegistry, aggregateStore, Settings.CommandProcessor.MaximumRetries)
+            : this(commandHandlerRegistry, aggregateStore, Settings.CommandProcessor.RetryTimeout)
         { }
 
         /// <summary>
@@ -44,15 +45,15 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
         /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
-        /// <param name="maximumRetries">The maximum number of retries when attempting to processing a given command.</param>
-        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore, Int32 maximumRetries)
+        /// <param name="retryTimeout">The maximum amount of time to try processing a given command.</param>
+        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore, TimeSpan retryTimeout)
         {
             Verify.NotNull(commandHandlerRegistry, "commandHandlerRegistry");
             Verify.NotNull(aggregateStore, "aggregateStore");
 
             this.commandHandlerRegistry = commandHandlerRegistry;
             this.aggregateStore = aggregateStore;
-            this.maximumRetries = maximumRetries;
+            this.retryTimeout = retryTimeout;
         }
 
         /// <summary>
@@ -70,23 +71,33 @@ namespace Spark.Infrastructure.Commanding
             using (var context = new CommandContext(commandId, headers))
             {
                 var commandHandler = commandHandlerRegistry.GetHandlerFor(command);
-                var retriesRemaining = maximumRetries;
-                var processed = false;
+                var backoffContext = default(ExponentialBackoff);
+                var done = false;
 
                 do
                 {
                     try
                     {
                         UpdateAggregate(context, commandHandler, command);
-                        processed = true;
+                        done = true;
                     }
                     catch (ConcurrencyException)
                     {
-                        retriesRemaining--;
-                        if (retriesRemaining == 0) 
+                        if (backoffContext == null)
+                            backoffContext = new ExponentialBackoff(retryTimeout);
+
+                        if (backoffContext.CanRetry)
+                        {
+                            Log.WarnFormat("Concurrency conflict: {0}", command);
+                            backoffContext.WaitUntilRetry();
+                        }
+                        else
+                        {
                             Log.ErrorFormat("Unresolved Concurrency conflict: {0}", command);
+                            done = true;
+                        }
                     }
-                } while (!processed && retriesRemaining > 0);
+                } while (!done);
             }
         }
 

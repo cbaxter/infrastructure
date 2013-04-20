@@ -104,6 +104,7 @@
     <Compile Include="StringExtensionTests.cs" />
     <Compile Include="SystemTimeTests.cs" />
     <Compile Include="Threading\BlockingThreadPoolTaskSchedulerTests.cs" />
+    <Compile Include="Threading\ExponentialBackoffTests.cs" />
     <Compile Include="Threading\FakeMonitor.cs" />
     <Compile Include="Threading\FakeThreadPool.cs" />
     <Compile Include="Threading\PartitionedTaskSchedulerTests.cs" />

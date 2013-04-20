@@ -6,6 +6,7 @@ using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Threading;
 
 namespace Spark.Infrastructure.Domain
 {
@@ -75,46 +76,45 @@ namespace Spark.Infrastructure.Domain
             Verify.NotNull(aggregate, "aggregate");
             Verify.NotNull(context, "context");
 
+            var backoffContext = default(ExponentialBackoff);
             var commit = CreateCommit(aggregate, context);
-            var endTime = default(DateTime?);
-            var timeout = TimeSpan.Zero;
-            var saved = false;
+            var done = false;
 
             do
             {
                 try
                 {
                     eventStore.SaveCommit(commit);
-                    saved = true;
+                    done = true;
                 }
                 catch (DuplicateCommitException)
                 {
                     Log.WarnFormat("Duplicate commit: {0}", commit);
-                    saved = true;
+                    done = true;
                 }
                 catch (ConcurrencyException)
                 {
-                    Log.WarnFormat("Concurrency conflict: {0}", commit);
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    if (CanRetry(ref endTime, ref timeout))
+                    if (backoffContext == null)
+                        backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    if (backoffContext.CanRetry)
                     {
                         Log.Warn(ex.Message);
-                        Log.TraceFormat("Waiting {0}", timeout);
-
-                        Thread.Sleep(timeout);
+                        backoffContext.WaitUntilRetry();
                     }
                     else
                     {
                         Log.Error(ex);
-                        saved = true;
+                        done = true;
                     }
                 }
-            } while (!saved);
+            } while (!done);
         }
-        
+
         private static Commit CreateCommit(Aggregate aggregate, CommandContext context)
         {
             EventCollection events = context.GetRaisedEvents();
@@ -133,41 +133,6 @@ namespace Spark.Infrastructure.Domain
 
             return new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
         }
-        
-        /// <summary>
-        /// Determine if another attempt should be made to process the command. 
-        /// </summary>
-        /// <param name="endTime">The absolute end time to stop processing this command.</param>
-        /// <param name="timeout">The timeout between processing attempts.</param>
-        private Boolean CanRetry(ref DateTime? endTime, ref TimeSpan timeout)
-        {
-            var now = SystemTime.Now;
-            var canRetry = false;
-
-            if (!endTime.HasValue)
-                endTime = now.Add(retryTimeout);
-
-            if (now < endTime)
-            {
-                if (timeout == TimeSpan.Zero)
-                {
-                    timeout = TimeSpan.FromMilliseconds(5);
-                }
-                else
-                {
-                    timeout = TimeSpan.FromMilliseconds(timeout.TotalMilliseconds * 2);
-
-                    var timeRemaining = endTime.Value.Subtract(now);
-                    if (timeout > timeRemaining)
-                        timeout = timeRemaining;
-                }
-
-                canRetry = true;
-            }
-
-            return canRetry;
-        }
-
 
         private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate) //TODO: likely need to make protected
         {
@@ -181,6 +146,8 @@ namespace Spark.Infrastructure.Domain
             }
         }
     }
+
+    
 
     //TODO: Implement
     //public class HookableAggregateRepository : IStoreAggregates

@@ -23,7 +23,7 @@ namespace Spark.Infrastructure.Configuration
     internal sealed class AggregateRepositoryElement : ConfigurationElement
     {
         /// <summary>
-        /// The maximum amount of time to spend trying to process a command (default 00:00:10).
+        /// The maximum amount of time to spend trying to save a commit (default 00:00:10).
         /// </summary>
         [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
         public TimeSpan RetryTimeout { get { return (TimeSpan)base["retryTimeout"]; } }

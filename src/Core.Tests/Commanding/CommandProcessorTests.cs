@@ -25,7 +25,7 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests.Commanding
 {
-    public static class CommandProcessorTests
+    public static class UsingCommandProcessor
     {
         public abstract class UsingCommandProcessorBase
         {
@@ -99,13 +99,13 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), command.AggregateId), Times.Exactly(2));
             }
-            
+
             [Fact]
             public void WillTimeoutEventuallyIfCannotSave()
             {
                 var command = new FakeCommand();
                 var aggregate = new FakeAggregate();
-                var processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, 5);
+                var processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, TimeSpan.FromMilliseconds(20));
 
                 HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), (a, c) => { }));
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), command.AggregateId)).Returns(aggregate);
@@ -113,7 +113,7 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 processor.Process(Guid.NewGuid(), HeaderCollection.Empty, command);
 
-                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), command.AggregateId), Times.Exactly(5));
+                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), command.AggregateId), Times.Between(2, 4, Range.Inclusive));
             }
         }
 

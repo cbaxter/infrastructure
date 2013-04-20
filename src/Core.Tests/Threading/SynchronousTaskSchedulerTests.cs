@@ -1,8 +1,8 @@
-﻿using Spark.Infrastructure.Threading;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Spark.Infrastructure.Threading;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.

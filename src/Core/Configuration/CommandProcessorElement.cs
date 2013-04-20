@@ -23,9 +23,9 @@ namespace Spark.Infrastructure.Configuration
     internal sealed class CommandProcessorElement : ConfigurationElement
     {
         /// <summary>
-        /// The maximum numbert of attempts when trying to process a command (default 5).
+        /// The maximum amount of time to spend trying to process a command (default 00:00:10).
         /// </summary>
-        [ConfigurationProperty("maximumRetries", IsRequired = false, DefaultValue = "5")]
-        public Int32 MaximumRetries { get { return (Int32)base["maximumRetries"]; } }
+        [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
+        public TimeSpan RetryTimeout { get { return (TimeSpan)base["retryTimeout"]; } }
     }
 }
