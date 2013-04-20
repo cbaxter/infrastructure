@@ -112,6 +112,7 @@
     <Compile Include="EventStore\Dialects\IEventStoreDialect.cs" />
     <Compile Include="EventStore\Dialects\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Dialects\SqlServerDialect.cs" />
+    <Compile Include="EventStore\Dialects\SqlServerSequentialGuid.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSqlStatements.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -159,7 +160,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
-    <Compile Include="SequentialGuid.cs" />
+    <Compile Include="GuidStrategy.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\ISerializeObjects.cs" />
     <Compile Include="StringExtensions.cs" />

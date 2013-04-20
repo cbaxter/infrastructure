@@ -39,7 +39,7 @@ namespace Spark.Infrastructure.Messaging
         /// <param name="headers">The message headers.</param>
         public Message<T> Create<T>(T payload, IEnumerable<Header> headers)
         {
-            return new Message<T>(SequentialGuid.NewGuid(), new HeaderCollection(CreateHeaderDictionary(headers)), payload);
+            return new Message<T>(GuidStrategy.NewGuid(), new HeaderCollection(CreateHeaderDictionary(headers)), payload);
         }
         
         /// <summary>
