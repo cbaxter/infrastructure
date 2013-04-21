@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.EventStore;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -38,5 +38,11 @@ namespace Spark.Infrastructure.Configuration
         /// </summary>
         [ConfigurationProperty("commandReceiver", IsRequired = false)]
         public CommandReceiverElement CommandReceiver { get { return (CommandReceiverElement)base["commandReceiver"]; } }
+
+        /// <summary>
+        /// The <see cref="IStoreEvents"/> configuration settings.
+        /// </summary>
+        [ConfigurationProperty("eventStore", IsRequired = false)]
+        public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"]; } }
     }
 }

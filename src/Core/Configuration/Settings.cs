@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Spark.Infrastructure.EventStore;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -55,6 +56,14 @@ namespace Spark.Infrastructure.Configuration
         public static CommandReceiverElement CommandReceiver
         {
             get { return Default.CommandReceiver; }
+        }
+
+        /// <summary>
+        /// The <see cref="IStoreEvents"/> configuration settings.
+        /// </summary>
+        public static EventStoreElement Eventstore
+        {
+            get { return Default.EventStore; }
         }
     }
 }

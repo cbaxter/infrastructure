@@ -29,6 +29,10 @@ namespace Spark.Infrastructure.EventStore.Dialects
         String DeleteStreamStatement { get; }
         String DeleteStreamsStatement { get; }
         String EnsureCommitTableCreatedStatement { get; }
+        String EnsureDuplicateCommitsSuppressedStatement { get; }
+        String EnsureDuplicateCommitsDetectedStatement { get; }
+        String EnsureTimestampIndexCreatedStatement { get; }
+        String EnsureTimestampIndexDroppedStatement { get; }
 
         DbParameter CreateTimestampParameter(DateTime timestamp);
         DbParameter CreateCommitIdParameter(Guid commitId);

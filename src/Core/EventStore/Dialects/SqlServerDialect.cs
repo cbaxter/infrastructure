@@ -38,6 +38,10 @@ namespace Spark.Infrastructure.EventStore.Dialects
         public String DeleteStreamStatement { get { return SqlServerSqlStatements.DeleteStream; } }
         public String DeleteStreamsStatement { get { return SqlServerSqlStatements.PurgeCommits; } }
         public String EnsureCommitTableCreatedStatement { get { return SqlServerSqlStatements.EnsureCommitTableCreated; } }
+        public String EnsureDuplicateCommitsSuppressedStatement { get { return SqlServerSqlStatements.EnsureDuplicateCommitsSuppressed; } }
+        public String EnsureDuplicateCommitsDetectedStatement { get { return SqlServerSqlStatements.EnsureDuplicateCommitsDetected; } }
+        public String EnsureTimestampIndexCreatedStatement { get { return SqlServerSqlStatements.EnsureTimestampIndexCreated; } }
+        public String EnsureTimestampIndexDroppedStatement { get { return SqlServerSqlStatements.EnsureTimestampIndexDropped; } }
 
         // ISnapshotStoreDialect
         public String GetSnapshotStatement { get { return SqlServerSqlStatements.GetSnapshot; } }

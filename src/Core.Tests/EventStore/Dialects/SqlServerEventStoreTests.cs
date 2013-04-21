@@ -32,7 +32,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
 
             internal UsingInitializedEventStore()
             {
-                EventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5));
+                EventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5), true, true);
                 EventStore.Initialize();
             }
 

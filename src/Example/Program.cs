@@ -26,12 +26,20 @@ namespace Example
 
             var commandReceiver = container.Resolve<CommandReceiver>();
             var commandPublisher = container.Resolve<IPublishCommands>();
+            var eventStore = container.Resolve<IStoreEvents>();
 
             var connection = new SqlConnection("Data Source=(local); Initial Catalog=Infrastructure; Integrated Security=true;");
             var command = new SqlCommand("SELECT SUM (row_count) FROM sys.dm_db_partition_stats WHERE object_id=OBJECT_ID('Commit') AND (index_id=0 or index_id=1)", connection);
             var count = 100000;
             var commits = 0L;
 
+            Console.WriteLine("Initializing event store...");
+            eventStore.Initialize();
+
+            Console.WriteLine("Purging event store...");
+            eventStore.Purge();
+
+            Console.WriteLine("Starting performance test...");
             DateTime start = DateTime.Now;
 
             for (var i = 1; i <= count; i++)

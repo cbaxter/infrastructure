@@ -67,6 +67,7 @@
     <Compile Include="Configuration\CommandProcessorElement.cs" />
     <Compile Include="Configuration\ConfigurationSettings.cs" />
     <Compile Include="Configuration\CommandReceiverElement.cs" />
+    <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Domain\AggregateRepository.cs" />
     <Compile Include="Domain\AggregateRepositoryExtensions.cs" />

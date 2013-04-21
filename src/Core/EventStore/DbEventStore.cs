@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.EventStore.Dialects;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Logging;
@@ -31,6 +32,9 @@ namespace Spark.Infrastructure.EventStore
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IEventStoreDialect dialect;
+        private readonly Boolean detectDuplicateCommits;
+        private readonly Boolean useGetStreamOnly;
+
         private static class Column
         {
             public const Int32 StreamId = 0;
@@ -47,7 +51,7 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="connectionName">The name of the connection string associated with this <see cref="DbSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         public DbEventStore(String connectionName, ISerializeObjects serializer)
-            : this(connectionName, serializer, DialectProvider.GetEventStoreDialect(connectionName))
+            : this(connectionName, serializer, DialectProvider.GetEventStoreDialect(connectionName), Settings.Eventstore.UseGetStreamOnly, Settings.Eventstore.DetectDuplicateCommits)
         { }
 
         /// <summary>
@@ -56,12 +60,16 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="connectionName">The name of the connection string associated with this <see cref="DbSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal DbEventStore(String connectionName, ISerializeObjects serializer, IEventStoreDialect dialect)
+        /// <param name="useGetStreamOnly">Specify <value>true</value> to ensure `timestamp` has no index; otherwise <value>false</value> to ensure timestamp has index.</param>
+        /// <param name="detectDuplicateCommits">Specify <value>true</value> to ensure `commitId` has a unique index; otherwise <value>false</value> to ensure no unique index.</param>
+        internal DbEventStore(String connectionName, ISerializeObjects serializer, IEventStoreDialect dialect, Boolean useGetStreamOnly, Boolean detectDuplicateCommits)
             : base(connectionName, serializer, dialect)
         {
             Verify.NotNull(dialect, "dialect");
 
             this.dialect = dialect;
+            this.useGetStreamOnly = useGetStreamOnly;
+            this.detectDuplicateCommits = detectDuplicateCommits;
         }
 
         /// <summary>
@@ -69,12 +77,20 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         public void Initialize()
         {
-            using (var command = CreateCommand(dialect.EnsureCommitTableCreatedStatement))
-            {
-                Log.Trace("Initializing event store");
+            Log.Trace("Initializing event store");
 
+            using (var command = CreateCommand(dialect.EnsureCommitTableCreatedStatement))
                 ExecuteNonQuery(command);
-            }
+
+            // NOTE: Most durable message queues ensure `at least once` delivery of messages; however when using an internal message 
+            //       queue (i.e., BlockingCollection) or non-durable message queue (i.e., IPC via named pipes) duplicate commits may 
+            //       not need to be enforced. Allow additional commit ID unique index be created/droped as desired.
+            using (var command = CreateCommand(detectDuplicateCommits ? dialect.EnsureDuplicateCommitsDetectedStatement : dialect.EnsureDuplicateCommitsSuppressedStatement))
+                ExecuteNonQuery(command);
+
+            // NOTE: Allow optimization for lookup by streamId (no index write overhead) or by timestamp.
+            using (var command = CreateCommand(useGetStreamOnly ? dialect.EnsureTimestampIndexDroppedStatement : dialect.EnsureTimestampIndexCreatedStatement))
+                ExecuteNonQuery(command);
         }
 
         /// <summary>
@@ -102,6 +118,9 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="page">The current page of data to retrieve.</param>
         private IEnumerable<Commit> GetFrom(DateTime startTime, Page page)
         {
+            if (useGetStreamOnly)
+                Log.Warn("Event store not optimized for timestamp based queries.");
+
             using (var command = new SqlCommand(dialect.GetCommits))
             {
                 Log.TraceFormat("Getting commits since {0} ({1})", startTime, page);
