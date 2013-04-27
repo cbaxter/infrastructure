@@ -4,6 +4,7 @@ using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -81,21 +82,16 @@ namespace Spark.Infrastructure.Commanding
                         UpdateAggregate(context, commandHandler, command);
                         done = true;
                     }
-                    catch (ConcurrencyException)
+                    catch (ConcurrencyException ex)
                     {
                         if (backoffContext == null)
                             backoffContext = new ExponentialBackoff(retryTimeout);
 
-                        if (backoffContext.CanRetry)
-                        {
-                            Log.WarnFormat("Concurrency conflict: {0}", command);
-                            backoffContext.WaitUntilRetry();
-                        }
-                        else
-                        {
-                            Log.ErrorFormat("Unresolved Concurrency conflict: {0}", command);
-                            done = true;
-                        }
+                        if (!backoffContext.CanRetry)
+                            throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(command), ex);
+
+                        Log.WarnFormat("Concurrency conflict: {0}", command);
+                        backoffContext.WaitUntilRetry();
                     }
                 } while (!done);
             }

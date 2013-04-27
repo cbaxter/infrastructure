@@ -206,6 +206,17 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The commit operation has timed out.
+        ///Commit Id: {0}
+        ///Stream Id: {0}.
+        /// </summary>
+        internal static string CommitTimeout {
+            get {
+                return ResourceManager.GetString("CommitTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Concurrency Exception.
         ///Stream Id: {0}
         ///Version: {1}.
@@ -329,6 +340,15 @@ namespace Spark.Infrastructure.Resources {
         internal static string UnknownDialect {
             get {
                 return ResourceManager.GetString("UnknownDialect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unresolved Concurrency conflict: {0}.
+        /// </summary>
+        internal static string UnresolvedConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("UnresolvedConcurrencyConflict", resourceCulture);
             }
         }
     }

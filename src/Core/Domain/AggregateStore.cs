@@ -1,36 +1,39 @@
 ﻿using System;
-using System.Threading;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 using Spark.Infrastructure.Threading;
 
 namespace Spark.Infrastructure.Domain
 {
-    //TODO: Reminder when creating cached implementation, create ability to verify aggregate state before returning cached object... thus won't throw on violation of modifying state when it happens, but on next use...
-
-    public class AggregateRepository : IStoreAggregates
+    public sealed class AggregateStore : IStoreAggregates
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IApplyEvents aggregateUpdater;
         private readonly IStoreSnapshots snapshotStore;
         private readonly IStoreEvents eventStore;
+        private readonly Int32 snapshotInterval;
         private readonly TimeSpan retryTimeout;
 
-        public AggregateRepository(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore)
-            : this(aggregateUpdater, snapshotStore, eventStore, Settings.AggregateRepository.RetryTimeout)
+        public AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore)
+            : this(aggregateUpdater, snapshotStore, eventStore, Settings.AggregateStore.SnapshotInterval, Settings.AggregateStore.SaveRetryTimeout)
         { }
 
-        internal AggregateRepository(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, TimeSpan retryTimeout)
+        //TODO: create interface for settings so only pass in 1 additional arg?
+        internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, Int32 snapshotInterval, TimeSpan retryTimeout) 
         {
-            Verify.NotNull(aggregateUpdater, "aggregateUpdater");
-            Verify.NotNull(snapshotStore, "snapshotStore");
             Verify.NotNull(eventStore, "eventStore");
+            Verify.NotNull(snapshotStore, "snapshotStore");
+            Verify.NotNull(aggregateUpdater, "aggregateUpdater");
+            Verify.GreaterThanOrEqual(0, snapshotInterval, "snapshotInterval");
+            Verify.GreaterThanOrEqual(TimeSpan.Zero, retryTimeout, "retryTimeout");
 
             this.retryTimeout = retryTimeout;
+            this.snapshotInterval = snapshotInterval;
             this.aggregateUpdater = aggregateUpdater;
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
@@ -65,13 +68,12 @@ namespace Spark.Infrastructure.Domain
                 aggregate = (Aggregate)snapshot.State;
                 aggregate.Id = id;
                 aggregate.Version = snapshot.Version;
-                aggregate.SnapshotVersion = snapshot.Version; //TODO: Snapshot on load rather than save (might not be saved)?
             }
 
             return aggregate;
         }
 
-        public void Save(Aggregate aggregate, CommandContext context)
+        public Commit Save(Aggregate aggregate, CommandContext context)
         {
             Verify.NotNull(aggregate, "aggregate");
             Verify.NotNull(context, "context");
@@ -101,18 +103,24 @@ namespace Spark.Infrastructure.Domain
                     if (backoffContext == null)
                         backoffContext = new ExponentialBackoff(retryTimeout);
 
-                    if (backoffContext.CanRetry)
-                    {
-                        Log.Warn(ex.Message);
-                        backoffContext.WaitUntilRetry();
-                    }
-                    else
-                    {
-                        Log.Error(ex);
-                        done = true;
-                    }
+                    if (!backoffContext.CanRetry)
+                        throw new TimeoutException(Exceptions.CommitTimeout.FormatWith(commit.CommitId, commit.StreamId), ex);
+
+                    Log.Warn(ex.Message);
+                    backoffContext.WaitUntilRetry();
                 }
             } while (!done);
+
+            // NOTE: Apply commit directly to existing aggregate. By default, each call to `Get` returns a new `Aggregate` instance.
+            //       Should the caller hold on to a reference to `this` aggregate instance, it is their responsibility to gaurd against
+            //       modifications (via `aggregate.Copy()` call) if they require an unaltered instance of `aggregate`.
+            ApplyCommitToAggregate(commit, aggregate);
+
+            // NOTE: We do not need multiple snapshots for a given aggregate; thus we will simply replace any existing snapshot if required.
+            if (aggregate.Version > 0 && aggregate.Version % snapshotInterval == 0)
+                snapshotStore.ReplaceSnapshot(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
+
+            return commit;
         }
 
         private static Commit CreateCommit(Aggregate aggregate, CommandContext context)
@@ -134,49 +142,13 @@ namespace Spark.Infrastructure.Domain
             return new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
         }
 
-        private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate) //TODO: likely need to make protected
+        private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
         {
             //TODO: EventContext
 
             aggregate.Version = commit.Version;
-
             foreach (var e in commit.Events)
-            {
                 aggregateUpdater.Apply(e, aggregate);
-            }
         }
     }
-
-    
-
-    //TODO: Implement
-    //public class HookableAggregateRepository : IStoreAggregates
-    //{
-    //    public Aggregate Get(Type aggregateType, Guid id)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Save(Aggregate aggregate, CommandContext context)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-    //TODO: Implement
-    //TODO: Purge from cache if cached impl on concurrencyexception and then rethrow (doesn't apply here, but CachedAggregateRepository impl)
-    //TODO: Cached impl must work on copy of aggregate
-    //TODO: Cached impl should gaurd against illegal state modification
-    //public class CacheableAggregateRepository : IStoreAggregates
-    //{
-    //    public Aggregate Get(Type aggregateType, Guid id)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Save(Aggregate aggregate, CommandContext context)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 }

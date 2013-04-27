@@ -28,7 +28,7 @@ namespace Example.Modules
 
 
             builder.RegisterType<AggregateUpdater>().As<IApplyEvents>().SingleInstance();
-            builder.RegisterType<AggregateRepository>().As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
+            builder.RegisterType<AggregateStore>().As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
             builder.Register(context => new DbEventStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreEvents>().SingleInstance();
             builder.Register(context => new DbSnapshotStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreSnapshots>().SingleInstance();
 

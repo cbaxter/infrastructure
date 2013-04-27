@@ -1,4 +1,5 @@
 ﻿using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.EventStore;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -25,6 +26,6 @@ namespace Spark.Infrastructure.Domain
         /// </summary>
         /// <param name="aggregate">The current aggregate version for which the context applies.</param>
         /// <param name="context">The command context containing the aggregate changes to be applied.</param>
-        void Save(Aggregate aggregate, CommandContext context);
+        Commit Save(Aggregate aggregate, CommandContext context);
     }
 }

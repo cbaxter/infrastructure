@@ -22,10 +22,10 @@ namespace Spark.Infrastructure.Configuration
     internal sealed class SparkConfigurationSection : ConfigurationSection
     {
         /// <summary>
-        /// The <see cref="AggregateRepository"/> configuration settings.
+        /// The <see cref="AggregateStore"/> configuration settings.
         /// </summary>
-        [ConfigurationProperty("aggregateRepository", IsRequired = false)]
-        public AggregateRepositoryElement AggregateRepository { get { return (AggregateRepositoryElement)base["aggregateRepository"]; } }
+        [ConfigurationProperty("aggregateStore", IsRequired = false)]
+        public AggregateStoreElement AggregateStore { get { return (AggregateStoreElement)base["aggregateStore"]; } }
 
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.

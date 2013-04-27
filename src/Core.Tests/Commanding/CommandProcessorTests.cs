@@ -111,9 +111,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), command.AggregateId)).Returns(aggregate);
                 AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
 
-                processor.Process(Guid.NewGuid(), HeaderCollection.Empty, command);
-
-                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), command.AggregateId), Times.Between(2, 4, Range.Inclusive));
+                Assert.Throws<TimeoutException>(()=> processor.Process(Guid.NewGuid(), HeaderCollection.Empty, command));
             }
         }
 

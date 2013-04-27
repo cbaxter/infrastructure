@@ -37,9 +37,9 @@ namespace Spark.Infrastructure.Configuration
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.
         /// </summary>
-        public static AggregateRepositoryElement AggregateRepository
+        public static AggregateStoreElement AggregateStore
         {
-            get { return Default.AggregateRepository; }
+            get { return Default.AggregateStore; }
         }
 
         /// <summary>

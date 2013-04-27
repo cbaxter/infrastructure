@@ -29,6 +29,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         [IgnoreDataMember]
         internal Guid AggregateId { get { return GetAggregateId(); } }
+        //TODO: Replace with --> internal protected abstract Guid AggregateId { get; } (should simplify inherited class code).
 
         /// <summary>
         /// The message header collection associated with this command instance.

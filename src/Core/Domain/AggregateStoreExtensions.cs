@@ -18,7 +18,7 @@ namespace Spark.Infrastructure.Domain
     /// <summary>
     /// Extension methods of <see cref="IRetrieveAggregates"/> and <see cref="IStoreAggregates"/>.
     /// </summary>
-    public static class AggregateRepositoryExtensions
+    public static class AggregateStoreExtensions
     {
         /// <summary>
         /// Retrieve the aggregate of the specified <typeparamref name="TAggregate"/> type and aggregate <paramref name="id"/>.

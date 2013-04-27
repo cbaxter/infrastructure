@@ -9,7 +9,7 @@ using Spark.Infrastructure.Logging;
 
 namespace Spark.Infrastructure.Domain
 {
-    public sealed class AggregateUpdater : IApplyEvents //TODO: IRetrieveApplyMethods? (i.e., make similar to CommandHandlerRegistry...)
+    public sealed class AggregateUpdater : IApplyEvents
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private static readonly Action<Aggregate, Event> VoidApplyMethod = (aggregate, e) => { };

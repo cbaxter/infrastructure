@@ -172,6 +172,11 @@ Method Name: {1}</value>
     <value>Command not handled by any known aggregate type.
 Command Type: {0}</value>
   </data>
+  <data name="CommitTimeout" xml:space="preserve">
+    <value>The commit operation has timed out.
+Commit Id: {0}
+Stream Id: {0}</value>
+  </data>
   <data name="ConcurrencyException" xml:space="preserve">
     <value>Concurrency Exception.
 Stream Id: {0}
@@ -220,5 +225,8 @@ Type: {1}</value>
   <data name="UnknownDialect" xml:space="preserve">
     <value>Unknown database dialect.
 Provider Name: {0}</value>
+  </data>
+  <data name="UnresolvedConcurrencyConflict" xml:space="preserve">
+    <value>Unresolved Concurrency conflict: {0}</value>
   </data>
 </root>
