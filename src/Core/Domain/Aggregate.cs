@@ -24,7 +24,7 @@ namespace Spark.Infrastructure.Domain
         {
             lock (SyncLock)
             {
-                return ObjectCopier.Copy(this);    
+                return ObjectCopier.Copy(this);
             }
         }
 

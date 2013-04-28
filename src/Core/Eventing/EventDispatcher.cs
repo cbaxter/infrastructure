@@ -1,8 +1,11 @@
-﻿using Spark.Infrastructure.Commanding;
+﻿using System;
+using System.Linq;
+using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Threading;
 
 namespace Spark.Infrastructure.Eventing
 {
@@ -24,11 +27,58 @@ namespace Spark.Infrastructure.Eventing
 
             this.messageFactory = messageFactory;
             this.messageSender = messageSender;
+
+            //TODO: Pull any undispatched messages and dispatch (or at least have ready to dispatch -- have to review startup sequence to determine ordering)?
         }
 
         public override void PostSave(CommandContext context, Commit commit)
         {
-            //TODO: Implement...
+            var count = commit.Events.Count;
+            for (var i = 0; i < count; i++)
+            {
+                try
+                {
+                    DispatchEvent(commit.StreamId, commit.Headers, commit.Events[i]);
+                }
+                catch (TimeoutException)
+                {
+                    Log.ErrorFormat("Failed to dispatch {0} of {1} events from commit {2}", count - i, count, commit.CommitId);
+                    //TODO: Track failed commit, and specific event within commit that failed... 
+                    //      perhaps serialize just events that weren't dispatched from commit  (i.e., convert to messages and serialize messages)? { Timestamp = commit.Timestamp, Headers = commit.Headers, Event = e}
+                    //      Write out to local storage (file-system?, sqlce? something?).
+                    throw;
+                }
+            }
+        }
+
+        private void DispatchEvent(Guid aggregateId, HeaderCollection headers, Event e)
+        {
+            var message = messageFactory.Create(new EventEnvelope(aggregateId, e), headers);
+            var backoffContext = default(ExponentialBackoff);
+            var done = false;
+
+            do
+            {
+                try
+                {
+                    messageSender.Send(message);
+                    done = true;
+                }
+                catch (Exception ex)
+                {
+                    //if (backoffContext == null)
+                    //    backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    //if (!backoffContext.CanRetry)
+                    //{
+                    //    //TODO: Write out to local storage (file system, sqlce, or something that is lightweight/durable -- local filesystem least likely to fail).
+                    //    throw new TimeoutException(Exceptions.DispatchTimeout.FormatWith(commit.CommitId, commit.StreamId), ex);
+                    //}
+
+                    Log.Warn(ex.Message);
+                    //backoffContext.WaitUntilRetry();
+                }
+            } while (!done);
         }
     }
 }

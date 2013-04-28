@@ -29,7 +29,15 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         [IgnoreDataMember]
         internal Guid AggregateId { get { return GetAggregateId(); } }
-        //TODO: Replace with --> internal protected abstract Guid AggregateId { get; } (should simplify inherited class code).
+        //TODO: Replace with --> internal protected abstract Guid AggregateId { get; } (should simplify inherited class code)
+        //      OR
+        //      remove completely and create command wrapper class (envelop) that separates aggregate id from command/event...
+        //      message: { id: ~, headers: ~, payload: { aggregateId, command } so wrap command in CommandEnvelope (or EventEnvelop) that attaches additional meta-data?
+        //      commandPublisher(aggregateId, command) ==> messageFactory.Create(new CommandEnvelope(aggregateId, command));
+        //      eventDispatcher(aggregateId, event, headers) ==> messageFactory.Create(new EventEnvelope(aggregateId, aggregateType, event), headers);
+        //      envelope classes would be internal??? classes could actually be structs?
+        //      OR
+        //      Convert existing ICreateMessages in to something else and have explicit ICreateCommandMessages, ICreateEventMessages... 
 
         /// <summary>
         /// The message header collection associated with this command instance.

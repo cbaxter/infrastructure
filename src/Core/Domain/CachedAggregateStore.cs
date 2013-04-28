@@ -72,6 +72,7 @@ namespace Spark.Infrastructure.Domain
             var cachedValue = memoryCache.AddOrGetExisting(key, lazyValue, CreateCacheItemPolicy());
 
             //TODO: Gaurd against illegal state modification (with option to enable/disable) -- i.e., throw execption if illegally modified cached instance.
+            //      Create ObjectHasher that can be exposed via extension method (ToHash()); similar in impl to ObjectCloner without copy...
 
             return cachedValue as Aggregate ?? (cachedValue as Lazy<Aggregate> ?? lazyValue).Value;
         }

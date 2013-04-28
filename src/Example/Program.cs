@@ -26,6 +26,7 @@ namespace Example
 
             var commandReceiver = container.Resolve<CommandReceiver>();
             var commandPublisher = container.Resolve<IPublishCommands>();
+            var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
 
             var connection = new SqlConnection("Data Source=(local); Initial Catalog=Infrastructure; Integrated Security=true;");
@@ -34,8 +35,9 @@ namespace Example
             var commits = 0L;
 
             Console.WriteLine("Initializing event store...");
+            snapshotStore.Initialize();
             eventStore.Initialize();
-
+            
             Console.WriteLine("Purging event store...");
             eventStore.Purge();
 
@@ -52,17 +54,19 @@ namespace Example
                 try
                 {
                     commits = (Int64)command.ExecuteScalar();
+                    Console.Write("\rCommits: " + commits);
                 }
                 finally
                 {
                     connection.Close();
                 }
 
-                Thread.Sleep(25);
+                Thread.Sleep(500);
             }
 
             DateTime end = DateTime.Now;
 
+            Console.WriteLine();
             Console.WriteLine((count / end.Subtract(start).TotalSeconds) + @" / sec");
         }
     }
