@@ -19,30 +19,45 @@ namespace Spark.Infrastructure.Configuration
     /// <summary>
     /// The main configuration section where all custom settings are contained.
     /// </summary>
-    internal sealed class SparkConfigurationSection : ConfigurationSection
+    public interface ISettings
     {
         /// <summary>
         /// The <see cref="AggregateStore"/> configuration settings.
         /// </summary>
-        [ConfigurationProperty("aggregateStore", IsRequired = false)]
-        public AggregateStoreElement AggregateStore { get { return (AggregateStoreElement)base["aggregateStore"]; } }
+        IStoreAggregateSettings AggregateStore { get; }
 
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.
         /// </summary>
-        [ConfigurationProperty("commandProcessor", IsRequired = false)]
-        public CommandProcessorElement CommandProcessor { get { return (CommandProcessorElement)base["commandProcessor"]; } }
+        IProcessCommandSettings CommandProcessor { get; }
 
         /// <summary>
         /// The <see cref="CommandReceiver"/> configuration settings.
         /// </summary>
-        [ConfigurationProperty("commandReceiver", IsRequired = false)]
-        public CommandReceiverElement CommandReceiver { get { return (CommandReceiverElement)base["commandReceiver"]; } }
+        IReceiveCommandSettings CommandReceiver { get; }
 
         /// <summary>
         /// The <see cref="IStoreEvents"/> configuration settings.
         /// </summary>
+        IStoreEventSettings EventStore { get; }
+    }
+
+    internal sealed class SparkConfigurationSection : ConfigurationSection, ISettings
+    {
+        [ConfigurationProperty("aggregateStore", IsRequired = false)]
+        public AggregateStoreElement AggregateStore { get { return (AggregateStoreElement)base["aggregateStore"] ?? new AggregateStoreElement(); } }
+        IStoreAggregateSettings ISettings.AggregateStore { get { return AggregateStore; } }
+
+        [ConfigurationProperty("commandProcessor", IsRequired = false)]
+        public CommandProcessorElement CommandProcessor { get { return (CommandProcessorElement)base["commandProcessor"] ?? new CommandProcessorElement(); } }
+        IProcessCommandSettings ISettings.CommandProcessor { get { return CommandProcessor; } }
+
+        [ConfigurationProperty("commandReceiver", IsRequired = false)]
+        public CommandReceiverElement CommandReceiver { get { return (CommandReceiverElement)base["commandReceiver"] ?? new CommandReceiverElement(); } }
+        IReceiveCommandSettings ISettings.CommandReceiver { get { return CommandReceiver; } }
+
         [ConfigurationProperty("eventStore", IsRequired = false)]
-        public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"]; } }
+        public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"] ?? new EventStoreElement(); } }
+        IStoreEventSettings ISettings.EventStore { get { return EventStore; } }
     }
 }

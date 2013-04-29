@@ -20,17 +20,24 @@ namespace Spark.Infrastructure.Configuration
     /// <summary>
     /// <see cref="IStoreEvents"/> configuration settings.
     /// </summary>
-    internal sealed class EventStoreElement : ConfigurationElement
+    public interface IStoreEventSettings
     {
         /// <summary>
         /// Optimizes the <see cref="IStoreEvents"/> implementation for <see cref="IStoreEvents.GetStream"/> use only (i.e., no timestamp index created for <see cref="IStoreEvents.GetFrom"/>).
         /// </summary>
-        [ConfigurationProperty("useGetStreamOnly", IsRequired = false, DefaultValue = false)]
-        public Boolean UseGetStreamOnly { get { return (Boolean)base["useGetStreamOnly"]; } }
+        Boolean UseGetStreamOnly { get; }
 
         /// <summary>
         /// Optimizes the <see cref="IStoreEvents"/> implementation by omitting the duplicate commit detection (i.e., no unique index on commitId).
         /// </summary>
+        Boolean DetectDuplicateCommits { get; }
+    }
+
+    internal sealed class EventStoreElement : ConfigurationElement, IStoreEventSettings
+    {
+        [ConfigurationProperty("useGetStreamOnly", IsRequired = false, DefaultValue = false)]
+        public Boolean UseGetStreamOnly { get { return (Boolean)base["useGetStreamOnly"]; } }
+
         [ConfigurationProperty("detectDuplicateCommits", IsRequired = false, DefaultValue = true)]
         public Boolean DetectDuplicateCommits { get { return (Boolean)base["detectDuplicateCommits"]; } }
     }

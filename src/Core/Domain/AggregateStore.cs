@@ -20,20 +20,18 @@ namespace Spark.Infrastructure.Domain
         private readonly TimeSpan retryTimeout;
 
         public AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore)
-            : this(aggregateUpdater, snapshotStore, eventStore, Settings.AggregateStore.SnapshotInterval, Settings.AggregateStore.SaveRetryTimeout)
+            : this(aggregateUpdater, snapshotStore, eventStore, Settings.Default.AggregateStore)
         { }
 
-        //TODO: create interface for settings so only pass in 1 additional arg?
-        internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, Int32 snapshotInterval, TimeSpan retryTimeout) 
+        internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, IStoreAggregateSettings settings) 
         {
+            Verify.NotNull(settings, "settings");
             Verify.NotNull(eventStore, "eventStore");
             Verify.NotNull(snapshotStore, "snapshotStore");
             Verify.NotNull(aggregateUpdater, "aggregateUpdater");
-            Verify.GreaterThanOrEqual(0, snapshotInterval, "snapshotInterval");
-            Verify.GreaterThanOrEqual(TimeSpan.Zero, retryTimeout, "retryTimeout");
 
-            this.retryTimeout = retryTimeout;
-            this.snapshotInterval = snapshotInterval;
+            this.snapshotInterval = settings.SnapshotInterval;
+            this.retryTimeout = settings.SaveRetryTimeout;
             this.aggregateUpdater = aggregateUpdater;
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
@@ -145,7 +143,6 @@ namespace Spark.Infrastructure.Domain
         private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
         {
             //TODO: EventContext
-
             aggregate.Version = commit.Version;
             foreach (var e in commit.Events)
                 aggregateUpdater.Apply(e, aggregate);

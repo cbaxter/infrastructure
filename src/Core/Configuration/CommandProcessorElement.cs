@@ -20,11 +20,16 @@ namespace Spark.Infrastructure.Configuration
     /// <summary>
     /// <see cref="CommandProcessor"/> configuration settings.
     /// </summary>
-    internal sealed class CommandProcessorElement : ConfigurationElement
+    public interface IProcessCommandSettings
     {
         /// <summary>
         /// The maximum amount of time to spend trying to process a command (default 00:00:10).
         /// </summary>
+        TimeSpan RetryTimeout { get; }
+    }
+
+    internal sealed class CommandProcessorElement : ConfigurationElement, IProcessCommandSettings
+    {
         [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
         public TimeSpan RetryTimeout { get { return (TimeSpan)base["retryTimeout"]; } }
     }

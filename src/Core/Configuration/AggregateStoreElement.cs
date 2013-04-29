@@ -20,23 +20,32 @@ namespace Spark.Infrastructure.Configuration
     /// <summary>
     /// <see cref="CommandProcessor"/> configuration settings.
     /// </summary>
-    internal sealed class AggregateStoreElement : ConfigurationElement
+    public interface IStoreAggregateSettings
     {
         /// <summary>
         /// The maximum amount of time an aggregate will remain cached if not accessed.
         /// </summary>
-        [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
-        public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
+        TimeSpan CacheSlidingExpiration { get; }
 
         /// <summary>
         /// The maximum amount of time to spend trying to save a commit (default 00:00:10).
         /// </summary>
-        [ConfigurationProperty("saveRetryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
-        public TimeSpan SaveRetryTimeout { get { return (TimeSpan)base["saveRetryTimeout"]; } }
+        TimeSpan SaveRetryTimeout { get; }
 
         /// <summary>
         /// The number of aggregate versions between snapshots (default 100).
         /// </summary>
+        Int32 SnapshotInterval { get; }
+    }
+
+    internal sealed class AggregateStoreElement : ConfigurationElement, IStoreAggregateSettings
+    {
+        [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
+        public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
+
+        [ConfigurationProperty("saveRetryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
+        public TimeSpan SaveRetryTimeout { get { return (TimeSpan)base["saveRetryTimeout"]; } }
+
         [ConfigurationProperty("snapshotInterval", IsRequired = false, DefaultValue = "100")]
         public Int32 SnapshotInterval { get { return (Int32)base["snapshotInterval"]; } }
     }

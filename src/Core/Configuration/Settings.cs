@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using Spark.Infrastructure.EventStore;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -19,51 +20,53 @@ namespace Spark.Infrastructure.Configuration
     /// <summary>
     /// Static settings class to access `spark.infrastructure` configuration section.
     /// </summary>
-    internal static class Settings
+    public static class Settings
     {
-        /// <summary>
-        /// Gets or sets the default <see cref="SparkConfigurationSection"/>.
-        /// </summary>
-        public static SparkConfigurationSection Default { get; set; }
+        private static readonly ISettings configuration;
 
         /// <summary>
-        /// Initializes <see cref="Default"/> to the currently configured <see cref="SparkConfigurationSection"/>.
+        /// Gets the default application <see cref="ISettings"/>.
+        /// </summary>
+        public static ISettings Default { get { return configuration; } }
+
+        /// <summary>
+        /// Initializes <see cref="configuration"/> to the currently configured <see cref="SparkConfigurationSection"/>.
         /// </summary>
         static Settings()
         {
-           Default = (SparkConfigurationSection)ConfigurationManager.GetSection("spark.infrastructure") ?? new SparkConfigurationSection();
+            configuration = (SparkConfigurationSection)ConfigurationManager.GetSection("spark.infrastructure") ?? new SparkConfigurationSection();
         }
 
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.
         /// </summary>
-        public static AggregateStoreElement AggregateStore
+        public static IStoreAggregateSettings AggregateStore
         {
-            get { return Default.AggregateStore; }
+            get { return configuration.AggregateStore; }
         }
 
         /// <summary>
         /// The <see cref="CommandProcessor"/> configuration settings.
         /// </summary>
-        public static CommandProcessorElement CommandProcessor
+        public static IProcessCommandSettings CommandProcessor
         {
-            get { return Default.CommandProcessor; }
+            get { return configuration.CommandProcessor; }
         }
 
         /// <summary>
         /// The <see cref="CommandReceiver"/> configuration settings.
         /// </summary>
-        public static CommandReceiverElement CommandReceiver
+        public static IReceiveCommandSettings CommandReceiver
         {
-            get { return Default.CommandReceiver; }
+            get { return configuration.CommandReceiver; }
         }
 
         /// <summary>
         /// The <see cref="IStoreEvents"/> configuration settings.
         /// </summary>
-        public static EventStoreElement Eventstore
+        public static IStoreEventSettings Eventstore
         {
-            get { return Default.EventStore; }
+            get { return configuration.EventStore; }
         }
     }
 }
