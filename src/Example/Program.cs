@@ -45,7 +45,7 @@ namespace Example
             DateTime start = DateTime.Now;
 
             for (var i = 1; i <= count; i++)
-                commandPublisher.Publish(new RegisterClient(GuidStrategy.NewGuid(), "User #" + i.ToString("{0:00000}")));
+                commandPublisher.Publish(GuidStrategy.NewGuid(), new RegisterClient("User #" + i.ToString("{0:00000}")));
 
             while (commits < count)
             {

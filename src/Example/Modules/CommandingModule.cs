@@ -16,7 +16,7 @@ namespace Example.Modules
             base.Load(builder);
 
             // Register Common Types (i.e., Sending or Receiving).
-            builder.RegisterType<BlockingCollectionMessageBus<Command>>().As<ISendMessages<Command>>().As<IReceiveMessages<Command>>().SingleInstance();
+            builder.RegisterType<BlockingCollectionMessageBus<CommandEnvelope>>().As<ISendMessages<CommandEnvelope>>().As<IReceiveMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<ServiceMessageFactory>().As<ICreateMessages>().SingleInstance();
 
 

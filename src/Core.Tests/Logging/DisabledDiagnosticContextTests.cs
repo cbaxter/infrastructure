@@ -28,28 +28,6 @@ namespace Spark.Infrastructure.Tests.Logging
                 using (DisabledDiagnosticContext.Instance)
                     DisabledDiagnosticContext.Instance.Dispose();
             }
-
-            [Fact]
-            public void PerfTest()
-            {
-                var values = new Int32[0];
-                var alwaysFalse = values.Length == 0;
-
-                var sw = Stopwatch.StartNew();
-
-                for (var i = 0; i < 1000000000; i++)
-                {
-                  
-                        foreach (var value in values)
-                            Console.WriteLine(value);
-                 
-                }
-
-                sw.Stop();
-
-                Console.WriteLine(sw.ElapsedMilliseconds);
-
-            }
         }
     }
 }

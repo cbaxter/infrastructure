@@ -24,9 +24,9 @@ namespace Spark.Infrastructure.Commanding
         /// <summary>
         /// Processes a given <see cref="Command"/> instance.
         /// </summary>
-        /// <param name="commandId">The unique <paramref name="command"/> instance id.</param>
-        /// <param name="headers">The message headers associated with the <paramref name="command"/>.</param>
-        /// <param name="command">The <see cref="Command"/> to process.</param>
-        void Process(Guid commandId, HeaderCollection headers, Command command);
+        /// <param name="commandId">The unique <see cref="Command"/> instance id.</param>
+        /// <param name="headers">The message headers associated with the <paramref name="envelope"/>.</param>
+        /// <param name="envelope">The <see cref="Command"/> envelope to process.</param>
+        void Process(Guid commandId, HeaderCollection headers, CommandEnvelope envelope);
     }
 }

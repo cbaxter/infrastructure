@@ -27,7 +27,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void MessageFactoryCannotBeNull()
             {
-                var messageBus = new Mock<ISendMessages<Command>>();
+                var messageBus = new Mock<ISendMessages<CommandEnvelope>>();
                 var ex = Assert.Throws<ArgumentNullException>(() => new CommandPublisher(null, messageBus.Object));
 
                 Assert.Equal("messageFactory", ex.ParamName);
@@ -49,10 +49,10 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CommandCannotBeNull()
             {
                 var messageFactory = new Mock<ICreateMessages>();
-                var messageBus = new Mock<ISendMessages<Command>>();
+                var messageBus = new Mock<ISendMessages<CommandEnvelope>>();
                 var publisher = new CommandPublisher(messageFactory.Object, messageBus.Object);
 
-                var ex = Assert.Throws<ArgumentNullException>(() => publisher.Publish(null, HeaderCollection.Empty));
+                var ex = Assert.Throws<ArgumentNullException>(() => publisher.Publish(GuidStrategy.NewGuid(), null, HeaderCollection.Empty));
 
                 Assert.Equal("command", ex.ParamName);
             }
@@ -61,10 +61,10 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void HeadersCanBeNull()
             {
                 var messageFactory = new Mock<ICreateMessages>();
-                var messageBus = new Mock<ISendMessages<Command>>();
+                var messageBus = new Mock<ISendMessages<CommandEnvelope>>();
                 var publisher = new CommandPublisher(messageFactory.Object, messageBus.Object);
 
-                Assert.DoesNotThrow(() => publisher.Publish(new FakeCommand(), null));
+                Assert.DoesNotThrow(() => publisher.Publish(GuidStrategy.NewGuid(), new FakeCommand(), null));
             }
 
             [Fact]
@@ -72,13 +72,13 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 var command = new FakeCommand() as Command;
                 var messageFactory = new Mock<ICreateMessages>();
-                var messageBus = new Mock<ISendMessages<Command>>();
+                var messageBus = new Mock<ISendMessages<CommandEnvelope>>();
                 var publisher = new CommandPublisher(messageFactory.Object, messageBus.Object);
-                var message = new Message<Command>(Guid.NewGuid(), HeaderCollection.Empty, command);
+                var message = new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new CommandEnvelope(GuidStrategy.NewGuid(), command));
 
-                messageFactory.Setup(mock => mock.Create(command, HeaderCollection.Empty)).Returns(message);
+                messageFactory.Setup(mock => mock.Create(It.Is<CommandEnvelope>(envelope => ReferenceEquals(command, envelope.Command)), HeaderCollection.Empty)).Returns(message);
 
-                publisher.Publish(command, HeaderCollection.Empty);
+                publisher.Publish(GuidStrategy.NewGuid(), command, HeaderCollection.Empty);
 
                 messageBus.Verify(mock => mock.Send(message), Times.Once());
             }
@@ -90,32 +90,29 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void UseNullHeaderCollectionIfOnlyCommandSpecified()
             {
                 var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
                 var publisher = new Mock<IPublishCommands>();
 
-                publisher.Object.Publish(command);
+                publisher.Object.Publish(aggregateId, command);
 
-                publisher.Verify(mock => mock.Publish(command, null), Times.Once());
+                publisher.Verify(mock => mock.Publish(aggregateId, command, null), Times.Once());
             }
 
             [Fact]
             public void UseParamsOverloadWhenAvailable()
             {
                 var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
                 var publisher = new Mock<IPublishCommands>();
                 var header = new Header("MyHeader", new Object());
 
-                publisher.Object.Publish(command, header);
+                publisher.Object.Publish(aggregateId, command, header);
 
-                publisher.Verify(mock => mock.Publish(command, It.Is<Header[]>(headers => Equals(headers.Single(), header))), Times.Once());
+                publisher.Verify(mock => mock.Publish(aggregateId, command, It.Is<Header[]>(headers => Equals(headers.Single(), header))), Times.Once());
             }
         }
 
         private class FakeCommand : Command
-        {
-            protected override Guid GetAggregateId()
-            {
-                return Guid.NewGuid();
-            }
-        }
+        { }
     }
 }

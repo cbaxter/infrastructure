@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Resources;
@@ -30,6 +31,7 @@ namespace Spark.Infrastructure.Commanding
         private readonly CommandContext originalContext;
         private readonly IList<Event> raisedEvents;
         private readonly HeaderCollection headers;
+        private readonly CommandEnvelope envelope;
         private readonly Guid commandId;
         private readonly Thread thread;
         private Boolean disposed;
@@ -50,19 +52,32 @@ namespace Spark.Infrastructure.Commanding
         public Guid CommandId { get { return commandId; } }
 
         /// <summary>
+        /// The unique <see cref="Aggregate"/> identifier that will handle the associated <see cref="Command"/>.
+        /// </summary>
+        public Guid AggregateId { get { return envelope.AggregateId; } }
+
+        /// <summary>
+        /// The <see cref="Command"/> associated with this <see cref="CommandContext"/>.
+        /// </summary>
+        public Command Command { get { return envelope.Command; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="CommandContext"/> with the specified <paramref name="commandId"/> and <paramref name="headers"/>.
         /// </summary>
-        /// <param name="commandId">The unique <see cref="Command"/> message id.</param>
-        /// <param name="headers">The <see cref="Command"/> message headers.</param>
-        public CommandContext(Guid commandId, HeaderCollection headers)
+        /// <param name="commandId">The unique <see cref="Command"/> identifier.</param>
+        /// <param name="headers">The <see cref="Command"/> headers.</param>
+        /// <param name="envelope">The <see cref="CommandEnvelope"/> containing the target <see cref="Aggregate"/> identifier and <see cref="Command"/> to process.</param>
+        public CommandContext(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
         {
             Verify.NotEqual(Guid.Empty, commandId, "commandId");
+            Verify.NotNull(envelope, "envelope");
             Verify.NotNull(headers, "headers");
 
             this.raisedEvents = new List<Event>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.commandId = commandId;
+            this.envelope = envelope;
             this.headers = headers;
 
             currentContext = this;
@@ -121,6 +136,14 @@ namespace Spark.Infrastructure.Commanding
         internal EventCollection GetRaisedEvents()
         {
             return new EventCollection(raisedEvents);
+        }
+        
+        /// <summary>
+        /// Returns the <see cref="CommandContext"/> description for this instance.
+        /// </summary>
+        public override String ToString()
+        {
+            return String.Format("{0} - {1}", Command.GetType(), AggregateId);
         }
     }
 }

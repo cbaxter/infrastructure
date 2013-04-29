@@ -22,34 +22,23 @@ namespace Spark.Infrastructure.Tests.Commanding
 {
     public static class UsingCommand
     {
-        public class WhenCreatingCommand
-        {
-            [Fact]
-            public void MustMapAggregateId()
-            {
-                var fakeId = Guid.NewGuid();
-                var command = new FakeCommand(fakeId);
-
-                Assert.Equal(fakeId, command.AggregateId);
-            }
-        }
-
         public class WhenGettingCommandHeaders
         {
             [Fact]
             public void ReturnHeadersFromCommandContextIfNotNull()
             {
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(Enumerable.Empty<Header>());
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Same(headers, command.Headers);
             }
 
             [Fact]
             public void ReturnEmptyHeaderCollectionIfNoCommandContext()
             {
-                var command = new FakeCommand(Guid.NewGuid());
+                var command = new FakeCommand();
 
                 Assert.Same(HeaderCollection.Empty, command.Headers);
             }
@@ -57,10 +46,11 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CanShortCircuitAccessToOriginHeader()
             {
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(new[] { new Header(Header.Origin, "MyOrigin", checkReservedNames: false) });
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Equal("MyOrigin", command.GetOrigin());
             }
 
@@ -68,72 +58,50 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CanShortCircuitAccessToTimestampHeader()
             {
                 var now = DateTime.UtcNow;
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now, checkReservedNames: false) });
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Equal(now, command.GetTimestamp());
             }
 
             [Fact]
             public void CanShortCircuitAccessToremoteAddressHeader()
             {
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback, checkReservedNames: false) });
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Equal(IPAddress.Loopback, command.GetRemoteAddress());
             }
 
             [Fact]
             public void CanShortCircuitAccessToUserAddressHeader()
             {
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback, checkReservedNames: false) });
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Equal(IPAddress.Loopback, command.GetUserAddress());
             }
 
             [Fact]
             public void CanShortCircuitAccessToUserNameHeader()
             {
+                var command = new FakeCommand();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var headers = new HeaderCollection(new[] { new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false) });
-                var command = new FakeCommand(Guid.NewGuid());
 
-                using (new CommandContext(Guid.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, envelope))
                     Assert.Equal("nbawdy@sparksoftware.net", command.GetUserName());
             }
         }
 
-        public class WhenConvertingToString
-        {
-            [Fact]
-            public void ReturnFriendlyDescription()
-            {
-                var fakeId = Guid.NewGuid();
-                var command = new FakeCommand(fakeId);
-
-                Assert.Equal(String.Format("{0} - {1}", typeof(FakeCommand), fakeId), command.ToString());
-            }
-        }
-
         private class FakeCommand : Command
-        {
-            private readonly Guid fakeId;
-
-            private Guid FakeId { get { return fakeId; } }
-
-            public FakeCommand(Guid fakeId)
-            {
-                this.fakeId = fakeId;
-            }
-
-            protected override Guid GetAggregateId()
-            {
-                return FakeId;
-            }
-        }
+        { }
     }
 
 }

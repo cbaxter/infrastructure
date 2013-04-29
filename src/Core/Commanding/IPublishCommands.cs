@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Messaging;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -24,9 +26,10 @@ namespace Spark.Infrastructure.Commanding
         /// <summary>
         /// Publishes the specified <paramref name="command"/> on the underlying message bus.
         /// </summary>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
         /// <param name="command">The command to be published.</param>
         /// <param name="headers">The set of message headers associated with the command.</param>
-        void Publish(Command command, IEnumerable<Header> headers);
+        void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers);
     }
 
     /// <summary>
@@ -38,25 +41,27 @@ namespace Spark.Infrastructure.Commanding
         /// Publishes the specified <paramref name="command"/> with only the default message headers.
         /// </summary>
         /// <param name="publisher">The command publisher.</param>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
         /// <param name="command">The command to be published.</param>
-        public static void Publish(this IPublishCommands publisher, Command command)
+        public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command)
         {
             Verify.NotNull(publisher, "publisher");
 
-            publisher.Publish(command, null);
+            publisher.Publish(aggregateId, command, null);
         }
 
         /// <summary>
         /// Publishes the specified <paramref name="command"/> with the set of custom message headers.
         /// </summary>
         /// <param name="publisher">The command publisher.</param>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
         /// <param name="command">The command to be published.</param>
         /// <param name="headers">The set of one or more custom message headers.</param>
-        public static void Publish(this IPublishCommands publisher, Command command, params Header[] headers)
+        public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command, params Header[] headers)
         {
             Verify.NotNull(publisher, "publisher");
 
-            publisher.Publish(command, headers);
+            publisher.Publish(aggregateId, command, headers);
         }
     }
 }

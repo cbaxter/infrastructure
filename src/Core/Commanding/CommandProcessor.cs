@@ -60,18 +60,18 @@ namespace Spark.Infrastructure.Commanding
         /// <summary>
         /// Processes a given <see cref="Command"/> instance.
         /// </summary>
-        /// <param name="commandId">The unique <paramref name="command"/> instance id.</param>
-        /// <param name="headers">The message headers associated with the <paramref name="command"/>.</param>
-        /// <param name="command">The <see cref="Command"/> to process.</param>
-        public void Process(Guid commandId, HeaderCollection headers, Command command)
+        /// <param name="commandId">The unique <see cref="Command"/> instance id.</param>
+        /// <param name="headers">The message headers associated with the <paramref name="envelope"/>.</param>
+        /// <param name="envelope">The <see cref="Command"/> envelope to process.</param>
+        public void Process(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
         {
             Verify.NotEqual(Guid.Empty, commandId, "commandId");
+            Verify.NotNull(envelope, "envelope");
             Verify.NotNull(headers, "headers");
-            Verify.NotNull(command, "command");
 
-            using (var context = new CommandContext(commandId, headers))
+            using (var context = new CommandContext(commandId, headers, envelope))
             {
-                var commandHandler = commandHandlerRegistry.GetHandlerFor(command);
+                var commandHandler = commandHandlerRegistry.GetHandlerFor(context.Command);
                 var backoffContext = default(ExponentialBackoff);
                 var done = false;
 
@@ -79,7 +79,7 @@ namespace Spark.Infrastructure.Commanding
                 {
                     try
                     {
-                        UpdateAggregate(context, commandHandler, command);
+                        UpdateAggregate(context, commandHandler);
                         done = true;
                     }
                     catch (ConcurrencyException ex)
@@ -88,9 +88,9 @@ namespace Spark.Infrastructure.Commanding
                             backoffContext = new ExponentialBackoff(retryTimeout);
 
                         if (!backoffContext.CanRetry)
-                            throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(command), ex);
+                            throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(context), ex);
 
-                        Log.WarnFormat("Concurrency conflict: {0}", command);
+                        Log.WarnFormat("Concurrency conflict: {0}", context);
                         backoffContext.WaitUntilRetry();
                     }
                 } while (!done);
@@ -98,18 +98,17 @@ namespace Spark.Infrastructure.Commanding
         }
 
         /// <summary>
-        /// Retrieves the target <see cref="Aggregate"/> instance and delegates the <paramref name="command"/> to the appropriate <see cref="CommandHandler"/>.
+        /// Retrieves the target <see cref="Aggregate"/> instance and delegates the <see cref="Command"/> to the appropriate <see cref="CommandHandler"/>.
         /// </summary>
-        /// <param name="context">The underlying <see cref="CommandContext"/> associated with the specified <paramref name="command"/> instance.</param>
-        /// <param name="commandHandler">The <see cref="CommandHandler"/> associated with the specified <paramref name="command"/> instance.</param>
-        /// <param name="command">The <see cref="Command"/> to process.</param>
-        private void UpdateAggregate(CommandContext context, CommandHandler commandHandler, Command command)
+        /// <param name="context">The underlying <see cref="CommandContext"/> associated with the specified <see cref="Command"/> instance.</param>
+        /// <param name="commandHandler">The <see cref="CommandHandler"/> associated with the specified <see cref="Command"/> instance.</param>
+        private void UpdateAggregate(CommandContext context, CommandHandler commandHandler)
         {
-            var aggregate = aggregateStore.Get(commandHandler.AggregateType, command.AggregateId);
+            var aggregate = aggregateStore.Get(commandHandler.AggregateType, context.AggregateId);
 
             Log.Trace("Executing command handler");
 
-            commandHandler.Handle(aggregate, command);
+            commandHandler.Handle(aggregate, context.Command);
 
             Log.Trace("Saving aggregate state");
 

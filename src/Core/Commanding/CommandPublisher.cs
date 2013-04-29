@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
 
@@ -23,7 +25,7 @@ namespace Spark.Infrastructure.Commanding
     public sealed class CommandPublisher : IPublishCommands
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly ISendMessages<Command> messageSender;
+        private readonly ISendMessages<CommandEnvelope> messageSender;
         private readonly ICreateMessages messageFactory;
 
         /// <summary>
@@ -31,7 +33,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         /// <param name="messageFactory">The message factory.</param>
         /// <param name="messageSender">The message sender.</param>
-        public CommandPublisher(ICreateMessages messageFactory, ISendMessages<Command> messageSender)
+        public CommandPublisher(ICreateMessages messageFactory, ISendMessages<CommandEnvelope> messageSender)
         {
             Verify.NotNull(messageFactory, "messageFactory");
             Verify.NotNull(messageSender, "messageSender");
@@ -43,15 +45,16 @@ namespace Spark.Infrastructure.Commanding
         /// <summary>
         /// Publishes the specified <paramref name="command"/> on the underlying message bus.
         /// </summary>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
         /// <param name="command">The command to be published.</param>
         /// <param name="headers">The set of message headers associated with the command.</param>
-        public void Publish(Command command, IEnumerable<Header> headers)
+        public void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers)
         {
             Verify.NotNull(command, "command");
 
-            Log.TraceFormat("Publishing {0} to {1}", command, command.AggregateId);
+            Log.TraceFormat("Publishing {0} to {1}", command, aggregateId);
 
-            messageSender.Send(messageFactory.Create(command, headers));
+            messageSender.Send(messageFactory.Create(new CommandEnvelope(aggregateId, command), headers));
         }
     }
 }

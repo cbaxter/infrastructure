@@ -5,7 +5,7 @@ using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Threading;
-using CommandMessage = Spark.Infrastructure.Messaging.Message<Spark.Infrastructure.Commanding.Command>;
+using CommandMessage = Spark.Infrastructure.Messaging.Message<Spark.Infrastructure.Commanding.CommandEnvelope>;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -28,7 +28,7 @@ namespace Spark.Infrastructure.Commanding
     public sealed class CommandReceiver : IDisposable
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly IReceiveMessages<Command> messageReceiver;
+        private readonly IReceiveMessages<CommandEnvelope> messageReceiver;
         private readonly IProcessCommands commandProcessor;
         private readonly TaskScheduler taskScheduler;
         private readonly Task receiverTask;
@@ -39,7 +39,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <param name="commandProcessor">The command processor.</param>
-        public CommandReceiver(IReceiveMessages<Command> messageReceiver, IProcessCommands commandProcessor)
+        public CommandReceiver(IReceiveMessages<CommandEnvelope> messageReceiver, IProcessCommands commandProcessor)
             : this(messageReceiver, commandProcessor, new PartitionedTaskScheduler(GetPartitionId, Settings.CommandReceiver.MaximumConcurrencyLevel, Settings.CommandReceiver.BoundedCapacity))
         { }
 
@@ -49,7 +49,7 @@ namespace Spark.Infrastructure.Commanding
         /// <param name="messageReceiver">The message receiver.</param>
         /// <param name="commandProcessor">The command processor.</param>
         /// <param name="taskScheduler">The task scheduler.</param>
-        internal CommandReceiver(IReceiveMessages<Command> messageReceiver, IProcessCommands commandProcessor, TaskScheduler taskScheduler)
+        internal CommandReceiver(IReceiveMessages<CommandEnvelope> messageReceiver, IProcessCommands commandProcessor, TaskScheduler taskScheduler)
         {
             Verify.NotNull(taskScheduler, "taskScheduler");
             Verify.NotNull(messageReceiver, "messageReceiver");
@@ -98,7 +98,7 @@ namespace Spark.Infrastructure.Commanding
         private static Object GetPartitionId(Task task)
         {
             var message = (CommandMessage)task.AsyncState;
-            
+
             return message.Payload == null ? Guid.Empty : message.Payload.AggregateId;
         }
 
@@ -126,8 +126,8 @@ namespace Spark.Infrastructure.Commanding
             {
                 try
                 {
-                    var command = message.Payload;
-                    if (command == null)
+                    var payload = message.Payload;
+                    if (payload == null)
                     {
                         Log.WarnFormat("Message payload empty; no action required");
                     }
@@ -135,7 +135,7 @@ namespace Spark.Infrastructure.Commanding
                     {
                         Log.Trace("Processing command");
 
-                        commandProcessor.Process(message.Id, message.Headers, command);
+                        commandProcessor.Process(message.Id, message.Headers, payload);
 
                         Log.Trace("Command processed");
                     }

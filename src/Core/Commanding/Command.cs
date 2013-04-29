@@ -25,21 +25,6 @@ namespace Spark.Infrastructure.Commanding
     public abstract class Command
     {
         /// <summary>
-        /// The target aggregate id for this <see cref="Command"/>.
-        /// </summary>
-        [IgnoreDataMember]
-        internal Guid AggregateId { get { return GetAggregateId(); } }
-        //TODO: Replace with --> internal protected abstract Guid AggregateId { get; } (should simplify inherited class code)
-        //      OR
-        //      remove completely and create command wrapper class (envelop) that separates aggregate id from command/event...
-        //      message: { id: ~, headers: ~, payload: { aggregateId, command } so wrap command in CommandEnvelope (or EventEnvelop) that attaches additional meta-data?
-        //      commandPublisher(aggregateId, command) ==> messageFactory.Create(new CommandEnvelope(aggregateId, command));
-        //      eventDispatcher(aggregateId, event, headers) ==> messageFactory.Create(new EventEnvelope(aggregateId, aggregateType, event), headers);
-        //      envelope classes would be internal??? classes could actually be structs?
-        //      OR
-        //      Convert existing ICreateMessages in to something else and have explicit ICreateCommandMessages, ICreateEventMessages... 
-
-        /// <summary>
         /// The message header collection associated with this command instance.
         /// </summary>
         [IgnoreDataMember]
@@ -52,11 +37,6 @@ namespace Spark.Infrastructure.Commanding
                 return context == null ? HeaderCollection.Empty : context.Headers;
             }
         }
-
-        /// <summary>
-        /// Gets the aggregate id mapping for this <see cref="Command"/> instance.
-        /// </summary>
-        protected abstract Guid GetAggregateId();
 
         /// <summary>
         /// Returns the origin server name that published the command or an empty string if not set.
@@ -97,14 +77,6 @@ namespace Spark.Infrastructure.Commanding
         public String GetUserName()
         {
             return Headers.GetUserName();
-        }
-
-        /// <summary>
-        /// Returns the <see cref="Command"/> description for this instance.
-        /// </summary>
-        public override String ToString()
-        {
-            return String.Format("{0} - {1}", GetType(), AggregateId);
         }
     }
 }

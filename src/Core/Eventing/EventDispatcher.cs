@@ -38,7 +38,7 @@ namespace Spark.Infrastructure.Eventing
             {
                 try
                 {
-                    DispatchEvent(commit.StreamId, commit.Headers, commit.Events[i]);
+                    //DispatchEvent(commit.StreamId, commit.Headers, commit.Events[i]);
                 }
                 catch (TimeoutException)
                 {
@@ -51,34 +51,34 @@ namespace Spark.Infrastructure.Eventing
             }
         }
 
-        private void DispatchEvent(Guid aggregateId, HeaderCollection headers, Event e)
-        {
-            var message = messageFactory.Create(new EventEnvelope(aggregateId, e), headers);
-            var backoffContext = default(ExponentialBackoff);
-            var done = false;
+        //private void DispatchEvent(Guid aggregateId, HeaderCollection headers, Event e)
+        //{
+        //    var message = messageFactory.Create(new EventEnvelope(aggregateId, e), headers);
+        //    var backoffContext = default(ExponentialBackoff);
+        //    var done = false;
 
-            do
-            {
-                try
-                {
-                    messageSender.Send(message);
-                    done = true;
-                }
-                catch (Exception ex)
-                {
-                    //if (backoffContext == null)
-                    //    backoffContext = new ExponentialBackoff(retryTimeout);
+        //    do
+        //    {
+        //        try
+        //        {
+        //            messageSender.Send(message);
+        //            done = true;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            //if (backoffContext == null)
+        //            //    backoffContext = new ExponentialBackoff(retryTimeout);
 
-                    //if (!backoffContext.CanRetry)
-                    //{
-                    //    //TODO: Write out to local storage (file system, sqlce, or something that is lightweight/durable -- local filesystem least likely to fail).
-                    //    throw new TimeoutException(Exceptions.DispatchTimeout.FormatWith(commit.CommitId, commit.StreamId), ex);
-                    //}
+        //            //if (!backoffContext.CanRetry)
+        //            //{
+        //            //    //TODO: Write out to local storage (file system, sqlce, or something that is lightweight/durable -- local filesystem least likely to fail).
+        //            //    throw new TimeoutException(Exceptions.DispatchTimeout.FormatWith(commit.CommitId, commit.StreamId), ex);
+        //            //}
 
-                    Log.Warn(ex.Message);
-                    //backoffContext.WaitUntilRetry();
-                }
-            } while (!done);
-        }
+        //            Log.Warn(ex.Message);
+        //            //backoffContext.WaitUntilRetry();
+        //        }
+        //    } while (!done);
+        //}
     }
 }

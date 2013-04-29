@@ -36,7 +36,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CommandProcessorCannotBeNull()
             {
-                var messageReceiver = new Mock<IReceiveMessages<Command>>();
+                var messageReceiver = new Mock<IReceiveMessages<CommandEnvelope>>();
                 var ex = Assert.Throws<ArgumentNullException>(() => new CommandReceiver(messageReceiver.Object, null));
 
                 Assert.Equal("commandProcessor", ex.ParamName);
@@ -48,12 +48,12 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CanTolerateNullCommandPayload()
             {
-                var commandProcessor = new Mock<IProcessCommands>(); ;
+                var commandProcessor = new Mock<IProcessCommands>();
 
-                using (var messageBus = new BlockingCollectionMessageBus<Command>())
+                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
                 using (new CommandReceiver(messageBus, commandProcessor.Object))
                 {
-                    messageBus.Send(new Message<Command>(Guid.NewGuid(), HeaderCollection.Empty, null));
+                    messageBus.Send(new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, null));
                     messageBus.Dispose();
                 }
             }
@@ -63,10 +63,10 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 var commandProcessor = new FakeCommandProcessor();
 
-                using (var messageBus = new BlockingCollectionMessageBus<Command>())
+                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
                 using (new CommandReceiver(messageBus, commandProcessor))
                 {
-                    messageBus.Send(new Message<Command>(Guid.NewGuid(), HeaderCollection.Empty, new FakeCommand()));
+                    messageBus.Send(new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty));
                     messageBus.Dispose();
                 }
 
@@ -76,12 +76,12 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CanTolerateProcessorExceptions()
             {
-                var message = new Message<Command>(Guid.NewGuid(), HeaderCollection.Empty, new FakeCommand());
+                var message = new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
                 var commandProcessor = new Mock<IProcessCommands>();
 
                 commandProcessor.Setup(mock => mock.Process(message.Id, message.Headers, message.Payload)).Throws(new InvalidOperationException());
 
-                using (var messageBus = new BlockingCollectionMessageBus<Command>())
+                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
                 using (new CommandReceiver(messageBus, commandProcessor.Object))
                 {
                     messageBus.Send(message);
@@ -90,19 +90,11 @@ namespace Spark.Infrastructure.Tests.Commanding
             }
         }
 
-        private sealed class FakeCommand : Command
-        {
-            protected override Guid GetAggregateId()
-            {
-                return Guid.NewGuid();
-            }
-        }
-
         private sealed class FakeCommandProcessor : IProcessCommands
         {
             private readonly ManualResetEvent commandProcessed = new ManualResetEvent(false);
 
-            public void Process(Guid commandId, HeaderCollection headers, Command command)
+            public void Process(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
             {
                 commandProcessed.Set();
             }

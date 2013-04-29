@@ -100,11 +100,6 @@ namespace Spark.Infrastructure.Tests.Commanding
         { }
 
         private class FakeCommand : Command
-        {
-            protected override Guid GetAggregateId()
-            {
-                return Guid.NewGuid();
-            }
-        }
+        { }
     }
 }
