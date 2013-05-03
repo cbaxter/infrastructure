@@ -27,4 +27,24 @@ namespace Spark.Infrastructure.Domain
         /// <param name="id">The unique aggregate id.</param>
         Aggregate Get(Type aggregateType, Guid id);
     }
+
+    /// <summary>
+    /// Extension methods of <see cref="IRetrieveAggregates"/> and <see cref="IStoreAggregates"/>.
+    /// </summary>
+    public static class RetrieveAggregateExtensions
+    {
+        /// <summary>
+        /// Retrieve the aggregate of the specified <typeparamref name="TAggregate"/> type and aggregate <paramref name="id"/>.
+        /// </summary>
+        /// <typeparam name="TAggregate">The type of aggregate to retrieve.</typeparam>
+        /// <param name="aggregateRepository">The aggregate repository from which the aggregate is to be retrieved.</param>
+        /// <param name="id">The unique aggregate id.</param>
+        public static TAggregate Get<TAggregate>(this IRetrieveAggregates aggregateRepository, Guid id)
+            where TAggregate : Aggregate
+        {
+            Verify.NotNull(aggregateRepository, "aggregateRepository");
+
+            return (TAggregate)aggregateRepository.Get(typeof(TAggregate), id);
+        }
+    }
 }

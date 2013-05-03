@@ -7,7 +7,7 @@ using Spark.Infrastructure.Logging;
 
 namespace Spark.Infrastructure.Domain
 {
-    public sealed class CachedAggregateStore : IStoreAggregates, IDisposable //TODO: make all stores disposable?
+    public sealed class CachedAggregateStore : IStoreAggregates, IDisposable //TODO: make all stores disposable (and piplineHooks)?
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IStoreAggregates aggregateStore;
@@ -71,9 +71,6 @@ namespace Spark.Infrastructure.Domain
             var lazyValue = new Lazy<Aggregate>(() => LoadAggregate(aggregateType, id));
             var cachedValue = memoryCache.AddOrGetExisting(key, lazyValue, CreateCacheItemPolicy());
 
-            //TODO: Gaurd against illegal state modification (with option to enable/disable) -- i.e., throw execption if illegally modified cached instance.
-            //      Create ObjectHasher that can be exposed via extension method (ToHash()); similar in impl to ObjectCloner without copy...
-
             return cachedValue as Aggregate ?? (cachedValue as Lazy<Aggregate> ?? lazyValue).Value;
         }
 
@@ -95,7 +92,7 @@ namespace Spark.Infrastructure.Domain
 
             var key = String.Concat(aggregate.GetType().FullName, "-", aggregate.Id.ToString());
             var copy = aggregate.Copy();
-            
+
             try
             {
                 var commit = aggregateStore.Save(copy, context);

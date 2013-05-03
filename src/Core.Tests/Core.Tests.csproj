@@ -97,6 +97,7 @@
     <Compile Include="Messaging\BlockingCollectionMessageBusTests.cs" />
     <Compile Include="Messaging\ServiceMessageFactoryTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
+    <Compile Include="ObjectHasherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>
       </SubType>

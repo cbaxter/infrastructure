@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Eventing;
 
@@ -12,20 +11,33 @@ namespace Spark.Infrastructure.Domain
         //TODO: Serialize Aggregate/Entity by converting all non-readonly fields in to dictionary or something... have overridable methods for Serialize and Deserialize
         //      that can be used for explicit mappings if required.
 
-        protected readonly Object SyncLock = new Object();
+        private Guid checkSum;
 
-        [IgnoreDataMember]
-        public Guid Id { get; internal set; }
+        public Guid Id { get; internal set; } //TODO: Ensure not serialized in snapshot
 
-        [IgnoreDataMember]
-        public Int32 Version { get; internal set; }
-
+        public Int32 Version { get; internal set; } //TODO: Ensure not serialized in snapshot
+        
         protected internal virtual Aggregate Copy()
         {
-            lock (SyncLock)
+            return ObjectCopier.Copy(this);
+        }
+
+        protected internal virtual void VerifyCheckSum()
+        {
+            if (checkSum == Guid.Empty)
             {
-                return ObjectCopier.Copy(this);
+                UpdateCheckSum();
             }
+            else
+            {
+                if (checkSum != ObjectHasher.Hash(this))
+                    throw new MemberAccessException(); //TODO: Set message
+            }
+        }
+
+        protected internal virtual void UpdateCheckSum()
+        {
+            checkSum = ObjectHasher.Hash(this);
         }
 
         protected void Notify(Event e)

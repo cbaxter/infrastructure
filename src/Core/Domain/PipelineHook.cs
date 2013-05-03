@@ -28,10 +28,10 @@ namespace Spark.Infrastructure.Domain
         public virtual void PostGet(Aggregate aggregate)
         { }
 
-        public virtual void PreSave(CommandContext context, Aggregate aggregate)
+        public virtual void PreSave(Aggregate aggregate, CommandContext context)
         { }
 
-        public virtual void PostSave(CommandContext context, Commit commit)
+        public virtual void PostSave(Aggregate aggregate, Commit commit, Exception error)
         { }
     }
 }

@@ -31,8 +31,14 @@ namespace Spark.Infrastructure.Eventing
             //TODO: Pull any undispatched messages and dispatch (or at least have ready to dispatch -- have to review startup sequence to determine ordering)?
         }
 
-        public override void PostSave(CommandContext context, Commit commit)
+        //TODO: PreSave should track a pending dispatch -- (i.e., prepare EventMessage and store in durable storage -- ESENT?) -- Maybe dispatch previous failures here ?
+        //      Failure events are anything that made it to pre-dispatch state but not cleared out of system...
+
+        public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
         {
+            //TODO: Mark events as predispatch so if fail here can at least potential duplicates etc (i.e., committed but not dispatched)???
+            //TODO: Must handle save failure (i.e., cleanup).
+
             var count = commit.Events.Count;
             for (var i = 0; i < count; i++)
             {

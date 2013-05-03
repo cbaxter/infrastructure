@@ -23,7 +23,7 @@ namespace Spark.Infrastructure.Domain
             : this(aggregateUpdater, snapshotStore, eventStore, Settings.Default.AggregateStore)
         { }
 
-        internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, IStoreAggregateSettings settings) 
+        internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, IStoreAggregateSettings settings)
         {
             Verify.NotNull(settings, "settings");
             Verify.NotNull(eventStore, "eventStore");

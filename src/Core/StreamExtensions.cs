@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -13,25 +14,23 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Infrastructure
 {
     /// <summary>
-    /// Extension methods of <see cref="IRetrieveAggregates"/> and <see cref="IStoreAggregates"/>.
+    /// Extension methods of <see cref="Stream"/>.
     /// </summary>
-    public static class AggregateStoreExtensions
+    public static class StreamExtensions
     {
         /// <summary>
-        /// Retrieve the aggregate of the specified <typeparamref name="TAggregate"/> type and aggregate <paramref name="id"/>.
+        /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
         /// </summary>
-        /// <typeparam name="TAggregate">The type of aggregate to retrieve.</typeparam>
-        /// <param name="aggregateRepository">The aggregate repository from which the aggregate is to be retrieved.</param>
-        /// <param name="id">The unique aggregate id.</param>
-        public static TAggregate Get<TAggregate>(this IRetrieveAggregates aggregateRepository, Guid id)
-            where TAggregate : Aggregate
+        /// <param name="stream">The target stream.</param>
+        /// <param name="buffer">>An array of bytes.</param>
+        public static void Write(this Stream stream, Byte[] buffer)
         {
-            Verify.NotNull(aggregateRepository, "aggregateRepository");
+            Verify.NotNull(stream, "stream");
 
-            return (TAggregate)aggregateRepository.Get(typeof(TAggregate), id);
+            stream.Write(buffer, 0, buffer.Length);
         }
     }
 }

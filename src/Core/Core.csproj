@@ -70,8 +70,9 @@
     <Compile Include="Configuration\CommandReceiverElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Domain\AggregateStateValidator.cs" />
+    <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />
-    <Compile Include="Domain\AggregateStoreExtensions.cs" />
     <Compile Include="Domain\CachedAggregateStore.cs" />
     <Compile Include="Domain\HookableAggregateStore.cs" />
     <Compile Include="Domain\PipelineHook.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="GuidStrategy.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\ISerializeObjects.cs" />
+    <Compile Include="StreamExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="Threading\BlockingThreadPoolTaskScheduler.cs" />

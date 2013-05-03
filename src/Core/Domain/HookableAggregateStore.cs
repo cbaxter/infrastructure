@@ -35,42 +35,73 @@ namespace Spark.Infrastructure.Domain
         {
             Aggregate aggregate;
 
+            InvokePreGetHooks(aggregateType, id);
+
+            aggregate = aggregateStore.Get(aggregateType, id);
+
+            InvokePostGetHooks(aggregate);
+
+            return aggregate;
+        }
+
+        private void InvokePreGetHooks(Type aggregateType, Guid id)
+        {
             foreach (var pipelineHook in preGetHooks)
             {
                 Log.TraceFormat("Invoking pre-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PreGet(aggregateType, id);
             }
+        }
 
-            aggregate = aggregateStore.Get(aggregateType, id);
-
+        private void InvokePostGetHooks(Aggregate aggregate)
+        {
             foreach (var pipelineHook in postGetHooks)
             {
                 Log.TraceFormat("Invoking post-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PostGet(aggregate);
             }
-
-            return aggregate;
         }
 
         public Commit Save(Aggregate aggregate, CommandContext context)
         {
-            Commit commit;
+            Exception error = null;
+            Commit commit = null;
 
-            foreach (var pipelineHook in preSaveHooks)
+            InvokePreSaveHooks(aggregate, context);
+
+            try
             {
-                Log.TraceFormat("Invoking pre-save pipeline hook: {0}", pipelineHook);
-                pipelineHook.PreSave(context, aggregate);
+                commit = aggregateStore.Save(aggregate, context);
             }
-
-            commit = aggregateStore.Save(aggregate, context);
-
-            foreach (var pipelineHook in postSaveHooks)
+            catch (Exception ex)
             {
-                Log.TraceFormat("Invoking post-save pipeline hook: {0}", pipelineHook);
-                pipelineHook.PostSave(context, commit);
+                error = ex;
+                throw;
+            }
+            finally
+            {
+                InvokePostSaveHooks(aggregate, commit, error);
             }
 
             return commit;
+        }
+
+        private void InvokePreSaveHooks(Aggregate aggregate, CommandContext context)
+        {
+            foreach (var pipelineHook in preSaveHooks)
+            {
+                Log.TraceFormat("Invoking pre-save pipeline hook: {0}", pipelineHook);
+                pipelineHook.PreSave(aggregate, context);
+            }
+        }
+
+        private void InvokePostSaveHooks(Aggregate aggregate, Commit commit, Exception error)
+        {
+            foreach (var pipelineHook in postSaveHooks)
+            {
+                Log.TraceFormat("Invoking post-save pipeline hook: {0}", pipelineHook);
+                pipelineHook.PostSave(aggregate, commit, error);
+            }
         }
     }
 }
