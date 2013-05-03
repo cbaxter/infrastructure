@@ -72,6 +72,7 @@
     <Compile Include="Commanding\CommandReceiverTests.cs" />
     <Compile Include="Commanding\CommandTests.cs" />
     <Compile Include="Domain\AggregateStateValidatorTests.cs" />
+    <Compile Include="Domain\AggregateStoreTests.cs" />
     <Compile Include="Domain\AggregateUpdaterTests.cs" />
     <Compile Include="Domain\CachedAggregateStoreTests.cs" />
     <Compile Include="Domain\HookableAggregateStoreTests.cs" />
