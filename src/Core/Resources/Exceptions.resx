@@ -120,6 +120,10 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="AggregateAmbiguousApplyMethodStrategy" xml:space="preserve">
+    <value>Aggregate must have a single explicit ApplyByStrategyAttribute defined.
+Aggregate Type: {0}</value>
+  </data>
   <data name="AggregateApplyMethodInvalidParameters" xml:space="preserve">
     <value>A method marked with ApplyMethodAttribute must have a single input parameter that derives from {0}.
 Reflected Type: {1}
@@ -129,6 +133,15 @@ Method Name: {2}</value>
     <value>A method marked with ApplyMethodAttribute must return void.
 Reflected Type: {0}
 Method Name: {1}</value>
+  </data>
+  <data name="AggregateApplyMethodNotFound" xml:space="preserve">
+    <value>Aggregate apply method not found for event type.
+Aggregate Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="AggregateDefaultConstructorRequired" xml:space="preserve">
+    <value>Aggregate must have a single public default constructor.
+Aggregate Type: {0}</value>
   </data>
   <data name="AggregateHandleByStrategyAmbiguous" xml:space="preserve">
     <value>Ambiguous command handler maping strategy,
@@ -143,6 +156,10 @@ Method Name: {2}</value>
     <value>A method marked with ApplyMethodAttribute must return void.
 Reflected Type: {0}
 Method Name: {1}</value>
+  </data>
+  <data name="AggregateTypeUndiscovered" xml:space="preserve">
+    <value>Aggregate type was not discovered by type locator.
+Aggregate Type: {0}</value>
   </data>
   <data name="ArgumentEqualToValue" xml:space="preserve">
     <value>Value must not equal {0}.</value>
@@ -175,7 +192,7 @@ Command Type: {0}</value>
   <data name="CommitTimeout" xml:space="preserve">
     <value>The commit operation has timed out.
 Commit Id: {0}
-Stream Id: {0}</value>
+Stream Id: {1}</value>
   </data>
   <data name="ConcurrencyException" xml:space="preserve">
     <value>Concurrency Exception.
@@ -193,6 +210,12 @@ Name: {0}</value>
   <data name="DuplicateCommitException" xml:space="preserve">
     <value>Duplicate commit.
 Commit Id: {0}</value>
+  </data>
+  <data name="EventContextInterleaved" xml:space="preserve">
+    <value>This EventContext is being disposed on a different thread than it was created.</value>
+  </data>
+  <data name="EventContextInvalidThread" xml:space="preserve">
+    <value>This EventContext is being disposed out of order.</value>
   </data>
   <data name="HandleMethodMustBeAssociatedWithSingleAggregate" xml:space="preserve">
     <value>A command may only be handled by a single aggregate type.
@@ -214,6 +237,10 @@ Command Type: {1}</value>
   <data name="ReservedHeaderName" xml:space="preserve">
     <value>Reserved system header.
 Name: {0}</value>
+  </data>
+  <data name="StateAccessException" xml:space="preserve">
+    <value>State may only be changed via an event apply method when saving an aggregate.
+Aggregate Id: {0}</value>
   </data>
   <data name="TypeArgumentMustNotBeAnInterface" xml:space="preserve">
     <value>Type cannot be an interface.</value>

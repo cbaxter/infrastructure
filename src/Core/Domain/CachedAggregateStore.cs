@@ -23,69 +23,45 @@ namespace Spark.Infrastructure.Domain
     /// <summary>
     /// A <see cref="IStoreAggregates"/> wrapper class to enable <see cref="MemoryCache"/> storage of <see cref="Aggregate"/> instances to reduce <see cref="Get"/> overhead.
     /// </summary>
-    public sealed class CachedAggregateStore : IStoreAggregates, IDisposable //TODO: make all stores disposable (and piplineHooks)?
+    public sealed class CachedAggregateStore : IStoreAggregates
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IStoreAggregates aggregateStore;
         private readonly TimeSpan slidingExpiration;
         private readonly MemoryCache memoryCache;
-        private Boolean disposed;
 
         /// <summary>
         /// Initializes a new instance of <see cref="CachedAggregateStore"/>.
         /// </summary>
         /// <param name="aggregateStore">The underlying <see cref="IStoreAggregates"/> implementation to be decorated.</param>
         public CachedAggregateStore(IStoreAggregates aggregateStore)
-            : this(aggregateStore, Settings.AggregateStore.CacheSlidingExpiration)
-        {
-            Verify.NotNull(aggregateStore, "aggregateStore");
-
-            this.aggregateStore = aggregateStore;
-            this.memoryCache = new MemoryCache("AggregateCache");
-        }
+            : this(aggregateStore, Settings.AggregateStore.CacheSlidingExpiration, new MemoryCache("AggregateCache"))
+        { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="CachedAggregateStore"/> using the specified <paramref name="slidingExpiration"/>.
         /// </summary>
         /// <param name="aggregateStore">The underlying <see cref="IStoreAggregates"/> implementation to be decorated.</param>
         /// <param name="slidingExpiration">The maximum time an <see cref="Aggregate"/> may existing in the cache without being accessed.</param>
-        internal CachedAggregateStore(IStoreAggregates aggregateStore, TimeSpan slidingExpiration)
+        /// <param name="memoryCache">The underlying cache implementation.</param>
+        internal CachedAggregateStore(IStoreAggregates aggregateStore, TimeSpan slidingExpiration, MemoryCache memoryCache)
         {
+            Verify.NotNull(memoryCache, "memoryCache");
             Verify.NotNull(aggregateStore, "aggregateStore");
             Verify.GreaterThanOrEqual(TimeSpan.FromSeconds(1), slidingExpiration, "aggregateStore");
 
+            this.memoryCache = memoryCache;
             this.aggregateStore = aggregateStore;
             this.slidingExpiration = slidingExpiration;
-            this.memoryCache = new MemoryCache("AggregateCache");
         }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
-        /// </summary>
-        ~CachedAggregateStore()
-        {
-            Dispose(false);
-        }
-
+        
         /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
-        /// </summary>
-        private void Dispose(Boolean disposing)
-        {
-            if (!disposing || disposed)
-                return;
-
+            aggregateStore.Dispose();
             memoryCache.Dispose();
-            disposed = true;
         }
 
         /// <summary>

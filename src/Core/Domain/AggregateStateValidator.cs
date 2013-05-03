@@ -34,7 +34,7 @@ namespace Spark.Infrastructure.Domain
         {
             Verify.NotNull(aggregate, "aggregate");
 
-            aggregate.VerifyCheckSum();
+            aggregate.VerifyHash();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Spark.Infrastructure.Domain
         /// <param name="context">The current <see cref="CommandContext"/> containing the pending aggregate modifications.</param>
         public override void PreSave(Aggregate aggregate, CommandContext context)
         {
-            aggregate.VerifyCheckSum();
+            aggregate.VerifyHash();
         }
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace Spark.Infrastructure.Domain
         public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
         {
             if (error != null)
-                aggregate.VerifyCheckSum();
+                aggregate.VerifyHash();
 
             if (commit != null)
-                aggregate.UpdateCheckSum();
+                aggregate.UpdateHash();
         }
     }
 }

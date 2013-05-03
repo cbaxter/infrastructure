@@ -66,6 +66,16 @@ namespace Spark.Infrastructure
 
             yield return item;
         }
+
+        /// <summary>
+        /// Releases all managed resources used by each <see cref="IDisposable"/> instance in <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">The sequence of elements to dispose.</param>
+        public static void DisposeAll(this IEnumerable<IDisposable> source)
+        {
+            foreach(var disposable in source.EmptyIfNull())
+                disposable.Dispose();
+        }
         
         /// <summary>
         /// Returns distinct elements from a sequence by using the the default equality comparer to compare <paramref name="keySelector"/> values.

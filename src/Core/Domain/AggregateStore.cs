@@ -34,7 +34,7 @@ namespace Spark.Infrastructure.Domain
         private readonly IStoreEvents eventStore;
         private readonly Int32 snapshotInterval;
         private readonly TimeSpan retryTimeout;
-        
+
         /// <summary>
         /// Initializes a new instance of <see cref="AggregateStore"/>.
         /// </summary>
@@ -58,6 +58,12 @@ namespace Spark.Infrastructure.Domain
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
         }
+
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
+        /// </summary>
+        public void Dispose()
+        { }
 
         /// <summary>
         /// Retrieve the aggregate of the specified <paramref name="aggregateType"/> and aggregate <paramref name="id"/>.
@@ -190,10 +196,12 @@ namespace Spark.Infrastructure.Domain
         /// <param name="aggregate">The <see cref="Aggregate"/> instance for which the commit is to be applied.</param>
         private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
         {
-            //TODO: EventContext
-            aggregate.Version = commit.Version;
-            foreach (var e in commit.Events)
-                aggregateUpdater.Apply(e, aggregate);
+            using (new EventContext(aggregate.Id, commit.Headers))
+            {
+                aggregate.Version = commit.Version;
+                foreach (var e in commit.Events)
+                    aggregateUpdater.Apply(e, aggregate);
+            }
         }
     }
 }

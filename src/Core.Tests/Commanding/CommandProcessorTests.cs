@@ -110,6 +110,8 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, TimeSpan.FromMilliseconds(20));
 
+                SystemTime.ClearOverride();
+
                 HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), (a, c) => { }));
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
                 AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });

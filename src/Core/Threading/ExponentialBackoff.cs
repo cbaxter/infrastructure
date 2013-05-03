@@ -70,7 +70,8 @@ namespace Spark.Infrastructure.Threading
                 if (wait > timeRemaining)
                     wait = timeRemaining;
 
-                Thread.Sleep(wait);
+                if(wait > TimeSpan.Zero)
+                    Thread.Sleep(wait);
             }
         }
     }

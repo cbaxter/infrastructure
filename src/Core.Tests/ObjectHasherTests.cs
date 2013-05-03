@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Xunit;
 using Xunit.Extensions;
 
@@ -35,8 +36,7 @@ namespace Spark.Infrastructure.Tests
             Theory,
             InlineData("8ad85243-aa78-7539-0bf7-0cd6f27bcaa5", 1),
             InlineData("73a742c2-d4b4-8cd4-f8fb-611564291274", 1.1),
-            InlineData("84ffd3f1-2943-3277-862d-f21dc4e57262", false),
-            InlineData("68b0910b-5265-6020-0f75-b80ff768cdf3", "MyValue")]
+            InlineData("84ffd3f1-2943-3277-862d-f21dc4e57262", false)]
             public void AlwaysReturnConsistentHash(String guid, Object value)
             {
                 Assert.Equal(Guid.Parse(guid), ObjectHasher.Hash(value));
@@ -87,6 +87,52 @@ namespace Spark.Infrastructure.Tests
                     ObjectHasher.Hash(new Dictionary<String, Object> { { "Value 2", 2 }, { "Value 3", 3 }, { "Value 1", 1 } }),
                     ObjectHasher.Hash(new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } })
                 );
+            }
+        }
+
+        public class WhenHashingCustomObjects
+        {
+            [Fact]
+            public void IgnoreFieldsMarkedWithNonHashedAttribute()
+            {
+                var graph = new CustomObject();
+
+                graph.NonHashedField = ObjectHasher.Hash(graph);
+
+                Assert.Equal(graph.NonHashedField, ObjectHasher.Hash(graph));
+            }
+
+            [Fact]
+            public void HashFieldsWithNonHashedAttributes()
+            {
+                var graph = new CustomObject();
+
+                graph.NonHashedField = ObjectHasher.Hash(graph);
+                graph.AttributeField = Guid.NewGuid();
+
+                Assert.NotEqual(graph.NonHashedField, ObjectHasher.Hash(graph));
+            }
+
+            [Fact]
+            public void HashFieldsWithNoAttributes()
+            {
+                var graph = new CustomObject();
+
+                graph.NonHashedField = ObjectHasher.Hash(graph);
+                graph.NoAttributeField = Guid.NewGuid();
+
+                Assert.NotEqual(graph.NonHashedField, ObjectHasher.Hash(graph));
+            }
+            
+            private class CustomObject
+            {
+                [NonHashed]
+                public Guid NonHashedField;
+
+                [DataMember]
+                public Guid AttributeField;
+
+                public Guid NoAttributeField;
             }
         }
     }

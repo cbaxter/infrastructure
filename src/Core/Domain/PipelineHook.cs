@@ -20,7 +20,7 @@ namespace Spark.Infrastructure.Domain
     /// <summary>
     /// A set of customized behaviors that may be plugged in to the <see cref="HookableAggregateStore"/>.
     /// </summary>
-    public abstract class PipelineHook
+    public abstract class PipelineHook : IDisposable
     {
         private static readonly Type PipelineHookType = typeof(PipelineHook);
 
@@ -28,17 +28,17 @@ namespace Spark.Infrastructure.Domain
         /// Return true if <see cref="PostSave"/> has been explicitly overriden; otherwise false.
         /// </summary>
         internal Boolean ImplementsPostSave { get; private set; }
-       
+
         /// <summary>
         /// Return true if <see cref="PreSave"/> has been explicitly overriden; otherwise false.
         /// </summary>
         internal Boolean ImplementsPreSave { get; private set; }
-        
+
         /// <summary>
         /// Return true if <see cref="PostGet"/> has been explicitly overriden; otherwise false.
         /// </summary>
         internal Boolean ImplementsPostGet { get; private set; }
-        
+
         /// <summary>
         /// Return true if <see cref="PreGet"/> has been explicitly overriden; otherwise false.
         /// </summary>
@@ -47,23 +47,46 @@ namespace Spark.Infrastructure.Domain
         /// <summary>
         /// The ordinal value that specifies an explicit invoke order for this <see cref="PipelineHook"/> instance.
         /// </summary>
-        /// <remarks>
-        /// The underlying <see cref="Type.FullName"/> will be used as a secondary sort if the same ordinal value is assigned to more than one <see cref="PipelineHook"/>.
-        /// </remarks>
-        protected internal virtual Int32 Order { get; set; }
+        internal virtual Int32 Order { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of a <see cref="PipelineHook"/>.
         /// </summary>
         protected PipelineHook()
+            : this(0)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of a <see cref="PipelineHook"/> using the specified <paramref name="ordinal"/>.
+        /// </summary>
+        /// <remarks>
+        /// The underlying <see cref="Type.FullName"/> will be used as a secondary sort if the same ordinal value is assigned to more than one <see cref="PipelineHook"/>.
+        /// </remarks>
+        /// <param name="ordinal">The ordinal value that specifies an explicit invoke order for this <see cref="PipelineHook"/> instance</param>
+        protected PipelineHook(Int32 ordinal)
         {
             var type = GetType();
 
+            Order = ordinal;
             ImplementsPreGet = type.GetMethod("PreGet").DeclaringType != PipelineHookType;
             ImplementsPostGet = type.GetMethod("PostGet").DeclaringType != PipelineHookType;
             ImplementsPreSave = type.GetMethod("PreSave").DeclaringType != PipelineHookType;
             ImplementsPostSave = type.GetMethod("PostSave").DeclaringType != PipelineHookType;
         }
+
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="PipelineHook"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="PipelineHook"/> class.
+        /// </summary>
+        protected virtual void Dispose(Boolean disposing)
+        { }
 
         /// <summary>
         /// When overriden, defines the custom behavior to be invoked prior to retrieving the <paramref name="aggregateType"/> identified by <paramref name="id"/>.

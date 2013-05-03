@@ -6,6 +6,7 @@ using System.Reflection;
 using Spark.Infrastructure.Domain.Mappings;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Logging;
+using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -64,11 +65,11 @@ namespace Spark.Infrastructure.Domain
         private static ApplyMethodCollection DiscoverApplyMethods(Type aggregateType)
         {
             if (aggregateType.GetConstructor(Type.EmptyTypes) == null)
-                throw new MappingException(""); //TODO: set message
-
+                throw new MappingException(Exceptions.AggregateDefaultConstructorRequired.FormatWith(aggregateType));
+            
             var applyMethodMappings = aggregateType.GetCustomAttributes<ApplyByStrategyAttribute>().ToArray();
             if (applyMethodMappings.Length > 1)
-                throw new MappingException(); //TODO: set message
+                throw new MappingException(Exceptions.AggregateAmbiguousApplyMethodStrategy.FormatWith(aggregateType));
 
             return (applyMethodMappings.Length == 0 ? ApplyByStrategyAttribute.Default : applyMethodMappings[0]).GetApplyMethods(aggregateType);
         }
@@ -84,7 +85,7 @@ namespace Spark.Infrastructure.Domain
             Verify.NotNull(aggregate, "aggregate");
 
             var applyMethods = GetKnownApplyMethods(aggregate);
-            var applyMethod = GetApplyMethod(applyMethods, e);
+            var applyMethod = GetApplyMethod(aggregate, e, applyMethods);
 
             Log.DebugFormat("Applying event {0} to aggregate {1}", e, aggregate);
             
@@ -99,9 +100,9 @@ namespace Spark.Infrastructure.Domain
         {
             Type aggregateType = aggregate.GetType();
             ApplyMethodCollection applyMethods;
-
+            
             if (!knownApplyMethods.TryGetValue(aggregateType, out applyMethods))
-                throw new MappingException();
+                throw new MappingException(Exceptions.AggregateTypeUndiscovered.FormatWith(aggregate.GetType()));
 
             return applyMethods;
         }
@@ -109,9 +110,10 @@ namespace Spark.Infrastructure.Domain
         /// <summary>
         /// Get the associated apply method for the specified <see cref="Event"/> <paramref name="e"/> from the known <paramref name="applyMethods"/>.
         /// </summary>
-        /// <param name="applyMethods">The set of known apply methods for a given aggregate instance</param>
+        /// <param name="aggregate">The <see cref="Aggregate"/> instance on which the event is to be applied.</param>
         /// <param name="e">The <see cref="Event"/> to be applied.</param>
-        private static Action<Aggregate, Event> GetApplyMethod(ApplyMethodCollection applyMethods, Event e)
+        /// <param name="applyMethods">The set of known apply methods for a given aggregate instance</param>
+        private static Action<Aggregate, Event> GetApplyMethod(Aggregate aggregate, Event e, ApplyMethodCollection applyMethods)
         {
             Action<Aggregate, Event> applyMethod;
             Type eventType = e.GetType();
@@ -120,7 +122,7 @@ namespace Spark.Infrastructure.Domain
                 return applyMethod;
             
             if (!applyMethods.ApplyOptional)
-                throw new MappingException(); //TODO: set message
+                throw new MappingException(Exceptions.AggregateApplyMethodNotFound.FormatWith(aggregate.GetType(), e.GetType()));
 
             return VoidApplyMethod;
         }

@@ -1,4 +1,5 @@
-﻿using Spark.Infrastructure.Commanding;
+﻿using System;
+using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -18,7 +19,7 @@ namespace Spark.Infrastructure.Domain
     /// <summary>
     /// Saves aggregate changes to the underlying event store.
     /// </summary>
-    public interface IStoreAggregates : IRetrieveAggregates
+    public interface IStoreAggregates : IRetrieveAggregates, IDisposable
     {
         /// <summary>
         /// Save the specified <paramref name="context"/> changes for the given aggregate.

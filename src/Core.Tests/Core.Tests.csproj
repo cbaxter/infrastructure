@@ -46,6 +46,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.XML" />
@@ -70,10 +71,15 @@
     <Compile Include="Commanding\CommandPublisherTests.cs" />
     <Compile Include="Commanding\CommandReceiverTests.cs" />
     <Compile Include="Commanding\CommandTests.cs" />
+    <Compile Include="Domain\AggregateStateValidatorTests.cs" />
+    <Compile Include="Domain\AggregateUpdaterTests.cs" />
+    <Compile Include="Domain\CachedAggregateStoreTests.cs" />
+    <Compile Include="Domain\HookableAggregateStoreTests.cs" />
     <Compile Include="Domain\Mappings\ApplyByAttributeAttributeTests.cs" />
     <Compile Include="Domain\Mappings\ApplyByConventionAttributeTests.cs" />
     <Compile Include="Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
     <Compile Include="Domain\Mappings\ApplyMethodMappingTests.cs" />
+    <Compile Include="Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />

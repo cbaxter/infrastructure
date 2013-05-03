@@ -29,7 +29,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CommandIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new CommandContext(Guid.Empty, HeaderCollection.Empty, CommandEnvelope.Empty));
+                var ex = Assert.Throws<ArgumentException>(() => new CommandContext(Guid.Empty, HeaderCollection.Empty));
 
                 Assert.Equal("commandId", ex.ParamName);
             }
@@ -37,7 +37,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void HeaderCollectionCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandContext(Guid.NewGuid(), null, CommandEnvelope.Empty));
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandContext(Guid.NewGuid(), null));
 
                 Assert.Equal("headers", ex.ParamName);
             }
@@ -46,7 +46,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CurrentContextSetToNewCommandContextInstance()
             {
                 var commandId = Guid.NewGuid();
-                var context = new CommandContext(commandId, HeaderCollection.Empty, CommandEnvelope.Empty);
+                var context = new CommandContext(commandId, HeaderCollection.Empty);
 
                 Assert.Same(context, CommandContext.Current);
                 Assert.Equal(commandId, CommandContext.Current.CommandId);
@@ -61,7 +61,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 FakeEvent e1 = new FakeEvent(), e2 = new FakeEvent(), e3 = new FakeEvent();
 
-                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty))
                 {
                     context.Raise(e1);
                     context.Raise(e2);
@@ -89,7 +89,7 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 Task.Factory.StartNew(() =>
                     {
-                        context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
+                        context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
                         manualResetEvent.Set();
                     });
 
@@ -103,8 +103,8 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CannotDisposeContextOutOfOrder()
             {
-                var context1 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
-                var context2 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
+                var context1 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
+                var context2 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
 
                 // ReSharper disable AccessToDisposedClosure
                 var ex = Assert.Throws<InvalidOperationException>(() => context1.Dispose());
@@ -119,7 +119,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CanCallDisposeMoreThanOnce()
             {
-                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty))
                 {
                     context.Dispose();
                     context.Dispose();

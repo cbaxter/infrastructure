@@ -137,6 +137,32 @@ namespace Spark.Infrastructure.Tests
             }
         }
 
+        public class WhenDisposingEnumerableSet
+        {
+            [Fact]
+            public void SetCanBeNull()
+            {
+                Assert.DoesNotThrow(() => default(IDisposable[]).DisposeAll());
+            }
+
+            [Fact]
+            public void DisposeEachItemInSet()
+            {
+                var disposable = new Disposable();
+                var disposables = new[] {disposable};
+                
+                disposables.DisposeAll();
+
+                Assert.True(disposable.Disposed);
+            }
+
+            private class Disposable : IDisposable
+            {
+                public Boolean Disposed { get; private set; }
+                public void Dispose() { Disposed = true; }
+            }
+        }
+
         public class WhenGettingDistinctValues
         {
             [Fact]

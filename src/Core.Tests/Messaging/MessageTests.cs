@@ -57,7 +57,7 @@ namespace Spark.Infrastructure.Tests.Messaging
                 var id = Guid.NewGuid();
                 var message = new Message<Object>(id, HeaderCollection.Empty, new Object());
 
-                Assert.Equal(String.Format("System.Object - {0}", id), message.ToString());
+                Assert.Equal(String.Format("{0} - System.Object", id), message.ToString());
             }
         }
     }

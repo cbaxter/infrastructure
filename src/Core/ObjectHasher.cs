@@ -21,6 +21,12 @@ using System.Security.Cryptography;
 namespace Spark.Infrastructure
 {
     /// <summary>
+    /// Indicates that a field of a class should not be included in a <see cref="ObjectHasher"/> hash.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    public sealed class NonHashedAttribute : Attribute { }
+
+    /// <summary>
     /// Computes a MD5 hash on any non-recursive object graph.
     /// </summary>
     public static class ObjectHasher
@@ -58,7 +64,7 @@ namespace Spark.Infrastructure
             else
             {
                 var type = value.GetType();
-                if (type.IsValueType || typeof (String).IsAssignableFrom(type))
+                if (type.IsValueType || typeof(String).IsAssignableFrom(type))
                 {
                     stream.Write(BitConverter.GetBytes(value.GetHashCode()));
                 }
@@ -97,7 +103,7 @@ namespace Spark.Infrastructure
                 HashArrayValues(value, stream, lengths, new Int32[value.Rank], 0);
             }
         }
-        
+
         /// <summary>
         /// Compute a MD5 hash on a set of multi-dimensonal array values.
         /// </summary>
@@ -174,7 +180,8 @@ namespace Spark.Infrastructure
                 var fields = type.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 foreach (var field in fields)
                 {
-                    yield return Expression.Call(HashObjectMethod, Expression.Convert(Expression.Field(typedValue, field), typeof(Object)), stream);
+                    if (field.GetCustomAttribute<NonHashedAttribute>() == null)
+                        yield return Expression.Call(HashObjectMethod, Expression.Convert(Expression.Field(typedValue, field), typeof(Object)), stream);
                 }
 
                 type = type.BaseType;

@@ -72,6 +72,7 @@
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Domain\AggregateStateValidator.cs" />
     <Compile Include="Domain\SaveResult.cs" />
+    <Compile Include="Eventing\EventContext.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />
     <Compile Include="Domain\CachedAggregateStore.cs" />

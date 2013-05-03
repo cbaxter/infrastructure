@@ -31,7 +31,6 @@ namespace Spark.Infrastructure.Commanding
         private readonly CommandContext originalContext;
         private readonly IList<Event> raisedEvents;
         private readonly HeaderCollection headers;
-        private readonly CommandEnvelope envelope;
         private readonly Guid commandId;
         private readonly Thread thread;
         private Boolean disposed;
@@ -52,43 +51,22 @@ namespace Spark.Infrastructure.Commanding
         public Guid CommandId { get { return commandId; } }
 
         /// <summary>
-        /// The unique <see cref="Aggregate"/> identifier that will handle the associated <see cref="Command"/>.
-        /// </summary>
-        public Guid AggregateId { get { return envelope.AggregateId; } }
-
-        /// <summary>
-        /// The <see cref="Command"/> associated with this <see cref="CommandContext"/>.
-        /// </summary>
-        public Command Command { get { return envelope.Command; } }
-
-        /// <summary>
         /// Initializes a new instance of <see cref="CommandContext"/> with the specified <paramref name="commandId"/> and <paramref name="headers"/>.
         /// </summary>
         /// <param name="commandId">The unique <see cref="Command"/> identifier.</param>
         /// <param name="headers">The <see cref="Command"/> headers.</param>
-        /// <param name="envelope">The <see cref="CommandEnvelope"/> containing the target <see cref="Aggregate"/> identifier and <see cref="Command"/> to process.</param>
-        public CommandContext(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
+        public CommandContext(Guid commandId, HeaderCollection headers)
         {
             Verify.NotEqual(Guid.Empty, commandId, "commandId");
-            Verify.NotNull(envelope, "envelope");
             Verify.NotNull(headers, "headers");
 
             this.raisedEvents = new List<Event>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.commandId = commandId;
-            this.envelope = envelope;
             this.headers = headers;
 
             currentContext = this;
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="CommandContext"/> class.
-        /// </summary>
-        ~CommandContext()
-        {
-            Dispose(false);
         }
 
         /// <summary>
@@ -96,16 +74,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="CommandContext"/> class.
-        /// </summary>
-        private void Dispose(Boolean disposing)
-        {
-            if (!disposing || disposed)
+            if (disposed)
                 return;
            
             if (this.thread != Thread.CurrentThread)
@@ -143,7 +112,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", Command.GetType(), AggregateId);
+            return String.Format("{0} - {1}", GetType(), CommandId);
         }
     }
 }

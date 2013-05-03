@@ -20,7 +20,7 @@ namespace Spark.Infrastructure.Logging
     /// <summary>
     /// Diagnostic context with trace events for transfer, start and stop of logical operations.
     /// </summary>
-    internal class DebugDiagnosticContext : DefaultDiagnosticContext
+    internal sealed class DebugDiagnosticContext : DefaultDiagnosticContext
     {
         private readonly DateTime startTime;
 

@@ -62,28 +62,11 @@ namespace Spark.Infrastructure.Commanding
         }
 
         /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="CommandReceiver"/> class.
-        /// </summary>
-        ~CommandReceiver()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="CommandReceiver"/> class.
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="CommandReceiver"/> class.
-        /// </summary>
-        private void Dispose(Boolean disposing)
-        {
-            if (!disposing || disposed)
+            if (disposed)
                 return;
 
             disposed = true;

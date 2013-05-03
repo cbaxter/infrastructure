@@ -70,6 +70,16 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Aggregate must have a single explicit ApplyByStrategyAttribute defined.
+        ///Aggregate Type: {0}.
+        /// </summary>
+        internal static string AggregateAmbiguousApplyMethodStrategy {
+            get {
+                return ResourceManager.GetString("AggregateAmbiguousApplyMethodStrategy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A method marked with ApplyMethodAttribute must have a single input parameter that derives from {0}.
         ///Reflected Type: {1}
         ///Method Name: {2}.
@@ -88,6 +98,27 @@ namespace Spark.Infrastructure.Resources {
         internal static string AggregateApplyMethodMustHaveVoidReturn {
             get {
                 return ResourceManager.GetString("AggregateApplyMethodMustHaveVoidReturn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate apply method not found for event type.
+        ///Aggregate Type: {0}
+        ///Event Type: {1}.
+        /// </summary>
+        internal static string AggregateApplyMethodNotFound {
+            get {
+                return ResourceManager.GetString("AggregateApplyMethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate must have a single public default constructor.
+        ///Aggregate Type: {0}.
+        /// </summary>
+        internal static string AggregateDefaultConstructorRequired {
+            get {
+                return ResourceManager.GetString("AggregateDefaultConstructorRequired", resourceCulture);
             }
         }
         
@@ -120,6 +151,16 @@ namespace Spark.Infrastructure.Resources {
         internal static string AggregateHandleMethodMustHaveVoidReturn {
             get {
                 return ResourceManager.GetString("AggregateHandleMethodMustHaveVoidReturn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate type was not discovered by type locator.
+        ///Aggregate Type: {0}.
+        /// </summary>
+        internal static string AggregateTypeUndiscovered {
+            get {
+                return ResourceManager.GetString("AggregateTypeUndiscovered", resourceCulture);
             }
         }
         
@@ -208,7 +249,7 @@ namespace Spark.Infrastructure.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The commit operation has timed out.
         ///Commit Id: {0}
-        ///Stream Id: {0}.
+        ///Stream Id: {1}.
         /// </summary>
         internal static string CommitTimeout {
             get {
@@ -254,6 +295,24 @@ namespace Spark.Infrastructure.Resources {
         internal static string DuplicateCommitException {
             get {
                 return ResourceManager.GetString("DuplicateCommitException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This EventContext is being disposed on a different thread than it was created..
+        /// </summary>
+        internal static string EventContextInterleaved {
+            get {
+                return ResourceManager.GetString("EventContextInterleaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This EventContext is being disposed out of order..
+        /// </summary>
+        internal static string EventContextInvalidThread {
+            get {
+                return ResourceManager.GetString("EventContextInvalidThread", resourceCulture);
             }
         }
         
@@ -311,6 +370,16 @@ namespace Spark.Infrastructure.Resources {
         internal static string ReservedHeaderName {
             get {
                 return ResourceManager.GetString("ReservedHeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to State may only be changed via an event apply method when saving an aggregate.
+        ///Aggregate Id: {0}.
+        /// </summary>
+        internal static string StateAccessException {
+            get {
+                return ResourceManager.GetString("StateAccessException", resourceCulture);
             }
         }
         

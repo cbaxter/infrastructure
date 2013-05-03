@@ -50,20 +50,11 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="DefaultDiagnosticContext"/> class.
-        /// </summary>
-        ~DefaultDiagnosticContext()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="DefaultDiagnosticContext"/> class.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>

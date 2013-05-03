@@ -71,7 +71,7 @@ namespace Spark.Infrastructure.Messaging
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", ReferenceEquals(Payload, null) ? "null" : Payload.GetType().FullName, id);
+            return String.Format("{0} - {1}", id, ReferenceEquals(Payload, null) ? "null" : Payload.ToString());
         }
     }
 }

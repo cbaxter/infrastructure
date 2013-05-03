@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Domain
             Verify.NotNull(commit, "commit");
 
             Aggregate = aggregate;
-            Commit = Commit;
+            Commit = commit;
         }
     }
 }

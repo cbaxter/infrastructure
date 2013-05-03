@@ -37,6 +37,26 @@ namespace Spark.Infrastructure.Domain
         private readonly PipelineHook[] preGetHooks;
 
         /// <summary>
+        /// Get the ordered set of post-save pipeline hooks.
+        /// </summary>
+        internal IEnumerable<PipelineHook> PostSaveHooks { get { return postSaveHooks; }}
+
+        /// <summary>
+        /// Get the ordered set of pre-save pipeline hooks.
+        /// </summary>
+        internal IEnumerable<PipelineHook> PreSaveHooks { get { return preSaveHooks; } }
+
+        /// <summary>
+        /// Get the ordered set of post-get pipeline hooks.
+        /// </summary>
+        internal IEnumerable<PipelineHook> PostGetHooks { get { return postGetHooks; } }
+
+        /// <summary>
+        /// Get the ordered set of pre-get pipeline hooks.
+        /// </summary>
+        internal IEnumerable<PipelineHook> PreGetHooks{ get { return preGetHooks; }}
+
+        /// <summary>
         /// Initializes a new instance of <see cref="HookableAggregateStore"/>.
         /// </summary>
         /// <param name="aggregateStore">The underlying <see cref="IStoreAggregates"/> implementation to be decorated.</param>
@@ -59,6 +79,18 @@ namespace Spark.Infrastructure.Domain
             this.postGetHooks = pipelineHooks.Where(pipelineHook => pipelineHook.ImplementsPostGet).Reverse().ToArray();
             this.preSaveHooks = pipelineHooks.Where(pipelineHook => pipelineHook.ImplementsPreSave).ToArray();
             this.postSaveHooks = pipelineHooks.Where(pipelineHook => pipelineHook.ImplementsPostSave).Reverse().ToArray();
+        }
+
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            postSaveHooks.DisposeAll();
+            preSaveHooks.DisposeAll();
+            postGetHooks.DisposeAll();
+            preGetHooks.DisposeAll();
+            aggregateStore.Dispose();
         }
 
         /// <summary>
