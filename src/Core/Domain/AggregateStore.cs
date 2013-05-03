@@ -8,8 +8,24 @@ using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Resources;
 using Spark.Infrastructure.Threading;
 
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
 namespace Spark.Infrastructure.Domain
 {
+    /// <summary>
+    /// The primary <see cref="IStoreAggregates"/> implementation that loads/persists aggregate instances to underlying <see cref="IStoreEvents"/> and <see cref="IStoreSnapshots"/> implementations.
+    /// </summary>
     public sealed class AggregateStore : IStoreAggregates
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
@@ -18,11 +34,17 @@ namespace Spark.Infrastructure.Domain
         private readonly IStoreEvents eventStore;
         private readonly Int32 snapshotInterval;
         private readonly TimeSpan retryTimeout;
-
+        
+        /// <summary>
+        /// Initializes a new instance of <see cref="AggregateStore"/>.
+        /// </summary>
         public AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore)
             : this(aggregateUpdater, snapshotStore, eventStore, Settings.Default.AggregateStore)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="AggregateStore"/> using the specified <paramref name="settings"/>.
+        /// </summary>
         internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, IStoreAggregateSettings settings)
         {
             Verify.NotNull(settings, "settings");
@@ -37,6 +59,11 @@ namespace Spark.Infrastructure.Domain
             this.eventStore = eventStore;
         }
 
+        /// <summary>
+        /// Retrieve the aggregate of the specified <paramref name="aggregateType"/> and aggregate <paramref name="id"/>.
+        /// </summary>
+        /// <param name="aggregateType">The type of aggregate to retrieve.</param>
+        /// <param name="id">The unique aggregate id.</param>
         public Aggregate Get(Type aggregateType, Guid id)
         {
             Verify.NotNull(aggregateType, "aggregateType");
@@ -51,6 +78,11 @@ namespace Spark.Infrastructure.Domain
             return aggregate;
         }
 
+        /// <summary>
+        /// Gets or creates the specified <paramref name="aggregateType"/> identified by the provided aggregate <paramref name="id"/>.
+        /// </summary>
+        /// <param name="aggregateType">The type of aggregate to retrieve.</param>
+        /// <param name="id">The unique aggregate id.</param>
         private Aggregate GetOrCreate(Type aggregateType, Guid id)
         {
             Snapshot snapshot = snapshotStore.GetLastSnapshot(id);
@@ -59,19 +91,25 @@ namespace Spark.Infrastructure.Domain
             if (snapshot == null)
             {
                 aggregate = (Aggregate)Activator.CreateInstance(aggregateType);
+                aggregate.Version = 0;
                 aggregate.Id = id;
             }
             else
             {
                 aggregate = (Aggregate)snapshot.State;
-                aggregate.Id = id;
                 aggregate.Version = snapshot.Version;
+                aggregate.Id = id;
             }
 
             return aggregate;
         }
 
-        public Commit Save(Aggregate aggregate, CommandContext context)
+        /// <summary>
+        /// Save the specified <paramref name="context"/> changes for the given aggregate.
+        /// </summary>
+        /// <param name="aggregate">The current aggregate version for which the context applies.</param>
+        /// <param name="context">The command context containing the aggregate changes to be applied.</param>
+        public SaveResult Save(Aggregate aggregate, CommandContext context)
         {
             Verify.NotNull(aggregate, "aggregate");
             Verify.NotNull(context, "context");
@@ -118,9 +156,14 @@ namespace Spark.Infrastructure.Domain
             if (aggregate.Version > 0 && aggregate.Version % snapshotInterval == 0)
                 snapshotStore.ReplaceSnapshot(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
 
-            return commit;
+            return new SaveResult(aggregate, commit);
         }
 
+        /// <summary>
+        /// Creates a commit for the specified <paramref name="aggregate"/> based on the provided <paramref name="context"/>.
+        /// </summary>
+        /// <param name="aggregate">The <see cref="Aggregate"/> instance for which the commit is to be applied.</param>
+        /// <param name="context">The <see cref="CommandContext"/> instance containing the pending modifications to the associated <paramref name="aggregate"/>.</param>
         private static Commit CreateCommit(Aggregate aggregate, CommandContext context)
         {
             EventCollection events = context.GetRaisedEvents();
@@ -140,6 +183,11 @@ namespace Spark.Infrastructure.Domain
             return new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
         }
 
+        /// <summary>
+        /// Applies all <see cref="Commit.Events"/> to the specified <paramref name="aggregate"/> instance.
+        /// </summary>
+        /// <param name="commit">The <see cref="Commit"/> to be applied to the specified <paramref name="aggregate"/>.</param>
+        /// <param name="aggregate">The <see cref="Aggregate"/> instance for which the commit is to be applied.</param>
         private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
         {
             //TODO: EventContext
