@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
@@ -31,7 +32,7 @@ namespace Spark.Infrastructure
     /// </summary>
     public static class ObjectHasher
     {
-        private static readonly Dictionary<Type, Action<Object, Stream>> Hashers = new Dictionary<Type, Action<Object, Stream>>();
+        private static readonly IDictionary<Type, Action<Object, Stream>> Hashers = new ConcurrentDictionary<Type, Action<Object, Stream>>();
         private static readonly MethodInfo HashObjectMethod = typeof(ObjectHasher).GetMethod("HashObject", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>

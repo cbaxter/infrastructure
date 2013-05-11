@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,10 +25,10 @@ namespace Spark.Infrastructure
     /// </summary>
     public static class ObjectCopier
     {
-        private static readonly Dictionary<Type, Func<Object, Object>> Copiers = new Dictionary<Type, Func<Object, Object>>();
-        private static readonly Dictionary<Type, Func<Array, Int32[], Array>> ArrayBuilders = new Dictionary<Type, Func<Array, Int32[], Array>>();
-        private static readonly MethodInfo CopyObjectMethod = typeof(ObjectCopier).GetMethod("CopyObject", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly IDictionary<Type, Func<Object, Object>> Copiers = new ConcurrentDictionary<Type, Func<Object, Object>>();
+        private static readonly IDictionary<Type, Func<Array, Int32[], Array>> ArrayBuilders = new ConcurrentDictionary<Type, Func<Array, Int32[], Array>>();
         private static readonly MethodInfo GetUninitializedObjectMethod = typeof(FormatterServices).GetMethod("GetUninitializedObject", BindingFlags.Static | BindingFlags.Public);
+        private static readonly MethodInfo CopyObjectMethod = typeof(ObjectCopier).GetMethod("CopyObject", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo SetFieldValueMethod = typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(Object), typeof(Object) });
         private static readonly MethodInfo ArrayLengthMethod = typeof(Array).GetMethod("GetLength", new[] { typeof(Int32) });
 
