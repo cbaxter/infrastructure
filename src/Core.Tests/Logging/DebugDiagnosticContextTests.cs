@@ -121,7 +121,7 @@ namespace Spark.Infrastructure.Tests.Logging
                 var data = Guid.NewGuid();
 
                 using (new DebugDiagnosticContext(traceSource, traceSource.Name, data, activityId))
-                    Assert.Equal(String.Format("{{ {0}, {1} }}", traceSource.Name, data), Trace.CorrelationManager.LogicalOperationStack.Peek());
+                    Assert.Equal(String.Format("{{ {0} = {1} }}", traceSource.Name, data), Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
             [Fact]
@@ -132,7 +132,7 @@ namespace Spark.Infrastructure.Tests.Logging
                 var activityId = Guid.NewGuid();
 
                 using (new DebugDiagnosticContext(traceSource, traceSource.Name, data, activityId))
-                    Assert.Equal(String.Format("{{ {0}, {1}, {2} }}", traceSource.Name, data[0], data[1]), Trace.CorrelationManager.LogicalOperationStack.Peek());
+                    Assert.Equal(String.Format("{{ {0} = [{1}, {2}] }}", traceSource.Name, data[0], data[1]), Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
         }
 

@@ -75,7 +75,7 @@ namespace Spark.Infrastructure.Commanding
                 }
             }
 
-            Log.Debug(logMessage.ToString());
+            Log.Debug(logMessage.ToString);
 
             return result;
         }

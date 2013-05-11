@@ -96,19 +96,23 @@ namespace Spark.Infrastructure.Logging
 
             if (data != null)
             {
-                var enumerable = data as IEnumerable;
-                if (enumerable == null)
+                var list = data as IList;
+                if (list == null)
                 {
-                    sb.Append(", ");
+                    sb.Append(" = ");
                     sb.Append(data);
                 }
                 else
                 {
-                    foreach (var value in enumerable)
+                    sb.Append(" = [");
+                    for (var i = 0; i < list.Count; i++)
                     {
-                        sb.Append(", ");
-                        sb.Append(value);
+                        if (i > 0)
+                            sb.Append(", ");
+
+                        sb.Append(list[i]);
                     }
+                    sb.Append("]");
                 }
             }
 
@@ -124,7 +128,7 @@ namespace Spark.Infrastructure.Logging
         /// <param name="to">The new/target activity id.</param>
         private void Transfer(Guid from, Guid to)
         {
-            if (from == to) 
+            if (from == to)
                 return;
 
             OnTransfer(@from, to);

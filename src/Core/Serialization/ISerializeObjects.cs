@@ -31,7 +31,7 @@ namespace Spark.Infrastructure.Serialization
         /// <summary>
         /// Deserialize an object graph from the speciied <paramref name="stream"/>.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> from which to deserialize the object <paramref name="graph"/>.</param>
+        /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
         Object Deserialize(Stream stream);
     }
 }

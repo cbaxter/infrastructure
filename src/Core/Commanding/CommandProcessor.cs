@@ -107,7 +107,7 @@ namespace Spark.Infrastructure.Commanding
         {
             var aggregate = aggregateStore.Get(commandHandler.AggregateType, envelope.AggregateId);
 
-            Log.Trace("Executing command handler");
+            Log.DebugFormat("Executing {0} command handler on aggregate {1}", envelope.Command, aggregate);
 
             commandHandler.Handle(aggregate, envelope.Command);
 

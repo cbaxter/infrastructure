@@ -62,7 +62,7 @@ namespace Spark.Infrastructure.Domain
         /// <param name="aggregateStore">The underlying <see cref="IStoreAggregates"/> implementation to be decorated.</param>
         /// <param name="pipelineHooks">The set of zero or more <see cref="PipelineHook"/> implementations used to extend <see cref="IStoreAggregates"/> behavior.</param>
         public HookableAggregateStore(IStoreAggregates aggregateStore, IEnumerable<PipelineHook> pipelineHooks)
-            : this(aggregateStore, pipelineHooks.DefaultIfEmpty().OrderBy(hook => hook.Order).ThenBy(hook => hook.GetType().FullName).ToList())
+            : this(aggregateStore, pipelineHooks.EmptyIfNull().OrderBy(hook => hook.Order).ThenBy(hook => hook.GetType().FullName).ToList())
         { }
 
         /// <summary>

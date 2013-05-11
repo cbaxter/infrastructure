@@ -20,16 +20,16 @@ namespace Spark.Infrastructure.EventStore.Dialects
     /// <summary>
     /// Extension methods of <see cref="DbCommand"/>.
     /// </summary>
-   internal static class DbCommandExtensions
+    internal static class DbCommandExtensions
     {
-       /// <summary>
-       /// Gets the value of the specified command parameter or null if not found.
-       /// </summary>
-       /// <param name="command">The command on which to locate a named parameter.</param>
-       /// <param name="parameterName">The name of the parameter to locate.</param>
-       public static Object GetParameterValue(this DbCommand command, String parameterName)
-       {
-           return command.Parameters.Cast<DbParameter>().Where(parameter => parameter.ParameterName == parameterName).Select(parameter => parameter.Value).SingleOrDefault();
-       }
+        /// <summary>
+        /// Gets the value of the specified command parameter or null if not found.
+        /// </summary>
+        /// <param name="command">The command on which to locate a named parameter.</param>
+        /// <param name="parameterName">The name of the parameter to locate.</param>
+        public static Object GetParameterValue(this DbCommand command, String parameterName)
+        {
+            return command.Parameters.Cast<DbParameter>().Where(parameter => parameter.ParameterName == parameterName).Select(parameter => parameter.Value).SingleOrDefault();
+        }
     }
 }

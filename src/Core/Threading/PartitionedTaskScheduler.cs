@@ -210,7 +210,7 @@ namespace Spark.Infrastructure.Threading
                 }
             }
 
-            Log.DebugFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
+            Log.TraceFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
 
             return partition;
         }
@@ -320,7 +320,7 @@ namespace Spark.Infrastructure.Threading
                 if (!taskExecuted)
                     taskExecuted = ExecuteTask(task);
 
-                Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
+                Log.TraceFormat("Releasing lock: partition {0}", partition.Id);
             }
 
             Pulse(queuedTasksExecuted);
