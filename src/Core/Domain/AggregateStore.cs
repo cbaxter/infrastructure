@@ -160,7 +160,7 @@ namespace Spark.Infrastructure.Domain
 
             // NOTE: We do not need multiple snapshots for a given aggregate; thus we will simply replace any existing snapshot if required.
             if (aggregate.Version > 0 && aggregate.Version % snapshotInterval == 0)
-                snapshotStore.ReplaceSnapshot(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
+                snapshotStore.Save(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
 
             return new SaveResult(aggregate, commit);
         }

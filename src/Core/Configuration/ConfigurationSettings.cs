@@ -40,6 +40,11 @@ namespace Spark.Infrastructure.Configuration
         /// The <see cref="IStoreEvents"/> configuration settings.
         /// </summary>
         IStoreEventSettings EventStore { get; }
+
+        /// <summary>
+        /// The <see cref="IStoreSnapshots"/> configuration settings.
+        /// </summary>
+        IStoreSnapshotSettings SnapshotStore { get; }
     }
 
     internal sealed class SparkConfigurationSection : ConfigurationSection, ISettings
@@ -59,5 +64,9 @@ namespace Spark.Infrastructure.Configuration
         [ConfigurationProperty("eventStore", IsRequired = false)]
         public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"] ?? new EventStoreElement(); } }
         IStoreEventSettings ISettings.EventStore { get { return EventStore; } }
+
+        [ConfigurationProperty("snapshotStore", IsRequired = false)]
+        public SnapshotStoreElement SnapshotStore { get { return (SnapshotStoreElement)base["snapshotStore"] ?? new SnapshotStoreElement(); } }
+        IStoreSnapshotSettings ISettings.SnapshotStore { get { return SnapshotStore; } }
     }
 }

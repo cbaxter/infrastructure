@@ -143,14 +143,14 @@ namespace Spark.Infrastructure.Tests.Domain
             }
 
             [Fact]
-            public void ReplaceSnapshotIfRequired()
+            public void SaveSnapshotIfRequired()
             {
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 9);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
                 aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
 
-                snapshotStore.Verify(mock => mock.ReplaceSnapshot(It.Is<Snapshot>(s => s.StreamId == aggregate.Id && s.Version == 10)), Times.Once());
+                snapshotStore.Verify(mock => mock.Save(It.Is<Snapshot>(s => s.StreamId == aggregate.Id && s.Version == 10)), Times.Once());
             }
 
             [Fact]

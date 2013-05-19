@@ -31,13 +31,7 @@ namespace Spark.Infrastructure.EventStore
         /// Adds a new snapshot to the snapshot store, keeping all existing snapshots.
         /// </summary>
         /// <param name="snapshot">The snapshot to append to the snapshot store.</param>
-        void SaveSnapshot(Snapshot snapshot);
-
-        /// <summary>
-        /// Replaces any existing snapshot with the specified <paramref name="snapshot"/>.
-        /// </summary>
-        /// <param name="snapshot">The snapshot to replace any existing snapshot.</param>
-        void ReplaceSnapshot(Snapshot snapshot);
+        void Save(Snapshot snapshot);
 
         /// <summary>
         /// Deletes all existing snapshots from the snapshot store.

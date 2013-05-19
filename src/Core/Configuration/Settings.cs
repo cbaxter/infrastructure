@@ -68,5 +68,13 @@ namespace Spark.Infrastructure.Configuration
         {
             get { return configuration.EventStore; }
         }
+
+        /// <summary>
+        /// The <see cref="IStoreSnapshots"/> configuration settings.
+        /// </summary>
+        public static IStoreSnapshotSettings SnapshotStore
+        {
+            get { return configuration.SnapshotStore; }
+        }
     }
 }

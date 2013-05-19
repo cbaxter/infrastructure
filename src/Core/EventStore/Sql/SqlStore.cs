@@ -128,7 +128,6 @@ namespace Spark.Infrastructure.EventStore.Sql
             {
                 using (var connection = dialect.CreateConnection(connectionString))
                 {
-                    connection.ConnectionString = connectionString;
                     connection.Open();
 
                     using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))

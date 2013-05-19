@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Serialization;
 
@@ -25,6 +26,7 @@ namespace Spark.Infrastructure.EventStore.Sql
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly ISnapshotStoreDialect dialect;
+        private readonly Boolean replaceExisting;
 
         private static class Column
         {
@@ -39,7 +41,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         public SqlSnapshotStore(String connectionName, ISerializeObjects serializer)
-            : this(connectionName, serializer, DialectProvider.GetSnapshotStoreDialect(connectionName))
+            : this(connectionName, serializer, Settings.SnapshotStore, DialectProvider.GetSnapshotStoreDialect(connectionName))
         { }
 
         /// <summary>
@@ -47,13 +49,18 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
+        /// <param name="settings">The event store settings.</param>
         /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal SqlSnapshotStore(String connectionName, ISerializeObjects serializer, ISnapshotStoreDialect dialect)
+        internal SqlSnapshotStore(String connectionName, ISerializeObjects serializer, IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
             : base(connectionName, serializer, dialect)
         {
+            Verify.NotNull(settings, "settings");
             Verify.NotNull(dialect, "dialect");
 
             this.dialect = dialect;
+            this.replaceExisting = settings.ReplaceExisting;
+
+            //TODO: Convert to async background writes (i.e., batch snapshot save).
 
             Initialize();
         }
@@ -99,10 +106,22 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
+        /// Adds a new <see cref="Snapshot"/> to the snapshot store.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to save to the snapshot store.</param>
+        public void Save(Snapshot snapshot)
+        {
+            if(replaceExisting)
+                UpdateSnapshot(snapshot);
+            else 
+                InsertSnapshot(snapshot);
+        }
+
+        /// <summary>
         /// Adds a new snapshot to the snapshot store, keeping all existing snapshots.
         /// </summary>
         /// <param name="snapshot">The snapshot to append to the snapshot store.</param>
-        public void SaveSnapshot(Snapshot snapshot)
+        private void InsertSnapshot(Snapshot snapshot)
         {
             using (var command = CreateCommand(dialect.InsertSnapshot))
             {
@@ -120,7 +139,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// Replaces any existing snapshot with the specified <paramref name="snapshot"/>.
         /// </summary>
         /// <param name="snapshot">The snapshot to replace any existing snapshot.</param>
-        public void ReplaceSnapshot(Snapshot snapshot)
+        private void UpdateSnapshot(Snapshot snapshot)
         {
             using (var command = CreateCommand(dialect.ReplaceSnapshot))
             {

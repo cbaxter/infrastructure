@@ -57,8 +57,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
         /// <param name="settings">The event store settings.</param>
+        /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
         internal SqlEventStore(String connectionName, ISerializeObjects serializer, IStoreEventSettings settings, IEventStoreDialect dialect)
             : base(connectionName, serializer, dialect)
         {
