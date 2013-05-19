@@ -20,16 +20,15 @@ namespace Spark.Infrastructure.Domain
 
         public Int32 Version { get; internal set; } //TODO: Ensure not serialized in snapshot
         
-        
         protected void Notify(Event e)
         {
             var context = CommandContext.Current;
             if (context == null)
                 throw null;
 
+            //TODO: Move to entity base class to allow events to be raised anywhere within aggregate root... apply will still have to be on aggregate until I think up a way to map to entities...
             context.Raise(e);
         }
-
 
         // could use expressions to get/set all non-readonly fields of aggregate... can be wrapped in overridable method where explicit mapping required (medium trust).
         // will likely need for Entity as well... or somehow magic map... 

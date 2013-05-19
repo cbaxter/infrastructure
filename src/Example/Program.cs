@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Threading;
 using Autofac;
 using Example.Domain.Commands;
 using Example.Modules;
 using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Dialects;
+using Spark.Infrastructure.EventStore.Sql.Dialects;
 
 namespace Example
 {
@@ -15,12 +16,14 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            var listeners = System.Diagnostics.Trace.Listeners;
-            listeners[0].Write("Test");
-            var builder = new ContainerBuilder();
-            builder.RegisterModule<CommandingModule>();
-
             GuidStrategy.Initialize(SqlServerSequentialGuid.NewGuid);
+
+            var count = 1000000;
+            var builder = new ContainerBuilder();
+            var benchmarkHook = new BenchmarkHook(count);
+
+            builder.RegisterModule<CommandingModule>();
+            builder.RegisterInstance(benchmarkHook).As<PipelineHook>();
 
             var container = builder.Build();
 
@@ -28,46 +31,69 @@ namespace Example
             var commandPublisher = container.Resolve<IPublishCommands>();
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
-
-            var connection = new SqlConnection("Data Source=(local); Initial Catalog=Infrastructure; Integrated Security=true;");
-            var command = new SqlCommand("SELECT SUM (row_count) FROM sys.dm_db_partition_stats WHERE object_id=OBJECT_ID('Commit') AND (index_id=0 or index_id=1)", connection);
-            var count = 100000;
-            var commits = 0L;
-
-            Console.WriteLine("Initializing event store...");
-            snapshotStore.Initialize();
-            eventStore.Initialize();
             
             Console.WriteLine("Purging event store...");
             eventStore.Purge();
 
             Console.WriteLine("Starting performance test...");
-            DateTime start = DateTime.Now;
+            Console.WriteLine();
 
             for (var i = 1; i <= count; i++)
                 commandPublisher.Publish(GuidStrategy.NewGuid(), new RegisterClient("User #" + i.ToString("{0:00000}")));
 
-            while (commits < count)
+            benchmarkHook.WaitForCommandDrain();
+        }
+
+        public class BenchmarkHook : PipelineHook
+        {
+            private readonly ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+            private readonly Int32 expectedCommands;
+            private readonly Timer timer;
+            private Int64 savedCommands;
+            private DateTime startTime;
+            private Boolean started;
+
+            public BenchmarkHook(Int32 expectedCommands)
             {
-                connection.Open();
-
-                try
-                {
-                    commits = (Int64)command.ExecuteScalar();
-                    Console.Write("\rCommits: " + commits);
-                }
-                finally
-                {
-                    connection.Close();
-                }
-
-                Thread.Sleep(500);
+                this.expectedCommands = expectedCommands;
+                this.timer = new Timer(WriteThroughput, null, 0, 500);
             }
 
-            DateTime end = DateTime.Now;
+            private void WriteThroughput(Object state)
+            {
+                var current = Interlocked.Read(ref savedCommands);
+                if (current > 0 && current < expectedCommands)
+                {
+                    var elapsedTime = DateTime.Now.Subtract(startTime);
 
-            Console.WriteLine();
-            Console.WriteLine((count / end.Subtract(start).TotalSeconds) + @" / sec");
+                    using (var process = Process.GetCurrentProcess())
+                        Console.Write("\r{0}: {1:0000000} @ {2:F2}/sec ({3})", elapsedTime, current, Math.Round(current / elapsedTime.TotalSeconds, 2), process.Threads.Count);
+                }
+            }
+
+            public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
+            {
+                if (!started)
+                {
+                    startTime = DateTime.Now;
+                    started = true;
+                }
+
+                if (Interlocked.Increment(ref savedCommands) == expectedCommands)
+                {
+                    var elapsedTime = DateTime.Now.Subtract(startTime);
+
+                    Console.Write("\r{0}: {1:0000000} @ {2:F2}/sec", elapsedTime, expectedCommands, Math.Round(expectedCommands / elapsedTime.TotalSeconds, 2));
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    manualResetEvent.Set();
+                }
+            }
+
+            public void WaitForCommandDrain()
+            {
+                manualResetEvent.WaitOne();
+            }
         }
     }
 }

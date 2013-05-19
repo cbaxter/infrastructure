@@ -24,15 +24,15 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void CommitIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), 1, Guid.Empty, null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, Guid.NewGuid(), 1, null, null));
 
-                Assert.Equal("commitId", ex.ParamName);
+                Assert.Equal("id", ex.ParamName);
             }
 
             [Fact]
             public void StreamIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, 1, Guid.NewGuid(), null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), Guid.Empty, 1, null, null));
 
                 Assert.Equal("streamId", ex.ParamName);
             }
@@ -40,7 +40,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void RevisionGreaterThanZero()
             {
-                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), 0, Guid.NewGuid(), null, null));
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), Guid.NewGuid(), 0, null, null));
 
                 Assert.Equal("version", ex.ParamName);
             }
@@ -48,7 +48,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void HeadersCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
 
                 Assert.NotNull(commit.Headers);
             }
@@ -56,7 +56,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void EventsCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
 
                 Assert.NotNull(commit.Events);
             }

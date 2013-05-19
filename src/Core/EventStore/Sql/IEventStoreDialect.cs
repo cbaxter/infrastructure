@@ -14,33 +14,32 @@ using System.Data.Common;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Dialects
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
-    /// The RDBMS dialect statements associated with an <see cref="DbEventStore"/> instance.
+    /// The SQL RDBMS dialect statements associated with an <see cref="SqlEventStore"/> instance.
     /// </summary>
-    internal interface IEventStoreDialect : IDialect
+    internal interface IEventStoreDialect : ISqlDialect
     {
-        Int32 PageSize { get; }
+        String GetRange { get; }
         String GetStream { get; }
-        String GetCommits { get; }
-        String InsertCommitStatement { get; }
-        String UpdateCommitStatement { get; }
-        String DeleteStreamStatement { get; }
-        String DeleteStreamsStatement { get; }
-        String EnsureCommitTableCreatedStatement { get; }
-        String EnsureDuplicateCommitsSuppressedStatement { get; }
-        String EnsureDuplicateCommitsDetectedStatement { get; }
-        String EnsureTimestampIndexCreatedStatement { get; }
-        String EnsureTimestampIndexDroppedStatement { get; }
+        String GetStreams { get; }
+        String InsertCommit { get; }
+        String UpdateCommit { get; }
+        String DeleteStream { get; }
+        String DeleteStreams { get; }
 
+        String EnsureCommitTableExists { get; }
+        String EnsureDuplicateCommitsDetected { get; }
+        String EnsureDuplicateCommitsSuppressed { get; }
+
+        DbParameter CreateIdParameter(Guid commitId);
         DbParameter CreateTimestampParameter(DateTime timestamp);
-        DbParameter CreateCommitIdParameter(Guid commitId);
         DbParameter CreateStreamIdParameter(Guid streamId);
         DbParameter CreateVersionParameter(Int32 version);
         DbParameter CreateHeadersParameter(Byte[] headers);
         DbParameter CreateEventsParameter(Byte[] events);
-        DbParameter CreateSkipParameter(Int32 skip);
-        DbParameter CreateTakeParameter(Int32 take);
+        DbParameter CreateSkipParameter(Int64 skip);
+        DbParameter CreateTakeParameter(Int64 take);
     }
 }

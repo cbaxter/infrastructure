@@ -25,15 +25,15 @@ namespace Spark.Infrastructure.EventStore
     /// <typeparam name="T"></typeparam>
     public class PagedResult<T> : IEnumerable<T>
     {
-        private readonly Func<Page, IEnumerable<T>> pageRetriever;
-        private readonly Int32 pageSize;
+        private readonly Func<T, Page, IEnumerable<T>> pageRetriever;
+        private readonly Int64 pageSize;
 
         /// <summary>
         /// Initializes a new instance of <see cref="PagedResult{T}"/>.
         /// </summary>
-        /// <param name="pageSize">The maximum number of items per page.</param>
+        /// <param name="pageSize">The page size.</param>
         /// <param name="pageRetriever">The paging function.</param>
-        public PagedResult(Int32 pageSize, Func<Page, IEnumerable<T>> pageRetriever)
+        public PagedResult(Int64 pageSize, Func<T, Page, IEnumerable<T>> pageRetriever)
         {
             Verify.NotNull(pageRetriever, "pageRetriever");
             Verify.GreaterThan(0, pageSize, "pageSize");
@@ -48,11 +48,12 @@ namespace Spark.Infrastructure.EventStore
         public IEnumerator<T> GetEnumerator()
         {
             var count = 0;
+            var lastResult = default(T);
             var currentPage = new Page(0, pageSize);
 
             do
             {
-                var results = pageRetriever(currentPage) ?? Enumerable.Empty<T>();
+                var results = pageRetriever(lastResult, currentPage) ?? Enumerable.Empty<T>();
 
                 count = 0;
                 foreach (var result in results)
@@ -60,7 +61,7 @@ namespace Spark.Infrastructure.EventStore
                     if (++count > pageSize)
                         throw new InvalidOperationException(Exceptions.PageSizeExceeded.FormatWith(pageSize));
 
-                    yield return result;
+                    yield return lastResult = result;
                 }
 
                 currentPage = currentPage.NextPage();

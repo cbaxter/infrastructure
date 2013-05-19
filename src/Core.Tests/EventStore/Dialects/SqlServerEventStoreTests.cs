@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Dialects;
+using Moq;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.EventStore.Sql;
+using Spark.Infrastructure.EventStore.Sql.Dialects;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 using Xunit;
@@ -29,11 +32,16 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
         public abstract class UsingInitializedEventStore : IDisposable
         {
             protected readonly IStoreEvents EventStore;
+            protected readonly Mock<IStoreEventSettings> Settings;
 
             internal UsingInitializedEventStore()
             {
-                EventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5), true, true);
-                EventStore.Initialize();
+                Settings = new Mock<IStoreEventSettings>();
+
+                Settings.Setup(mock => mock.PageSize).Returns(5);
+                Settings.Setup(mock => mock.DetectDuplicateCommits).Returns(true);
+
+                EventStore = new SqlEventStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
             }
 
             public void Dispose()
@@ -47,23 +55,17 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void WillCreateTableIfDoesNotExist()
             {
-                var eventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer());
-
                 DropExistingTable();
 
-                eventStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                var eventStore = new DbEventStore(SqlServerConnection.Name, new BinarySerializer());
-
-                eventStore.Initialize();
-                eventStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -94,34 +96,34 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void ThrowDuplicateCommitExceptionIfCommitAlreadyExists()
             {
-                var commit1 = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
-                var commit2 = new Commit(Guid.NewGuid(), 2, commit1.CommitId, HeaderCollection.Empty, EventCollection.Empty);
+                var commit1 = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
+                var commit2 = new Commit(commit1.Id, Guid.NewGuid(), 2, HeaderCollection.Empty, EventCollection.Empty);
 
-                EventStore.SaveCommit(commit1);
+                EventStore.Save(commit1);
 
-                Assert.Throws<DuplicateCommitException>(() => EventStore.SaveCommit(commit2));
+                Assert.Throws<DuplicateCommitException>(() => EventStore.Save(commit2));
             }
 
             [SqlServerFactAttribute]
             public void ThrowConcurrencyExceptionIfStreamVersionExists()
             {
-                var commit1 = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
-                var commit2 = new Commit(commit1.StreamId, 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
+                var commit1 = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
+                var commit2 = new Commit(Guid.NewGuid(), commit1.StreamId, 1, HeaderCollection.Empty, EventCollection.Empty);
 
-                EventStore.SaveCommit(commit1);
+                EventStore.Save(commit1);
 
-                Assert.Throws<ConcurrencyException>(() => EventStore.SaveCommit(commit2));
+                Assert.Throws<ConcurrencyException>(() => EventStore.Save(commit2));
             }
 
             [SqlServerFactAttribute]
             public void SaveCommitIfNextVersionInStream()
             {
                 var streamId = Guid.NewGuid();
-                var commit1 = new Commit(streamId, 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
-                var commit2 = new Commit(streamId, 2, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
+                var commit1 = new Commit(Guid.NewGuid(), streamId, 1, HeaderCollection.Empty, EventCollection.Empty);
+                var commit2 = new Commit(Guid.NewGuid(), streamId, 2, HeaderCollection.Empty, EventCollection.Empty);
 
-                EventStore.SaveCommit(commit1);
-                EventStore.SaveCommit(commit2);
+                EventStore.Save(commit1);
+                EventStore.Save(commit2);
 
                 Assert.Equal(2, EventStore.GetStream(streamId).Count());
             }
@@ -132,10 +134,10 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanUpdateHeaders()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
 
-                EventStore.SaveCommit(commit);
-                EventStore.Migrate(commit.CommitId, new HeaderCollection(new Dictionary<String, Object> { { "Key", 1 } }), EventCollection.Empty);
+                EventStore.Save(commit);
+                EventStore.Migrate(commit.Id, new HeaderCollection(new Dictionary<String, Object> { { "Key", 1 } }), EventCollection.Empty);
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Headers.Count);
             }
@@ -143,10 +145,10 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanUpdateEvents()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
 
-                EventStore.SaveCommit(commit);
-                EventStore.Migrate(commit.CommitId, HeaderCollection.Empty, new EventCollection(new[] { new FakeEvent() }));
+                EventStore.Save(commit);
+                EventStore.Migrate(commit.Id, HeaderCollection.Empty, new EventCollection(new[] { new FakeEvent() }));
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Events.Count);
             }
@@ -156,16 +158,16 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             { }
         }
 
-        public class WhenPurgingStreams : UsingInitializedEventStore
+        public class WhenDeletingStreams : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
             public void DeleteAllStreamCommits()
             {
                 var streamId = Guid.NewGuid();
 
-                EventStore.SaveCommit(new Commit(streamId, 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-                EventStore.SaveCommit(new Commit(streamId, 2, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-                EventStore.Purge(streamId);
+                EventStore.Save(new Commit(Guid.NewGuid(), streamId, 1, HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.Save(new Commit(Guid.NewGuid(), streamId, 2, HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.DeleteStream(streamId);
 
                 Assert.Equal(0, EventStore.GetStream(streamId).Count());
             }
@@ -176,21 +178,21 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var streamId = Guid.NewGuid();
                 var alternateStreamid = Guid.NewGuid();
 
-                EventStore.SaveCommit(new Commit(streamId, 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-                EventStore.SaveCommit(new Commit(alternateStreamid, 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-                EventStore.Purge(streamId);
+                EventStore.Save(new Commit(Guid.NewGuid(), streamId, 1, HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.Save(new Commit(Guid.NewGuid(), alternateStreamid, 1, HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.DeleteStream(streamId);
 
                 Assert.Equal(1, EventStore.GetStream(alternateStreamid).Count());
             }
         }
 
-        public class WhenPurgingAllStreams : UsingInitializedEventStore
+        public class WhenPurgingEventStore : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
             public void DeleteAllCommits()
             {
-                EventStore.SaveCommit(new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-                EventStore.SaveCommit(new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.Save(new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty));
+                EventStore.Save(new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty));
                 EventStore.Purge();
 
                 Assert.Equal(0, EventStore.GetAll().Count());
@@ -200,28 +202,39 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
         public class WhenGettingAllCommits : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
-            public void RecordsBeforeUnixEpochIgnored()
+            public void CanPageOverAllCommits()
             {
                 var streamId = Guid.NewGuid();
-                var startTime = new DateTime(1969, 12, 31, 20, 0, 0, DateTimeKind.Utc);
-                for (var i = 1; i <= 10; i++)
-                    EventStore.SaveCommit(new Commit(streamId, i, startTime.AddHours(i), Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
+                var startTime = DateTime.UtcNow.AddHours(-20);
 
-                Assert.Equal(7, EventStore.GetAll().Count());
+                EventStore.Purge();
+
+                for (var i = 1; i <= 10; i++)
+                    EventStore.Save(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+
+                Assert.Equal(10, EventStore.GetAll().Count());
             }
         }
 
-        public class WhenGettingCommitsFromStartTime : UsingInitializedEventStore
+        public class WhenGettingCommitRange : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
-            public void WillReturnCommitsOnOrAfterStartTime()
+            public void UseRangeQueryOnSequenceForSkip()
             {
                 var streamId = Guid.NewGuid();
-                var startTime = DateTime.UtcNow.Subtract(TimeSpan.FromHours(10));
-                for (var i = 1; i <= 10; i++)
-                    EventStore.SaveCommit(new Commit(streamId, i, startTime.AddHours(i), Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
+                var commits = new List<Commit>();
+                var startTime = DateTime.UtcNow.AddHours(-20);
 
-                Assert.Equal(8, EventStore.GetFrom(startTime.AddHours(3)).Count());
+                for (var i = 1; i <= 10; i++)
+                    commits.Add(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+
+                foreach (var commit in commits)
+                    EventStore.Save(commit);
+
+                var lowerBound = commits[3].Sequence.GetValueOrDefault();
+                var range = EventStore.GetRange(lowerBound, 4);
+                Assert.Equal(lowerBound + 1, range.Min(m => m.Sequence.GetValueOrDefault()));
+                Assert.Equal(lowerBound + 4, range.Max(m => m.Sequence.GetValueOrDefault()));
             }
         }
 
@@ -233,9 +246,9 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var streamId = Guid.NewGuid();
                 var startTime = DateTime.UtcNow.Subtract(TimeSpan.FromHours(10));
                 for (var i = 1; i <= 10; i++)
-                    EventStore.SaveCommit(new Commit(streamId, i, startTime.AddHours(i), Guid.NewGuid(), HeaderCollection.Empty, EventCollection.Empty));
-
-                Assert.Equal(7, EventStore.GetStreamFrom(streamId, 4).Count());
+                    EventStore.Save(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+          
+                Assert.Equal(7, EventStore.GetStream(streamId, 4).Count());
             }
         }
     }

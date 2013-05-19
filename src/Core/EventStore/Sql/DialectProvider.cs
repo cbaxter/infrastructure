@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using Spark.Infrastructure.EventStore.Sql.Dialects;
 using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -16,7 +17,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Dialects
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
     /// Gets the appropriate RDBMS dialect based on the specified connection provider name.
@@ -49,8 +50,8 @@ namespace Spark.Infrastructure.EventStore.Dialects
         /// <summary>
         /// Maps the provider name associated with the <paramref name="connectionName"/> to an RDBMS dialect.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string from which to construct the <see cref="IDialect"/>.</param>
-        private static IDialect GetDialect(String connectionName)
+        /// <param name="connectionName">The name of the connection string from which to construct the <see cref="ISqlDialect"/>.</param>
+        private static ISqlDialect GetDialect(String connectionName)
         {
             var connectionString = ConfigurationManager.ConnectionStrings[connectionName];
             if (connectionString == null)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using Spark.Infrastructure.EventStore.Dialects;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Serialization;
 
@@ -17,15 +16,16 @@ using Spark.Infrastructure.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
     /// An RDBMS snapshot store.
     /// </summary>
-    public sealed class DbSnapshotStore : DbStore, IStoreSnapshots
+    public sealed class SqlSnapshotStore : SqlStore, IStoreSnapshots
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly ISnapshotStoreDialect dialect;
+
         private static class Column
         {
             public const Int32 StreamId = 0;
@@ -34,34 +34,36 @@ namespace Spark.Infrastructure.EventStore
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="DbSnapshotStore"/>.
+        /// Initializes a new instance of <see cref="SqlSnapshotStore"/>.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="DbSnapshotStore"/>.</param>
+        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        public DbSnapshotStore(String connectionName, ISerializeObjects serializer)
+        public SqlSnapshotStore(String connectionName, ISerializeObjects serializer)
             : this(connectionName, serializer, DialectProvider.GetSnapshotStoreDialect(connectionName))
         { }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="DbSnapshotStore"/> with a custom <see cref="ISnapshotStoreDialect"/>.
+        /// Initializes a new instance of <see cref="SqlSnapshotStore"/> with a custom <see cref="ISnapshotStoreDialect"/>.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="DbSnapshotStore"/>.</param>
+        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal DbSnapshotStore(String connectionName, ISerializeObjects serializer, ISnapshotStoreDialect dialect)
+        internal SqlSnapshotStore(String connectionName, ISerializeObjects serializer, ISnapshotStoreDialect dialect)
             : base(connectionName, serializer, dialect)
         {
             Verify.NotNull(dialect, "dialect");
 
             this.dialect = dialect;
+
+            Initialize();
         }
 
         /// <summary>
         /// Initializes a new snapshot store.
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
-            using (var command = CreateCommand(dialect.EnsureSnapshotTableCreatedStatement))
+            using (var command = CreateCommand(dialect.EnsureSnapshotTableExists))
             {
                 Log.Trace("Initializing snapshot store");
 
@@ -85,7 +87,7 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="maximumVersion">The maximum snapshot version.</param>
         public Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion)
         {
-            using (var command = CreateCommand(dialect.GetSnapshotStatement))
+            using (var command = CreateCommand(dialect.GetSnapshot))
             {
                 Log.TraceFormat("Getting stream {0} snapshot with version less than or equal to {1}", streamId, maximumVersion);
 
@@ -102,7 +104,7 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="snapshot">The snapshot to append to the snapshot store.</param>
         public void SaveSnapshot(Snapshot snapshot)
         {
-            using (var command = CreateCommand(dialect.InsertSnapshotStatement))
+            using (var command = CreateCommand(dialect.InsertSnapshot))
             {
                 Log.TraceFormat("Inserting stream {0} snapshot for version {1}", snapshot.StreamId, snapshot.Version);
 
@@ -120,7 +122,7 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="snapshot">The snapshot to replace any existing snapshot.</param>
         public void ReplaceSnapshot(Snapshot snapshot)
         {
-            using (var command = CreateCommand(dialect.ReplaceSnapshotStatement))
+            using (var command = CreateCommand(dialect.ReplaceSnapshot))
             {
                 Log.TraceFormat("Updating stream {0} snapshot to version {1}", snapshot.StreamId, snapshot.Version);
 
@@ -137,7 +139,7 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         public void Purge()
         {
-            using (var command = CreateCommand(dialect.DeleteSnapshotsStatement))
+            using (var command = CreateCommand(dialect.DeleteSnapshots))
             {
                 Log.Trace("Purging snapshot store");
 
@@ -151,7 +153,7 @@ namespace Spark.Infrastructure.EventStore
         /// <param name="record">The record from which to create the new <see cref="Snapshot"/>.</param>
         private Snapshot CreateSnapshot(IDataRecord record)
         {
-            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), Deserialize(record, Column.State));
+            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), Deserialize(record.GetBytes(Column.State)));
         }
     }
 }

@@ -21,23 +21,12 @@ namespace Spark.Infrastructure.EventStore
     public interface IStoreSnapshots
     {
         /// <summary>
-        /// Initializes a new snapshot store.
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
-        /// Gets the most recent snapshot for the specified <paramref name="streamId"/>.
-        /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        Snapshot GetLastSnapshot(Guid streamId);
-
-        /// <summary>
         /// Gets the most recent snapshot for the specified <paramref name="streamId"/> and <paramref name="maximumVersion"/>.
         /// </summary>
         /// <param name="streamId">The unique stream identifier.</param>
         /// <param name="maximumVersion">The maximum snapshot version.</param>
         Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion);
-        
+
         /// <summary>
         /// Adds a new snapshot to the snapshot store, keeping all existing snapshots.
         /// </summary>
@@ -54,5 +43,23 @@ namespace Spark.Infrastructure.EventStore
         /// Deletes all existing snapshots from the snapshot store.
         /// </summary>
         void Purge();
+    }
+    
+    /// <summary>
+    /// Extension methods of <see cref="IStoreSnapshots"/>
+    /// </summary>
+    public static class SnapshotStoreExtensions
+    {
+        /// <summary>
+        /// Gets the last snapshot for the specified <paramref name="streamId"/>.
+        /// </summary>
+        /// <param name="snapshotStore">The snapshot store.</param>
+        /// <param name="streamId">The unique stream identifier.</param>
+        public static Snapshot GetLastSnapshot(this IStoreSnapshots snapshotStore, Guid streamId)
+        {
+            Verify.NotNull(snapshotStore, "snapshotStore");
+
+            return snapshotStore.GetSnapshot(streamId, Int32.MaxValue);
+        }
     }
 }

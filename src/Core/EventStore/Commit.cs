@@ -20,12 +20,17 @@ namespace Spark.Infrastructure.EventStore
     /// <summary>
     /// Represents a collection of events associated with a single unit of work.
     /// </summary>
-    public sealed class Commit
+    public class Commit
     {
         /// <summary>
         /// The unique identifier associated with this commit.
         /// </summary>
-        public Guid CommitId { get; private set; }
+        public Guid Id { get; private set; }
+
+        /// <summary>
+        /// The global commit sequence associated with this commit.
+        /// </summary>
+        public Int64? Sequence { get; internal set; }
 
         /// <summary>
         /// The stream identifier associated with this commit.
@@ -55,34 +60,35 @@ namespace Spark.Infrastructure.EventStore
         /// <summary>
         /// Initializes a new instance of <see cref="Commit"/>.
         /// </summary>
-        /// <param name="commitId">The unique commit id.</param>
+        /// <param name="id">The unique commit id.</param>
         /// <param name="streamId">The event stream id.</param>
         /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
-        public Commit(Guid streamId, Int32 version, Guid commitId, HeaderCollection headers, EventCollection events)
-            : this(streamId, version, SystemTime.Now, commitId, headers, events)
+        public Commit(Guid id, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
+            : this(id, null, SystemTime.Now, streamId, version, headers, events)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Commit"/>.
         /// </summary>
-        /// <param name="commitId">The unique commit id.</param>
+        /// <param name="id">The unique commit id.</param>
         /// <param name="streamId">The event stream id.</param>
         /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
         /// <param name="timestamp">The <see cref="DateTime"/> when the snapshot was persisted.</param>
-        internal Commit(Guid streamId, Int32 version, DateTime timestamp, Guid commitId, HeaderCollection headers, EventCollection events)
+        internal Commit(Guid id, Int64? sequence, DateTime timestamp, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
         {
-            Verify.NotEqual(Guid.Empty, commitId, "commitId");
+            Verify.NotEqual(Guid.Empty, id, "id");
             Verify.NotEqual(Guid.Empty, streamId, "streamId");
             Verify.GreaterThan(0, version, "version");
 
-            CommitId = commitId;
+            Id = id;
+            Sequence = sequence;
+            Timestamp = timestamp;
             StreamId = streamId;
             Version = version;
-            Timestamp = timestamp;
             Events = events ?? EventCollection.Empty;
             Headers = headers ?? HeaderCollection.Empty;
         }
@@ -92,7 +98,7 @@ namespace Spark.Infrastructure.EventStore
         /// </summary>
         public override string ToString()
         {
-            return String.Format("{0} - {1}", GetType(), CommitId);
+            return String.Format("{0} - {1}", GetType(), Id);
         }
     }
 }

@@ -120,67 +120,61 @@
   <data name="DeleteStream" xml:space="preserve">
     <value>DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;</value>
   </data>
-  <data name="EnsureCommitTableCreated" xml:space="preserve">
+  <data name="EnsureCommitTableExists" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = 'dbo' AND t.name = 'Commit')
+BEGIN
     CREATE TABLE [dbo].[Commit] (
+        [Id]        UNIQUEIDENTIFIER NOT NULL,
+        [Sequence]  BIGINT           NOT NULL IDENTITY(1,1),
+        [Timestamp] DATETIME2        NOT NULL,
         [StreamId]  UNIQUEIDENTIFIER NOT NULL,
         [Version]   INT              NOT NULL,
-        [Timestamp] DATETIME2        NOT NULL,
-        [CommitId]  UNIQUEIDENTIFIER NOT NULL,
         [Headers]   VARBINARY(MAX)   NOT NULL,
-        [Events]    VARBINARY(MAX)   NOT NULL,
-     
-        CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED ([StreamId],[Version])
-    );</value>
+        [Events]    VARBINARY(MAX)   NOT NULL
+    );
+
+    CREATE UNIQUE CLUSTERED INDEX [UQ_Commit_Sequence] ON [dbo].[Commit]([Sequence]);
+    CREATE UNIQUE NONCLUSTERED INDEX [UQ_Commit_StreamVersion] ON [dbo].[Commit]([StreamId],[Version]);
+END;</value>
   </data>
   <data name="EnsureDuplicateCommitsDetected" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'UQ_Commit')
-    CREATE UNIQUE INDEX [UQ_Commit] ON [dbo].[Commit]([CommitId]);</value>
+    <value>IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'PK_Commit')
+BEGIN
+    ALTER TABLE [dbo].[Commit] ADD CONSTRAINT [PK_Commit] PRIMARY KEY NONCLUSTERED ([Id]);
+END;</value>
   </data>
   <data name="EnsureDuplicateCommitsSuppressed" xml:space="preserve">
-    <value>IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'UQ_Commit')
-    DROP INDEX [UQ_Commit] ON [dbo].[Commit];</value>
+    <value>IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'PK_Commit')
+BEGIN
+    ALTER TABLE [dbo].[Commit] DROP CONSTRAINT [PK_Commit];
+END;</value>
   </data>
-  <data name="EnsureSnapshotTableCreated" xml:space="preserve">
+  <data name="EnsureSnapshotTableExists" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = 'dbo' AND t.name = 'Snapshot')
+BEGIN
     CREATE TABLE [dbo].[Snapshot] (
         [StreamId]  UNIQUEIDENTIFIER NOT NULL,
         [Version]   INT              NOT NULL,
         [State]     VARBINARY(MAX)   NOT NULL,
      
-        CONSTRAINT [PK_Snapshot] PRIMARY KEY CLUSTERED ([StreamId],[Version])
-    );</value>
+        CONSTRAINT [PK_Snapshot] PRIMARY KEY CLUSTERED ([StreamId],[Version]) WITH (IGNORE_DUP_KEY = ON)
+    );
+END;</value>
   </data>
-  <data name="EnsureTimestampIndexCreated" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'IX_Commit_Timestamp')
-    CREATE INDEX [IX_Commit_Timestamp] ON [dbo].[Commit]([Timestamp], [CommitId]);</value>
-  </data>
-  <data name="EnsureTimestampIndexDropped" xml:space="preserve">
-    <value>IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'IX_Commit_Timestamp')
-    DROP INDEX [IX_Commit_Timestamp] ON [dbo].[Commit];</value>
-  </data>
-  <data name="GetCommitsFrom" xml:space="preserve">
-    <value>    SELECT [StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events] 
-  FROM (SELECT *, RANK() OVER(ORDER BY [Timestamp], [CommitId]) 'Rank'
-          FROM [dbo].[Commit]
-         WHERE [Timestamp] &gt;= @timestamp
-       ) [Commit]
- WHERE [RANK] BETWEEN (@skip + 1) AND (@skip + @take)</value>
+  <data name="GetRange" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [Sequence] &gt;= @skip ORDER BY [Sequence];</value>
   </data>
   <data name="GetSnapshot" xml:space="preserve">
     <value>SELECT TOP(1) [StreamId],[Version],[State] FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;</value>
   </data>
-  <data name="GetStreamFrom" xml:space="preserve">
-    <value>    SELECT [StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events] 
-  FROM (SELECT *, RANK() OVER(ORDER BY [Version]) 'Rank'
-          FROM [dbo].[Commit]
-         WHERE [StreamId] = @streamId
-           AND [Version] &gt;= @version
-       ) [Commit]
- WHERE [RANK] BETWEEN (@skip + 1) AND (@skip + @take)</value>
+  <data name="GetStream" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];</value>
+  </data>
+  <data name="GetStreams" xml:space="preserve">
+    <value>SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 0 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
   </data>
   <data name="InsertCommit" xml:space="preserve">
-    <value>INSERT INTO [dbo].[Commit] ([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) VALUES(@streamId, @version, @timestamp, @commitId, @headers, @events);</value>
+    <value>INSERT INTO [dbo].[Commit] ([Id], [Timestamp], [StreamId], [Version], [Headers], [Events]) OUTPUT Inserted.Sequence VALUES(@id, @timestamp, @streamId, @version, @headers, @events);</value>
   </data>
   <data name="InsertSnapshot" xml:space="preserve">
     <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>
@@ -192,9 +186,13 @@
     <value>TRUNCATE TABLE [dbo].[Snapshot];</value>
   </data>
   <data name="ReplaceSnapshot" xml:space="preserve">
-    <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state); DELETE FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt; @version;</value>
+    <value>UPDATE TOP(1) [dbo].[Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
+IF @@ROWCOUNT = 0
+BEGIN
+    INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
+END;</value>
   </data>
   <data name="UpdateCommit" xml:space="preserve">
-    <value>UPDATE [dbo].[Commit] SET [Headers] = @headers, [Events] = @events WHERE [CommitId] = @commitId;</value>
+    <value>UPDATE [dbo].[Commit] SET [Headers] = @headers, [Events] = @events WHERE [Id] = @id;</value>
   </data>
 </root>

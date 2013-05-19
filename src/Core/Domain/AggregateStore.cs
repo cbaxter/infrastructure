@@ -76,7 +76,7 @@ namespace Spark.Infrastructure.Domain
             Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
 
             var aggregate = GetOrCreate(aggregateType, id);
-            var commits = eventStore.GetStreamFrom(id, aggregate.Version);
+            var commits = eventStore.GetStream(id, aggregate.Version);
 
             foreach (var commit in commits)
                 ApplyCommitToAggregate(commit, aggregate);
@@ -128,7 +128,7 @@ namespace Spark.Infrastructure.Domain
             {
                 try
                 {
-                    eventStore.SaveCommit(commit);
+                    eventStore.Save(commit);
                     done = true;
                 }
                 catch (DuplicateCommitException)
@@ -146,7 +146,7 @@ namespace Spark.Infrastructure.Domain
                         backoffContext = new ExponentialBackoff(retryTimeout);
 
                     if (!backoffContext.CanRetry)
-                        throw new TimeoutException(Exceptions.CommitTimeout.FormatWith(commit.CommitId, commit.StreamId), ex);
+                        throw new TimeoutException(Exceptions.CommitTimeout.FormatWith(commit.Id, commit.StreamId), ex);
 
                     Log.Warn(ex.Message);
                     backoffContext.WaitUntilRetry();
@@ -186,7 +186,7 @@ namespace Spark.Infrastructure.Domain
                 headers = context.Headers;
             }
 
-            return new Commit(aggregate.Id, aggregate.Version + 1, context.CommandId, headers, events);
+            return new Commit(context.CommandId, aggregate.Id, aggregate.Version + 1, headers, events);
         }
 
         /// <summary>

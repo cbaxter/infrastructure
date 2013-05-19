@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Messaging;
 
@@ -24,41 +25,36 @@ namespace Spark.Infrastructure.EventStore
     public interface IStoreEvents
     {
         /// <summary>
-        /// Initializes a new event store.
+        /// Get the specified commit sequence range starting after <paramref name="skip"/> and returing <paramref name="take"/> commits.
         /// </summary>
-        void Initialize();
+        /// <param name="skip">The commit sequence lower bound (exclusive).</param>
+        /// <param name="take">The number of commits to include in the result.</param>
+        IReadOnlyList<Commit> GetRange(Int64 skip, Int64 take);
 
         /// <summary>
-        /// Gets all commits from the event store.
+        /// Get all known stream identifiers.
         /// </summary>
-        /// <returns></returns>
-        IEnumerable<Commit> GetAll();
-
-        /// <summary>
-        /// Gets all commits from the event store commited on or after <paramref name="startTime"/>.
-        /// </summary>
-        /// <param name="startTime">The timestamp of the first commit to be returned (inclusive).</param>
-        /// <returns></returns>
-        IEnumerable<Commit> GetFrom(DateTime startTime);
-
-        /// <summary>
-        /// Gets all commits for the specified <paramref name="streamId"/>.
-        /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        IEnumerable<Commit> GetStream(Guid streamId);
+        /// <remarks>This method is not safe to call on an active event store; only use when new streams are not being committed.</remarks>
+        IEnumerable<Guid> GetStreams();
 
         /// <summary>
         /// Gets all commits for the specified <paramref name="streamId"/> with a version greater than or equal to <paramref name="minimumVersion"/>.
         /// </summary>
         /// <param name="streamId">The unique stream identifier.</param>
         /// <param name="minimumVersion">The minimum stream version (inclusive).</param>
-        IEnumerable<Commit> GetStreamFrom(Guid streamId, Int32 minimumVersion);
+        IEnumerable<Commit> GetStream(Guid streamId, Int32 minimumVersion);
 
         /// <summary>
-        /// Adds a new commit to the event store.
+        /// Deletes the specified event stream for <paramref name="streamId"/>.
+        /// </summary>
+        /// <param name="streamId">The unique stream identifier.</param>
+        void DeleteStream(Guid streamId);
+
+        /// <summary>
+        /// Appends a new commit to the event store.
         /// </summary>
         /// <param name="commit">The commit to append to the event store.</param>
-        void SaveCommit(Commit commit);
+        void Save(Commit commit);
 
         /// <summary>
         /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="commitId"/>.
@@ -69,14 +65,37 @@ namespace Spark.Infrastructure.EventStore
         void Migrate(Guid commitId, HeaderCollection headers, EventCollection events);
 
         /// <summary>
-        /// Deletes the specified event stream for <paramref name="streamId"/>.
-        /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        void Purge(Guid streamId);
-
-        /// <summary>
         /// Deletes all existing commits from the event store.
         /// </summary>
         void Purge();
+    }
+
+    /// <summary>
+    /// Extension methods of <see cref="IStoreEvents"/>
+    /// </summary>
+    public static class EventStoreExtensions
+    {
+        /// <summary>
+        /// Gets all commits from the event store.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<Commit> GetAll(this IStoreEvents eventStore)
+        {
+            Verify.NotNull(eventStore, "eventStore");
+
+            return new PagedResult<Commit>(Settings.Eventstore.PageSize, (lastResult, page) => eventStore.GetRange(lastResult == null ? 0L : lastResult.Sequence.GetValueOrDefault(), page.Take));
+        }
+
+        /// <summary>
+        /// Gets all commits for the specified <paramref name="streamId"/>.
+        /// </summary>
+        /// <param name="eventStore">The event store.</param>
+        /// <param name="streamId">The unique stream identifier.</param>
+        public static IEnumerable<Commit> GetStream(this IStoreEvents eventStore, Guid streamId)
+        {
+            Verify.NotNull(eventStore, "eventStore");
+
+            return eventStore.GetStream(streamId, 1);
+        }
     }
 }

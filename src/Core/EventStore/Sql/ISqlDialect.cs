@@ -14,12 +14,12 @@ using System.Data.Common;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Dialects
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
-    /// Base RDBMS dialect contract.
+    /// Base SQL RDBMS dialect contract.
     /// </summary>
-    internal interface IDialect
+    internal interface ISqlDialect
     {
         /// <summary>
         /// Create a new <see cref="DbConnection"/>.

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.EventStore.Sql;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 
@@ -28,14 +30,16 @@ namespace Example.Modules
 
 
             builder.RegisterType<AggregateUpdater>().As<IApplyEvents>().SingleInstance();
-            builder.RegisterType<AggregateStore>().As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
-            builder.Register(context => new DbEventStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreEvents>().SingleInstance();
-            builder.Register(context => new DbSnapshotStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreSnapshots>().SingleInstance();
+            builder.RegisterType<AggregateStore>().Named<IStoreAggregates>("AggregateStore").SingleInstance();
+            builder.Register(context => new SqlEventStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreEvents>().SingleInstance();
+            builder.Register(context => new SqlSnapshotStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreSnapshots>().SingleInstance();
 
 
             builder.RegisterType<CommandReceiver>().AsSelf().SingleInstance();
             builder.RegisterType<CommandProcessor>().As<IProcessCommands>().SingleInstance();
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
+
+            builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "AggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>();
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider

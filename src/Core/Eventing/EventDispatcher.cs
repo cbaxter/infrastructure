@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Threading;
 
 namespace Spark.Infrastructure.Eventing
 {
@@ -48,7 +45,7 @@ namespace Spark.Infrastructure.Eventing
                 }
                 catch (TimeoutException)
                 {
-                    Log.ErrorFormat("Failed to dispatch {0} of {1} events from commit {2}", count - i, count, commit.CommitId);
+                    Log.ErrorFormat("Failed to dispatch {0} of {1} events from commit {2}", count - i, count, commit.Id);
                     //TODO: Track failed commit, and specific event within commit that failed... 
                     //      perhaps serialize just events that weren't dispatched from commit  (i.e., convert to messages and serialize messages)? { Timestamp = commit.Timestamp, Headers = commit.Headers, Event = e}
                     //      Write out to local storage (file-system?, sqlce? something?).

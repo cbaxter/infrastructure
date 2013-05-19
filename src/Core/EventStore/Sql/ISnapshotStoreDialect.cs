@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Common;
-using System.Linq;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,21 +14,22 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Dialects
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
-    /// Extension methods of <see cref="DbCommand"/>.
+    /// The SQL RDBMS dialect statements associated with an <see cref="SqlSnapshotStore"/> instance.
     /// </summary>
-    internal static class DbCommandExtensions
+    internal interface ISnapshotStoreDialect : ISqlDialect
     {
-        /// <summary>
-        /// Gets the value of the specified command parameter or null if not found.
-        /// </summary>
-        /// <param name="command">The command on which to locate a named parameter.</param>
-        /// <param name="parameterName">The name of the parameter to locate.</param>
-        public static Object GetParameterValue(this DbCommand command, String parameterName)
-        {
-            return command.Parameters.Cast<DbParameter>().Where(parameter => parameter.ParameterName == parameterName).Select(parameter => parameter.Value).SingleOrDefault();
-        }
+        String EnsureSnapshotTableExists { get; }
+
+        String GetSnapshot { get; }
+        String InsertSnapshot { get; }
+        String ReplaceSnapshot { get; }
+        String DeleteSnapshots { get; }
+
+        DbParameter CreateStreamIdParameter(Guid streamId);
+        DbParameter CreateVersionParameter(Int32 version);
+        DbParameter CreateStateParameter(Byte[] state);
     }
 }

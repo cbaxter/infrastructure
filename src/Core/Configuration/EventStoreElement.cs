@@ -23,20 +23,20 @@ namespace Spark.Infrastructure.Configuration
     public interface IStoreEventSettings
     {
         /// <summary>
-        /// Optimizes the <see cref="IStoreEvents"/> implementation for <see cref="IStoreEvents.GetStream"/> use only (i.e., no timestamp index created for <see cref="IStoreEvents.GetFrom"/>).
+        /// The number of commits to include in a single page of a paged result (default = <value>100</value>).
         /// </summary>
-        Boolean UseGetStreamOnly { get; }
+        Int64 PageSize { get; }
 
         /// <summary>
-        /// Optimizes the <see cref="IStoreEvents"/> implementation by omitting the duplicate commit detection (i.e., no unique index on commitId).
+        /// Optimizes the <see cref="IStoreEvents"/> implementation by omitting duplicate commit detection (default = <value>true</value>).
         /// </summary>
         Boolean DetectDuplicateCommits { get; }
     }
 
     internal sealed class EventStoreElement : ConfigurationElement, IStoreEventSettings
     {
-        [ConfigurationProperty("useGetStreamOnly", IsRequired = false, DefaultValue = false)]
-        public Boolean UseGetStreamOnly { get { return (Boolean)base["useGetStreamOnly"]; } }
+        [ConfigurationProperty("pageSize", IsRequired = false, DefaultValue = 100L)]
+        public Int64 PageSize { get { return (Int64)base["pageSize"]; } }
 
         [ConfigurationProperty("detectDuplicateCommits", IsRequired = false, DefaultValue = true)]
         public Boolean DetectDuplicateCommits { get { return (Boolean)base["detectDuplicateCommits"]; } }

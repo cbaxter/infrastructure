@@ -4,8 +4,8 @@ using Moq;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Messaging;
 using Xunit;
 
@@ -62,7 +62,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var events = new Event[] { new FakeEvent(), new FakeEvent() };
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                eventStore.Setup(mock => mock.GetStreamFrom(id, 0)).Returns(new[] { new Commit(id, 1, DateTime.UtcNow, Guid.NewGuid(), HeaderCollection.Empty, new EventCollection(events)) });
+                eventStore.Setup(mock => mock.GetStream(id, 0)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 1, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
@@ -77,12 +77,12 @@ namespace Spark.Infrastructure.Tests.Domain
                 var events = new Event[] { new FakeEvent(), new FakeEvent() };
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                snapshotStore.Setup(mock => mock.GetLastSnapshot(id)).Returns(new Snapshot(id, 10, snapshot));
-                eventStore.Setup(mock => mock.GetStreamFrom(id, 10)).Returns(new[] { new Commit(id, 11, DateTime.UtcNow, Guid.NewGuid(), HeaderCollection.Empty, new EventCollection(events)) });
+                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, snapshot));
+                eventStore.Setup(mock => mock.GetStream(id, 10)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
-                snapshotStore.Verify(mock => mock.GetLastSnapshot(id), Times.Once());
+                snapshotStore.Verify(mock => mock.GetSnapshot(id, Int32.MaxValue), Times.Once());
 
                 Assert.Equal(11, aggregate.Version);
             }
@@ -139,7 +139,7 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
 
-                eventStore.Verify(mock => mock.SaveCommit(It.Is<Commit>(c => (Type)c.Headers[Header.Aggregate] == typeof(FakeAggregate))), Times.Once());
+                eventStore.Verify(mock => mock.Save(It.Is<Commit>(c => (Type)c.Headers[Header.Aggregate] == typeof(FakeAggregate))), Times.Once());
             }
 
             [Fact]
@@ -147,7 +147,7 @@ namespace Spark.Infrastructure.Tests.Domain
             {
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 9);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
-                
+
                 aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
 
                 snapshotStore.Verify(mock => mock.ReplaceSnapshot(It.Is<Snapshot>(s => s.StreamId == aggregate.Id && s.Version == 10)), Times.Once());
@@ -159,7 +159,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
-                eventStore.Setup(mock => mock.SaveCommit(It.IsAny<Commit>())).Throws<DuplicateCommitException>();
+                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<DuplicateCommitException>();
 
                 Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
             }
@@ -170,7 +170,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
-                eventStore.Setup(mock => mock.SaveCommit(It.IsAny<Commit>())).Throws<ConcurrencyException>();
+                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<ConcurrencyException>();
 
                 Assert.Throws<ConcurrencyException>(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
             }
@@ -182,7 +182,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
-                eventStore.Setup(mock => mock.SaveCommit(It.IsAny<Commit>())).Callback(() => { if (throwException) { throwException = false; throw new InvalidOperationException(); } });
+                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Callback(() => { if (throwException) { throwException = false; throw new InvalidOperationException(); } });
 
                 Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
             }
@@ -193,7 +193,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
-                eventStore.Setup(mock => mock.SaveCommit(It.IsAny<Commit>())).Throws<InvalidOperationException>();
+                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<InvalidOperationException>();
 
                 Assert.Throws<TimeoutException>(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
             }

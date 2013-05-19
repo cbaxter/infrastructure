@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Spark.Infrastructure.EventStore.Dialects {
+namespace Spark.Infrastructure.EventStore.Sql.Dialects {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Spark.Infrastructure.EventStore.Dialects {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class SqlServerSqlStatements {
+    internal class SqlServerDialectStatements {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal SqlServerSqlStatements() {
+        internal SqlServerDialectStatements() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.Infrastructure.EventStore.Dialects.SqlServerSqlStatements", typeof(SqlServerSqlStatements).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.Infrastructure.EventStore.Sql.Dialects.SqlServerDialectStatements", typeof(SqlServerDialectStatements).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -71,25 +71,27 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         
         /// <summary>
         ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = &apos;dbo&apos; AND t.name = &apos;Commit&apos;)
+        ///BEGIN
         ///    CREATE TABLE [dbo].[Commit] (
+        ///        [Id]        UNIQUEIDENTIFIER NOT NULL,
+        ///        [Sequence]  BIGINT           NOT NULL IDENTITY(1,1),
+        ///        [Timestamp] DATETIME2        NOT NULL,
         ///        [StreamId]  UNIQUEIDENTIFIER NOT NULL,
         ///        [Version]   INT              NOT NULL,
-        ///        [Timestamp] DATETIME2        NOT NULL,
-        ///        [CommitId]  UNIQUEIDENTIFIER NOT NULL,
         ///        [Headers]   VARBINARY(MAX)   NOT NULL,
-        ///        [Events]    VARBINARY(MAX)   NOT NULL,
-        ///     
-        ///        CONSTRAINT [PK_Commit] PRIMARY KE [rest of string was truncated]&quot;;.
+        ///        [Events]    VARBINA [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string EnsureCommitTableCreated {
+        internal static string EnsureCommitTableExists {
             get {
-                return ResourceManager.GetString("EnsureCommitTableCreated", resourceCulture);
+                return ResourceManager.GetString("EnsureCommitTableExists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;UQ_Commit&apos;)
-        ///    CREATE UNIQUE INDEX [UQ_Commit] ON [dbo].[Commit]([CommitId]);.
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;PK_Commit&apos;)
+        ///BEGIN
+        ///    ALTER TABLE [dbo].[Commit] ADD CONSTRAINT [PK_Commit] PRIMARY KEY NONCLUSTERED ([Id]);
+        ///END;.
         /// </summary>
         internal static string EnsureDuplicateCommitsDetected {
             get {
@@ -98,8 +100,10 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;UQ_Commit&apos;)
-        ///    DROP INDEX [UQ_Commit] ON [dbo].[Commit];.
+        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;PK_Commit&apos;)
+        ///BEGIN
+        ///    ALTER TABLE [dbo].[Commit] DROP CONSTRAINT [PK_Commit];
+        ///END;.
         /// </summary>
         internal static string EnsureDuplicateCommitsSuppressed {
             get {
@@ -109,51 +113,28 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         
         /// <summary>
         ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = &apos;dbo&apos; AND t.name = &apos;Snapshot&apos;)
+        ///BEGIN
         ///    CREATE TABLE [dbo].[Snapshot] (
         ///        [StreamId]  UNIQUEIDENTIFIER NOT NULL,
         ///        [Version]   INT              NOT NULL,
         ///        [State]     VARBINARY(MAX)   NOT NULL,
         ///     
-        ///        CONSTRAINT [PK_Snapshot] PRIMARY KEY CLUSTERED ([StreamId],[Version])
-        ///    );.
+        ///        CONSTRAINT [PK_Snapshot] PRIMARY KEY CLUSTERED ([StreamId],[Version]) WITH (IGNORE_DUP_KEY = ON)
+        ///    );
+        ///END;.
         /// </summary>
-        internal static string EnsureSnapshotTableCreated {
+        internal static string EnsureSnapshotTableExists {
             get {
-                return ResourceManager.GetString("EnsureSnapshotTableCreated", resourceCulture);
+                return ResourceManager.GetString("EnsureSnapshotTableExists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;IX_Commit_Timestamp&apos;)
-        ///    CREATE INDEX [IX_Commit_Timestamp] ON [dbo].[Commit]([Timestamp], [CommitId]);.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [Sequence] &gt;= @skip ORDER BY [Sequence];.
         /// </summary>
-        internal static string EnsureTimestampIndexCreated {
+        internal static string GetRange {
             get {
-                return ResourceManager.GetString("EnsureTimestampIndexCreated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = &apos;dbo&apos; AND  t.name = &apos;Commit&apos; AND i.name = &apos;IX_Commit_Timestamp&apos;)
-        ///    DROP INDEX [IX_Commit_Timestamp] ON [dbo].[Commit];.
-        /// </summary>
-        internal static string EnsureTimestampIndexDropped {
-            get {
-                return ResourceManager.GetString("EnsureTimestampIndexDropped", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to     SELECT [StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events] 
-        ///  FROM (SELECT *, RANK() OVER(ORDER BY [Timestamp], [CommitId]) &apos;Rank&apos;
-        ///          FROM [dbo].[Commit]
-        ///         WHERE [Timestamp] &gt;= @timestamp
-        ///       ) [Commit]
-        /// WHERE [RANK] BETWEEN (@skip + 1) AND (@skip + @take).
-        /// </summary>
-        internal static string GetCommitsFrom {
-            get {
-                return ResourceManager.GetString("GetCommitsFrom", resourceCulture);
+                return ResourceManager.GetString("GetRange", resourceCulture);
             }
         }
         
@@ -167,22 +148,25 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     SELECT [StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events] 
-        ///  FROM (SELECT *, RANK() OVER(ORDER BY [Version]) &apos;Rank&apos;
-        ///          FROM [dbo].[Commit]
-        ///         WHERE [StreamId] = @streamId
-        ///           AND [Version] &gt;= @version
-        ///       ) [Commit]
-        /// WHERE [RANK] BETWEEN (@skip + 1) AND (@skip + @take).
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];.
         /// </summary>
-        internal static string GetStreamFrom {
+        internal static string GetStream {
             get {
-                return ResourceManager.GetString("GetStreamFrom", resourceCulture);
+                return ResourceManager.GetString("GetStream", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([StreamId], [Version], [Timestamp], [CommitId], [Headers], [Events]) VALUES(@streamId, @version, @timestamp, @commitId, @headers, @events);.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 0 AND [StreamId] &gt; @streamId ORDER BY [StreamId];.
+        /// </summary>
+        internal static string GetStreams {
+            get {
+                return ResourceManager.GetString("GetStreams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([Id], [Timestamp], [StreamId], [Version], [Headers], [Events]) OUTPUT Inserted.Sequence VALUES(@id, @timestamp, @streamId, @version, @headers, @events);.
         /// </summary>
         internal static string InsertCommit {
             get {
@@ -218,7 +202,11 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state); DELETE FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt; @version;.
+        ///   Looks up a localized string similar to UPDATE TOP(1) [dbo].[Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
+        ///IF @@ROWCOUNT = 0
+        ///BEGIN
+        ///    INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
+        ///END;.
         /// </summary>
         internal static string ReplaceSnapshot {
             get {
@@ -227,7 +215,7 @@ namespace Spark.Infrastructure.EventStore.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UPDATE [dbo].[Commit] SET [Headers] = @headers, [Events] = @events WHERE [CommitId] = @commitId;.
+        ///   Looks up a localized string similar to UPDATE [dbo].[Commit] SET [Headers] = @headers, [Events] = @events WHERE [Id] = @id;.
         /// </summary>
         internal static string UpdateCommit {
             get {

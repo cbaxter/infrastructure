@@ -73,6 +73,22 @@
     <Compile Include="Domain\AggregateStateValidator.cs" />
     <Compile Include="Domain\SaveResult.cs" />
     <Compile Include="Eventing\EventContext.cs" />
+    <Compile Include="EventStore\Sql\DataRecordExtensions.cs" />
+    <Compile Include="EventStore\Sql\DbCommandExtensions.cs" />
+    <Compile Include="EventStore\Sql\DialectProvider.cs" />
+    <Compile Include="EventStore\Sql\Dialects\SqlServerDialect.cs" />
+    <Compile Include="EventStore\Sql\Dialects\SqlServerDialectStatements.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SqlServerDialectStatements.resx</DependentUpon>
+    </Compile>
+    <Compile Include="EventStore\Sql\Dialects\SqlServerSequentialGuid.cs" />
+    <Compile Include="EventStore\Sql\IEventStoreDialect.cs" />
+    <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
+    <Compile Include="EventStore\Sql\ISqlDialect.cs" />
+    <Compile Include="EventStore\Sql\SqlEventStore.cs" />
+    <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="EventStore\Sql\SqlStore.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />
     <Compile Include="Domain\CachedAggregateStore.cs" />
@@ -115,29 +131,12 @@
     <Compile Include="Eventing\Thoughts.cs" />
     <Compile Include="EventStore\Commit.cs" />
     <Compile Include="EventStore\ConcurrencyException.cs" />
-    <Compile Include="EventStore\Dialects\DbCommandExtensions.cs" />
-    <Compile Include="EventStore\Dialects\DialectProvider.cs" />
-    <Compile Include="EventStore\Dialects\IDialect.cs" />
-    <Compile Include="EventStore\Dialects\IEventStoreDialect.cs" />
-    <Compile Include="EventStore\Dialects\ISnapshotStoreDialect.cs" />
-    <Compile Include="EventStore\Dialects\SqlServerDialect.cs" />
-    <Compile Include="EventStore\Dialects\SqlServerSequentialGuid.cs" />
-    <Compile Include="EventStore\Dialects\SqlServerSqlStatements.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlServerSqlStatements.resx</DependentUpon>
-    </Compile>
     <Compile Include="EventStore\DuplicateCommitException.cs" />
     <Compile Include="EventStore\Page.cs" />
     <Compile Include="EventStore\PagedResult.cs" />
-    <Compile Include="EventStore\DbSnapshotStore.cs" />
-    <Compile Include="EventStore\DbStore.cs" />
     <Compile Include="EventStore\IStoreEvents.cs" />
     <Compile Include="EventStore\IStoreSnapshots.cs" />
     <Compile Include="EventStore\Snapshot.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EventStore\DbEventStore.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logging\DebugDiagnosticContext.cs" />
@@ -193,9 +192,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EventStore\Dialects\SqlServerSqlStatements.resx">
+    <EmbeddedResource Include="EventStore\Sql\Dialects\SqlServerDialectStatements.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlServerSqlStatements.Designer.cs</LastGenOutput>
+      <LastGenOutput>SqlServerDialectStatements.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Exceptions.resx">
       <Generator>ResXFileCodeGenerator</Generator>

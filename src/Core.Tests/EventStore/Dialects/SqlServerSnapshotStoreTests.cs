@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Data.SqlClient;
 using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Dialects;
+using Spark.Infrastructure.EventStore.Sql;
+using Spark.Infrastructure.EventStore.Sql.Dialects;
 using Spark.Infrastructure.Serialization;
 using Xunit;
 
@@ -28,8 +29,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
 
             internal UsingInitializedSnapshotStore()
             {
-                SnapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5));
-                SnapshotStore.Initialize();
+                SnapshotStore = new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect());
             }
 
             public void Dispose()
@@ -43,23 +43,17 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void WillCreateTableIfDoesNotExist()
             {
-                var snapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer());
-
                 DropExistingTable();
 
-                snapshotStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                var snapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer());
-
-                snapshotStore.Initialize();
-                snapshotStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -88,13 +82,13 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
         public class WhenSavingSnapshot : UsingInitializedSnapshotStore
         {
             [SqlServerFactAttribute]
-            public void ThrowConcurrencyExceptionIfStreamVersionExists()
+            public void IgnoreSnapshotIfStreamVersionExists()
             {
                 var snapshot = new Snapshot(Guid.NewGuid(), 1, new Object());
 
                 SnapshotStore.SaveSnapshot(snapshot);
 
-                Assert.Throws<ConcurrencyException>(() => SnapshotStore.SaveSnapshot(snapshot));
+                Assert.DoesNotThrow(() => SnapshotStore.SaveSnapshot(snapshot));
             }
 
             [SqlServerFactAttribute]
@@ -143,7 +137,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                     command.Parameters.AddWithValue("@StreamId", streamId);
                     connection.Open();
 
-                    return (Int32) command.ExecuteScalar();
+                    return (Int32)command.ExecuteScalar();
                 }
             }
         }

@@ -5,7 +5,6 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
-using Spark.Infrastructure.EventStore.Dialects;
 using Spark.Infrastructure.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -21,24 +20,24 @@ using Spark.Infrastructure.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
-    /// An RDBMS data sore.
+    /// An SQL data sore.
     /// </summary>
-    public abstract class DbStore
+    public abstract class SqlStore
     {
         private readonly ISerializeObjects serializer;
         private readonly String connectionString;
-        private readonly IDialect dialect;
+        private readonly ISqlDialect dialect;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="DbStore"/>.
+        /// Initializes a new instance of <see cref="SqlStore"/>.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="DbSnapshotStore"/>.</param>
+        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal DbStore(String connectionName, ISerializeObjects serializer, IDialect dialect)
+        internal SqlStore(String connectionName, ISerializeObjects serializer, ISqlDialect dialect)
         {
             Verify.NotNull(dialect, "dialect");
             Verify.NotNull(serializer, "serializer");
@@ -168,11 +167,9 @@ namespace Spark.Infrastructure.EventStore
         /// <summary>
         /// Deserializes a binary field in to an object graph.
         /// </summary>
-        /// <param name="record">The <see cref="IDataRecord"/> containing the field to deserialize.</param>
-        /// <param name="ordinal">The field index containing the binary data to deserialize.</param>
-        protected Object Deserialize(IDataRecord record, Int32 ordinal)
+        /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
+        protected Object Deserialize(Byte[] buffer)
         {
-            var buffer = (Byte[])record.GetValue(ordinal);
             using (var stream = new MemoryStream(buffer, writable: false))
             {
                 var result = serializer.Deserialize(stream);
