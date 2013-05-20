@@ -239,6 +239,10 @@ Actual Version: {1}</value>
   <data name="PageSizeExceeded" xml:space="preserve">
     <value>Maximum page size of {0} has been exceeded.</value>
   </data>
+  <data name="ParameterSourceColumnNotSet" xml:space="preserve">
+    <value>Parameter source column not specified.
+Parameter Name: {0}</value>
+  </data>
   <data name="ReservedHeaderName" xml:space="preserve">
     <value>Reserved system header.
 Name: {0}</value>

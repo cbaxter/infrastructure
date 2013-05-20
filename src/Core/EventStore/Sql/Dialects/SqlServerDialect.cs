@@ -21,8 +21,12 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
 {
     internal sealed class SqlServerDialect : IEventStoreDialect, ISnapshotStoreDialect
     {
-        public const Int32 UniqueIndexViolation = 2601;
-        public const Int32 UniqueConstraintViolation = 2627;
+        private const Int32 Max = -1;
+        private const Int32 UniqueIndexViolation = 2601;
+        private const Int32 UniqueConstraintViolation = 2627;
+
+        // Database Provider
+        public DbProviderFactory Provider { get { return SqlClientFactory.Instance; } }
 
         // IEventStoreDialect
         public String GetRange { get { return SqlServerDialectStatements.GetRange; } }
@@ -42,19 +46,17 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
         public String ReplaceSnapshot { get { return SqlServerDialectStatements.ReplaceSnapshot; } }
         public String DeleteSnapshots { get { return SqlServerDialectStatements.PurgeSnapshots; } }
         public String EnsureSnapshotTableExists { get { return SqlServerDialectStatements.EnsureSnapshotTableExists; } }
-        
+
         // Create Methods
-        public DbCommand CreateCommand(String commandText) { return new SqlCommand(commandText); }
-        public DbConnection CreateConnection(String connectionString) { return new SqlConnection(connectionString); }
-        public DbParameter CreateIdParameter(Guid commitId) { return new SqlParameter("@id", SqlDbType.UniqueIdentifier) { Value = commitId }; }
-        public DbParameter CreateTimestampParameter(DateTime timestamp) { return new SqlParameter("@timestamp", SqlDbType.DateTime2) { Value = timestamp }; }
-        public DbParameter CreateStreamIdParameter(Guid streamId) { return new SqlParameter("@streamId", SqlDbType.UniqueIdentifier) { Value = streamId }; }
-        public DbParameter CreateVersionParameter(Int32 version) { return new SqlParameter("@version", SqlDbType.Int) { Value = version }; }
-        public DbParameter CreateHeadersParameter(Byte[] headers) { return new SqlParameter("@headers", SqlDbType.VarBinary) { Value = headers }; }
-        public DbParameter CreateEventsParameter(Byte[] events) { return new SqlParameter("@events", SqlDbType.VarBinary) { Value = events }; }
-        public DbParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary) { Value = state }; }
-        public DbParameter CreateSkipParameter(Int64 skip) { return new SqlParameter("@skip", SqlDbType.BigInt) { Value = skip }; }
-        public DbParameter CreateTakeParameter(Int64 take) { return new SqlParameter("@take", SqlDbType.BigInt) { Value = take }; }
+        public DbParameter CreateIdParameter(Guid commitId) { return new SqlParameter("@id", SqlDbType.UniqueIdentifier) { SourceColumn = "id", Value = commitId }; }
+        public DbParameter CreateTimestampParameter(DateTime timestamp) { return new SqlParameter("@timestamp", SqlDbType.DateTime2) { SourceColumn = "timestamp", Value = timestamp }; }
+        public DbParameter CreateStreamIdParameter(Guid streamId) { return new SqlParameter("@streamId", SqlDbType.UniqueIdentifier) { SourceColumn = "streamId", Value = streamId }; }
+        public DbParameter CreateVersionParameter(Int32 version) { return new SqlParameter("@version", SqlDbType.Int) { SourceColumn = "version", Value = version }; }
+        public DbParameter CreateHeadersParameter(Byte[] headers) { return new SqlParameter("@headers", SqlDbType.VarBinary, Max) { SourceColumn = "headers", Value = headers }; }
+        public DbParameter CreateEventsParameter(Byte[] events) { return new SqlParameter("@events", SqlDbType.VarBinary, Max) { SourceColumn = "events", Value = events }; }
+        public DbParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
+        public DbParameter CreateSkipParameter(Int64 skip) { return new SqlParameter("@skip", SqlDbType.BigInt) { SourceColumn = "skip", Value = skip }; }
+        public DbParameter CreateTakeParameter(Int64 take) { return new SqlParameter("@take", SqlDbType.BigInt) { SourceColumn = "take", Value = take }; }
 
         // Translate
         public Exception Translate(DbCommand command, DbException ex)

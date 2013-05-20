@@ -22,16 +22,9 @@ namespace Spark.Infrastructure.EventStore.Sql
     internal interface ISqlDialect
     {
         /// <summary>
-        /// Create a new <see cref="DbConnection"/>.
+        /// Get the <see cref="DbProviderFactory"/> for this SQL dialect.
         /// </summary>
-        /// <param name="connectionString">The connection string for this connection.</param>
-        DbConnection CreateConnection(String connectionString);
-
-        /// <summary>
-        /// Create a new <see cref="DbCommand"/>.
-        /// </summary>
-        /// <param name="commandText">The command text for this command.</param>
-        DbCommand CreateCommand(String commandText);
+        DbProviderFactory Provider { get; }
 
         /// <summary>
         /// Translate the specified <see cref="DbException"/> if required.

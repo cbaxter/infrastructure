@@ -375,6 +375,16 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter source column not specified.
+        ///Parameter Name: {0}.
+        /// </summary>
+        internal static string ParameterSourceColumnNotSet {
+            get {
+                return ResourceManager.GetString("ParameterSourceColumnNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reserved system header.
         ///Name: {0}.
         /// </summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Spark.Infrastructure.Serialization;
@@ -48,13 +49,39 @@ namespace Spark.Infrastructure.EventStore.Sql
             this.connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
         }
 
+        protected virtual DbConnection OpenConnection()
+        {
+            var connection = dialect.Provider.CreateConnection();
+
+            Debug.Assert(connection != null);
+
+            try
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+            }
+            catch (Exception)
+            {
+                connection.Dispose();
+                throw;
+            }
+
+            return connection;
+        }
+
         /// <summary>
         /// Creates a new database connection.
         /// </summary>
         /// <param name="commandText">The SQL Statement associated with this <see cref="DbCommand"/>.</param>
         protected virtual DbCommand CreateCommand(String commandText)
         {
-            return dialect.CreateCommand(commandText);
+            var command = dialect.Provider.CreateCommand();
+
+            Debug.Assert(command != null);
+
+            command.CommandText = commandText;
+
+            return command;
         }
 
         /// <summary>
@@ -126,19 +153,15 @@ namespace Spark.Infrastructure.EventStore.Sql
 
             try
             {
-                using (var connection = dialect.CreateConnection(connectionString))
+                using (var connection = OpenConnection())
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    connection.Open();
+                    command.Connection = connection;
+                    command.Transaction = transaction;
 
-                    using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        command.Connection = connection;
-                        command.Transaction = transaction;
+                    result = executor();
 
-                        result = executor();
-
-                        transaction.Commit();
-                    }
+                    transaction.Commit();
                 }
             }
             catch (DbException ex)
@@ -148,7 +171,7 @@ namespace Spark.Infrastructure.EventStore.Sql
 
             return result;
         }
-        
+
         /// <summary>
         /// Serializes an object graph to binary data.
         /// </summary>

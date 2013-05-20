@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
+using System.Threading;
 using Spark.Infrastructure.Configuration;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Logging;
+using Spark.Infrastructure.Resources;
 using Spark.Infrastructure.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -22,11 +27,18 @@ namespace Spark.Infrastructure.EventStore.Sql
     /// <summary>
     /// An RDBMS snapshot store.
     /// </summary>
-    public sealed class SqlSnapshotStore : SqlStore, IStoreSnapshots
+    public sealed class SqlSnapshotStore : SqlStore, IStoreSnapshots, IDisposable
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly ISnapshotStoreDialect dialect;
+        private readonly EventWaitHandle waitHandle;
         private readonly Boolean replaceExisting;
+        private readonly Thread backgroundWorker;
+        private readonly TimeSpan flushInterval;
+        private readonly Boolean useAsyncWrite;
+        private readonly DataTable buffer;
+        private readonly Int32 batchSize;
+        private Boolean disposed;
 
         private static class Column
         {
@@ -34,6 +46,11 @@ namespace Spark.Infrastructure.EventStore.Sql
             public const Int32 Version = 1;
             public const Int32 State = 2;
         }
+
+        /// <summary>
+        /// Returns <value>true</value> if the current batch is less than <see cref="batchSize"/>; otherwise returns <value>false</value>.
+        /// </summary>
+        private Boolean WaitForMoreSnapshots { get { lock (buffer) { return buffer.Rows.Count < batchSize; } } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlSnapshotStore"/>.
@@ -58,11 +75,35 @@ namespace Spark.Infrastructure.EventStore.Sql
             Verify.NotNull(dialect, "dialect");
 
             this.dialect = dialect;
+            this.useAsyncWrite = settings.Async;
+            this.batchSize = settings.BatchSize;
+            this.flushInterval = settings.FlushInterval;
             this.replaceExisting = settings.ReplaceExisting;
-
-            //TODO: Convert to async background writes (i.e., batch snapshot save).
+            this.waitHandle = new ManualResetEvent(initialState: false);
+            this.backgroundWorker = new Thread(WaitForSnapshots) { Name = "Snapshot Writer", IsBackground = true };
+            this.buffer = CreateSnapshotBuffer();
 
             Initialize();
+        }
+
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+
+            disposed = true;
+
+            if (useAsyncWrite)
+            {
+                waitHandle.Set();
+                backgroundWorker.Join();
+            }
+
+            waitHandle.Dispose();
+            buffer.Dispose();
         }
 
         /// <summary>
@@ -76,15 +117,37 @@ namespace Spark.Infrastructure.EventStore.Sql
 
                 ExecuteNonQuery(command);
             }
+
+            if (useAsyncWrite)
+                backgroundWorker.Start();
         }
 
         /// <summary>
-        /// Gets the most recent snapshot for the specified <paramref name="streamId"/>.
+        /// Creates a <see cref="DataTable"/> based on the required insert/update command parameters.
         /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        public Snapshot GetLastSnapshot(Guid streamId)
+        private DataTable CreateSnapshotBuffer()
         {
-            return GetSnapshot(streamId, Int32.MaxValue);
+            var buffer = new DataTable("Snapshot");
+
+            buffer.Columns.Add(GetColumnName(dialect.CreateStreamIdParameter(Guid.Empty)), typeof(Guid));
+            buffer.Columns.Add(GetColumnName(dialect.CreateVersionParameter(0)), typeof(Int32));
+            buffer.Columns.Add(GetColumnName(dialect.CreateStateParameter(null)), typeof(Byte[]));
+
+            return buffer;
+        }
+
+        /// <summary>
+        /// Gets the column name for the specified <paramref name="parameter"/> (source column must be set).
+        /// </summary>
+        /// <param name="parameter">The parameter for which the source column is to be retrieved.</param>
+        private static String GetColumnName(DbParameter parameter)
+        {
+            Verify.NotNull(parameter, "parameter");
+
+            if (parameter.SourceColumn.IsNullOrWhiteSpace())
+                throw new MappingException(Exceptions.ParameterSourceColumnNotSet.FormatWith(parameter.ParameterName));
+
+            return parameter.SourceColumn;
         }
 
         /// <summary>
@@ -111,10 +174,41 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="snapshot">The snapshot to save to the snapshot store.</param>
         public void Save(Snapshot snapshot)
         {
-            if(replaceExisting)
-                UpdateSnapshot(snapshot);
-            else 
-                InsertSnapshot(snapshot);
+            if (disposed)
+                throw new ObjectDisposedException(GetType().FullName);
+
+            if (useAsyncWrite)
+            {
+                BufferSnapshot(snapshot);
+            }
+            else
+            {
+                if (replaceExisting)
+                    UpdateSnapshot(snapshot);
+                else
+                    InsertSnapshot(snapshot);
+            }
+        }
+
+        /// <summary>
+        /// Adds a new snapshot to the snapshot store, keeping all existing snapshots.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to append to the snapshot store.</param>
+        private void BufferSnapshot(Snapshot snapshot)
+        {
+            var state = Serialize(snapshot.State);
+            lock (buffer)
+            {
+                var row = buffer.NewRow();
+
+                row[Column.StreamId] = snapshot.StreamId;
+                row[Column.Version] = snapshot.Version;
+                row[Column.State] = state;
+
+                buffer.Rows.Add(row);
+            }
+
+            waitHandle.Set();
         }
 
         /// <summary>
@@ -173,6 +267,89 @@ namespace Spark.Infrastructure.EventStore.Sql
         private Snapshot CreateSnapshot(IDataRecord record)
         {
             return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), Deserialize(record.GetBytes(Column.State)));
+        }
+
+        /// <summary>
+        /// Wait for one or more snapshots to write out to the underlying data store.
+        /// </summary>
+        private void WaitForSnapshots()
+        {
+            try
+            {
+                while (!disposed && waitHandle.WaitOne())
+                {
+                    waitHandle.Reset();
+
+                    if (!disposed && WaitForMoreSnapshots)
+                        Thread.Sleep(flushInterval);
+
+                    WriteBufferToDataStore();
+                }
+
+                // WaitOne returns true when signal received and false if the wait has timed out; using Timeout.Infinity this statement should only be reached on a clean shutdown.
+                if (!disposed)
+                    Log.Warn("Background worker aborted.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Write out the current batch of snapshots to the underlying data store.
+        /// </summary>
+        private void WriteBufferToDataStore()
+        {
+            try
+            {
+                var batch = CopyAndClearBuffer();
+                if (batch.Rows.Count == 0)
+                    return;
+
+                using (var connection = OpenConnection())
+                using (var dataAdapter = dialect.Provider.CreateDataAdapter())
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var command = CreateCommand(replaceExisting ? dialect.ReplaceSnapshot : dialect.InsertSnapshot))
+                {
+                    Debug.Assert(dataAdapter != null);
+
+                    dataAdapter.ContinueUpdateOnError = true;
+                    dataAdapter.UpdateBatchSize = batchSize;
+                    dataAdapter.InsertCommand = command;
+
+                    command.Connection = connection;
+                    command.Transaction = transaction;
+                    command.UpdatedRowSource = UpdateRowSource.None;
+                    command.Parameters.Add(dialect.CreateStreamIdParameter(Guid.Empty));
+                    command.Parameters.Add(dialect.CreateVersionParameter(0));
+                    command.Parameters.Add(dialect.CreateStateParameter(null));
+
+                    dataAdapter.Update(batch);
+
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Snapshots are non-critical and highly unlikely to fail (short of network/database connectivity issues); just log the failure and continue.
+                Log.Error(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Copies the currently buffered snapshots to a new data table and clears the buffer to prepare for the next batch.
+        /// </summary>
+        private DataTable CopyAndClearBuffer()
+        {
+            lock (buffer)
+            {
+                var copy = buffer.Copy();
+
+                buffer.Clear();
+
+                return copy;
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Threading;
 using Moq;
 using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.EventStore;
@@ -35,9 +36,16 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             { }
 
             internal UsingInitializedSnapshotStore(Boolean replaceExisting)
+                : this(replaceExisting, false)
+            { }
+
+            internal UsingInitializedSnapshotStore(Boolean replaceExisting, Boolean async)
             {
                 Settings = new Mock<IStoreSnapshotSettings>();
+                Settings.Setup(mock => mock.Async).Returns(async);
+                Settings.Setup(mock => mock.BatchSize).Returns(10);
                 Settings.Setup(mock => mock.ReplaceExisting).Returns(replaceExisting);
+                Settings.Setup(mock => mock.FlushInterval).Returns(TimeSpan.FromMilliseconds(20));
 
                 SnapshotStore = new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
             }
@@ -86,6 +94,38 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
 
                     return Equals(command.ExecuteScalar(), 1);
                 }
+            }
+        }
+
+        public class WhenDisposingSnapshotStore : UsingInitializedSnapshotStore
+        {
+
+            [SqlServerFactAttribute]
+            public void CanDisposeSynchronousStore()
+            {
+                var settings = new Mock<IStoreSnapshotSettings>();
+                settings.Setup(mock => mock.Async).Returns(false);
+
+                new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), settings.Object, new SqlServerDialect()).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanDisposeAsynchronousStore()
+            {
+                var settings = new Mock<IStoreSnapshotSettings>();
+                settings.Setup(mock => mock.Async).Returns(true);
+
+                new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), settings.Object, new SqlServerDialect()).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanSafelyCallDisposeMultipleTimes()
+            {
+                var snapshotStore = new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
+
+                snapshotStore.Dispose();
+
+                Assert.DoesNotThrow(() => snapshotStore.Dispose());
             }
         }
 
@@ -141,6 +181,39 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 SnapshotStore.Save(snapshot);
 
                 Assert.Equal(1, CountSnapshots(streamId));
+            }
+
+            private Int32 CountSnapshots(Guid streamId)
+            {
+                using (var connection = SqlServerConnection.Create())
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                {
+                    command.Parameters.AddWithValue("@StreamId", streamId);
+                    connection.Open();
+
+                    return (Int32)command.ExecuteScalar();
+                }
+            }
+        }
+
+        public class WhenUsingAsyncSnapshotStore : UsingInitializedSnapshotStore
+        {
+            public WhenUsingAsyncSnapshotStore()
+                : base(true, true)
+            { }
+
+            [SqlServerFact]
+            public void CanWriteBatchedSnapshots()
+            {
+                var snapshot = new Snapshot(Guid.NewGuid(), 1, new Object());
+                var attempt = 0;
+
+                SnapshotStore.Save(snapshot);
+
+                while (++attempt < 20 && CountSnapshots(snapshot.StreamId) == 0)
+                    Thread.Sleep(10);
+
+                Assert.True(attempt < 20);
             }
 
             private Int32 CountSnapshots(Guid streamId)
