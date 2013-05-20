@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Moq;
 using Spark.Infrastructure.Commanding;
@@ -7,6 +8,7 @@ using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -41,9 +43,15 @@ namespace Spark.Infrastructure.Tests.Domain
 
         public class WhenGettingAggregate
         {
+            private readonly Mock<IStoreAggregateSettings> settings = new Mock<IStoreAggregateSettings>();
             private readonly Mock<IStoreSnapshots> snapshotStore = new Mock<IStoreSnapshots>();
             private readonly Mock<IApplyEvents> aggregateUpdater = new Mock<IApplyEvents>();
             private readonly Mock<IStoreEvents> eventStore = new Mock<IStoreEvents>();
+
+            public WhenGettingAggregate()
+            {
+                settings.Setup(mock => mock.SnapshotInterval).Returns(5);
+            }
 
             [Fact]
             public void CreateNewAggregateIfNoExistingEventStream()
@@ -62,7 +70,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var events = new Event[] { new FakeEvent(), new FakeEvent() };
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                eventStore.Setup(mock => mock.GetStream(id, 0)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 1, HeaderCollection.Empty, new EventCollection(events)) });
+                eventStore.Setup(mock => mock.GetStream(id, 1)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 1, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
@@ -78,13 +86,47 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
                 snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, snapshot));
-                eventStore.Setup(mock => mock.GetStream(id, 10)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11, HeaderCollection.Empty, new EventCollection(events)) });
+                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
                 snapshotStore.Verify(mock => mock.GetSnapshot(id, Int32.MaxValue), Times.Once());
 
                 Assert.Equal(11, aggregate.Version);
+            }
+
+            [Fact]
+            public void SaveSnapshotIfLoadedCommitsGreaterThanSnapshotInterval()
+            {
+                var id = GuidStrategy.NewGuid();
+                var commits = new List<Commit>();
+                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
+
+                for (var i = 0; i < 10; i++)
+                    commits.Add(new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11 + i, HeaderCollection.Empty, EventCollection.Empty));
+
+                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
+                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(commits);
+
+                var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
+
+                snapshotStore.Verify(mock => mock.Save(It.Is<Snapshot>(s => s.Version == 20)), Times.Once());
+
+                Assert.Equal(20, aggregate.Version);
+            }
+
+            [Fact]
+            public void ThrowInvalidOperationExceptionIfAggregateStreamCorrupt()
+            {
+                var id = GuidStrategy.NewGuid();
+                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
+
+                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
+                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 12, HeaderCollection.Empty, EventCollection.Empty) });
+
+                var ex = Assert.Throws<InvalidOperationException>(() => aggregateStore.Get(typeof(FakeAggregate), id));
+
+                Assert.Equal(Exceptions.MissingAggregateCommits.FormatWith(11, 12), ex.Message);
             }
 
             private class FakeAggregate : Aggregate

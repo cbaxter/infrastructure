@@ -76,10 +76,14 @@ namespace Spark.Infrastructure.Domain
             Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
 
             var aggregate = GetOrCreate(aggregateType, id);
-            var commits = eventStore.GetStream(id, aggregate.Version);
+            var originalAggregateVersion = aggregate.Version;
+            var commits = eventStore.GetStream(id, aggregate.Version + 1);
 
             foreach (var commit in commits)
                 ApplyCommitToAggregate(commit, aggregate);
+
+            if (aggregate.Version - originalAggregateVersion >= snapshotInterval)
+                snapshotStore.Save(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
 
             return aggregate;
         }
@@ -196,6 +200,10 @@ namespace Spark.Infrastructure.Domain
         /// <param name="aggregate">The <see cref="Aggregate"/> instance for which the commit is to be applied.</param>
         private void ApplyCommitToAggregate(Commit commit, Aggregate aggregate)
         {
+            var expectedVersion = aggregate.Version + 1;
+            if (commit.Version != expectedVersion)
+                throw new InvalidOperationException(Exceptions.MissingAggregateCommits.FormatWith(expectedVersion, commit.Version));
+
             using (new EventContext(aggregate.Id, commit.Headers))
             {
                 aggregate.Version = commit.Version;

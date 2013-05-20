@@ -225,6 +225,11 @@ Command Type: {1}</value>
   <data name="HttpContextNotAvailable" xml:space="preserve">
     <value>The current HTTP context is not available on this thread.</value>
   </data>
+  <data name="MissingAggregateCommits" xml:space="preserve">
+    <value>Missing one or more aggregate commits; unable to apply commit to aggregate.
+Expected Version: {0}
+Actual Version: {1}</value>
+  </data>
   <data name="MustContainOneNonWhitespaceCharacter" xml:space="preserve">
     <value>Value must contain at least one non-whitespace character.</value>
   </data>

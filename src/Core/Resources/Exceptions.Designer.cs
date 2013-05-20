@@ -337,6 +337,17 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Missing one or more aggregate commits; unable to apply commit to aggregate.
+        ///Expected Version: {0}
+        ///Actual Version: {1}.
+        /// </summary>
+        internal static string MissingAggregateCommits {
+            get {
+                return ResourceManager.GetString("MissingAggregateCommits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value must contain at least one non-whitespace character..
         /// </summary>
         internal static string MustContainOneNonWhitespaceCharacter {
