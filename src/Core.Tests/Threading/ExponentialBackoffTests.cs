@@ -49,20 +49,16 @@ namespace Spark.Infrastructure.Tests.Threading
             }
         }
         
-        public class WehnWaitingUntilRetry
+        public class WhenWaitingUntilRetry
         {
             [Fact]
             public void FirstWaitShouldNotSleep()
             {
                 SystemTime.ClearOverride();
 
-                var backoff = new ExponentialBackoff(TimeSpan.FromMinutes(1));
-                var stopwatch = Stopwatch.StartNew();
-                
-                backoff.WaitUntilRetry();
-                stopwatch.Stop();
-
-                Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 2);
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(100));
+             
+                Assert.Equal(TimeSpan.Zero, backoff.WaitUntilRetry());
             }
 
             [Fact]
@@ -70,16 +66,11 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 SystemTime.ClearOverride();
 
-                var backoff = new ExponentialBackoff(TimeSpan.FromMinutes(1));
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(100));
 
                 backoff.WaitUntilRetry();
 
-                var stopwatch = Stopwatch.StartNew();
-
-                backoff.WaitUntilRetry();
-                stopwatch.Stop();
-
-                Assert.InRange(stopwatch.ElapsedMilliseconds, 8, 18);  
+                Assert.NotEqual(TimeSpan.Zero, backoff.WaitUntilRetry());  
             }
 
             [Fact]
@@ -87,18 +78,11 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 SystemTime.ClearOverride();
 
-                var backoff = new ExponentialBackoff(TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(20));
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(5), TimeSpan.FromMilliseconds(5));
 
                 backoff.WaitUntilRetry();
-                backoff.WaitUntilRetry();
-                backoff.WaitUntilRetry();
 
-                var stopwatch = Stopwatch.StartNew();
-
-                backoff.WaitUntilRetry();
-                stopwatch.Stop();
-
-                Assert.InRange(stopwatch.ElapsedMilliseconds, 18, 38);  
+                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));  
             }
 
             [Fact]
@@ -106,17 +90,11 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 SystemTime.ClearOverride();
 
-                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(25));
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(5), TimeSpan.FromSeconds(1));
 
                 backoff.WaitUntilRetry();
-                backoff.WaitUntilRetry();
 
-                var stopwatch = Stopwatch.StartNew();
-
-                backoff.WaitUntilRetry();
-                stopwatch.Stop();
-
-                Assert.InRange(stopwatch.ElapsedMilliseconds, 12, 18);  
+                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));  
             }
         }
     }

@@ -21,7 +21,6 @@ namespace Example.Modules
             builder.RegisterType<BlockingCollectionMessageBus<CommandEnvelope>>().As<ISendMessages<CommandEnvelope>>().As<IReceiveMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<ServiceMessageFactory>().As<ICreateMessages>().SingleInstance();
 
-
             builder.RegisterType<CommandPublisher>().As<IPublishCommands>().SingleInstance();
 
             builder.RegisterType<TypeLocator>().As<ILocateTypes>().SingleInstance();

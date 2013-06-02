@@ -54,8 +54,10 @@ namespace Spark.Infrastructure.Threading
         /// Blocks the current thread until the next retry attempt should be made.
         /// </summary>
         /// <remarks>The first retry will always be immediate; subsequent retries will increase exponentially starting from 10ms.</remarks>
-        public void WaitUntilRetry()
+        public TimeSpan WaitUntilRetry()
         {
+            var result = wait;
+
             if (wait == TimeSpan.Zero)
             {
                 wait = TimeSpan.FromMilliseconds(5);
@@ -73,6 +75,8 @@ namespace Spark.Infrastructure.Threading
                 if(wait > TimeSpan.Zero)
                     Thread.Sleep(wait);
             }
+
+            return result;
         }
     }
 }
