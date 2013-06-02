@@ -66,16 +66,16 @@ namespace Spark.Infrastructure.Tests.Messaging
             }
 
             [Fact]
-            public void DoNotSetTimestampToSystemTimeIfAlreadySet()
+            public void AlwaysSetTimestampToSystemTime()
             {
                 var now = DateTime.UtcNow;
                 var messageFactory = new FakeMessageFactory();
 
                 SystemTime.OverrideWith(() => now);
 
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.Timestamp, DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(1)), checkReservedNames: false) });
+                var message = messageFactory.Create(new Object(), new[] { new Header(Header.Timestamp, DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(1)).ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
                 
-                Assert.NotEqual(now, message.Headers.GetTimestamp());
+                Assert.Equal(now, message.Headers.GetTimestamp());
             }
         }
 

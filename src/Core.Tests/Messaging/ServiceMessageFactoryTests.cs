@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var hostAddress = GetHostAddress();
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None, checkReservedNames: false) });
+                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) });
 
                 Assert.NotEqual(hostAddress, message.Headers.GetRemoteAddress());
             }

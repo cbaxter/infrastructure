@@ -71,6 +71,7 @@
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Domain\AggregateStateValidator.cs" />
     <Compile Include="Domain\SaveResult.cs" />
     <Compile Include="Eventing\EventContext.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
     <Compile Include="EventStore\Sql\SqlStore.cs" />
+    <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />
     <Compile Include="Domain\CachedAggregateStore.cs" />

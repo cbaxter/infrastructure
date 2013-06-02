@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.Messaging;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -16,14 +16,14 @@ using Spark.Infrastructure.Eventing;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization.Json
+namespace Spark.Infrastructure.Serialization.Converters
 {
     /// <summary>
-    /// Converts a <see cref="EventCollection"/> to and from JSON.
+    /// Converts a <see cref="HeaderCollection"/> to and from JSON.
     /// </summary>
-    public sealed class EventCollectionConverter : JsonConverter
+    public sealed class HeaderCollectionConverter : JsonConverter
     {
-        private static readonly Type EventCollectionType = typeof (EventCollection);
+        private static readonly Type HeaderCollectionType = typeof(HeaderCollection);
 
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
@@ -31,45 +31,61 @@ namespace Spark.Infrastructure.Serialization.Json
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == EventCollectionType;
+            return objectType == HeaderCollectionType;
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="EventCollection"/> instance.
+        /// Writes the JSON representation of an <see cref="HeaderCollection"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, Object value, Newtonsoft.Json.JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var items = (EventCollection)value;
+            var headers = value as HeaderCollection;
 
-            writer.WriteStartArray();
+            if (headers == null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                writer.WriteStartObject();
 
-            foreach (var item in items)
-                serializer.Serialize(writer, item);
+                foreach (var header in headers)
+                {
+                    writer.WritePropertyName(header.Key);
+                    serializer.Serialize(writer, header.Value);
+                }
 
-            writer.WriteEndArray();
+                writer.WriteEndObject();
+            }
         }
 
         /// <summary>
-        /// Reads the JSON representation of an <see cref="EventCollection"/> instance.
+        /// Reads the JSON representation of an <see cref="HeaderCollection"/> instance.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
         /// <param name="objectType">The type of object.</param>
         /// <param name="existingValue">The existing value of the object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            var list = new List<Event>();
+            var dictionary = new Dictionary<String, String>();
 
-            if (reader.TokenType == JsonToken.None)
-                reader.Read();
+            if (!reader.CanReadObject())
+                return null;
+            
+            while (reader.Read() && reader.TokenType != JsonToken.EndObject)
+            {
+                String propertyName;
+                if (!reader.TryGetProperty(out propertyName))
+                    continue;
 
-            while (reader.Read() && reader.TokenType != JsonToken.EndArray)
-                list.Add((Event)serializer.Deserialize(reader, reader.ValueType));
-
-            return new EventCollection(list);
+                dictionary.Add(propertyName, serializer.Deserialize<String>(reader));
+            }
+            
+            return new HeaderCollection(dictionary);
         }
     }
 }

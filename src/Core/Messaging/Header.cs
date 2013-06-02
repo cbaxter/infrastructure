@@ -30,9 +30,8 @@ namespace Spark.Infrastructure.Messaging
         public const String UserName = "_i";
 
         private static readonly HashSet<String> ReservedNames = new HashSet<String> { Origin, Timestamp, RemoteAddress, UserAddress, UserName };
-        private static readonly Int32 NullValueHash = Guid.NewGuid().GetHashCode();
+        private readonly String value;
         private readonly String name;
-        private readonly Object value;
 
         /// <summary>
         /// The name of the header value.
@@ -42,21 +41,21 @@ namespace Spark.Infrastructure.Messaging
         /// <summary>
         /// The header value.
         /// </summary>
-        public Object Value { get { return value; } }
+        public String Value { get { return value; } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Header"/>.
         /// </summary>
         /// <param name="name">The name of the header value.</param>
         /// <param name="value">The header value.</param>
-        public Header(String name, Object value)
+        public Header(String name, String value)
             : this(name, value, true)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Header"/> by-passing reserved name check.
         /// </summary>
-        internal Header(String name, Object value, Boolean checkReservedNames)
+        internal Header(String name, String value, Boolean checkReservedNames)
         {
             Verify.NotNullOrWhiteSpace(name, "name");
             Verify.False(checkReservedNames && ReservedNames.Contains(name), "name", Exceptions.ReservedHeaderName.FormatWith(name));
@@ -93,7 +92,7 @@ namespace Spark.Infrastructure.Messaging
                 var hash = 43;
 
                 hash = (hash * 397) + (Name ?? String.Empty).GetHashCode();
-                hash = (hash * 397) + (Value ?? NullValueHash).GetHashCode();
+                hash = (hash * 397) + (Value ?? String.Empty).GetHashCode();
 
                 return hash;
             }

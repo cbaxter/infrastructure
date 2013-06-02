@@ -47,7 +47,7 @@ namespace Spark.Infrastructure.Domain
         /// <summary>
         /// The ordinal value that specifies an explicit invoke order for this <see cref="PipelineHook"/> instance.
         /// </summary>
-        internal virtual Int32 Order { get; private set; }
+        internal Int32 Order { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of a <see cref="PipelineHook"/>.

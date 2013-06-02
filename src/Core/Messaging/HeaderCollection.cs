@@ -25,26 +25,26 @@ namespace Spark.Infrastructure.Messaging
     /// A read-only collection of named values (headers).
     /// </summary>
     [Serializable]
-    public sealed class HeaderCollection : ReadOnlyDictionary<String, Object>, IEnumerable<Header>
+    public sealed class HeaderCollection : ReadOnlyDictionary<String, String>, IEnumerable<Header>
     {
         /// <summary>
         /// Represents an empty <see cref="HeaderCollection"/>. This field is read-only.
         /// </summary>
-        public static readonly HeaderCollection Empty = new HeaderCollection(new Dictionary<String, Object>());
+        public static readonly HeaderCollection Empty = new HeaderCollection(new Dictionary<String, String>());
 
         /// <summary>
         /// Initializes a new instance of <see cref="HeaderCollection"/> with both system and custom headers.
         /// </summary>
         /// <param name="headers">The set of headers used to populate this <see cref="HeaderCollection"/>.</param>
         public HeaderCollection(IEnumerable<Header> headers)
-            : this(headers == null ? new Dictionary<String, Object>() : headers.ToDictionary(header => header.Name, header => header.Value))
+            : this(headers == null ? new Dictionary<String, String>() : headers.ToDictionary(header => header.Name, header => header.Value))
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="HeaderCollection"/>.
         /// </summary>
         /// <param name="dictionary">The set of named values used to populate this <see cref="HeaderCollection"/>.</param>
-        internal HeaderCollection(IDictionary<String, Object> dictionary)
+        internal HeaderCollection(IDictionary<String, String> dictionary)
             : base(dictionary)
         { }
 
@@ -53,8 +53,8 @@ namespace Spark.Infrastructure.Messaging
         /// </summary>
         public String GetOrigin()
         {
-            Object value;
-            return TryGetValue(Header.Origin, out value) && value != null ? value.ToString() : String.Empty;
+            String value;
+            return TryGetValue(Header.Origin, out value) && value != null ? value : String.Empty;
         }
 
         /// <summary>
@@ -62,16 +62,12 @@ namespace Spark.Infrastructure.Messaging
         /// </summary>
         public DateTime GetTimestamp()
         {
-            Object value;
-
+            String value;
             if (!TryGetValue(Header.Timestamp, out value) || value == null)
                 return SystemTime.Now;
-
-            if (value is DateTime)
-                return (DateTime)value;
-
+            
             DateTime timestamp;
-            return DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out timestamp) ? timestamp : SystemTime.Now;
+            return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out timestamp) ? timestamp : SystemTime.Now;
         }
 
         /// <summary>
@@ -101,16 +97,12 @@ namespace Spark.Infrastructure.Messaging
         /// <param name="name">The name of the header to be accessed.</param>
         private IPAddress GetAddress(String name)
         {
-            Object value;
-
+            String value;
             if (!TryGetValue(name, out value) || value == null)
                 return IPAddress.None;
 
-            var ipAddress = value as IPAddress;
-            if (ipAddress != null)
-                return ipAddress;
-
-            return IPAddress.TryParse(value.ToString(), out ipAddress) ? ipAddress : IPAddress.None;
+            IPAddress ipAddress;
+            return IPAddress.TryParse(value, out ipAddress) ? ipAddress : IPAddress.None;
         }
 
         /// <summary>
@@ -118,8 +110,8 @@ namespace Spark.Infrastructure.Messaging
         /// </summary>
         public String GetUserName()
         {
-            Object value;
-            return TryGetValue(Header.UserName, out value) && value != null ? value.ToString() : String.Empty;
+            String value;
+            return TryGetValue(Header.UserName, out value) && value != null ? value : String.Empty;
         }
         
         /// <summary>

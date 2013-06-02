@@ -24,7 +24,7 @@ namespace Example.Modules
             builder.RegisterType<CommandPublisher>().As<IPublishCommands>().SingleInstance();
 
             builder.RegisterType<TypeLocator>().As<ILocateTypes>().SingleInstance();
-            builder.RegisterType<BinarySerializer>().As<ISerializeObjects>().SingleInstance();
+            builder.RegisterType<NewtonsoftJsonSerializer>().As<ISerializeObjects>().SingleInstance();
             builder.Register(context => new AutofacServiceProvider(context.Resolve<ILifetimeScope>())).As<IServiceProvider>().SingleInstance();
 
 

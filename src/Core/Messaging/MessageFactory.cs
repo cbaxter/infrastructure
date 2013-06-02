@@ -46,15 +46,14 @@ namespace Spark.Infrastructure.Messaging
         /// Creates the underlying <see cref="HeaderCollection"/> dictionary.
         /// </summary>
         /// <param name="headers">The set of custom message headers.</param>
-        protected virtual Dictionary<String, Object> CreateHeaderDictionary(IEnumerable<Header> headers)
+        protected virtual Dictionary<String, String> CreateHeaderDictionary(IEnumerable<Header> headers)
         {
-            var result = headers == null ? new Dictionary<String, Object>() : headers.Distinct(header => header.Name).ToDictionary(header => header.Name, header => header.Value);
-
+            var result = headers == null ? new Dictionary<String, String>() : headers.ToDictionary(header => header.Name, header => header.Value);
+            
             if (!result.ContainsKey(Header.Origin))
                 result[Header.Origin] = HostServer;
 
-            if (!result.ContainsKey(Header.Timestamp))
-                result[Header.Timestamp] = SystemTime.Now;
+            result[Header.Timestamp] = SystemTime.GetTimestamp().ToString(DateTimeFormat.RoundTrip);
 
             return result;
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
 using Spark.Infrastructure.Messaging;
 using Xunit;
@@ -36,10 +35,10 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void CanMutateUnderlyingCollection()
             {
-                var dictionary = new Dictionary<String, Object>();
+                var dictionary = new Dictionary<String, String>();
                 var headers = new HeaderCollection(dictionary);
 
-                dictionary.Add("MyTestKey", new Object());
+                dictionary.Add("MyTestKey", "MyTestValue");
 
                 Assert.Equal(1, headers.Count);
             }
@@ -47,10 +46,10 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void CanCloneHeaderCollection()
             {
-                var dictionary = new Dictionary<String, Object>();
+                var dictionary = new Dictionary<String, String>();
                 var headers = (IEnumerable<Header>)new HeaderCollection(dictionary);
 
-                dictionary.Add("MyTestKey", new Object());
+                dictionary.Add("MyTestKey", "MyTestValue");
 
                 Assert.Equal(1, new HeaderCollection(headers).Count);
             }
@@ -98,22 +97,12 @@ namespace Spark.Infrastructure.Tests.Messaging
                 SystemTime.OverrideWith(() => now);
                 Assert.Equal(now, headers.GetTimestamp());
             }
-
-            [Fact]
-            public void ReturnSameDateTimeIfValueIsDateTime()
-            {
-                var now = DateTime.UtcNow;
-                var header = new Header(Header.Timestamp, now, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
-
-                Assert.Equal(now, headers.GetTimestamp());
-            }
-
+            
             [Fact]
             public void ReturnParsedDateTimeIfValueIsNotDateTime()
             {
                 var now = new DateTime(2013, 2, 10, 15, 58, 12);
-                var header = new Header(Header.Timestamp, now.ToString(CultureInfo.InvariantCulture), checkReservedNames: false);
+                var header = new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false);
                 var headers = new HeaderCollection(header.AsArray());
 
                 Assert.Equal(now, headers.GetTimestamp());
@@ -149,16 +138,7 @@ namespace Spark.Infrastructure.Tests.Messaging
 
                 Assert.Equal(IPAddress.None, headers.GetRemoteAddress());
             }
-
-            [Fact]
-            public void ReturnSameAddressIfValueIsAddress()
-            {
-                var header = new Header(Header.RemoteAddress, IPAddress.Loopback, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
-
-                Assert.Same(IPAddress.Loopback, headers.GetRemoteAddress());
-            }
-
+            
             [Fact]
             public void ReturnParsedAddressIfValueIsNotAddress()
             {
@@ -198,15 +178,6 @@ namespace Spark.Infrastructure.Tests.Messaging
             }
 
             [Fact]
-            public void ReturnSameAddressIfValueIsAddress()
-            {
-                var header = new Header(Header.UserAddress, IPAddress.Loopback, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
-
-                Assert.Same(IPAddress.Loopback, headers.GetUserAddress());
-            }
-
-            [Fact]
             public void ReturnParsedAddressIfValueIsNotAddress()
             {
                 var header = new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false);
@@ -227,7 +198,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void ReturnRemoteAddressIfUserAddressNotSpecified()
             {
-                var header = new Header(Header.RemoteAddress, IPAddress.Loopback, checkReservedNames: false);
+                var header = new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false);
                 var headers = new HeaderCollection(header.AsArray());
 
                 Assert.Equal(IPAddress.Loopback, headers.GetUserAddress());

@@ -137,7 +137,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
 
                 EventStore.Save(commit);
-                EventStore.Migrate(commit.Id, new HeaderCollection(new Dictionary<String, Object> { { "Key", 1 } }), EventCollection.Empty);
+                EventStore.Migrate(commit.Id, new HeaderCollection(new Dictionary<String, String> { { "Key", "Value" } }), EventCollection.Empty);
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Headers.Count);
             }

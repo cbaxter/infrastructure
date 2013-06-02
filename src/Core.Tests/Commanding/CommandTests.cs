@@ -57,7 +57,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 var now = DateTime.UtcNow;
                 var command = new FakeCommand();
-                var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now, checkReservedNames: false) });
+                var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
 
                 using (new CommandContext(GuidStrategy.NewGuid(), headers))
                     Assert.Equal(now, command.GetTimestamp());
@@ -67,7 +67,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CanShortCircuitAccessToremoteAddressHeader()
             {
                 var command = new FakeCommand();
-                var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback, checkReservedNames: false) });
+                var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
                 using (new CommandContext(GuidStrategy.NewGuid(), headers))
                     Assert.Equal(IPAddress.Loopback, command.GetRemoteAddress());
@@ -77,7 +77,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CanShortCircuitAccessToUserAddressHeader()
             {
                 var command = new FakeCommand();
-                var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback, checkReservedNames: false) });
+                var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
                 using (new CommandContext(GuidStrategy.NewGuid(), headers))
                     Assert.Equal(IPAddress.Loopback, command.GetUserAddress());

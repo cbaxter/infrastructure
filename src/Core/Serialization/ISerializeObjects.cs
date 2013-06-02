@@ -26,12 +26,72 @@ namespace Spark.Infrastructure.Serialization
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> on which to serialize the object <paramref name="graph"/>.</param>
         /// <param name="graph">The object to serialize.</param>
-        void Serialize(Stream stream, Object graph);
+        /// <param name="type">The <see cref="Type"/> of object being serialized.</param>
+        void Serialize(Stream stream, Object graph, Type type);
 
         /// <summary>
         /// Deserialize an object graph from the speciied <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
-        Object Deserialize(Stream stream);
+        /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
+        Object Deserialize(Stream stream, Type type);
+    }
+
+    /// <summary>
+    /// Extension methods of <see cref="ISerializeObjects"/>
+    /// </summary>
+    public static class SerializeObjectExtensions
+    {
+        /// <summary>
+        /// Serializes the object graph to the specified <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="stream">The <see cref="Stream"/> on which to serialize the object <paramref name="graph"/>.</param>
+        /// <param name="graph">The object to serialize.</param>
+        public static void Serialize<T>(this ISerializeObjects serializer, Stream stream, T graph)
+        {
+            Verify.NotNull(serializer, "serializer");
+
+            serializer.Serialize(stream, graph, typeof(T));
+        }
+
+        /// <summary>
+        /// Serializes the object graph to the specified <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="stream">The <see cref="Stream"/> on which to serialize the object <paramref name="graph"/>.</param>
+        /// <param name="graph">The object to serialize.</param>
+        [Obsolete("Extension method exists to support backward compatibility until migration completed")]
+        public static void Serialize(this ISerializeObjects serializer, Stream stream, Object graph)
+        {
+            Verify.NotNull(serializer, "serializer");
+
+            serializer.Serialize(stream, graph, typeof(Object));
+        }
+
+        /// <summary>
+        /// Deserialize an object graph from the speciied <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
+        public static T Deserialize<T>(this ISerializeObjects serializer, Stream stream)
+        {
+            Verify.NotNull(serializer, "serializer");
+
+            return (T)serializer.Deserialize(stream, typeof(T));
+        }
+
+        /// <summary>
+        /// Deserialize an object graph from the speciied <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
+        [Obsolete("Extension method exists to support backward compatibility until migration completed")]
+        public static Object Deserialize(this ISerializeObjects serializer, Stream stream)
+        {
+            Verify.NotNull(serializer, "serializer");
+
+            return serializer.Deserialize(stream, typeof(Object));
+        }
     }
 }

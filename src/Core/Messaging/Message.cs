@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -20,7 +21,7 @@ namespace Spark.Infrastructure.Messaging
     /// A message envelope containing a unique identifier, message headers and associated payload.
     /// </summary>
     [Serializable]
-    public sealed class Message<TPayload>
+    public sealed class Message<TPayload> : IMessage
     {
         private readonly Guid id;
         private readonly HeaderCollection headers;
@@ -40,16 +41,7 @@ namespace Spark.Infrastructure.Messaging
         /// The message payload.
         /// </summary>
         public TPayload Payload { get { return payload; } }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="Message{TPayload}"/>.
-        /// </summary>
-        /// <param name="id">The unique message identifier</param>
-        /// <param name="headers">The set of headers associated with this message.</param>
-        /// <param name="payload">The message payload.</param>
-        public Message(Guid id, IEnumerable<Header> headers, TPayload payload)
-            : this(id, new HeaderCollection(headers), payload)
-        { }
+        Object IMessage.Payload { get { return payload; } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Message{TPayload}"/>.

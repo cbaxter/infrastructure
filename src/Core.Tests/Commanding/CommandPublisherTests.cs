@@ -104,7 +104,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var aggregateId = GuidStrategy.NewGuid();
                 var publisher = new Mock<IPublishCommands>();
-                var header = new Header("MyHeader", new Object());
+                var header = new Header("MyHeader", "MyValue");
 
                 publisher.Object.Publish(aggregateId, command, header);
 

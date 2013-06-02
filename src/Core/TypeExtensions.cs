@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -21,6 +23,8 @@ namespace Spark.Infrastructure
     /// </summary>
     public static class TypeExtensions
     {
+        private static readonly IDictionary<Type, String> AssemblyTypeNameCache = new ConcurrentDictionary<Type, String>();
+        
         /// <summary>
         /// Returns <value>true</value> if <paramref name="type"/> derives from <paramref name="baseType"/>; otherwise <value>false</value>.
         /// </summary>
@@ -41,7 +45,7 @@ namespace Spark.Infrastructure
             Verify.NotNull(type, "type");
             Verify.NotNull(baseType, "baseType");
             Verify.False(baseType.IsInterface, "baseType", Exceptions.TypeArgumentMustNotBeAnInterface);
-
+            
             var subType = type.BaseType;
             while (subType != null && !Equal(subType, baseType))
                 subType = subType.BaseType;
@@ -57,6 +61,19 @@ namespace Spark.Infrastructure
         private static Boolean Equal(Type type, Type targetType)
         {
             return targetType.IsGenericTypeDefinition ? type.IsGenericType && type.GetGenericTypeDefinition() == targetType : type == targetType;
+        }
+
+        /// <summary>
+        /// Gets the full name with assembly name for the specified <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> for which the full name and assembly name are to be retrieved.</param>
+        public static String GetFullNameWithAssembly(this Type type)
+        {
+            String result;
+            if (!AssemblyTypeNameCache.TryGetValue(type, out result))
+                AssemblyTypeNameCache[type] = result = String.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name);
+
+            return result;
         }
     }
 }

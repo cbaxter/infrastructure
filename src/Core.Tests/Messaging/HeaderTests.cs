@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Resources;
 using Xunit;
@@ -28,7 +27,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             public void HeaderNameCannotBeReservedName(String name)
             {
                 var expectedEx = new ArgumentException(Exceptions.ReservedHeaderName.FormatWith(name), "name");
-                var actualEx = Assert.Throws<ArgumentException>(() =>new Header(name, new Object()));
+                var actualEx = Assert.Throws<ArgumentException>(() =>new Header(name, "value"));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }
@@ -36,7 +35,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void HeaderNameCanBeReservedNameIfKeyValuePair()
             {
-                Assert.DoesNotThrow(() => new Header(Header.Timestamp, SystemTime.Now, checkReservedNames: false));
+                Assert.DoesNotThrow(() => new Header(Header.Timestamp, SystemTime.Now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false));
             }
         }
 
@@ -45,8 +44,8 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void NameAndValueMustBeEqual()
             {
-                var header1 = new Header("Header1", 100);
-                var header2 = new Header("Header1", 100);
+                var header1 = new Header("Header1", "Value");
+                var header2 = new Header("Header1", "Value");
 
                 Assert.True(header1.Equals(header2));
             }
@@ -54,8 +53,8 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void HeaderCanBeBoxed()
             {
-                var header1 = new Header("Header1", 100);
-                var header2 = new Header("Header1", 100);
+                var header1 = new Header("Header1", "Value");
+                var header2 = new Header("Header1", "Value");
 
                 Assert.True(header1.Equals((Object)header2));
             }
@@ -66,8 +65,8 @@ namespace Spark.Infrastructure.Tests.Messaging
             [Fact]
             public void AlwaysReturnConsistentValue()
             {
-                var header1 = new Header("Header1", 100);
-                var header2 = new Header("Header1", 100);
+                var header1 = new Header("Header1", "Value");
+                var header2 = new Header("Header1", "Value");
 
                 Assert.Equal(header1.GetHashCode(), header2.GetHashCode());
             }

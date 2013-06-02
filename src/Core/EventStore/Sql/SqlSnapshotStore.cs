@@ -66,7 +66,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        /// <param name="settings">The event store settings.</param>
+        /// <param name="settings">The snapshot store settings.</param>
         /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
         internal SqlSnapshotStore(String connectionName, ISerializeObjects serializer, IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
             : base(connectionName, serializer, dialect)
@@ -87,7 +87,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
+        /// Releases all managed resources used by the current instance of the <see cref="SqlSnapshotStore"/> class.
         /// </summary>
         public void Dispose()
         {
@@ -197,6 +197,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         private void BufferSnapshot(Snapshot snapshot)
         {
             var state = Serialize(snapshot.State);
+
             lock (buffer)
             {
                 var row = buffer.NewRow();

@@ -31,12 +31,6 @@ namespace Spark.Infrastructure.Tests.Messaging
             }
 
             [Fact]
-            public void EnumerableHeadersCanBeNull()
-            {
-                Assert.DoesNotThrow(() => new Message<Object>(Guid.NewGuid(), (IEnumerable<Header>)null, new Object()));
-            }
-
-            [Fact]
             public void HeadersCollectionCanBeNull()
             {
                 Assert.DoesNotThrow(() => new Message<Object>(Guid.NewGuid(), null, new Object()));

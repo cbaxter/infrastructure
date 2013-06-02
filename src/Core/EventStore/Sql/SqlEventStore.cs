@@ -254,7 +254,7 @@ namespace Spark.Infrastructure.EventStore.Sql
                 record.GetDateTime(Column.Timestamp),
                 record.GetGuid(Column.StreamId),
                 record.GetInt32(Column.Version),
-                new HeaderCollection((IDictionary<String, Object>)Deserialize(record.GetBytes(Column.Headers))),
+                new HeaderCollection((IDictionary<String, String>)Deserialize(record.GetBytes(Column.Headers))),
                 new EventCollection((IList<Event>)Deserialize(record.GetBytes(Column.Events)))
             );
         }

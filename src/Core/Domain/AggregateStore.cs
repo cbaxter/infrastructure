@@ -181,7 +181,7 @@ namespace Spark.Infrastructure.Domain
 
             if (aggregate.Version == 0)
             {
-                var typeHeader = new Header(Header.Aggregate, aggregate.GetType(), checkReservedNames: false);
+                var typeHeader = new Header(Header.Aggregate, aggregate.GetType().GetFullNameWithAssembly(), checkReservedNames: false);
 
                 headers = new HeaderCollection(context.Headers.Concat(typeHeader));
             }

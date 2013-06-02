@@ -181,7 +181,7 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
 
-                eventStore.Verify(mock => mock.Save(It.Is<Commit>(c => (Type)c.Headers[Header.Aggregate] == typeof(FakeAggregate))), Times.Once());
+                eventStore.Verify(mock => mock.Save(It.Is<Commit>(c => c.Headers[Header.Aggregate] == typeof(FakeAggregate).GetFullNameWithAssembly())), Times.Once());
             }
 
             [Fact]

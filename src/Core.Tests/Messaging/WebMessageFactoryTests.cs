@@ -37,8 +37,8 @@ namespace Spark.Infrastructure.Tests.Messaging
                 Assert.DoesNotThrow(() => messageFactory.Create(new Object(), new[]
                     {
                         new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false), 
-                        new Header(Header.RemoteAddress, IPAddress.Loopback, checkReservedNames: false), 
-                        new Header(Header.UserAddress, IPAddress.Loopback, checkReservedNames: false)
+                        new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false), 
+                        new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false)
 
                     }));
             }
@@ -68,7 +68,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var httpContext = CreateFakeHttpContext(Thread.CurrentPrincipal, new NameValueCollection { { "REMOTE_ADDR", IPAddress.Loopback.ToString() } });
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None, checkReservedNames: false) });
+                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) });
 
                 Assert.NotEqual(IPAddress.Loopback, message.Headers.GetRemoteAddress());
             }

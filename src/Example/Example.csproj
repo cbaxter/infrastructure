@@ -68,6 +68,10 @@
       <Project>{DFD230FA-76D5-4EF4-8035-80E848CF798B}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serialization.Newtonsoft\Serialization.Newtonsoft.csproj">
+      <Project>{70b4a934-bfdd-4e12-9741-443148585b8a}</Project>
+      <Name>Serialization.Newtonsoft</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\Events\" />

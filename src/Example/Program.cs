@@ -14,11 +14,11 @@ namespace Example
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             GuidStrategy.Initialize(SqlServerSequentialGuid.NewGuid);
 
-            var count = 1000000;
+            var count = 250000;
             var builder = new ContainerBuilder();
             var benchmarkHook = new BenchmarkHook(count);
 

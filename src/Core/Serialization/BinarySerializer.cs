@@ -27,7 +27,8 @@ namespace Spark.Infrastructure.Serialization
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> on which to serialize the object <paramref name="graph"/>.</param>
         /// <param name="graph">The object to serialize.</param>
-        public void Serialize(Stream stream, Object graph)
+        /// <param name="type">The <see cref="Type"/> of object being serialized.</param>
+        public void Serialize(Stream stream, Object graph, Type type)
         {
             Verify.NotNull(graph, "graph");
             Verify.NotNull(stream, "stream");
@@ -38,8 +39,9 @@ namespace Spark.Infrastructure.Serialization
         /// <summary>
         /// Deserialize an object graph from the speciied <paramref name="stream"/>.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> from which to deserialize the object <paramref name="graph"/>.</param>
-        public Object Deserialize(Stream stream)
+        /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
+        /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
+        public Object Deserialize(Stream stream, Type type)
         {
             Verify.NotNull(stream, "stream");
 

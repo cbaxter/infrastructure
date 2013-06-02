@@ -31,12 +31,12 @@ namespace Spark.Infrastructure.Messaging
         /// Creates the underlying <see cref="HeaderCollection"/> dictionary.
         /// </summary>
         /// <param name="headers">The set of custom message headers.</param>
-        protected override Dictionary<String, Object> CreateHeaderDictionary(IEnumerable<Header> headers)
+        protected override Dictionary<String, String> CreateHeaderDictionary(IEnumerable<Header> headers)
         {
             var result = base.CreateHeaderDictionary(headers);
             
             if (!result.ContainsKey(Header.RemoteAddress))
-                result[Header.RemoteAddress] = HostAddress;
+                result[Header.RemoteAddress] = HostAddress.ToString();
 
             if (!result.ContainsKey(Header.UserName))
             {

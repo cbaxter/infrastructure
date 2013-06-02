@@ -19,6 +19,7 @@ namespace Spark.Infrastructure.Commanding
     /// <summary>
     /// The command message envelope that pairs a <see cref="Command"/> with the target <see cref="Aggregate"/> identifier.
     /// </summary>
+    [Serializable]
     public sealed class CommandEnvelope
     {
         private class NullCommand : Command { }
