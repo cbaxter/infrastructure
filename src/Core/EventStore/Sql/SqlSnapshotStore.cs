@@ -267,7 +267,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="record">The record from which to create the new <see cref="Snapshot"/>.</param>
         private Snapshot CreateSnapshot(IDataRecord record)
         {
-            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), Deserialize(record.GetBytes(Column.State)));
+            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), Deserialize<Object>(record.GetBytes(Column.State)));
         }
 
         /// <summary>

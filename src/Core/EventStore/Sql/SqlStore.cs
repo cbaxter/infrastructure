@@ -176,7 +176,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// Serializes an object graph to binary data.
         /// </summary>
         /// <param name="graph">The object graph to serialize.</param>
-        protected Byte[] Serialize(Object graph)
+        protected Byte[] Serialize<T>(T graph)
         {
             using (var stream = new MemoryStream())
             {
@@ -190,11 +190,11 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// Deserializes a binary field in to an object graph.
         /// </summary>
         /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
-        protected Object Deserialize(Byte[] buffer)
+        protected T Deserialize<T>(Byte[] buffer)
         {
             using (var stream = new MemoryStream(buffer, writable: false))
             {
-                var result = serializer.Deserialize(stream);
+                var result = serializer.Deserialize<T>(stream);
 
                 return result;
             }

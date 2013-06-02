@@ -109,7 +109,7 @@ namespace Spark.Infrastructure.EventStore.Sql
                 return QueryMultiple(command, CreateCommit);
             }
         }
-        
+
         /// <summary>
         /// Get all known stream identifiers.
         /// </summary>
@@ -254,8 +254,8 @@ namespace Spark.Infrastructure.EventStore.Sql
                 record.GetDateTime(Column.Timestamp),
                 record.GetGuid(Column.StreamId),
                 record.GetInt32(Column.Version),
-                new HeaderCollection((IDictionary<String, String>)Deserialize(record.GetBytes(Column.Headers))),
-                new EventCollection((IList<Event>)Deserialize(record.GetBytes(Column.Events)))
+                new HeaderCollection(Deserialize<IDictionary<String, String>>(record.GetBytes(Column.Headers))),
+                new EventCollection(Deserialize<IList<Event>>(record.GetBytes(Column.Events)))
             );
         }
     }
