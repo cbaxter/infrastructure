@@ -182,7 +182,7 @@ namespace Spark.Infrastructure.Tests.Threading
             public void RunTasksOnDifferentPartitionsInParallel()
             {
                 var tasks = new Task[200];
-                var taskOrder = new List<Int32>();
+                var taskOrder = new List<Int32>(tasks.Length);
                 var tasksQueued = new ManualResetEvent(false);
                 var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, tasks.Length);
 
@@ -191,7 +191,12 @@ namespace Spark.Infrastructure.Tests.Threading
                     tasks[i] = Task.Factory.StartNew(state =>
                         {
                             var taskId = (Int32) state;
-                            taskOrder.Add(taskId);
+
+                            lock (taskOrder)
+                            {
+                                taskOrder.Add(taskId);
+                            }
+
                             tasksQueued.WaitOne();
                             Thread.Sleep(taskId % 3);
                         }, i, CancellationToken.None, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, taskScheduler);
