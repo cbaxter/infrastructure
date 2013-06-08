@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Messaging
         {
             return new Message<T>(GuidStrategy.NewGuid(), new HeaderCollection(CreateHeaderDictionary(headers)), payload);
         }
-        
+
         /// <summary>
         /// Creates the underlying <see cref="HeaderCollection"/> dictionary.
         /// </summary>
@@ -49,11 +49,12 @@ namespace Spark.Infrastructure.Messaging
         protected virtual Dictionary<String, String> CreateHeaderDictionary(IEnumerable<Header> headers)
         {
             var result = headers == null ? new Dictionary<String, String>() : headers.ToDictionary(header => header.Name, header => header.Value);
-            
+
             if (!result.ContainsKey(Header.Origin))
                 result[Header.Origin] = HostServer;
 
-            result[Header.Timestamp] = SystemTime.GetTimestamp().ToString(DateTimeFormat.RoundTrip);
+            if (!result.ContainsKey(Header.Timestamp))
+                result[Header.Timestamp] = SystemTime.GetTimestamp().ToString(DateTimeFormat.RoundTrip);
 
             return result;
         }

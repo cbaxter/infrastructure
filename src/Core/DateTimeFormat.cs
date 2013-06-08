@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -19,8 +15,14 @@ using System.Threading.Tasks;
 
 namespace Spark.Infrastructure
 {
+    /// <summary>
+    /// Common <see cref="DateTime"/> format strings.
+    /// </summary>
     public static class DateTimeFormat
     {
+        /// <summary>
+        /// Represents the round-trip date/time pattern (i.e., 2013-06-15T13:45:30.0900000).
+        /// </summary>
         public const String RoundTrip = "o";
     }
 }
