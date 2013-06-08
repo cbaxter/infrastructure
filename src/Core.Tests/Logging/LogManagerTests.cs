@@ -116,9 +116,7 @@ namespace Spark.Infrastructure.Tests.Logging
             [Fact]
             public void LoggerIsNamedAfterDeclaringClassFullName()
             {
-                var logger = LogManager.GetCurrentClassLogger();
-
-                Assert.Equal("Spark.Infrastructure.Tests.Logging.UsingLogManager+WhenGettingCurrentClassLogger", logger.Name);
+                Assert.Equal("Spark.Infrastructure.Tests.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
             }
         }
 
@@ -166,6 +164,11 @@ namespace Spark.Infrastructure.Tests.Logging
             {
                 return element.GetHashCode();
             }
+        }
+
+        public sealed class LoggerClass
+        {
+            public static readonly ILog Log = LogManager.GetCurrentClassLogger();
         }
 
         public sealed class FakeSwitchElement : ConfigurationElement

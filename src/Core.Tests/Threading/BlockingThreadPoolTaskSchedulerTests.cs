@@ -55,7 +55,7 @@ namespace Spark.Infrastructure.Tests.Threading
                     });
 
                 Assert.True(task.Wait(TimeSpan.FromMilliseconds(100)));
-                Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
+                Task.WaitAll(taskScheduler.ScheduledTasks.ToArray());
             }
 
             [Fact]

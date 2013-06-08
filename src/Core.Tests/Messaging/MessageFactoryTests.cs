@@ -62,7 +62,7 @@ namespace Spark.Infrastructure.Tests.Messaging
 
                 var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
 
-                Assert.Equal(now, message.Headers.GetTimestamp());
+                Assert.Equal(now.ToString(DateTimeFormat.RoundTrip), message.Headers.GetTimestamp().ToString(DateTimeFormat.RoundTrip));
             }
 
             [Fact]
