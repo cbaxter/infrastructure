@@ -56,6 +56,21 @@ namespace Spark.Infrastructure.Serialization
         }
 
         /// <summary>
+        /// Serializes an object graph to binary data.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="graph">The object graph to serialize.</param>
+        public static Byte[] Serialize<T>(this ISerializeObjects serializer, T graph)
+        {
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(stream, graph);
+
+                return stream.ToArray();
+            }
+        }
+
+        /// <summary>
         /// Deserialize an object graph from the speciied <paramref name="stream"/>.
         /// </summary>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
@@ -65,6 +80,21 @@ namespace Spark.Infrastructure.Serialization
             Verify.NotNull(serializer, "serializer");
 
             return (T)serializer.Deserialize(stream, typeof(T));
+        }
+
+        /// <summary>
+        /// Deserializes a binary field in to an object graph.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
+        public static T Deserialize<T>(this ISerializeObjects serializer, Byte[] buffer)
+        {
+            using (var stream = new MemoryStream(buffer, writable: false))
+            {
+                var result = serializer.Deserialize<T>(stream);
+
+                return result;
+            }
         }
     }
 }

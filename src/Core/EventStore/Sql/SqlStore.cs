@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using Spark.Infrastructure.Serialization;
 
@@ -178,12 +177,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="graph">The object graph to serialize.</param>
         protected Byte[] Serialize<T>(T graph)
         {
-            using (var stream = new MemoryStream())
-            {
-                serializer.Serialize(stream, graph);
-
-                return stream.ToArray();
-            }
+            return serializer.Serialize(graph);
         }
 
         /// <summary>
@@ -192,12 +186,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
         protected T Deserialize<T>(Byte[] buffer)
         {
-            using (var stream = new MemoryStream(buffer, writable: false))
-            {
-                var result = serializer.Deserialize<T>(stream);
-
-                return result;
-            }
+            return serializer.Deserialize<T>(buffer);
         }
     }
 }
