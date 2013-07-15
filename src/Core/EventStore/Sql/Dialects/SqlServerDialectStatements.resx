@@ -121,9 +121,9 @@
     <value>DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;</value>
   </data>
   <data name="EnsureCommitTableExists" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = 'dbo' AND t.name = 'Commit')
+    <value>IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE type = 'U' AND name = 'Commit' AND uid = SCHEMA_ID())
 BEGIN
-    CREATE TABLE [dbo].[Commit] (
+    CREATE TABLE [Commit] (
         [Id]        UNIQUEIDENTIFIER NOT NULL,
         [Sequence]  BIGINT           NOT NULL IDENTITY(1,1),
         [Timestamp] DATETIME2        NOT NULL,
@@ -133,26 +133,26 @@ BEGIN
         [Events]    VARBINARY(MAX)   NOT NULL
     );
 
-    CREATE UNIQUE CLUSTERED INDEX [UQ_Commit_Sequence] ON [dbo].[Commit]([Sequence]);
-    CREATE UNIQUE NONCLUSTERED INDEX [UQ_Commit_StreamVersion] ON [dbo].[Commit]([StreamId],[Version]);
+    CREATE UNIQUE CLUSTERED INDEX [UQ_Commit_Sequence] ON [Commit]([Sequence]);
+    CREATE UNIQUE NONCLUSTERED INDEX [UQ_Commit_StreamVersion] ON [Commit]([StreamId],[Version]);
 END;</value>
   </data>
   <data name="EnsureDuplicateCommitsDetected" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'PK_Commit')
+    <value>IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_Commit' AND uid = SCHEMA_ID())
 BEGIN
-    ALTER TABLE [dbo].[Commit] ADD CONSTRAINT [PK_Commit] PRIMARY KEY NONCLUSTERED ([Id]);
+    ALTER TABLE [Commit] ADD CONSTRAINT [PK_Commit] PRIMARY KEY NONCLUSTERED ([Id]);
 END;</value>
   </data>
   <data name="EnsureDuplicateCommitsSuppressed" xml:space="preserve">
-    <value>IF EXISTS (SELECT * FROM sys.indexes i INNER JOIN sys.tables t ON i.object_id = t.object_id INNER JOIN sys.schemas s ON s.schema_id = t.schema_id WHERE s.name = 'dbo' AND  t.name = 'Commit' AND i.name = 'PK_Commit')
+    <value>IF EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_Commit' AND uid = SCHEMA_ID())
 BEGIN
-    ALTER TABLE [dbo].[Commit] DROP CONSTRAINT [PK_Commit];
+    ALTER TABLE [Commit] DROP CONSTRAINT [PK_Commit];
 END;</value>
   </data>
   <data name="EnsureSnapshotTableExists" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.tables t INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE s.name = 'dbo' AND t.name = 'Snapshot')
+    <value>IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = 'U' AND name = 'Snapshot' AND uid = SCHEMA_ID())
 BEGIN
-    CREATE TABLE [dbo].[Snapshot] (
+    CREATE TABLE [Snapshot] (
         [StreamId]  UNIQUEIDENTIFIER NOT NULL,
         [Version]   INT              NOT NULL,
         [State]     VARBINARY(MAX)   NOT NULL,
