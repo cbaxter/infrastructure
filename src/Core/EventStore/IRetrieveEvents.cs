@@ -1,6 +1,5 @@
 ﻿using System;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Messaging;
+using System.Collections.Generic;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -20,31 +19,26 @@ namespace Spark.Infrastructure.EventStore
     /// <summary>
     /// Data access contract for an event store.
     /// </summary>
-    public interface IStoreEvents : IRetrieveEvents
+    public interface IRetrieveEvents
     {
         /// <summary>
-        /// Deletes the specified event stream for <paramref name="streamId"/>.
+        /// Get all known stream identifiers.
+        /// </summary>
+        /// <remarks>This method is not safe to call on an active event store; only use when new streams are not being committed.</remarks>
+        IEnumerable<Guid> GetStreams();
+
+        /// <summary>
+        /// Get the specified commit sequence range starting after <paramref name="skip"/> and returing <paramref name="take"/> commits.
+        /// </summary>
+        /// <param name="skip">The commit sequence lower bound (exclusive).</param>
+        /// <param name="take">The number of commits to include in the result.</param>
+        IReadOnlyList<Commit> GetRange(Int64 skip, Int64 take);
+
+        /// <summary>
+        /// Gets all commits for the specified <paramref name="streamId"/> with a version greater than or equal to <paramref name="minimumVersion"/>.
         /// </summary>
         /// <param name="streamId">The unique stream identifier.</param>
-        void DeleteStream(Guid streamId);
-
-        /// <summary>
-        /// Appends a new commit to the event store.
-        /// </summary>
-        /// <param name="commit">The commit to append to the event store.</param>
-        void Save(Commit commit);
-
-        /// <summary>
-        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="commitId"/>.
-        /// </summary>
-        /// <param name="commitId">The unique commit identifier.</param>
-        /// <param name="headers">The new commit headers.</param>
-        /// <param name="events">The new commit events.</param>
-        void Migrate(Guid commitId, HeaderCollection headers, EventCollection events);
-
-        /// <summary>
-        /// Deletes all existing commits from the event store.
-        /// </summary>
-        void Purge();
+        /// <param name="minimumVersion">The minimum stream version (inclusive).</param>
+        IEnumerable<Commit> GetStream(Guid streamId, Int32 minimumVersion);
     }
 }

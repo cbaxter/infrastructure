@@ -48,6 +48,9 @@ namespace Spark.Infrastructure.EventStore.Sql
             this.connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
         }
 
+        /// <summary>
+        /// Opens a new database connection.
+        /// </summary>
         protected virtual DbConnection OpenConnection()
         {
             var connection = dialect.Provider.CreateConnection();
@@ -69,9 +72,9 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
-        /// Creates a new database connection.
+        /// Creates a new database command.
         /// </summary>
-        /// <param name="commandText">The SQL Statement associated with this <see cref="DbCommand"/>.</param>
+        /// <param name="commandText">The SQL statement associated with this <see cref="DbCommand"/>.</param>
         protected virtual DbCommand CreateCommand(String commandText)
         {
             var command = dialect.Provider.CreateCommand();

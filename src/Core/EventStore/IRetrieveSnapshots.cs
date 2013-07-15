@@ -1,4 +1,6 @@
-﻿/* Copyright (c) 2012 Spark Software Ltd.
+﻿using System;
+
+/* Copyright (c) 2012 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,17 +18,13 @@ namespace Spark.Infrastructure.EventStore
     /// <summary>
     /// Data access contract for a snapshot store.
     /// </summary>
-    public interface IStoreSnapshots : IRetrieveSnapshots
+    public interface IRetrieveSnapshots
     {
         /// <summary>
-        /// Adds a new snapshot to the snapshot store, keeping all existing snapshots.
+        /// Gets the most recent snapshot for the specified <paramref name="streamId"/> and <paramref name="maximumVersion"/>.
         /// </summary>
-        /// <param name="snapshot">The snapshot to append to the snapshot store.</param>
-        void Save(Snapshot snapshot);
-
-        /// <summary>
-        /// Deletes all existing snapshots from the snapshot store.
-        /// </summary>
-        void Purge();
+        /// <param name="streamId">The unique stream identifier.</param>
+        /// <param name="maximumVersion">The maximum snapshot version.</param>
+        Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion);
     }
 }

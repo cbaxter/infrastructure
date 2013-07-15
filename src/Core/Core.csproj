@@ -75,6 +75,10 @@
     <Compile Include="Domain\AggregateStateValidator.cs" />
     <Compile Include="Domain\SaveResult.cs" />
     <Compile Include="Eventing\EventContext.cs" />
+    <Compile Include="EventStore\EventStoreExtensions.cs" />
+    <Compile Include="EventStore\IRetrieveSnapshots.cs" />
+    <Compile Include="EventStore\IRetrieveEvents.cs" />
+    <Compile Include="EventStore\SnapshotStoreExtensions.cs" />
     <Compile Include="EventStore\Sql\DataRecordExtensions.cs" />
     <Compile Include="EventStore\Sql\DbCommandExtensions.cs" />
     <Compile Include="EventStore\Sql\DialectProvider.cs" />
