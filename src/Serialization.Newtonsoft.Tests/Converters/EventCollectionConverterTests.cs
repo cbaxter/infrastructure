@@ -69,7 +69,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
                 var bson = WriteBson(new EventCollectionConverter(), events);
 
-                Validate(bson, "﻿wwAAAAMwALsAAAACJHR5cGUAkQAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0V2ZW50Q29sbGVjdGlvbkNvbnZlcnRlcitGYWtlRXZlbnQsIFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkADAAAAE15IFByb3BlcnR5AAAA");
+                Validate("﻿wwAAAAMwALsAAAACJHR5cGUAkQAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0V2ZW50Q29sbGVjdGlvbkNvbnZlcnRlcitGYWtlRXZlbnQsIFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkADAAAAE15IFByb3BlcnR5AAAA", bson);
             }
         }
 

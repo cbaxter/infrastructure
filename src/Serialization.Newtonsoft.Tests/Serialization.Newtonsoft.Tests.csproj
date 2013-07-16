@@ -61,6 +61,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Converters\CommandEnvelopeConverterTests.cs" />
+    <Compile Include="Converters\CommitDataConverterTests.cs" />
     <Compile Include="Converters\EventCollectionConverterTests.cs" />
     <Compile Include="Converters\HeaderCollectionConverterTests.cs" />
     <Compile Include="Converters\MessageConverterTests.cs" />

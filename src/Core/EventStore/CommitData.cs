@@ -23,6 +23,7 @@ namespace Spark.Infrastructure.EventStore
     [Serializable]
     internal struct CommitData
     {
+        public static readonly CommitData Empty = new CommitData(HeaderCollection.Empty, EventCollection.Empty);
         public readonly HeaderCollection Headers;
         public readonly EventCollection Events;
 

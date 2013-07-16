@@ -48,10 +48,10 @@ namespace Spark.Infrastructure.Serialization.Converters
             writer.WriteStartObject();
 
             writer.WritePropertyName("h");
-            serializer.Serialize(writer, data.Headers);
+            serializer.Serialize(writer, data.Headers ?? HeaderCollection.Empty);
 
             writer.WritePropertyName("e");
-            serializer.Serialize(writer, data.Events);
+            serializer.Serialize(writer, data.Events ?? EventCollection.Empty);
 
             writer.WriteEndObject();
         }
@@ -69,7 +69,7 @@ namespace Spark.Infrastructure.Serialization.Converters
             var events = EventCollection.Empty;
 
             if (!reader.CanReadObject())
-                return null;
+                return CommitData.Empty;
 
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
@@ -82,7 +82,7 @@ namespace Spark.Infrastructure.Serialization.Converters
                     case "h":
                         headers = serializer.Deserialize<HeaderCollection>(reader);
                         break;
-                    case "c":
+                    case "e":
                         events = serializer.Deserialize<EventCollection>(reader);
                         break;
                 }

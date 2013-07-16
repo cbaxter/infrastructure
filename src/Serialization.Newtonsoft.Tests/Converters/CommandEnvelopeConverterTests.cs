@@ -90,7 +90,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
                 var envelope = new CommandEnvelope(aggregateId, new FakeCommand("My Command"));
                 var json = WriteBson(new CommandEnvelopeConverter(), envelope);
 
-                Validate(json, "﻿3AAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjALwAAAACJHR5cGUAkwAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0NvbW1hbmRFbnZlbG9wZUNvbnZlcnRlcitGYWtlQ29tbWFuZCwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQALAAAATXkgQ29tbWFuZAAAAA==");
+                Validate("﻿3AAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjALwAAAACJHR5cGUAkwAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0NvbW1hbmRFbnZlbG9wZUNvbnZlcnRlcitGYWtlQ29tbWFuZCwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQALAAAATXkgQ29tbWFuZAAAAA==", json);
             }
         }
 

@@ -92,7 +92,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
                 var message = new Message<CommandEnvelope>(id, HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand("My Command")));
                 var json = WriteBson(new MessageConverter(), message);
 
-                Validate(json, "﻿/QAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwANQAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwC0AAAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==");
+                Validate("﻿/QAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwANQAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwC0AAAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==", json);
             }
         }
 

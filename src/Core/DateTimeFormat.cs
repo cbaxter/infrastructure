@@ -21,6 +21,11 @@ namespace Spark.Infrastructure
     public static class DateTimeFormat
     {
         /// <summary>
+        /// Represents the RFC1123 date/time pattern (i.e., Mon, 15 Jun 2009 20:45:30 GMT).
+        /// </summary>
+        public const String RFC1123 = "r";
+
+        /// <summary>
         /// Represents the round-trip date/time pattern (i.e., 2013-06-15T13:45:30.0900000).
         /// </summary>
         public const String RoundTrip = "o";
