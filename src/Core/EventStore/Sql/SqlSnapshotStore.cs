@@ -200,13 +200,7 @@ namespace Spark.Infrastructure.EventStore.Sql
 
             lock (buffer)
             {
-                var row = buffer.NewRow();
-
-                row[Column.StreamId] = snapshot.StreamId;
-                row[Column.Version] = snapshot.Version;
-                row[Column.State] = state;
-
-                buffer.Rows.Add(row);
+                buffer.Rows.Add(snapshot.StreamId, snapshot.Version, state);
             }
 
             waitHandle.Set();
