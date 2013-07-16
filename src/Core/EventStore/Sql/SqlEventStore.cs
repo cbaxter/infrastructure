@@ -35,12 +35,11 @@ namespace Spark.Infrastructure.EventStore.Sql
         private static class Column
         {
             public const Int32 Id = 0;
-            public const Int32 Sequence = 1;
-            public const Int32 Timestamp = 2;
+            public const Int32 Timestamp = 1;
+            public const Int32 CorrelationId = 2;
             public const Int32 StreamId = 3;
             public const Int32 Version = 4;
-            public const Int32 Headers = 5;
-            public const Int32 Events = 6;
+            public const Int32 Data = 5;
         }
 
         /// <summary>
@@ -191,39 +190,39 @@ namespace Spark.Infrastructure.EventStore.Sql
         {
             Verify.NotNull(commit, "commit");
 
+            var data = Serialize(new CommitData(commit.Headers, commit.Events));
             using (var command = CreateCommand(dialect.InsertCommit))
             {
                 Log.TraceFormat("Inserting stream {0} commit for version {1}", commit.StreamId, commit.Version);
 
-                command.Parameters.Add(dialect.CreateIdParameter(commit.Id));
+                command.Parameters.Add(dialect.CreateTimestampParameter(commit.Timestamp));
+                command.Parameters.Add(dialect.CreateCorrelationIdParameter(commit.CorrelationId));
                 command.Parameters.Add(dialect.CreateStreamIdParameter(commit.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(commit.Version));
-                command.Parameters.Add(dialect.CreateTimestampParameter(commit.Timestamp));
-                command.Parameters.Add(dialect.CreateHeadersParameter(Serialize(commit.Headers)));
-                command.Parameters.Add(dialect.CreateEventsParameter(Serialize(commit.Events)));
+                command.Parameters.Add(dialect.CreateDataParameter(data));
 
-                commit.Sequence = Convert.ToInt64(ExecuteScalar(command));
+                commit.Id = Convert.ToInt64(ExecuteScalar(command));
             }
         }
 
         /// <summary>
-        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="commitId"/>.
+        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="id"/>.
         /// </summary>
-        /// <param name="commitId">The unique commit identifier.</param>
+        /// <param name="id">The unique commit identifier.</param>
         /// <param name="headers">The new commit headers.</param>
         /// <param name="events">The new commit events.</param>
-        public void Migrate(Guid commitId, HeaderCollection headers, EventCollection events)
+        public void Migrate(Int64 id, HeaderCollection headers, EventCollection events)
         {
             Verify.NotNull(headers, "headers");
             Verify.NotNull(events, "events");
 
+            var data = Serialize(new CommitData(headers, events));
             using (var command = CreateCommand(dialect.UpdateCommit))
             {
-                Log.TraceFormat("Updating commit {0}", commitId);
+                Log.TraceFormat("Updating commit {0}", id);
 
-                command.Parameters.Add(dialect.CreateIdParameter(commitId));
-                command.Parameters.Add(dialect.CreateHeadersParameter(Serialize(headers)));
-                command.Parameters.Add(dialect.CreateEventsParameter(Serialize(events)));
+                command.Parameters.Add(dialect.CreateIdParameter(id));
+                command.Parameters.Add(dialect.CreateDataParameter(data));
 
                 ExecuteNonQuery(command);
             }
@@ -248,15 +247,14 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="record">The record from which to create the new <see cref="Commit"/>.</param>
         private Commit CreateCommit(IDataRecord record)
         {
-            return new Commit(
-                record.GetGuid(Column.Id),
-                record.GetInt64(Column.Sequence),
-                record.GetDateTime(Column.Timestamp),
-                record.GetGuid(Column.StreamId),
-                record.GetInt32(Column.Version),
-                new HeaderCollection(Deserialize<IDictionary<String, String>>(record.GetBytes(Column.Headers))),
-                new EventCollection(Deserialize<IList<Event>>(record.GetBytes(Column.Events)))
-            );
+            var id = record.GetInt64(Column.Id);
+            var timestamp = record.GetDateTime(Column.Timestamp);
+            var correlationId = record.GetGuid(Column.CorrelationId);
+            var streamId = record.GetGuid(Column.StreamId);
+            var version = record.GetInt32(Column.Version);
+            var data = Deserialize<CommitData>(record.GetBytes(Column.Data));
+
+            return new Commit(id, timestamp, correlationId, streamId, version, data.Headers, data.Events);
         }
     }
 }

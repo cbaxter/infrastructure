@@ -70,7 +70,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var events = new Event[] { new FakeEvent(), new FakeEvent() };
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                eventStore.Setup(mock => mock.GetStream(id, 1)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 1, HeaderCollection.Empty, new EventCollection(events)) });
+                eventStore.Setup(mock => mock.GetStream(id, 1)).Returns(new[] { new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 1, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
@@ -86,7 +86,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
                 snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, snapshot));
-                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11, HeaderCollection.Empty, new EventCollection(events)) });
+                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 11, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
@@ -103,7 +103,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
                 for (var i = 0; i < 10; i++)
-                    commits.Add(new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 11 + i, HeaderCollection.Empty, EventCollection.Empty));
+                    commits.Add(new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 11 + i, HeaderCollection.Empty, EventCollection.Empty));
 
                 snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
                 eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(commits);
@@ -122,7 +122,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
                 snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
-                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(Guid.NewGuid(), 1L, DateTime.UtcNow, id, 12, HeaderCollection.Empty, EventCollection.Empty) });
+                eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 12, HeaderCollection.Empty, EventCollection.Empty) });
 
                 var ex = Assert.Throws<InvalidOperationException>(() => aggregateStore.Get(typeof(FakeAggregate), id));
 
@@ -253,6 +253,7 @@ namespace Spark.Infrastructure.Tests.Domain
                 }
             }
 
+            [UsedImplicitly]
             private class FakeEvent : Event
             { }
         }

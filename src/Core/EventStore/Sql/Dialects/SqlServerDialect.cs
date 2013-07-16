@@ -48,12 +48,14 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
         public String EnsureSnapshotTableExists { get { return SqlServerDialectStatements.EnsureSnapshotTableExists; } }
 
         // Create Methods
-        public DbParameter CreateIdParameter(Guid commitId) { return new SqlParameter("@id", SqlDbType.UniqueIdentifier) { SourceColumn = "id", Value = commitId }; }
+        public DbParameter CreateIdParameter(Int64 id) { return new SqlParameter("@id", SqlDbType.BigInt) { SourceColumn = "id", Value = id }; }
         public DbParameter CreateTimestampParameter(DateTime timestamp) { return new SqlParameter("@timestamp", SqlDbType.DateTime2) { SourceColumn = "timestamp", Value = timestamp }; }
+        public DbParameter CreateCorrelationIdParameter(Guid correlationId) { return new SqlParameter("@correlationId", SqlDbType.UniqueIdentifier) { SourceColumn = "correlationId", Value = correlationId }; }
         public DbParameter CreateStreamIdParameter(Guid streamId) { return new SqlParameter("@streamId", SqlDbType.UniqueIdentifier) { SourceColumn = "streamId", Value = streamId }; }
         public DbParameter CreateVersionParameter(Int32 version) { return new SqlParameter("@version", SqlDbType.Int) { SourceColumn = "version", Value = version }; }
         public DbParameter CreateHeadersParameter(Byte[] headers) { return new SqlParameter("@headers", SqlDbType.VarBinary, Max) { SourceColumn = "headers", Value = headers }; }
         public DbParameter CreateEventsParameter(Byte[] events) { return new SqlParameter("@events", SqlDbType.VarBinary, Max) { SourceColumn = "events", Value = events }; }
+        public DbParameter CreateDataParameter(Byte[] data) { return new SqlParameter("@data", SqlDbType.VarBinary, Max) { SourceColumn = "data", Value = data }; }
         public DbParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
         public DbParameter CreateSkipParameter(Int64 skip) { return new SqlParameter("@skip", SqlDbType.BigInt) { SourceColumn = "skip", Value = skip }; }
         public DbParameter CreateTakeParameter(Int64 take) { return new SqlParameter("@take", SqlDbType.BigInt) { SourceColumn = "take", Value = take }; }
@@ -65,14 +67,14 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
             if (sqlException == null)
                 return ex;
 
-            if (sqlException.Number == UniqueConstraintViolation)
+            if (sqlException.Number == UniqueIndexViolation)
             {
                 var commitId = command.GetParameterValue("@id");
 
                 return new DuplicateCommitException(Exceptions.DuplicateCommitException.FormatWith(commitId));
             }
 
-            if (sqlException.Number == UniqueIndexViolation)
+            if (sqlException.Number == UniqueConstraintViolation)
             {
                 var streamId = command.GetParameterValue("@streamId");
                 var version = command.GetParameterValue("@version");

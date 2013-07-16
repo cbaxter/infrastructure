@@ -53,6 +53,7 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Converters\CommitDataConverter.cs" />
     <Compile Include="JsonReaderExtensions.cs" />
     <Compile Include="NewtonsoftBsonSerializer.cs" />
     <Compile Include="ConverterContractResolver.cs" />

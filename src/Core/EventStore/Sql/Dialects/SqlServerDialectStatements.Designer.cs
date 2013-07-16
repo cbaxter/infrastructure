@@ -70,19 +70,18 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE type = &apos;U&apos; AND name = &apos;Commit&apos; AND uid = SCHEMA_ID())
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = &apos;Commit&apos;)
         ///BEGIN
         ///    CREATE TABLE [Commit] (
-        ///        [Id]        UNIQUEIDENTIFIER NOT NULL,
-        ///        [Sequence]  BIGINT           NOT NULL IDENTITY(1,1),
-        ///        [Timestamp] DATETIME2        NOT NULL,
-        ///        [StreamId]  UNIQUEIDENTIFIER NOT NULL,
-        ///        [Version]   INT              NOT NULL,
-        ///        [Headers]   VARBINARY(MAX)   NOT NULL,
-        ///        [Events]    VARBINARY(MAX)   NOT NULL
-        ///    );
+        ///        [Id]            BIGINT           NOT NULL IDENTITY(1,1),
+        ///        [Timestamp]     DATETIME2        NOT NULL,
+        ///        [CorrelationId] UNIQUEIDENTIFIER NOT NULL,
+        ///        [StreamId]      UNIQUEIDENTIFIER NOT NULL,
+        ///        [Version]       INT              NOT NULL,
+        ///        [Dispatched]    BIT              NOT NULL,
+        ///        [Data]        VARBINARY(MAX)   NOT NULL,
         ///
-        ///    CREATE U [rest of string was truncated]&quot;;.
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EnsureCommitTableExists {
             get {
@@ -91,9 +90,9 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = &apos;PK&apos; AND name = &apos;PK_Commit&apos; AND uid = SCHEMA_ID())
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(&apos;Commit&apos;) AND name = &apos;UQ_Commit_CorrelationId&apos;)
         ///BEGIN
-        ///    ALTER TABLE [Commit] ADD CONSTRAINT [PK_Commit] PRIMARY KEY NONCLUSTERED ([Id]);
+        ///    CREATE UNIQUE INDEX [UQ_Commit_CorrelationId] ON [Commit]([CorrelationId]);
         ///END;.
         /// </summary>
         internal static string EnsureDuplicateCommitsDetected {
@@ -103,9 +102,9 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = &apos;PK&apos; AND name = &apos;PK_Commit&apos; AND uid = SCHEMA_ID())
+        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(&apos;Commit&apos;) AND name = &apos;UQ_Commit_CorrelationId&apos;)
         ///BEGIN
-        ///    ALTER TABLE [Commit] DROP CONSTRAINT [PK_Commit];
+        ///    DROP INDEX [UQ_Commit_CorrelationId] ON [Commit];
         ///END;.
         /// </summary>
         internal static string EnsureDuplicateCommitsSuppressed {
@@ -115,7 +114,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE xtype = &apos;U&apos; AND name = &apos;Snapshot&apos; AND uid = SCHEMA_ID())
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = &apos;Snapshot&apos; )
         ///BEGIN
         ///    CREATE TABLE [Snapshot] (
         ///        [StreamId]  UNIQUEIDENTIFIER NOT NULL,
@@ -133,7 +132,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [Sequence] &gt;= @skip ORDER BY [Sequence];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];.
         /// </summary>
         internal static string GetRange {
             get {
@@ -151,7 +150,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Sequence],[Timestamp],[StreamId],[Version],[Headers],[Events] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];.
         /// </summary>
         internal static string GetStream {
             get {
@@ -169,7 +168,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([Id], [Timestamp], [StreamId], [Version], [Headers], [Events]) OUTPUT Inserted.Sequence VALUES(@id, @timestamp, @streamId, @version, @headers, @events);.
+        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);.
         /// </summary>
         internal static string InsertCommit {
             get {
@@ -218,7 +217,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UPDATE [dbo].[Commit] SET [Headers] = @headers, [Events] = @events WHERE [Id] = @id;.
+        ///   Looks up a localized string similar to UPDATE [dbo].[Commit] SET [Data] = @data WHERE [Id] = @id;.
         /// </summary>
         internal static string UpdateCommit {
             get {

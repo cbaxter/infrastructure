@@ -23,14 +23,19 @@ namespace Spark.Infrastructure.EventStore
     public class Commit
     {
         /// <summary>
-        /// The unique identifier associated with this commit.
-        /// </summary>
-        public Guid Id { get; private set; }
-
-        /// <summary>
         /// The global commit sequence associated with this commit.
         /// </summary>
-        public Int64? Sequence { get; internal set; }
+        public Int64? Id { get; internal set; }
+
+        /// <summary>
+        /// Gets the time when the commit was persisted to the database.
+        /// </summary>
+        public DateTime Timestamp { get; private set; }
+
+        /// <summary>
+        /// The unique identifier associated with this commit.
+        /// </summary>
+        public Guid CorrelationId { get; private set; }
 
         /// <summary>
         /// The stream identifier associated with this commit.
@@ -41,11 +46,6 @@ namespace Spark.Infrastructure.EventStore
         /// Gets the current version of the event stream.
         /// </summary>
         public Int32 Version { get; private set; }
-
-        /// <summary>
-        /// Gets the time when the commit was persisted to the database.
-        /// </summary>
-        public DateTime Timestamp { get; private set; }
 
         /// <summary>
         /// Gets the set of commit headers associated with this commit.
@@ -60,33 +60,34 @@ namespace Spark.Infrastructure.EventStore
         /// <summary>
         /// Initializes a new instance of <see cref="Commit"/>.
         /// </summary>
-        /// <param name="id">The unique commit id.</param>
+        /// <param name="correlationId">The correlation id.</param>
         /// <param name="streamId">The event stream id.</param>
         /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
-        public Commit(Guid id, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
-            : this(id, null, SystemTime.Now, streamId, version, headers, events)
+        public Commit(Guid correlationId, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
+            : this(null, SystemTime.Now, correlationId, streamId, version, headers, events)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Commit"/>.
         /// </summary>
         /// <param name="id">The unique commit id.</param>
+        /// <param name="timestamp">The <see cref="DateTime"/> when the snapshot was persisted.</param>
+        /// <param name="correlationId">The correlation id.</param>
         /// <param name="streamId">The event stream id.</param>
         /// <param name="version">The event stream revision.</param>
         /// <param name="headers">The optional set of headers associated with this commit.</param>
         /// <param name="events">The optional set of events associated with this commit.</param>
-        /// <param name="timestamp">The <see cref="DateTime"/> when the snapshot was persisted.</param>
-        internal Commit(Guid id, Int64? sequence, DateTime timestamp, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
+        internal Commit(Int64? id, DateTime timestamp, Guid correlationId, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
         {
-            Verify.NotEqual(Guid.Empty, id, "id");
+            Verify.NotEqual(Guid.Empty, correlationId, "correlationId");
             Verify.NotEqual(Guid.Empty, streamId, "streamId");
             Verify.GreaterThan(0, version, "version");
 
             Id = id;
-            Sequence = sequence;
             Timestamp = timestamp;
+            CorrelationId = correlationId;
             StreamId = streamId;
             Version = version;
             Events = events ?? EventCollection.Empty;

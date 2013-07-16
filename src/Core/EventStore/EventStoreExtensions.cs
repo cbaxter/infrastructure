@@ -30,7 +30,7 @@ namespace Spark.Infrastructure.EventStore
         {
             Verify.NotNull(eventStore, "eventStore");
 
-            return new PagedResult<Commit>(Settings.Eventstore.PageSize, (lastResult, page) => eventStore.GetRange(lastResult == null ? 0L : lastResult.Sequence.GetValueOrDefault(), page.Take));
+            return new PagedResult<Commit>(Settings.Eventstore.PageSize, (lastResult, page) => eventStore.GetRange(lastResult == null ? 0L : lastResult.Id.GetValueOrDefault(), page.Take));
         }
 
         /// <summary>

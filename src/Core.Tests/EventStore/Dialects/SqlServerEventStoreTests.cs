@@ -97,7 +97,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             public void ThrowDuplicateCommitExceptionIfCommitAlreadyExists()
             {
                 var commit1 = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
-                var commit2 = new Commit(commit1.Id, Guid.NewGuid(), 2, HeaderCollection.Empty, EventCollection.Empty);
+                var commit2 = new Commit(commit1.CorrelationId, Guid.NewGuid(), 2, HeaderCollection.Empty, EventCollection.Empty);
 
                 EventStore.Save(commit1);
 
@@ -137,7 +137,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
 
                 EventStore.Save(commit);
-                EventStore.Migrate(commit.Id, new HeaderCollection(new Dictionary<String, String> { { "Key", "Value" } }), EventCollection.Empty);
+                EventStore.Migrate(commit.Id.GetValueOrDefault(), new HeaderCollection(new Dictionary<String, String> { { "Key", "Value" } }), EventCollection.Empty);
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Headers.Count);
             }
@@ -148,7 +148,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
 
                 EventStore.Save(commit);
-                EventStore.Migrate(commit.Id, HeaderCollection.Empty, new EventCollection(new[] { new FakeEvent() }));
+                EventStore.Migrate(commit.Id.GetValueOrDefault(), HeaderCollection.Empty, new EventCollection(new[] { new FakeEvent() }));
 
                 Assert.Equal(1, EventStore.GetStream(commit.StreamId).Single().Events.Count);
             }
@@ -210,7 +210,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 EventStore.Purge();
 
                 for (var i = 1; i <= 10; i++)
-                    EventStore.Save(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+                    EventStore.Save(new Commit(null, startTime.AddHours(i), Guid.NewGuid(), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
 
                 Assert.Equal(10, EventStore.GetAll().Count());
             }
@@ -226,15 +226,15 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var startTime = DateTime.UtcNow.AddHours(-20);
 
                 for (var i = 1; i <= 10; i++)
-                    commits.Add(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+                    commits.Add(new Commit(null, startTime.AddHours(i), Guid.NewGuid(), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
 
                 foreach (var commit in commits)
                     EventStore.Save(commit);
 
-                var lowerBound = commits[3].Sequence.GetValueOrDefault();
+                var lowerBound = commits[3].Id.GetValueOrDefault();
                 var range = EventStore.GetRange(lowerBound, 4);
-                Assert.Equal(lowerBound + 1, range.Min(m => m.Sequence.GetValueOrDefault()));
-                Assert.Equal(lowerBound + 4, range.Max(m => m.Sequence.GetValueOrDefault()));
+                Assert.Equal(lowerBound + 1, range.Min(m => m.Id.GetValueOrDefault()));
+                Assert.Equal(lowerBound + 4, range.Max(m => m.Id.GetValueOrDefault()));
             }
         }
 
@@ -246,8 +246,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var streamId = Guid.NewGuid();
                 var startTime = DateTime.UtcNow.Subtract(TimeSpan.FromHours(10));
                 for (var i = 1; i <= 10; i++)
-                    EventStore.Save(new Commit(Guid.NewGuid(), null, startTime.AddHours(i), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
-          
+                    EventStore.Save(new Commit(null, startTime.AddHours(i), Guid.NewGuid(), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+
                 Assert.Equal(7, EventStore.GetStream(streamId, 4).Count());
             }
         }

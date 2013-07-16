@@ -22,11 +22,11 @@ namespace Spark.Infrastructure.Tests.EventStore
         public class WhenCreatingNewCommit
         {
             [Fact]
-            public void CommitIdCannotBeEmptyGuid()
+            public void CorrelationIdCannotBeEmptyGuid()
             {
                 var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, Guid.NewGuid(), 1, null, null));
 
-                Assert.Equal("id", ex.ParamName);
+                Assert.Equal("correlationId", ex.ParamName);
             }
 
             [Fact]

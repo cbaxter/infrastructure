@@ -41,6 +41,9 @@ namespace Spark.Infrastructure.Eventing
             {
                 try
                 {
+                    //TODO: Consider using Commit.Id + Comment.Events.Count + i to create event message id (i.e., unique 16 bytes for commit, number of events in commit, and event within commit).
+                    //      Some of this may need to be on event envelope to ensure proper sequencing (i.e., id will ensure uniqueness, but may not be suitable for enfocing ordering???)
+
                     //DispatchEvent(commit.StreamId, commit.Headers, commit.Events[i]);
                 }
                 catch (TimeoutException)

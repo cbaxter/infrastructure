@@ -33,12 +33,12 @@ namespace Spark.Infrastructure.EventStore.Sql
         String EnsureDuplicateCommitsDetected { get; }
         String EnsureDuplicateCommitsSuppressed { get; }
 
-        DbParameter CreateIdParameter(Guid commitId);
+        DbParameter CreateIdParameter(Int64 id);
         DbParameter CreateTimestampParameter(DateTime timestamp);
+        DbParameter CreateCorrelationIdParameter(Guid correlationId);
         DbParameter CreateStreamIdParameter(Guid streamId);
         DbParameter CreateVersionParameter(Int32 version);
-        DbParameter CreateHeadersParameter(Byte[] headers);
-        DbParameter CreateEventsParameter(Byte[] events);
+        DbParameter CreateDataParameter(Byte[] data);
         DbParameter CreateSkipParameter(Int64 skip);
         DbParameter CreateTakeParameter(Int64 take);
     }

@@ -35,12 +35,12 @@ namespace Spark.Infrastructure.EventStore
         void Save(Commit commit);
 
         /// <summary>
-        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="commitId"/>.
+        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="id"/>.
         /// </summary>
-        /// <param name="commitId">The unique commit identifier.</param>
+        /// <param name="id">The unique commit identifier.</param>
         /// <param name="headers">The new commit headers.</param>
         /// <param name="events">The new commit events.</param>
-        void Migrate(Guid commitId, HeaderCollection headers, EventCollection events);
+        void Migrate(Int64 id, HeaderCollection headers, EventCollection events);
 
         /// <summary>
         /// Deletes all existing commits from the event store.
