@@ -82,6 +82,7 @@
     <Compile Include="EventStore\SnapshotStoreExtensions.cs" />
     <Compile Include="EventStore\Sql\DataRecordExtensions.cs" />
     <Compile Include="EventStore\Sql\DbCommandExtensions.cs" />
+    <Compile Include="EventStore\Sql\SqlBulkOperation.cs" />
     <Compile Include="EventStore\Sql\SqlDialectExtensions.cs" />
     <Compile Include="EventStore\Sql\DialectProvider.cs" />
     <Compile Include="EventStore\Sql\Dialects\SqlServerDialect.cs" />

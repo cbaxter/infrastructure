@@ -23,6 +23,16 @@ namespace Spark.Infrastructure.EventStore.Sql
     internal static class DbCommandExtensions
     {
         /// <summary>
+        /// Creates a new <see cref="DbCommand"/> that is a copy of the current instance.
+        /// </summary>
+        /// <param name="command">The <see cref="DbCommand"/> to clone.</param>
+        public static DbCommand Clone(this DbCommand command)
+        {
+            // NOTE: All known implementations of DbCommand also implement ICloneable; should this change method will need to be more robust.
+            return (DbCommand)((ICloneable)command).Clone();
+        }
+
+        /// <summary>
         /// Gets the value of the specified command parameter or null if not found.
         /// </summary>
         /// <param name="command">The command on which to locate a named parameter.</param>
