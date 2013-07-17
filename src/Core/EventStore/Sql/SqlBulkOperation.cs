@@ -104,8 +104,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <remarks>Value indices should map to the original command template parameter indicies.</remarks>
         public void Add(params Object[] values)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            Verify.NotDisposed(this, disposed);
 
             lock (buffer)
             {
@@ -121,8 +120,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         public void Flush()
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            Verify.NotDisposed(this, disposed);
 
             WriteBufferToDataStore();
         }

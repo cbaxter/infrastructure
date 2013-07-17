@@ -23,6 +23,18 @@ namespace Spark.Infrastructure
     public static class Verify
     {
         /// <summary>
+        /// Throws an <exception cref="ObjectDisposedException">ObjectDisposedException</exception> if <paramref name="disposed"/> is <value>true</value>.
+        /// </summary>
+        /// <param name="instance">The <see cref="IDisposable"/> instance.</param>
+        /// <param name="disposed">The flag indicating if the specified <paramref name="instance"/> has been disposed.</param>
+        public static void NotDisposed<T>(T instance, Boolean disposed)
+            where T : IDisposable
+        {
+            if (disposed)
+                throw new ObjectDisposedException(typeof(T).FullName);
+        }
+
+        /// <summary>
         /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="condition"/> is <value>false</value>.
         /// </summary>
         /// <param name="condition">The <see cref="Boolean"/> condition to check.</param>

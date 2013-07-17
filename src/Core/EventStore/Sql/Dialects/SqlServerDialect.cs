@@ -42,10 +42,13 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
         public String GetRange { get { return SqlServerDialectStatements.GetRange; } }
         public String GetStream { get { return SqlServerDialectStatements.GetStream; } }
         public String GetStreams { get { return SqlServerDialectStatements.GetStreams; } }
+        public String GetUndispatched { get { return SqlServerDialectStatements.GetUndispatched; } }
+        public String MarkDispatched { get { return SqlServerDialectStatements.MarkDispatched; } }
         public String InsertCommit { get { return SqlServerDialectStatements.InsertCommit; } }
         public String UpdateCommit { get { return SqlServerDialectStatements.UpdateCommit; } }
         public String DeleteStream { get { return SqlServerDialectStatements.DeleteStream; } }
         public String DeleteStreams { get { return SqlServerDialectStatements.PurgeCommits; } }
+
         public String EnsureCommitTableExists { get { return SqlServerDialectStatements.EnsureCommitTableExists; } }
         public String EnsureDuplicateCommitsDetected { get { return SqlServerDialectStatements.EnsureDuplicateCommitsDetected; } }
         public String EnsureDuplicateCommitsSuppressed { get { return SqlServerDialectStatements.EnsureDuplicateCommitsSuppressed; } }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using Autofac;
 using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.EventStore.Sql;
+using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 
@@ -39,6 +41,10 @@ namespace Example.Modules
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
 
             builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "AggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>();
+
+            //TODO: Cleanup...
+            builder.RegisterType<EventDispatcher>().As<PipelineHook>().SingleInstance();
+
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider

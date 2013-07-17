@@ -159,11 +159,20 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 0 AND [StreamId] &gt; @streamId ORDER BY [StreamId];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];.
         /// </summary>
         internal static string GetStreams {
             get {
                 return ResourceManager.GetString("GetStreams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];.
+        /// </summary>
+        internal static string GetUndispatched {
+            get {
+                return ResourceManager.GetString("GetUndispatched", resourceCulture);
             }
         }
         
@@ -182,6 +191,15 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         internal static string InsertSnapshot {
             get {
                 return ResourceManager.GetString("InsertSnapshot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE [Commit] SET [Dispatched] = 1 WHERE [Id] = @id;.
+        /// </summary>
+        internal static string MarkDispatched {
+            get {
+                return ResourceManager.GetString("MarkDispatched", resourceCulture);
             }
         }
         

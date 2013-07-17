@@ -84,19 +84,6 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
-        /// Initializes a new snapshot store.
-        /// </summary>
-        private void Initialize()
-        {
-            using (var command = dialect.CreateCommand(dialect.EnsureSnapshotTableExists))
-            {
-                Log.Trace("Initializing snapshot store");
-
-                dialect.ExecuteNonQuery(command);
-            }
-        }
-
-        /// <summary>
         /// Creates a <see cref="DataTable"/> based on the required insert/update command parameters.
         /// </summary>
         private static SqlBatchOperation CreateBuffer(IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
@@ -112,14 +99,26 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
+        /// Initializes a new snapshot store.
+        /// </summary>
+        private void Initialize()
+        {
+            using (var command = dialect.CreateCommand(dialect.EnsureSnapshotTableExists))
+            {
+                Log.Trace("Initializing snapshot store");
+
+                dialect.ExecuteNonQuery(command);
+            }
+        }
+
+        /// <summary>
         /// Gets the most recent snapshot for the specified <paramref name="streamId"/> and <paramref name="maximumVersion"/>.
         /// </summary>
         /// <param name="streamId">The unique stream identifier.</param>
         /// <param name="maximumVersion">The maximum snapshot version.</param>
         public Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            Verify.NotDisposed(this, disposed);
 
             using (var command = dialect.CreateCommand(dialect.GetSnapshot))
             {
@@ -138,8 +137,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="snapshot">The snapshot to save to the snapshot store.</param>
         public void Save(Snapshot snapshot)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            Verify.NotDisposed(this, disposed);
 
             if (useAsyncWrite)
             {
@@ -199,8 +197,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         public void Purge()
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            Verify.NotDisposed(this, disposed);
 
             using (var command = dialect.CreateCommand(dialect.DeleteSnapshots))
             {

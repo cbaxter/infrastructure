@@ -35,6 +35,12 @@ namespace Spark.Infrastructure.EventStore
         void Save(Commit commit);
 
         /// <summary>
+        /// Mark the specified commit as being dispatched.
+        /// </summary>
+        /// <param name="id">The unique commit identifier that has been dispatched.</param>
+        void MarkDispatched(Int64 id);
+
+        /// <summary>
         /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The unique commit identifier.</param>

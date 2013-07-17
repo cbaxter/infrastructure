@@ -25,13 +25,16 @@ namespace Spark.Infrastructure.EventStore.Sql
     /// <summary>
     /// An RDBMS event store.
     /// </summary>
-    public sealed class SqlEventStore : IStoreEvents
+    public sealed class SqlEventStore : IStoreEvents, IDisposable
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private readonly SqlBatchOperation dispatchedBuffer;
         private readonly Boolean detectDuplicateCommits;
         private readonly ISerializeObjects serializer;
         private readonly IEventStoreDialect dialect;
+        private readonly Boolean useAsyncWrite;
         private readonly Int64 pageSize;
+        private Boolean disposed;
 
         private static class Column
         {
@@ -67,9 +70,38 @@ namespace Spark.Infrastructure.EventStore.Sql
             this.dialect = dialect;
             this.serializer = serializer;
             this.pageSize = settings.PageSize;
+            this.useAsyncWrite = settings.Async;
             this.detectDuplicateCommits = settings.DetectDuplicateCommits;
+            this.dispatchedBuffer = settings.Async ? CreateBuffer(settings, dialect) : null;
 
             Initialize();
+        }
+
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="SqlSnapshotStore"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+
+            disposed = true;
+
+            if (useAsyncWrite)
+                dispatchedBuffer.Dispose();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataTable"/> based on the required insert/update command parameters.
+        /// </summary>
+        private static SqlBatchOperation CreateBuffer(IStoreEventSettings settings, IEventStoreDialect dialect)
+        {
+            using (var command = dialect.CreateCommand(dialect.MarkDispatched))
+            {
+                command.Parameters.Add(dialect.CreateIdParameter(default(Int64)));
+
+                return new SqlBatchOperation(dialect, command, settings.BatchSize, settings.FlushInterval);
+            }
         }
 
         /// <summary>
@@ -90,14 +122,43 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
-        /// Get the specified commit sequence range starting after <paramref name="skip"/> and returing <paramref name="take"/> commits.
+        /// Get all undispatched commits.
         /// </summary>
-        /// <param name="skip">The commit sequence lower bound (exclusive).</param>
+        public IEnumerable<Commit> GetUndispatched()
+        {
+            Verify.NotDisposed(this, disposed);
+
+            return new PagedResult<Commit>(pageSize, (lastResult, page) => GetUndispatchedAfter(lastResult != null && lastResult.Id.HasValue ? lastResult.Id.Value : 0, page.Take));
+        }
+
+        /// <summary>
+        /// Get a specified undispatched commit range starting after <paramref name="skip"/> and returing <paramref name="take"/> commits.
+        /// </summary>
+        /// <param name="skip">The commit id lower bound (exclusive).</param>
+        /// <param name="take">The number of commits to include in the result.</param>
+        private IEnumerable<Commit> GetUndispatchedAfter(Int64 skip, Int64 take)
+        {
+            using (var command = dialect.CreateCommand(dialect.GetUndispatched))
+            {
+                Log.TraceFormat("Getting next {0} undispatched commits after {1}", take, skip);
+
+                command.Parameters.Add(dialect.CreateSkipParameter(skip + 1));
+                command.Parameters.Add(dialect.CreateTakeParameter(take));
+
+                return dialect.QueryMultiple(command, CreateCommit);
+            }
+        }
+
+        /// <summary>
+        /// Get the specified commit range starting after <paramref name="skip"/> and returing <paramref name="take"/> commits.
+        /// </summary>
+        /// <param name="skip">The commit id lower bound (exclusive).</param>
         /// <param name="take">The number of commits to include in the result.</param>
         public IReadOnlyList<Commit> GetRange(Int64 skip, Int64 take)
         {
-            Verify.GreaterThanOrEqual(0, skip, "skip");
+            Verify.NotDisposed(this, disposed);
             Verify.GreaterThan(0, take, "take");
+            Verify.GreaterThanOrEqual(0, skip, "skip");
 
             using (var command = dialect.CreateCommand(dialect.GetRange))
             {
@@ -116,6 +177,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <remarks>This method is not safe to call on an active event store; only use when new streams are not being committed.</remarks>
         public IEnumerable<Guid> GetStreams()
         {
+            Verify.NotDisposed(this, disposed);
+
             return new PagedResult<Guid>(pageSize, (lastResult, page) => GetStreamsAfter(lastResult));
         }
 
@@ -143,6 +206,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="minimumVersion">The minimum stream version (inclusive).</param>
         public IEnumerable<Commit> GetStream(Guid streamId, Int32 minimumVersion)
         {
+            Verify.NotDisposed(this, disposed);
             Verify.GreaterThan(0, minimumVersion, "minimumVersion");
 
             return new PagedResult<Commit>(pageSize, (lastResult, page) => GetStreamFrom(streamId, lastResult == null ? minimumVersion : lastResult.Version + 1));
@@ -173,6 +237,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="streamId">The unique stream identifier.</param>
         public void DeleteStream(Guid streamId)
         {
+            Verify.NotDisposed(this, disposed);
+
             using (var command = dialect.CreateCommand(dialect.DeleteStream))
             {
                 Log.TraceFormat("Purging stream {0}", streamId);
@@ -189,6 +255,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="commit">The commit to append to the event store.</param>
         public void Save(Commit commit)
         {
+            Verify.NotDisposed(this, disposed);
             Verify.NotNull(commit, "commit");
 
             var data = serializer.Serialize(new CommitData(commit.Headers, commit.Events));
@@ -207,6 +274,31 @@ namespace Spark.Infrastructure.EventStore.Sql
         }
 
         /// <summary>
+        /// Mark the specified commit as being dispatched.
+        /// </summary>
+        /// <param name="id">The unique commit identifier that has been dispatched.</param>
+        public void MarkDispatched(Int64 id)
+        {
+            Verify.NotDisposed(this, disposed);
+
+            if (useAsyncWrite)
+            {
+                dispatchedBuffer.Add(id);
+            }
+            else
+            {
+                using (var command = dialect.CreateCommand(dialect.MarkDispatched))
+                {
+                    Log.TraceFormat("Marking commit {0} as dispatched", id);
+
+                    command.Parameters.Add(dialect.CreateIdParameter(id));
+
+                    dialect.ExecuteNonQuery(command);
+                }
+            }
+        }
+
+        /// <summary>
         /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The unique commit identifier.</param>
@@ -214,6 +306,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="events">The new commit events.</param>
         public void Migrate(Int64 id, HeaderCollection headers, EventCollection events)
         {
+            Verify.NotDisposed(this, disposed);
             Verify.NotNull(headers, "headers");
             Verify.NotNull(events, "events");
 
@@ -234,6 +327,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         public void Purge()
         {
+            Verify.NotDisposed(this, disposed);
+
             using (var command = dialect.CreateCommand(dialect.DeleteStreams))
             {
                 Log.Trace("Purging event store");

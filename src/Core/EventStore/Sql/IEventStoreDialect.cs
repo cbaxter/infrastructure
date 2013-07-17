@@ -24,6 +24,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         String GetRange { get; }
         String GetStream { get; }
         String GetStreams { get; }
+        String GetUndispatched { get; }
+        String MarkDispatched { get; }
         String InsertCommit { get; }
         String UpdateCommit { get; }
         String DeleteStream { get; }

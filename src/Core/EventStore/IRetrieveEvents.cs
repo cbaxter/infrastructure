@@ -22,6 +22,11 @@ namespace Spark.Infrastructure.EventStore
     public interface IRetrieveEvents
     {
         /// <summary>
+        /// Get all undispatched commits.
+        /// </summary>
+        IEnumerable<Commit> GetUndispatched();
+
+        /// <summary>
         /// Get all known stream identifiers.
         /// </summary>
         /// <remarks>This method is not safe to call on an active event store; only use when new streams are not being committed.</remarks>

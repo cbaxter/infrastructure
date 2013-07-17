@@ -136,7 +136,7 @@ BEGIN
         CONSTRAINT [UQ_Commit_StreamVersion] UNIQUE ([StreamId],[Version])
     );
 
-    CREATE NONCLUSTERED INDEX [IX_Commit_NotDispatched] ON [Commit]([Dispatched]) WHERE [Dispatched] = 0;
+    CREATE NONCLUSTERED INDEX [IX_Commit_NotDispatched] ON [Commit]([Dispatched],[Id]) WHERE [Dispatched] = 0;
 END;</value>
   </data>
   <data name="EnsureDuplicateCommitsDetected" xml:space="preserve">
@@ -173,13 +173,19 @@ END;</value>
     <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];</value>
   </data>
   <data name="GetStreams" xml:space="preserve">
-    <value>SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 0 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
+    <value>SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
+  </data>
+  <data name="GetUndispatched" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];</value>
   </data>
   <data name="InsertCommit" xml:space="preserve">
     <value>INSERT INTO [dbo].[Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);</value>
   </data>
   <data name="InsertSnapshot" xml:space="preserve">
     <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>
+  </data>
+  <data name="MarkDispatched" xml:space="preserve">
+    <value>UPDATE [Commit] SET [Dispatched] = 1 WHERE [Id] = @id;</value>
   </data>
   <data name="PurgeCommits" xml:space="preserve">
     <value>TRUNCATE TABLE [dbo].[Commit];</value>

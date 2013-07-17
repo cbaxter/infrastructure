@@ -91,6 +91,38 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             }
         }
 
+        public class WhenDisposingSnapshotStore : UsingInitializedEventStore
+        {
+
+            [SqlServerFactAttribute]
+            public void CanDisposeSynchronousStore()
+            {
+                var settings = new Mock<IStoreEventSettings>();
+                settings.Setup(mock => mock.Async).Returns(false);
+
+                new SqlEventStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanDisposeAsynchronousStore()
+            {
+                var settings = new Mock<IStoreEventSettings>();
+                settings.Setup(mock => mock.Async).Returns(true);
+
+                new SqlEventStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanSafelyCallDisposeMultipleTimes()
+            {
+                var snapshotStore = new SqlEventStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
+
+                snapshotStore.Dispose();
+
+                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+            }
+        }
+
         public class WhenSavingCommit : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -126,6 +158,20 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 EventStore.Save(commit2);
 
                 Assert.Equal(2, EventStore.GetStream(streamId).Count());
+            }
+        }
+
+        public class WhenMarkingCommitDispatched : UsingInitializedEventStore
+        {
+            [SqlServerFactAttribute]
+            public void CanPageOverCommits()
+            {
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty);
+
+                EventStore.Save(commit);
+                EventStore.MarkDispatched(commit.Id.GetValueOrDefault());
+
+                Assert.Equal(0, EventStore.GetUndispatched().Count(c => c.Id == commit.Id));
             }
         }
 
@@ -199,10 +245,27 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             }
         }
 
-        public class WhenGettingAllCommits : UsingInitializedEventStore
+        public class WhenGettingUndispatchedCommits : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
             public void CanPageOverAllCommits()
+            {
+                var streamId = Guid.NewGuid();
+                var startTime = DateTime.UtcNow.AddHours(-20);
+
+                EventStore.Purge();
+
+                for (var i = 1; i <= 10; i++)
+                    EventStore.Save(new Commit(null, startTime.AddHours(i), Guid.NewGuid(), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
+
+                Assert.Equal(10, EventStore.GetUndispatched().Count());
+            }
+        }
+
+        public class WhenGettingAllCommits : UsingInitializedEventStore
+        {
+            [SqlServerFactAttribute]
+            public void CanPageOverCommits()
             {
                 var streamId = Guid.NewGuid();
                 var startTime = DateTime.UtcNow.AddHours(-20);
@@ -245,10 +308,32 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             {
                 var streamId = Guid.NewGuid();
                 var startTime = DateTime.UtcNow.Subtract(TimeSpan.FromHours(10));
+                
+                EventStore.Purge();
+
                 for (var i = 1; i <= 10; i++)
                     EventStore.Save(new Commit(null, startTime.AddHours(i), Guid.NewGuid(), streamId, i, HeaderCollection.Empty, EventCollection.Empty));
 
                 Assert.Equal(7, EventStore.GetStream(streamId, 4).Count());
+            }
+        }
+
+        public class WhenGettingStreams : UsingInitializedEventStore
+        {
+            [SqlServerFactAttribute]
+            public void WillReturnDistinctStreamIds()
+            {
+                EventStore.Purge();
+
+                for (var i = 1; i <= 5; i++)
+                {
+                    var streamId = Guid.NewGuid();
+
+                    EventStore.Save(new Commit(null, SystemTime.GetTimestamp(), Guid.NewGuid(), streamId, 1, HeaderCollection.Empty, EventCollection.Empty));
+                    EventStore.Save(new Commit(null, SystemTime.GetTimestamp(), Guid.NewGuid(), streamId, 2, HeaderCollection.Empty, EventCollection.Empty));
+                }
+
+                Assert.Equal(5, EventStore.GetStreams().Count());
             }
         }
     }

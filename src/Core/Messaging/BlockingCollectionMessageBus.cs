@@ -110,10 +110,8 @@ namespace Spark.Infrastructure.Messaging
         /// <param name="message">The message to publish on the underlying message bus.</param>
         public void Send(Message<T> message)
         {
+            Verify.NotDisposed(this, disposed);
             Verify.NotNull(message, "message");
-
-            if (disposed)
-                throw new ObjectDisposedException(GetType().FullName);
 
             Log.TraceFormat("Sending message {0}", message.Id);
 
