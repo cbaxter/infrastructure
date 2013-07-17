@@ -62,7 +62,7 @@ namespace Spark.Infrastructure.EventStore.Sql
                 throw new InvalidOperationException(Exceptions.ConnectionProviderNotSpecified.FormatWith(connectionName));
 
             if (providerName.Equals("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase))
-                return new SqlServerDialect();
+                return new SqlServerDialect(connectionName);
 
             throw new NotSupportedException(Exceptions.UnknownDialect.FormatWith(providerName));
         }

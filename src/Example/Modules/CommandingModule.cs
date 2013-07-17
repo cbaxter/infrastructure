@@ -30,8 +30,8 @@ namespace Example.Modules
 
             builder.RegisterType<AggregateUpdater>().As<IApplyEvents>().SingleInstance();
             builder.RegisterType<AggregateStore>().Named<IStoreAggregates>("AggregateStore").SingleInstance();
-            builder.Register(context => new SqlEventStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreEvents>().SingleInstance();
-            builder.Register(context => new SqlSnapshotStore("eventStore", context.Resolve<ISerializeObjects>())).As<IStoreSnapshots>().SingleInstance();
+            builder.Register(context => new SqlEventStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreEvents>().SingleInstance();
+            builder.Register(context => new SqlSnapshotStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreSnapshots>().SingleInstance();
 
 
             builder.RegisterType<CommandReceiver>().AsSelf().SingleInstance();

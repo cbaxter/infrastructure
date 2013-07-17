@@ -25,10 +25,11 @@ namespace Spark.Infrastructure.EventStore.Sql
     /// <summary>
     /// An RDBMS event store.
     /// </summary>
-    public sealed class SqlEventStore : SqlStore, IStoreEvents
+    public sealed class SqlEventStore : IStoreEvents
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly Boolean detectDuplicateCommits;
+        private readonly ISerializeObjects serializer;
         private readonly IEventStoreDialect dialect;
         private readonly Int64 pageSize;
 
@@ -45,26 +46,26 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <summary>
         /// Initializes a new instance of <see cref="SqlEventStore"/>.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        public SqlEventStore(String connectionName, ISerializeObjects serializer)
-            : this(connectionName, serializer, Settings.Eventstore, DialectProvider.GetEventStoreDialect(connectionName))
+        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
+        public SqlEventStore(ISerializeObjects serializer, String connectionName)
+            : this(serializer, Settings.Eventstore, DialectProvider.GetEventStoreDialect(connectionName))
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlEventStore"/> with a custom <see cref="IEventStoreDialect"/>.
         /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="settings">The event store settings.</param>
-        /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal SqlEventStore(String connectionName, ISerializeObjects serializer, IStoreEventSettings settings, IEventStoreDialect dialect)
-            : base(connectionName, serializer, dialect)
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlEventStore"/>.</param>
+        internal SqlEventStore(ISerializeObjects serializer, IStoreEventSettings settings, IEventStoreDialect dialect)
         {
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(serializer, "serializer");
             Verify.NotNull(settings, "settings");
+            Verify.NotNull(dialect, "dialect");
 
             this.dialect = dialect;
+            this.serializer = serializer;
             this.pageSize = settings.PageSize;
             this.detectDuplicateCommits = settings.DetectDuplicateCommits;
 
@@ -78,14 +79,14 @@ namespace Spark.Infrastructure.EventStore.Sql
         {
             Log.Trace("Initializing event store");
 
-            using (var command = CreateCommand(dialect.EnsureCommitTableExists))
-                ExecuteNonQuery(command);
+            using (var command = dialect.CreateCommand(dialect.EnsureCommitTableExists))
+                dialect.ExecuteNonQuery(command);
 
             // NOTE: Most durable message queues ensure `at least once` delivery of messages; however when using an internal message 
             //       queue (i.e., BlockingCollection) or non-durable message queue (i.e., IPC via named pipes) duplicate commits may 
             //       not need to be enforced. Allow additional commit ID unique index be created/droped as desired.
-            using (var command = CreateCommand(detectDuplicateCommits ? dialect.EnsureDuplicateCommitsDetected : dialect.EnsureDuplicateCommitsSuppressed))
-                ExecuteNonQuery(command);
+            using (var command = dialect.CreateCommand(detectDuplicateCommits ? dialect.EnsureDuplicateCommitsDetected : dialect.EnsureDuplicateCommitsSuppressed))
+                dialect.ExecuteNonQuery(command);
         }
 
         /// <summary>
@@ -98,14 +99,14 @@ namespace Spark.Infrastructure.EventStore.Sql
             Verify.GreaterThanOrEqual(0, skip, "skip");
             Verify.GreaterThan(0, take, "take");
 
-            using (var command = CreateCommand(dialect.GetRange))
+            using (var command = dialect.CreateCommand(dialect.GetRange))
             {
                 Log.TraceFormat("Getting next {0} commits after {1}", take, skip);
 
                 command.Parameters.Add(dialect.CreateSkipParameter(skip + 1));
                 command.Parameters.Add(dialect.CreateTakeParameter(take));
 
-                return QueryMultiple(command, CreateCommit);
+                return dialect.QueryMultiple(command, CreateCommit);
             }
         }
 
@@ -124,14 +125,14 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="streamId">The last ordered stream identifier from the previous result page.</param>
         private IEnumerable<Guid> GetStreamsAfter(Guid streamId)
         {
-            using (var command = CreateCommand(dialect.GetStreams))
+            using (var command = dialect.CreateCommand(dialect.GetStreams))
             {
                 Log.TraceFormat("Getting next {0} stream identifiers after {1}", pageSize, streamId);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateTakeParameter(pageSize));
 
-                return QueryMultiple(command, record => record.GetGuid(0));
+                return dialect.QueryMultiple(command, record => record.GetGuid(0));
             }
         }
 
@@ -154,7 +155,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="minimumVersion">The minimum stream version (inclusive).</param>
         private IEnumerable<Commit> GetStreamFrom(Guid streamId, Int32 minimumVersion)
         {
-            using (var command = CreateCommand(dialect.GetStream))
+            using (var command = dialect.CreateCommand(dialect.GetStream))
             {
                 Log.TraceFormat("Getting next {0} commits for stream {1} from version {2}", pageSize, streamId, minimumVersion);
 
@@ -162,7 +163,7 @@ namespace Spark.Infrastructure.EventStore.Sql
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateTakeParameter(pageSize));
 
-                return QueryMultiple(command, CreateCommit);
+                return dialect.QueryMultiple(command, CreateCommit);
             }
         }
 
@@ -172,13 +173,13 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="streamId">The unique stream identifier.</param>
         public void DeleteStream(Guid streamId)
         {
-            using (var command = CreateCommand(dialect.DeleteStream))
+            using (var command = dialect.CreateCommand(dialect.DeleteStream))
             {
                 Log.TraceFormat("Purging stream {0}", streamId);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
 
-                ExecuteNonQuery(command);
+                dialect.ExecuteNonQuery(command);
             }
         }
 
@@ -190,8 +191,8 @@ namespace Spark.Infrastructure.EventStore.Sql
         {
             Verify.NotNull(commit, "commit");
 
-            var data = Serialize(new CommitData(commit.Headers, commit.Events));
-            using (var command = CreateCommand(dialect.InsertCommit))
+            var data = serializer.Serialize(new CommitData(commit.Headers, commit.Events));
+            using (var command = dialect.CreateCommand(dialect.InsertCommit))
             {
                 Log.TraceFormat("Inserting stream {0} commit for version {1}", commit.StreamId, commit.Version);
 
@@ -201,7 +202,7 @@ namespace Spark.Infrastructure.EventStore.Sql
                 command.Parameters.Add(dialect.CreateVersionParameter(commit.Version));
                 command.Parameters.Add(dialect.CreateDataParameter(data));
 
-                commit.Id = Convert.ToInt64(ExecuteScalar(command));
+                commit.Id = Convert.ToInt64(dialect.ExecuteScalar(command));
             }
         }
 
@@ -216,15 +217,15 @@ namespace Spark.Infrastructure.EventStore.Sql
             Verify.NotNull(headers, "headers");
             Verify.NotNull(events, "events");
 
-            var data = Serialize(new CommitData(headers, events));
-            using (var command = CreateCommand(dialect.UpdateCommit))
+            var data = serializer.Serialize(new CommitData(headers, events));
+            using (var command = dialect.CreateCommand(dialect.UpdateCommit))
             {
                 Log.TraceFormat("Updating commit {0}", id);
 
                 command.Parameters.Add(dialect.CreateIdParameter(id));
                 command.Parameters.Add(dialect.CreateDataParameter(data));
 
-                ExecuteNonQuery(command);
+                dialect.ExecuteNonQuery(command);
             }
         }
 
@@ -233,11 +234,11 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// </summary>
         public void Purge()
         {
-            using (var command = CreateCommand(dialect.DeleteStreams))
+            using (var command = dialect.CreateCommand(dialect.DeleteStreams))
             {
                 Log.Trace("Purging event store");
 
-                ExecuteNonQuery(command);
+                dialect.ExecuteNonQuery(command);
             }
         }
 
@@ -252,7 +253,7 @@ namespace Spark.Infrastructure.EventStore.Sql
             var correlationId = record.GetGuid(Column.CorrelationId);
             var streamId = record.GetGuid(Column.StreamId);
             var version = record.GetInt32(Column.Version);
-            var data = Deserialize<CommitData>(record.GetBytes(Column.Data));
+            var data = serializer.Deserialize<CommitData>(record.GetBytes(Column.Data));
 
             return new Commit(id, timestamp, correlationId, streamId, version, data.Headers, data.Events);
         }

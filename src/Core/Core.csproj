@@ -82,6 +82,7 @@
     <Compile Include="EventStore\SnapshotStoreExtensions.cs" />
     <Compile Include="EventStore\Sql\DataRecordExtensions.cs" />
     <Compile Include="EventStore\Sql\DbCommandExtensions.cs" />
+    <Compile Include="EventStore\Sql\SqlDialectExtensions.cs" />
     <Compile Include="EventStore\Sql\DialectProvider.cs" />
     <Compile Include="EventStore\Sql\Dialects\SqlServerDialect.cs" />
     <Compile Include="EventStore\Sql\Dialects\SqlServerDialectStatements.Designer.cs">
@@ -95,7 +96,6 @@
     <Compile Include="EventStore\Sql\ISqlDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
-    <Compile Include="EventStore\Sql\SqlStore.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />

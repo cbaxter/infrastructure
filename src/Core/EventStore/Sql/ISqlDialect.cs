@@ -27,6 +27,11 @@ namespace Spark.Infrastructure.EventStore.Sql
         DbProviderFactory Provider { get; }
 
         /// <summary>
+        /// Get the connection string for this SQL dialect.
+        /// </summary>
+        String ConnectionString { get; }
+
+        /// <summary>
         /// Translate the specified <see cref="DbException"/> if required.
         /// </summary>
         /// <param name="command">The <see cref="DbCommand"/> that generated the exception.</param>

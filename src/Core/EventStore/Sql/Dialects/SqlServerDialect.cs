@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -24,9 +25,18 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects
         private const Int32 Max = -1;
         private const Int32 UniqueIndexViolation = 2601;
         private const Int32 UniqueConstraintViolation = 2627;
+        private readonly String connectionString;
+
+        public SqlServerDialect(String connectionName)
+        {
+            Verify.NotNullOrWhiteSpace(connectionName, "connectionName");
+
+            connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
+        }
 
         // Database Provider
         public DbProviderFactory Provider { get { return SqlClientFactory.Instance; } }
+        public String ConnectionString { get { return connectionString; } }
 
         // IEventStoreDialect
         public String GetRange { get { return SqlServerDialectStatements.GetRange; } }

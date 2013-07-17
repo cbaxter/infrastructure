@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 Settings.Setup(mock => mock.PageSize).Returns(5);
                 Settings.Setup(mock => mock.DetectDuplicateCommits).Returns(true);
 
-                EventStore = new SqlEventStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
+                EventStore = new SqlEventStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
             }
 
             public void Dispose()
@@ -57,15 +57,15 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
-                Assert.DoesNotThrow(() => new SqlEventStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
                 Assert.True(TableExists());
             }
 

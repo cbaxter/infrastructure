@@ -47,7 +47,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 Settings.Setup(mock => mock.ReplaceExisting).Returns(replaceExisting);
                 Settings.Setup(mock => mock.FlushInterval).Returns(TimeSpan.FromMilliseconds(20));
 
-                SnapshotStore = new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
+                SnapshotStore = new SqlSnapshotStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
             }
 
             public void Dispose()
@@ -63,15 +63,15 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
                 Assert.True(TableExists());
             }
 
@@ -106,7 +106,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var settings = new Mock<IStoreSnapshotSettings>();
                 settings.Setup(mock => mock.Async).Returns(false);
 
-                new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), settings.Object, new SqlServerDialect()).Dispose();
+                new SqlSnapshotStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
@@ -115,13 +115,13 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var settings = new Mock<IStoreSnapshotSettings>();
                 settings.Setup(mock => mock.Async).Returns(true);
 
-                new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), settings.Object, new SqlServerDialect()).Dispose();
+                new SqlSnapshotStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), Settings.Object, new SqlServerDialect());
+                var snapshotStore = new SqlSnapshotStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
 
                 snapshotStore.Dispose();
 

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using Spark.Infrastructure.Serialization;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -23,35 +21,15 @@ using Spark.Infrastructure.Serialization;
 namespace Spark.Infrastructure.EventStore.Sql
 {
     /// <summary>
-    /// An SQL data sore.
+    /// Extension methods of <see cref="ISqlDialect"/>.
     /// </summary>
-    public abstract class SqlStore
+    internal static class SqlDialectExtensions
     {
-        private readonly ISerializeObjects serializer;
-        private readonly String connectionString;
-        private readonly ISqlDialect dialect;
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="SqlStore"/>.
-        /// </summary>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlStore"/>.</param>
-        /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        /// <param name="dialect">The database dialect associated with the <paramref name="connectionName"/>.</param>
-        internal SqlStore(String connectionName, ISerializeObjects serializer, ISqlDialect dialect)
-        {
-            Verify.NotNull(dialect, "dialect");
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNullOrWhiteSpace(connectionName, "connectionName");
-
-            this.dialect = dialect;
-            this.serializer = serializer;
-            this.connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
-        }
-
         /// <summary>
         /// Opens a new database connection.
         /// </summary>
-        protected virtual DbConnection OpenConnection()
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        public static DbConnection OpenConnection(this ISqlDialect dialect)
         {
             var connection = dialect.Provider.CreateConnection();
 
@@ -59,7 +37,7 @@ namespace Spark.Infrastructure.EventStore.Sql
 
             try
             {
-                connection.ConnectionString = connectionString;
+                connection.ConnectionString = dialect.ConnectionString;
                 connection.Open();
             }
             catch (Exception)
@@ -74,8 +52,9 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <summary>
         /// Creates a new database command.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="commandText">The SQL statement associated with this <see cref="DbCommand"/>.</param>
-        protected virtual DbCommand CreateCommand(String commandText)
+        public static DbCommand CreateCommand(this ISqlDialect dialect, String commandText)
         {
             var command = dialect.Provider.CreateCommand();
 
@@ -89,39 +68,43 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <summary>
         /// Executes a SQL statement against a connection object.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
-        protected Int32 ExecuteNonQuery(DbCommand command)
+        public static Int32 ExecuteNonQuery(this ISqlDialect dialect, DbCommand command)
         {
-            return ExecuteCommand(command, command.ExecuteNonQuery);
+            return dialect.ExecuteCommand(command, command.ExecuteNonQuery);
         }
 
         /// <summary>
         /// Executes the query and returns the first column of the first row in the result set returned by the query. All other columns and rows are ignored.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
-        protected Object ExecuteScalar(DbCommand command)
+        public static Object ExecuteScalar(this ISqlDialect dialect, DbCommand command)
         {
-            return ExecuteCommand(command, command.ExecuteScalar);
+            return dialect.ExecuteCommand(command, command.ExecuteScalar);
         }
 
         /// <summary>
         /// Queries the databse for a single database record returning default <typeparamref name="T"/> if not found.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="recordBuilder">The record builder that maps an <see cref="IDataRecord"/> to <typeparamref name="T"/>.</param>
-        protected T QuerySingle<T>(DbCommand command, Func<IDataRecord, T> recordBuilder)
+        public static T QuerySingle<T>(this ISqlDialect dialect, DbCommand command, Func<IDataRecord, T> recordBuilder)
         {
-            return ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult | CommandBehavior.SingleRow, recordBuilder).SingleOrDefault());
+            return dialect.ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult | CommandBehavior.SingleRow, recordBuilder).SingleOrDefault());
         }
 
         /// <summary>
         /// Queries the databse for a zero or more database records.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="recordBuilder">The record builder that maps an <see cref="IDataRecord"/> to <typeparamref name="T"/>.</param>
-        protected List<T> QueryMultiple<T>(DbCommand command, Func<IDataRecord, T> recordBuilder)
+        public static List<T> QueryMultiple<T>(this ISqlDialect dialect, DbCommand command, Func<IDataRecord, T> recordBuilder)
         {
-            return ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult, recordBuilder));
+            return dialect.ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult, recordBuilder));
         }
 
         /// <summary>
@@ -147,15 +130,16 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <summary>
         /// Executes the specified command.
         /// </summary>
+        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="executor">The executor used to execute the command.</param>
-        private TResult ExecuteCommand<TResult>(DbCommand command, Func<TResult> executor)
+        private static TResult ExecuteCommand<TResult>(this ISqlDialect dialect, DbCommand command, Func<TResult> executor)
         {
             TResult result;
 
             try
             {
-                using (var connection = OpenConnection())
+                using (var connection = dialect.OpenConnection())
                 using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     command.Connection = connection;
@@ -172,24 +156,6 @@ namespace Spark.Infrastructure.EventStore.Sql
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Serializes an object graph to binary data.
-        /// </summary>
-        /// <param name="graph">The object graph to serialize.</param>
-        protected Byte[] Serialize<T>(T graph)
-        {
-            return serializer.Serialize(graph);
-        }
-
-        /// <summary>
-        /// Deserializes a binary field in to an object graph.
-        /// </summary>
-        /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
-        protected T Deserialize<T>(Byte[] buffer)
-        {
-            return serializer.Deserialize<T>(buffer);
         }
     }
 }
