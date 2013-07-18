@@ -23,7 +23,7 @@
         <Delete Files="@(CleanFiles)" TreatErrorsAsWarnings="true" />
     </Target>
 
-    <Target Name="StampVersionInfo" DependsOnTargets="Clean">
+    <Target Name="StampVersionInfo" DependsOnTargets="Clean"> 
         <PropertyGroup>
             <GetBuildDateScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Date.Subtract(new DateTime(2012, 11, 18)).TotalDays).ToString(); } ]]></GetBuildDateScript>
             <GetBuildTimeScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Subtract(DateTime.Today).TotalMinutes).ToString(); } ]]></GetBuildTimeScript>

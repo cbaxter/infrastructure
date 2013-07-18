@@ -5,37 +5,38 @@ using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Resources;
 
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
 namespace Spark.Infrastructure.Domain
 {
-    public abstract class Aggregate
+    /// <summary>
+    /// A collection of <see cref="Entity"/> objects that are bound together by this root entity.
+    /// </summary>
+    public abstract class Aggregate : Entity
     {
-        //TODO: Confirm read-Only Properties not serialized --> http://docs.mongodb.org/ecosystem/tutorial/serialize-documents-with-the-csharp-driver/
+        [NonSerialized]
+        private Int32 version;
 
-        //TODO: Serialize Aggregate/Entity by converting all non-readonly fields in to dictionary or something... have overridable methods for Serialize and Deserialize
-        //      that can be used for explicit mappings if required.
-        [NonHashed]
+        [NonSerialized, NonHashed]
         private Guid checksum;
 
-        public Guid Id { get; internal set; } //TODO: Ensure not serialized in snapshot
-
-        public Int32 Version { get; internal set; } //TODO: Ensure not serialized in snapshot
+        /// <summary>
+        /// The aggregate revision.
+        /// </summary>
+        [IgnoreDataMember]
+        public Int32 Version { get { return version; } internal set { version = value; } }
         
-        protected void Notify(Event e)
-        {
-            var context = CommandContext.Current;
-            if (context == null)
-                throw null;
-
-            //TODO: Move to entity base class to allow events to be raised anywhere within aggregate root... apply will still have to be on aggregate until I think up a way to map to entities...
-            context.Raise(e);
-        }
-
-        // could use expressions to get/set all non-readonly fields of aggregate... can be wrapped in overridable method where explicit mapping required (medium trust).
-        // will likely need for Entity as well... or somehow magic map... 
-
-        // Start Stable Code (Aggregate not finished).
-        //--------------------------------------------
-
         /// <summary>
         /// Creates a deep-copy of the current aggregate object graph by traversing all public and non-public fields.
         /// </summary>
