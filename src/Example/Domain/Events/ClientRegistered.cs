@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Spark.Infrastructure;
-using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Eventing;
 
-namespace Example.Domain.Commands
+namespace Example.Domain.Events
 {
     [DataContract]
-    public sealed class RegisterClient : Command
+    public sealed class ClientRegistered : Event
     {
         [DataMember(Name = "n")]
         public String Name { get; private set; }
 
-        public RegisterClient(String name)
+        public ClientRegistered(String name)
         {
             Verify.NotNullOrWhiteSpace(name, "name");
 

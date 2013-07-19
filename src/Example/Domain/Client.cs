@@ -1,4 +1,5 @@
 ﻿using Example.Domain.Commands;
+using Example.Domain.Events;
 using Spark.Infrastructure.Domain;
 
 namespace Example.Domain
@@ -8,6 +9,8 @@ namespace Example.Domain
         public void Handle(RegisterClient command)
         {
             //TODO: Should really enforce new aggregate... CreateWith(...)
+
+            Raise(new ClientRegistered(command.Name));
         }
     }
 }

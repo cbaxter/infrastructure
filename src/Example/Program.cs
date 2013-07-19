@@ -8,6 +8,7 @@ using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.EventStore.Sql;
 using Spark.Infrastructure.EventStore.Sql.Dialects;
 
 namespace Example
@@ -26,12 +27,11 @@ namespace Example
             builder.RegisterInstance(benchmarkHook).As<PipelineHook>();
 
             var container = builder.Build();
-
             var commandReceiver = container.Resolve<CommandReceiver>();
             var commandPublisher = container.Resolve<IPublishCommands>();
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
-            
+
             Console.WriteLine("Purging event store...");
             eventStore.Purge();
 
@@ -42,6 +42,9 @@ namespace Example
                 commandPublisher.Publish(GuidStrategy.NewGuid(), new RegisterClient("User #" + i.ToString("{0:00000}")));
 
             benchmarkHook.WaitForCommandDrain();
+
+            ((SqlSnapshotStore)container.Resolve<IStoreSnapshots>()).Dispose();
+            ((SqlEventStore)container.Resolve<IStoreEvents>()).Dispose();
         }
 
         public class BenchmarkHook : PipelineHook

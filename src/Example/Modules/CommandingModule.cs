@@ -40,11 +40,11 @@ namespace Example.Modules
             builder.RegisterType<CommandProcessor>().As<IProcessCommands>().SingleInstance();
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
 
-            builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "AggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>();
+            builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new CachedAggregateStore(aggregateStore), "AggregateStore").Named<IStoreAggregates>("CachedAggregateStore").SingleInstance();
+            builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedAggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
 
             //TODO: Cleanup...
             builder.RegisterType<EventDispatcher>().As<PipelineHook>().SingleInstance();
-
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider
