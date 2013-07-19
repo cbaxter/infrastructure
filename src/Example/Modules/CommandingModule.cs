@@ -45,6 +45,8 @@ namespace Example.Modules
 
             //TODO: Cleanup...
             builder.RegisterType<EventDispatcher>().As<PipelineHook>().SingleInstance();
+            builder.RegisterType<BlockingCollectionMessageBus<EventEnvelope>>().As<ISendMessages<EventEnvelope>>().As<IReceiveMessages<EventEnvelope>>().SingleInstance();
+            builder.RegisterType<EventPublisher>().As<IPublishEvents>().SingleInstance();
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider

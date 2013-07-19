@@ -76,7 +76,11 @@
     <Compile Include="Domain\Entity.cs" />
     <Compile Include="Domain\EntityCollection.cs" />
     <Compile Include="Domain\SaveResult.cs" />
+    <Compile Include="Eventing\EventPublisher.cs" />
+    <Compile Include="Eventing\EventEnvelope.cs" />
     <Compile Include="Eventing\EventContext.cs" />
+    <Compile Include="Eventing\EventVersion.cs" />
+    <Compile Include="Eventing\IPublishEvents.cs" />
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />

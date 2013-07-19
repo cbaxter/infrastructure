@@ -23,7 +23,7 @@ using CommandMessage = Spark.Infrastructure.Messaging.Message<Spark.Infrastructu
 namespace Spark.Infrastructure.Commanding
 {
     /// <summary>
-    ///  Publishes commands from the underlying <see cref="Command"/> message bus and delegates to a <see cref="IProcessCommands"/> instance.
+    /// Receives commands from the underlying <see cref="Command"/> message bus and delegates to a <see cref="IProcessCommands"/> instance.
     /// </summary>
     public sealed class CommandReceiver : IDisposable
     {
