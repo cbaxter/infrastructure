@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Spark.Infrastructure.Domain;
+﻿using System.Collections.Generic;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
 
@@ -43,18 +41,17 @@ namespace Spark.Infrastructure.Commanding
         }
 
         /// <summary>
-        /// Publishes the specified <paramref name="command"/> on the underlying message bus.
+        /// Publishes the specified <paramref name="payload"/> on the underlying message bus.
         /// </summary>
-        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
-        /// <param name="command">The command to be published.</param>
         /// <param name="headers">The set of message headers associated with the command.</param>
-        public void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers)
+        /// <param name="payload">The command payload to be published.</param>
+        public void Publish(IEnumerable<Header> headers, CommandEnvelope payload)
         {
-            Verify.NotNull(command, "command");
+            Verify.NotNull(payload, "payload");
 
-            Log.TraceFormat("Publishing {0} to {1}", command, aggregateId);
+            Log.TraceFormat("Publishing {0} to {1}", payload.Command, payload.AggregateId);
 
-            messageSender.Send(messageFactory.Create(headers, new CommandEnvelope(aggregateId, command)));
+            messageSender.Send(messageFactory.Create(headers, payload));
         }
     }
 }

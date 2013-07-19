@@ -24,12 +24,11 @@ namespace Spark.Infrastructure.Commanding
     public interface IPublishCommands
     {
         /// <summary>
-        /// Publishes the specified <paramref name="command"/> on the underlying message bus.
+        /// Publishes the specified <paramref name="payload"/> on the underlying message bus.
         /// </summary>
-        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
-        /// <param name="command">The command to be published.</param>
         /// <param name="headers">The set of message headers associated with the command.</param>
-        void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers);
+        /// <param name="payload">The command payload to be published.</param>
+        void Publish(IEnumerable<Header> headers, CommandEnvelope payload);
     }
 
     /// <summary>
@@ -47,7 +46,7 @@ namespace Spark.Infrastructure.Commanding
         {
             Verify.NotNull(publisher, "publisher");
 
-            publisher.Publish(aggregateId, command, null);
+            publisher.Publish(null, new CommandEnvelope(aggregateId, command));
         }
 
         /// <summary>
@@ -61,7 +60,22 @@ namespace Spark.Infrastructure.Commanding
         {
             Verify.NotNull(publisher, "publisher");
 
-            publisher.Publish(aggregateId, command, headers);
+            publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
+        }
+
+
+        /// <summary>
+        /// Publishes the specified <paramref name="command"/> on the underlying message bus.
+        /// </summary>
+        /// <param name="publisher">The command publisher.</param>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
+        /// <param name="command">The command to be published.</param>
+        /// <param name="headers">The set of message headers associated with the command.</param>
+        public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command, IEnumerable<Header> headers)
+        {
+            Verify.NotNull(publisher, "publisher");
+
+            publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
         }
     }
 }

@@ -95,7 +95,7 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 publisher.Object.Publish(aggregateId, command);
 
-                publisher.Verify(mock => mock.Publish(aggregateId, command, null), Times.Once());
+                publisher.Verify(mock => mock.Publish(null, It.IsAny<CommandEnvelope>()), Times.Once());
             }
 
             [Fact]
@@ -108,7 +108,20 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 publisher.Object.Publish(aggregateId, command, header);
 
-                publisher.Verify(mock => mock.Publish(aggregateId, command, It.Is<Header[]>(headers => Equals(headers.Single(), header))), Times.Once());
+                publisher.Verify(mock => mock.Publish(It.Is<Header[]>(headers => Equals(headers.Single(), header)), It.IsAny<CommandEnvelope>()), Times.Once());
+            }
+
+            [Fact]
+            public void UseHeadersOverloadWhenAvailable()
+            {
+                var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
+                var publisher = new Mock<IPublishCommands>();
+                var header = new Header("MyHeader", "MyValue");
+
+                publisher.Object.Publish(aggregateId, command, new[] { header });
+
+                publisher.Verify(mock => mock.Publish(It.Is<Header[]>(headers => Equals(headers.Single(), header)), It.IsAny<CommandEnvelope>()), Times.Once());
             }
         }
 
