@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Spark.Infrastructure.Commanding;
@@ -78,7 +79,21 @@ namespace Spark.Infrastructure.Domain
                     throw new MemberAccessException(Exceptions.StateAccessException.FormatWith(Id));
             }
         }
-        
+
+        /// <summary>
+        /// Get the underlying <see cref="Aggregate"/> mutable state information.
+        /// </summary>
+        protected internal override IDictionary<String, Object> GetState()
+        {
+            var state = base.GetState();
+
+            // NOTE: Although entities consider the ID as a part of their state; aggregates are the exception.
+            //       Remove the `id` attribute from state if required to avoid duplicate representation.
+            state.Remove(Property.Id);
+
+            return state;
+        }
+
         /// <summary>
         /// Returns the <see cref="Aggregate"/> description for this instance.
         /// </summary>

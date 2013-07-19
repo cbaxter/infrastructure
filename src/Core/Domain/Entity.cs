@@ -25,14 +25,16 @@ namespace Spark.Infrastructure.Domain
     /// </summary>
     public abstract class Entity
     {
-        [NonSerialized]
-        private Guid id;
+        protected static class Property
+        {
+            public const String Id = "id";
+        }
 
         /// <summary>
         /// The unique entity identifier.
         /// </summary>
-        [IgnoreDataMember]
-        public Guid Id { get { return id; } internal set { id = value; } }
+        [DataMember(Name = Property.Id)]
+        public Guid Id { get; internal set; }
 
         /// <summary>
         /// Raises the specified event.
@@ -50,11 +52,24 @@ namespace Spark.Infrastructure.Domain
         }
 
         /// <summary>
+        /// Get the <see cref="Entity"/> field type for the specified attribute <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the field.</param>
+        protected internal virtual Type GetFieldType(String name)
+        {
+            var type = ObjectMapper.GetFieldType(GetType(), name);
+
+            return type;
+        }
+
+        /// <summary>
         /// Get the underlying <see cref="Entity"/> mutable state information.
         /// </summary>
         protected internal virtual IDictionary<String, Object> GetState()
         {
-            return ObjectMapper.GetState(this);
+            var state = ObjectMapper.GetState(this);
+
+            return state;
         }
 
         /// <summary>

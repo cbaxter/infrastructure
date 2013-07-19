@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Newtonsoft.Json;
 using Spark.Infrastructure.Domain;
 
@@ -28,13 +29,42 @@ namespace Spark.Infrastructure.Serialization.Converters
         private static readonly Type EntityType = typeof(Entity);
         private static readonly IDictionary<Type, String> TypeShortAssemblyQualifiedName = new ConcurrentDictionary<Type, String>();
 
+        // NOTE: Serialization Guide: http://james.newtonking.com/projects/json/help/index.html?topic=html/SerializationGuide.htm
+        private static readonly HashSet<Type> ImplicitTypes = new HashSet<Type>
+            {
+                //String
+                typeof(String),
+
+                // Integer
+                typeof(Byte),
+                typeof(SByte), 
+                typeof(UInt16), 
+                typeof(Int16), 
+                typeof(UInt32), 
+                typeof(Int32), 
+                typeof(UInt64),
+                typeof(Int64), 
+
+                // Float
+                typeof(Single),
+                typeof(Double), 
+                typeof(Decimal), 
+
+                // Other
+                typeof(Byte[]), 
+                typeof(DateTime), 
+                typeof(Guid), 
+                typeof(Type),
+                typeof(TypeConverter)
+            };
+
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
         /// </summary>
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == EntityType;
+            return EntityType.IsAssignableFrom(objectType); //TODO: Will want to introduce an interface that may be shared with Saga as well (since will require identical handling).
         }
 
         /// <summary>
@@ -84,43 +114,22 @@ namespace Spark.Infrastructure.Serialization.Converters
             if (!reader.CanReadObject())
                 return null;
 
+            var propertyName = String.Empty;
+            while (reader.Read() && reader.TokenType != JsonToken.EndObject && !reader.TryGetProperty(out propertyName))
+                continue; //NOTE: Given that JSON.NET expects `$type` to be the first property, we can make the same assumption to keep life simple.
+
+            var type = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
+            var entity = (Entity)Activator.CreateInstance(type);
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
-                String propertyName;
                 if (!reader.TryGetProperty(out propertyName))
                     continue;
 
-                state.Add(propertyName, serializer.Deserialize<Object>(reader));
+                var fieldType = entity.GetFieldType(propertyName);
+                state.Add(propertyName, serializer.Deserialize(reader, fieldType.IsEnum || ImplicitTypes.Contains(fieldType) ? fieldType : typeof(Object)));
             }
 
-            return CreateEntity(objectType, state);
-        }
-
-        /// <summary>
-        /// Craete a new instance of the target <see cref="Entity"/> type and specified <paramref name="state"/> data.
-        /// </summary>
-        /// <param name="objectType">The type of object.</param>
-        /// <param name="state">The parsed JSON state.</param>
-        private static Entity CreateEntity(Type objectType, IDictionary<String, Object> state)
-        {
-            var entityType = GetEntityType(objectType, state);
-            var entity = (Entity)Activator.CreateInstance(entityType);
-
-            entity.SetState(state);
-
             return entity;
-        }
-
-        /// <summary>
-        /// Get the target entity type from the stored state or use the requested <paramref name="objectType"/> if not found.
-        /// </summary>
-        /// <param name="objectType">The type of object.</param>
-        /// <param name="state">The parsed JSON state.</param>
-        private static Type GetEntityType(Type objectType, IDictionary<String, Object> state)
-        {
-            Object value;
-
-            return state.TryGetValue(TypePropertyName, out value) && value != null ? Type.GetType(value.ToString(), throwOnError: true, ignoreCase: true) : objectType;
         }
 
         /// <summary>

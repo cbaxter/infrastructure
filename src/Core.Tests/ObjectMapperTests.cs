@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests
 {
-    public static class ObjectMapperTests
+    public static class UsingObjectMapper
     {
         public class WhenGettingObjectState
         {

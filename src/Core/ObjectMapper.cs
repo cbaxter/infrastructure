@@ -35,6 +35,19 @@ namespace Spark.Infrastructure
         private static readonly ConstructorInfo MissingMemberExceptionConstructor = typeof(MissingMemberException).GetConstructor(new[] { typeof(String), typeof(String) });
         private static readonly ConstructorInfo DictionaryConstructor = typeof(Dictionary<String, Object>).GetConstructor(new[] { typeof(Int32) });
         private static readonly IDictionary<Type, ObjectBinding> Bindings = new ConcurrentDictionary<Type, ObjectBinding>();
+        
+        /// <summary>
+        /// Get the field type for the specified <paramref name="type"/> attribute <paramref name="name"/>.
+        /// </summary>
+        /// <param name="type">The type of the object.</param>
+        /// <param name="name">The name of the field.</param>
+        public static Type GetFieldType(Type type, String name)
+        {
+            Verify.NotNull(type, "type");
+            Verify.NotNullOrWhiteSpace(name, "name");
+
+            return GetBinding(type).GetFieldType(name);
+        }
 
         /// <summary>
         /// Get the underlying <see cref="Object"/> mutable state information.
@@ -44,11 +57,7 @@ namespace Spark.Infrastructure
         {
             Verify.NotNull(value, "value");
 
-            ObjectBinding binding;
-            if (!Bindings.TryGetValue(value.GetType(), out binding))
-                Bindings[value.GetType()] = binding = CompileBindings(value.GetType());
-
-            return binding.GetState(value);
+            return GetBinding(value.GetType()).GetState(value);
         }
 
         /// <summary>
@@ -61,11 +70,21 @@ namespace Spark.Infrastructure
             Verify.NotNull(value, "value");
             Verify.NotNull(state, "state");
 
+            GetBinding(value.GetType()).SetState(value, state);
+        }
+        
+        /// <summary>
+        /// Get the object binding for the specified object <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The type of object for which bindings are to be compiled.</param>
+        private static ObjectBinding GetBinding(Type type)
+        {
             ObjectBinding binding;
-            if (!Bindings.TryGetValue(value.GetType(), out binding))
-                Bindings[value.GetType()] = binding = CompileBindings(value.GetType());
 
-            binding.SetState(value, state);
+            if (!Bindings.TryGetValue(type, out binding))
+                Bindings[type] = binding = CompileBindings(type);
+
+            return binding;
         }
 
         /// <summary>
@@ -76,7 +95,7 @@ namespace Spark.Infrastructure
         {
             var fields = GetFieldBindings(type).Where(binding => !binding.Ignore).OrderBy(binding => binding.Metadata.Order).ThenBy(binding => binding.Metadata.Name).ToArray();
 
-            return new ObjectBinding(CompileGetStateMethod(type, fields), CompileSetStateMethod(type, fields));
+            return new ObjectBinding(fields, CompileGetStateMethod(type, fields), CompileSetStateMethod(type, fields));
         }
 
         /// <summary>
@@ -232,7 +251,6 @@ namespace Spark.Infrastructure
                        fieldInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null ||
                        propertyInfo != null && propertyInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null;
             }
-
         }
 
         /// <summary>
@@ -240,21 +258,36 @@ namespace Spark.Infrastructure
         /// </summary>
         private sealed class ObjectBinding
         {
+            private readonly IReadOnlyDictionary<String, FieldBinding> fields;
             private readonly Func<Object, IDictionary<String, Object>> getState;
             private readonly Action<Object, IDictionary<String, Object>> setState;
 
             /// <summary>
             /// Initializes a new instance of <see cref="ObjectBinding"/>.
             /// </summary>
+            /// <param name="fields">The object fields.</param>
             /// <param name="getState">The read binding.</param>
             /// <param name="setState">The write binding.</param>
-            public ObjectBinding(Func<Object, IDictionary<String, Object>> getState, Action<Object, IDictionary<String, Object>> setState)
+            public ObjectBinding(FieldBinding[] fields, Func<Object, IDictionary<String, Object>> getState, Action<Object, IDictionary<String, Object>> setState)
             {
+                Verify.NotNull(fields, "fields");
                 Verify.NotNull(getState, "getState");
                 Verify.NotNull(setState, "setState");
 
+                this.fields = fields.ToDictionary(binding => binding.Metadata.Name, binding => binding);
                 this.getState = getState;
                 this.setState = setState;
+            }
+
+            /// <summary>
+            /// Get the field type for the specified attribute <paramref name="name"/>.
+            /// </summary>
+            /// <param name="name">The name of the field.</param>
+            public Type GetFieldType(String name)
+            {
+                FieldBinding binding;
+
+                return fields.TryGetValue(name, out binding) ? binding.Field.FieldType : typeof(Object);
             }
 
             /// <summary>
