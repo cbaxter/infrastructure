@@ -31,7 +31,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var hostAddress = GetHostAddress();
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal(hostAddress, message.Headers.GetRemoteAddress());
             }
@@ -41,7 +41,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var hostAddress = GetHostAddress();
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) }, new Object());
 
                 Assert.NotEqual(hostAddress, message.Headers.GetRemoteAddress());
             }
@@ -51,7 +51,7 @@ namespace Spark.Infrastructure.Tests.Messaging
                 Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("nbawdy@sparksoftware.net"), new String[0]);
 
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal("nbawdy@sparksoftware.net", message.Headers.GetUserName());
             }
@@ -62,7 +62,7 @@ namespace Spark.Infrastructure.Tests.Messaging
                 Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("nbawdy@sparksoftware.net"), new String[0]);
 
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.UserName, "nowan@sparksoftware.net", checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.UserName, "nowan@sparksoftware.net", checkReservedNames: false) }, new Object());
 
                 Assert.NotEqual("nbawdy@sparksoftware.net", message.Headers.GetUserName());
             }
@@ -73,7 +73,7 @@ namespace Spark.Infrastructure.Tests.Messaging
                 Thread.CurrentPrincipal = null;
 
                 var messageFactory = new ServiceMessageFactory();
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal(String.Empty, message.Headers.GetUserName());
             }

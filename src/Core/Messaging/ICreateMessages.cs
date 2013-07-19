@@ -25,8 +25,8 @@ namespace Spark.Infrastructure.Messaging
         /// Creates a new message with a payload of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The payload type.</typeparam>
-        /// <param name="payload">The message payload.</param>
         /// <param name="headers">The message headers.</param>
-        Message<T> Create<T>(T payload, IEnumerable<Header> headers);
+        /// <param name="payload">The message payload.</param>
+        Message<T> Create<T>(IEnumerable<Header> headers, T payload);
     }
 }

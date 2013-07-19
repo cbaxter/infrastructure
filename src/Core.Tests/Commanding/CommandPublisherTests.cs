@@ -76,7 +76,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var publisher = new CommandPublisher(messageFactory.Object, messageBus.Object);
                 var message = new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new CommandEnvelope(GuidStrategy.NewGuid(), command));
 
-                messageFactory.Setup(mock => mock.Create(It.Is<CommandEnvelope>(envelope => ReferenceEquals(command, envelope.Command)), HeaderCollection.Empty)).Returns(message);
+                messageFactory.Setup(mock => mock.Create(HeaderCollection.Empty, It.Is<CommandEnvelope>(envelope => ReferenceEquals(command, envelope.Command)))).Returns(message);
 
                 publisher.Publish(GuidStrategy.NewGuid(), command, HeaderCollection.Empty);
 

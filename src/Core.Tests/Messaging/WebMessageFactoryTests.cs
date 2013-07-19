@@ -34,20 +34,19 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var messageFactory = new WebMessageFactory();
 
-                Assert.DoesNotThrow(() => messageFactory.Create(new Object(), new[]
+                Assert.DoesNotThrow(() => messageFactory.Create(new[]
                     {
                         new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false), 
                         new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false), 
                         new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false)
-
-                    }));
+                    }, new Object()));
             }
 
             [Fact]
             public void HttpContextRequiredIfWebHeadersNotSet()
             {
                 var messageFactory = new WebMessageFactory();
-                var ex = Assert.Throws<InvalidOperationException>(() => messageFactory.Create(new Object(), HeaderCollection.Empty));
+                var ex = Assert.Throws<InvalidOperationException>(() => messageFactory.Create(HeaderCollection.Empty, new Object()));
 
                 Assert.Equal(Exceptions.HttpContextNotAvailable, ex.Message);
             }
@@ -58,7 +57,7 @@ namespace Spark.Infrastructure.Tests.Messaging
                 var remoteAddress = IPAddress.Loopback.ToString();
                 var httpContext = CreateFakeHttpContext(Thread.CurrentPrincipal, new NameValueCollection { { "REMOTE_ADDR", remoteAddress } });
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal(IPAddress.Loopback, message.Headers.GetRemoteAddress());
             }
@@ -68,7 +67,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var httpContext = CreateFakeHttpContext(Thread.CurrentPrincipal, new NameValueCollection { { "REMOTE_ADDR", IPAddress.Loopback.ToString() } });
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.RemoteAddress, IPAddress.None.ToString(), checkReservedNames: false) }, new Object());
 
                 Assert.NotEqual(IPAddress.Loopback, message.Headers.GetRemoteAddress());
             }
@@ -78,7 +77,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var httpContext = CreateFakeHttpContext(new GenericPrincipal(new GenericIdentity("nbawdy@sparksoftware.net"), new String[0]), new NameValueCollection());
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal("nbawdy@sparksoftware.net", message.Headers.GetUserName());
             }
@@ -88,7 +87,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var httpContext = CreateFakeHttpContext(new GenericPrincipal(new GenericIdentity("nbawdy@sparksoftware.net"), new String[0]), new NameValueCollection());
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.UserName, "nowan@sparksoftware.net", checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.UserName, "nowan@sparksoftware.net", checkReservedNames: false) }, new Object());
 
                 Assert.NotEqual("nbawdy@sparksoftware.net", message.Headers.GetUserName());
             }
@@ -98,7 +97,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var httpContext = CreateFakeHttpContext(Thread.CurrentPrincipal, new NameValueCollection { { "REMOTE_ADDR", IPAddress.Broadcast.ToString() }, { serverVariable, IPAddress.Loopback.ToString() } });
                 var messageFactory = new WebMessageFactory(() => httpContext);
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal(IPAddress.Loopback, message.Headers.GetUserAddress());
             }

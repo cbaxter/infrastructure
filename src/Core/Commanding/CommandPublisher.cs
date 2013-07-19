@@ -54,7 +54,7 @@ namespace Spark.Infrastructure.Commanding
 
             Log.TraceFormat("Publishing {0} to {1}", command, aggregateId);
 
-            messageSender.Send(messageFactory.Create(new CommandEnvelope(aggregateId, command), headers));
+            messageSender.Send(messageFactory.Create(headers, new CommandEnvelope(aggregateId, command)));
         }
     }
 }

@@ -26,8 +26,8 @@ namespace Spark.Infrastructure.Tests.Messaging
             public void HeadersCanBeNull()
             {
                 var messageFactory = new FakeMessageFactory();
-               
-                Assert.DoesNotThrow(() => messageFactory.Create(new Object(), null));
+
+                Assert.DoesNotThrow(() => messageFactory.Create(null, new Object()));
             }
 
             [Fact]
@@ -35,7 +35,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var messageFactory = new FakeMessageFactory();
                 var properties = IPGlobalProperties.GetIPGlobalProperties();
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
                 var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : String.Format("{0}.{1}", properties.HostName, properties.DomainName);
 
                 Assert.Equal(serverName, message.Headers.GetOrigin());
@@ -46,7 +46,7 @@ namespace Spark.Infrastructure.Tests.Messaging
             {
                 var messageFactory = new FakeMessageFactory();
                 var properties = IPGlobalProperties.GetIPGlobalProperties();
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.Origin, "NotThisMachineName", checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.Origin, "NotThisMachineName", checkReservedNames: false) }, new Object());
                 var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : String.Format("{0}.{1}", properties.HostName, properties.DomainName);
 
                 Assert.NotEqual(serverName, message.Headers.GetOrigin());
@@ -60,7 +60,7 @@ namespace Spark.Infrastructure.Tests.Messaging
 
                 SystemTime.OverrideWith(() => now);
 
-                var message = messageFactory.Create(new Object(), HeaderCollection.Empty);
+                var message = messageFactory.Create(HeaderCollection.Empty, new Object());
 
                 Assert.Equal(now.ToString(DateTimeFormat.RFC1123), message.Headers.GetTimestamp().ToString(DateTimeFormat.RFC1123));
             }
@@ -74,7 +74,7 @@ namespace Spark.Infrastructure.Tests.Messaging
 
                 SystemTime.OverrideWith(() => now);
 
-                var message = messageFactory.Create(new Object(), new[] { new Header(Header.Timestamp, timestamp.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
+                var message = messageFactory.Create(new[] { new Header(Header.Timestamp, timestamp.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) }, new Object());
 
                 Assert.Equal(timestamp, message.Headers.GetTimestamp());
             }

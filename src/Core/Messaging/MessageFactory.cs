@@ -35,9 +35,9 @@ namespace Spark.Infrastructure.Messaging
         /// Creates a new message with a payload of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The payload type.</typeparam>
-        /// <param name="payload">The message payload.</param>
         /// <param name="headers">The message headers.</param>
-        public Message<T> Create<T>(T payload, IEnumerable<Header> headers)
+        /// <param name="payload">The message payload.</param>
+        public Message<T> Create<T>(IEnumerable<Header> headers, T payload)
         {
             return new Message<T>(GuidStrategy.NewGuid(), new HeaderCollection(CreateHeaderDictionary(headers)), payload);
         }
