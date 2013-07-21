@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Spark.Infrastructure.Messaging;
 using Xunit;
 
@@ -31,15 +30,19 @@ namespace Spark.Infrastructure.Tests.Messaging
             }
 
             [Fact]
-            public void HeadersCollectionCanBeNull()
+            public void HeadersCollectionCannotBeNull()
             {
-                Assert.DoesNotThrow(() => new Message<Object>(Guid.NewGuid(), null, new Object()));
+                var ex = Assert.Throws<ArgumentNullException>(() => new Message<Object>(Guid.NewGuid(), null, new Object()));
+
+                Assert.Equal("headers", ex.ParamName);
             }
 
             [Fact]
-            public void PayloadCanBeNull()
+            public void PayloadCannotBeNull()
             {
-                Assert.DoesNotThrow(() => new Message<Object>(Guid.NewGuid(), HeaderCollection.Empty, null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new Message<Object>(Guid.NewGuid(), HeaderCollection.Empty, null));
+
+                Assert.Equal("payload", ex.ParamName);
             }
         }
 

@@ -46,19 +46,6 @@ namespace Spark.Infrastructure.Tests.Commanding
         public class WhenUsingDefaultTaskScheduler
         {
             [Fact]
-            public void CanTolerateNullCommandPayload()
-            {
-                var commandProcessor = new Mock<IProcessCommands>();
-
-                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
-                using (new CommandReceiver(messageBus, commandProcessor.Object))
-                {
-                    messageBus.Send(new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, null));
-                    messageBus.Dispose();
-                }
-            }
-
-            [Fact]
             public void PassPayloadOnToCommandProcessor()
             {
                 var commandProcessor = new FakeCommandProcessor();

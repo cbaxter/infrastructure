@@ -404,14 +404,35 @@ namespace Spark.Infrastructure.Tests
             [Fact]
             public void NotNullValueDoesNotThrow()
             {
+                Assert.DoesNotThrow(() => Verify.NotNull((Object)0, "paramName"));
+            }
+
+            [Fact]
+            public void NotNullReferenceDoesNotThrow()
+            {
                 Assert.DoesNotThrow(() => Verify.NotNull(new Object(), "paramName"));
             }
 
             [Fact]
-            public void NullValueThrowsArgumentNullException()
+            public void NotNullNullableDoesNotThrow()
+            {
+                Assert.DoesNotThrow(() => Verify.NotNull((Int32?)0, "paramName"));
+            }
+
+            [Fact]
+            public void NullReferenceThrowsArgumentNullException()
             {
                 var expectedEx = new ArgumentNullException("paramName");
                 var actualEx = Assert.Throws<ArgumentNullException>(() => Verify.NotNull(default(Object), "paramName"));
+
+                Assert.Equal(expectedEx.Message, actualEx.Message);
+            }
+
+            [Fact]
+            public void NullNullableThrowsArgumentNullException()
+            {
+                var expectedEx = new ArgumentNullException("paramName");
+                var actualEx = Assert.Throws<ArgumentNullException>(() => Verify.NotNull(default(Int32?), "paramName"));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }

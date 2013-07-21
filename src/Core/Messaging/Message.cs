@@ -52,6 +52,8 @@ namespace Spark.Infrastructure.Messaging
         public Message(Guid id, HeaderCollection headers, TPayload payload)
         {
             Verify.NotEqual(Guid.Empty, id, "id");
+            Verify.NotNull(headers, "headers");
+            Verify.NotNull((Object)payload, "payload");
 
             this.id = id;
             this.headers = headers;
@@ -63,7 +65,7 @@ namespace Spark.Infrastructure.Messaging
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", id, ReferenceEquals(Payload, null) ? "null" : Payload.ToString());
+            return String.Format("{0} - {1}", Id, Payload);
         }
     }
 }

@@ -5,7 +5,6 @@ using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Threading;
-using CommandMessage = Spark.Infrastructure.Messaging.Message<Spark.Infrastructure.Commanding.CommandEnvelope>;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -80,9 +79,9 @@ namespace Spark.Infrastructure.Commanding
         /// <param name="task">The task to partition.</param>
         private static Object GetPartitionId(Task task)
         {
-            var message = (CommandMessage)task.AsyncState;
+            var message = (Message<CommandEnvelope>)task.AsyncState;
 
-            return message.Payload == null ? Guid.Empty : message.Payload.AggregateId;
+            return message.Payload.AggregateId;
         }
 
         /// <summary>
@@ -90,12 +89,12 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         private void ReceiveAllMessages()
         {
-            CommandMessage message;
+            Message<CommandEnvelope> message;
             while ((message = messageReceiver.Receive()) != null)
             {
                 Log.TraceFormat("Message received: {0}", message);
 
-                Task.Factory.StartNew(m => ProcessMessage((CommandMessage)m), message, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
+                Task.Factory.StartNew(m => ProcessMessage((Message<CommandEnvelope>)m), message, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
             }
         }
 
@@ -103,25 +102,17 @@ namespace Spark.Infrastructure.Commanding
         /// Process the received <see cref="Command"/> message instance.
         /// </summary>
         /// <param name="message">The <see cref="Command"/> message.</param>
-        private void ProcessMessage(CommandMessage message)
+        private void ProcessMessage(Message<CommandEnvelope> message)
         {
             using (Log.PushContext("Message", message))
             {
                 try
                 {
-                    var payload = message.Payload;
-                    if (payload == null)
-                    {
-                        Log.WarnFormat("Message payload empty; no action required");
-                    }
-                    else
-                    {
-                        Log.Trace("Processing command");
+                    Log.Trace("Processing command");
 
-                        commandProcessor.Process(message.Id, message.Headers, payload);
+                    commandProcessor.Process(message.Id, message.Headers, message.Payload);
 
-                        Log.Trace("Command processed");
-                    }
+                    Log.Trace("Command processed");
                 }
                 catch (Exception ex)
                 {
