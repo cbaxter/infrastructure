@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Principal;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -33,8 +34,10 @@ namespace Spark.Infrastructure.Commanding
             get
             {
                 var context = CommandContext.Current;
-                
-                return context == null ? HeaderCollection.Empty : context.Headers;
+                if(context == null)
+                    throw new InvalidOperationException(Exceptions.NoCommandContext);
+
+                return context.Headers;
             }
         }
 

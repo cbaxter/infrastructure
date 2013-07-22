@@ -377,6 +377,15 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The current EventContext is null..
+        /// </summary>
+        internal static string NoEventContext {
+            get {
+                return ResourceManager.GetString("NoEventContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext..
         /// </summary>
         internal static string OperationIdModifiedInsideScope {

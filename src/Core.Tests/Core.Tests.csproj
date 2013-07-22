@@ -92,6 +92,7 @@
     </Compile>
     <Compile Include="Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Eventing\EventTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByConventionAttributeTests.cs" />

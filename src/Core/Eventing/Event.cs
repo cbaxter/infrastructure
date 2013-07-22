@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Net;
+using System.Runtime.Serialization;
+using System.Security.Principal;
+using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -20,5 +25,77 @@ namespace Spark.Infrastructure.Eventing
     /// </summary>
     [Serializable]
     public abstract class Event
-    { }
+    {
+        /// <summary>
+        /// Get the aggregate unique identifier that raised this event instance.
+        /// </summary>
+        protected Guid AggregateId
+        {
+            get
+            {
+                var context = EventContext.Current;
+                if (context == null)
+                    throw new InvalidOperationException(Exceptions.NoEventContext);
+
+                return context.AggregateId;
+            }
+        }
+
+        /// <summary>
+        /// The message header collection associated with this event instance.
+        /// </summary>
+        [IgnoreDataMember]
+        public HeaderCollection Headers
+        {
+            get
+            {
+                var context = EventContext.Current;
+                if (context == null)
+                    throw new InvalidOperationException(Exceptions.NoEventContext);
+
+                return context.Headers;
+            }
+        }
+
+        /// <summary>
+        /// Returns the origin server name that published the event or an empty string if not set.
+        /// </summary>
+        public String GetOrigin()
+        {
+            return Headers.GetOrigin();
+        }
+
+        /// <summary>
+        /// Returns the timestamp of when the event was published or the current system time if not set.
+        /// </summary>
+        public DateTime GetTimestamp()
+        {
+            return Headers.GetTimestamp();
+        }
+
+        /// <summary>
+        /// Returns the event publisher's remote address or <see cref="IPAddress.None"/> if not set.
+        /// </summary>
+        public IPAddress GetRemoteAddress()
+        {
+            return Headers.GetRemoteAddress();
+        }
+
+        /// <summary>
+        /// Returns the event publisher's client address or <see cref="IPAddress.None"/> if not set.
+        /// </summary>
+        /// <remarks>Value will be the same as <see cref="GetRemoteAddress"/> unless the request went through an intermediary such as a load-balancer or proxy.</remarks>
+        public IPAddress GetUserAddress()
+        {
+            return Headers.GetUserAddress();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="IIdentity.Name"/> of the user principal that published this event, or <see cref="String.Empty"/> if not set.
+        /// </summary>
+        public String GetUserName()
+        {
+            return Headers.GetUserName();
+        }
+    }
 }

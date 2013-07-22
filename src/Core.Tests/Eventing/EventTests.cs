@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Messaging;
 using Xunit;
 
@@ -19,84 +18,107 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Commanding
+namespace Spark.Infrastructure.Tests.Eventing
 {
-    public static class UsingCommand
+    public static class UsingEvent
     {
-        public class WhenGettingCommandHeaders
+        public class WhenGettingAggregateId
         {
             [Fact]
-            public void ReturnHeadersFromCommandContextIfNotNull()
+            public void ReturnIdFromEventContextIfNotNull()
             {
-                var command = new FakeCommand();
-                var headers = new HeaderCollection(Enumerable.Empty<Header>());
+                var e = new FakeEvent();
+                var aggregateId = GuidStrategy.NewGuid();
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Same(headers, command.Headers);
+                using (new EventContext(aggregateId, HeaderCollection.Empty))
+                    Assert.Equal(aggregateId, e.FakeId);
             }
 
             [Fact]
-            public void ThrowInvalidOperationExceptionIfNoCommandContext()
+            public void ThrowInvalidOperationExceptionIfNoEventContext()
             {
-                var command = new FakeCommand();
+                var e = new FakeEvent();
 
-                Assert.Throws<InvalidOperationException>(() => command.Headers);
+                Assert.Throws<InvalidOperationException>(() => e.FakeId);
+            }
+        }
+
+        public class WhenGettingEventHeaders
+        {
+            [Fact]
+            public void ReturnHeadersFromEventContextIfNotNull()
+            {
+                var e = new FakeEvent();
+                var headers = new HeaderCollection(Enumerable.Empty<Header>());
+
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Same(headers, e.Headers);
+            }
+
+            [Fact]
+            public void ThrowInvalidOperationExceptionIfNoEventContext()
+            {
+                var e = new FakeEvent();
+
+                Assert.Throws<InvalidOperationException>(() => e.Headers);
             }
 
             [Fact]
             public void CanShortCircuitAccessToOriginHeader()
             {
-                var command = new FakeCommand();
+                var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.Origin, "MyOrigin", checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Equal("MyOrigin", command.GetOrigin());
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Equal("MyOrigin", e.GetOrigin());
             }
 
             [Fact]
             public void CanShortCircuitAccessToTimestampHeader()
             {
                 var now = DateTime.UtcNow;
-                var command = new FakeCommand();
+                var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Equal(now, command.GetTimestamp());
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Equal(now, e.GetTimestamp());
             }
 
             [Fact]
             public void CanShortCircuitAccessToremoteAddressHeader()
             {
-                var command = new FakeCommand();
+                var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Equal(IPAddress.Loopback, command.GetRemoteAddress());
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Equal(IPAddress.Loopback, e.GetRemoteAddress());
             }
 
             [Fact]
             public void CanShortCircuitAccessToUserAddressHeader()
             {
-                var command = new FakeCommand();
+                var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Equal(IPAddress.Loopback, command.GetUserAddress());
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Equal(IPAddress.Loopback, e.GetUserAddress());
             }
 
             [Fact]
             public void CanShortCircuitAccessToUserNameHeader()
             {
-                var command = new FakeCommand();
+                var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
-                    Assert.Equal("nbawdy@sparksoftware.net", command.GetUserName());
+                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                    Assert.Equal("nbawdy@sparksoftware.net", e.GetUserName());
             }
         }
 
-        private class FakeCommand : Command
-        { }
+        private class FakeEvent : Event
+        {
+            public Guid FakeId { get { return AggregateId; } }
+        }
     }
 
 }

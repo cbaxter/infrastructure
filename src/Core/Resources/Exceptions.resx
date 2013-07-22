@@ -241,6 +241,9 @@ Actual Version: {1}</value>
   <data name="NoCommandContext" xml:space="preserve">
     <value>The current CommandContext is null.</value>
   </data>
+  <data name="NoEventContext" xml:space="preserve">
+    <value>The current EventContext is null.</value>
+  </data>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
   </data>

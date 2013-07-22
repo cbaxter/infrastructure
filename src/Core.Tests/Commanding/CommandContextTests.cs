@@ -46,11 +46,12 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CurrentContextSetToNewCommandContextInstance()
             {
                 var commandId = Guid.NewGuid();
-                var context = new CommandContext(commandId, HeaderCollection.Empty);
-
-                Assert.Same(context, CommandContext.Current);
-                Assert.Equal(commandId, CommandContext.Current.CommandId);
-                Assert.Equal(HeaderCollection.Empty, CommandContext.Current.Headers);
+                using (var context = new CommandContext(commandId, HeaderCollection.Empty))
+                {
+                    Assert.Same(context, CommandContext.Current);
+                    Assert.Equal(commandId, CommandContext.Current.CommandId);
+                    Assert.Equal(HeaderCollection.Empty, CommandContext.Current.Headers);
+                }
             }
         }
 
@@ -84,20 +85,25 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CannotDisposeContextFromAnotherThread()
             {
-                var manualResetEvent = new ManualResetEvent(false);
+                var contextDisposedEvent = new ManualResetEvent(false);
+                var contextCreatedEvent = new ManualResetEvent(false);
                 var context = default(CommandContext);
 
                 Task.Factory.StartNew(() =>
                     {
                         context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
-                        manualResetEvent.Set();
+                        contextCreatedEvent.Set();
+                        contextDisposedEvent.WaitOne();
+                        context.Dispose();
                     });
 
-                manualResetEvent.WaitOne();
+                contextCreatedEvent.WaitOne();
 
                 var ex = Assert.Throws<InvalidOperationException>(() => context.Dispose());
 
                 Assert.Equal(Exceptions.CommandContextInterleaved, ex.Message);
+
+                contextDisposedEvent.Set();
             }
 
             [Fact]
