@@ -21,14 +21,14 @@ using Xunit;
 
 namespace Spark.Infrastructure.Serialization.Tests.Converters
 {
-    public static class UsingEntityConverter
+    public static class UsingStateObjectConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new EntityConverter(), default(Entity));
+                var json = WriteJson(new StateObjectConverter(), default(Entity));
 
                 Validate("null", json);
             }
@@ -37,10 +37,10 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             public void CanSerializeToJson()
             {
                 var entity = new TestAggregate();
-                var json = WriteJson(new EntityConverter(), entity);
+                var json = WriteJson(new StateObjectConverter(), entity);
 
                 Validate(
-                    "{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingEntityConverter+TestAggregate, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Infrastructure.Domain.EntityCollection`1[[Spark.Infrastructure.Domain.Entity, Spark.Infrastructure.Core]], Spark.Infrastructure.Core\",\"$values\":[{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingEntityConverter+TestEntity, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}",
+                    "{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Infrastructure.Domain.EntityCollection`1[[Spark.Infrastructure.Domain.Entity, Spark.Infrastructure.Core]], Spark.Infrastructure.Core\",\"$values\":[{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}",
                     json
                 );
             }
@@ -51,14 +51,14 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Null(ReadJson<Entity>(new EntityConverter(), "null"));
+                Assert.Null(ReadJson<Entity>(new StateObjectConverter(), "null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingEntityConverter+TestAggregate, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Infrastructure.Domain.EntityCollection`1[[Spark.Infrastructure.Domain.Entity, Spark.Infrastructure.Core]], Spark.Infrastructure.Core\",\"$values\":[{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingEntityConverter+TestEntity, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}";
-                var entity = (TestAggregate)ReadJson<Entity>(new EntityConverter(), json);
+                var json = "{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Infrastructure.Domain.EntityCollection`1[[Spark.Infrastructure.Domain.Entity, Spark.Infrastructure.Core]], Spark.Infrastructure.Core\",\"$values\":[{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}";
+                var entity = (TestAggregate)ReadJson<Entity>(new StateObjectConverter(), json);
 
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);
                 Assert.Equal("My Aggregate", entity.Name);
@@ -76,10 +76,10 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             public void CanSerializeToBson()
             {
                 var entity = new TestAggregate();
-                var bson = WriteBson(new EntityConverter(), entity);
+                var bson = WriteBson(new StateObjectConverter(), entity);
 
                 Validate(
-                    "VQIAAAIkdHlwZQCMAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nRW50aXR5Q29udmVydGVyK1Rlc3RBZ2dyZWdhdGUsIFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwADYwBvAQAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5Eb21haW4uRW50aXR5Q29sbGVjdGlvbmAxW1tTcGFyay5JbmZyYXN0cnVjdHVyZS5Eb21haW4uRW50aXR5LCBTcGFyay5JbmZyYXN0cnVjdHVyZS5Db3JlXV0sIFNwYXJrLkluZnJhc3RydWN0dXJlLkNvcmUABCR2YWx1ZXMAywAAAAMwAMMAAAACJHR5cGUAiQAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0VudGl0eUNvbnZlcnRlcitUZXN0RW50aXR5LCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABWlkABAAAAAEcfG1jAVVE0O4qANF1wz7RgJuAAoAAABNeSBFbnRpdHkAAAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA", 
+                    "XwIAAAIkdHlwZQCRAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjAHQBAAACJHR5cGUAiwAAAFNwYXJrLkluZnJhc3RydWN0dXJlLkRvbWFpbi5FbnRpdHlDb2xsZWN0aW9uYDFbW1NwYXJrLkluZnJhc3RydWN0dXJlLkRvbWFpbi5FbnRpdHksIFNwYXJrLkluZnJhc3RydWN0dXJlLkNvcmVdXSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuQ29yZQAEJHZhbHVlcwDQAAAAAzAAyAAAAAIkdHlwZQCOAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAAFkAM3MzMzMzCFAAWYAMzMzMzOLfEASaQB7AAAAAAAAAAJuAA0AAABNeSBBZ2dyZWdhdGUAEHMAAQAAAAl0AAD70Jg/AQAAAA==", 
                     bson
                 );
             }
@@ -90,8 +90,8 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "﻿VQIAAAIkdHlwZQCMAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nRW50aXR5Q29udmVydGVyK1Rlc3RBZ2dyZWdhdGUsIFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwADYwBvAQAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5Eb21haW4uRW50aXR5Q29sbGVjdGlvbmAxW1tTcGFyay5JbmZyYXN0cnVjdHVyZS5Eb21haW4uRW50aXR5LCBTcGFyay5JbmZyYXN0cnVjdHVyZS5Db3JlXV0sIFNwYXJrLkluZnJhc3RydWN0dXJlLkNvcmUABCR2YWx1ZXMAywAAAAMwAMMAAAACJHR5cGUAiQAAAFNwYXJrLkluZnJhc3RydWN0dXJlLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0VudGl0eUNvbnZlcnRlcitUZXN0RW50aXR5LCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABWlkABAAAAAEcfG1jAVVE0O4qANF1wz7RgJuAAoAAABNeSBFbnRpdHkAAAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA";
-                var entity = (TestAggregate)ReadBson<Entity>(new EntityConverter(), bson);
+                var bson = "XwIAAAIkdHlwZQCRAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjAHQBAAACJHR5cGUAiwAAAFNwYXJrLkluZnJhc3RydWN0dXJlLkRvbWFpbi5FbnRpdHlDb2xsZWN0aW9uYDFbW1NwYXJrLkluZnJhc3RydWN0dXJlLkRvbWFpbi5FbnRpdHksIFNwYXJrLkluZnJhc3RydWN0dXJlLkNvcmVdXSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuQ29yZQAEJHZhbHVlcwDQAAAAAzAAyAAAAAIkdHlwZQCOAAAAU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuSW5mcmFzdHJ1Y3R1cmUuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAAFkAM3MzMzMzCFAAWYAMzMzMzOLfEASaQB7AAAAAAAAAAJuAA0AAABNeSBBZ2dyZWdhdGUAEHMAAQAAAAl0AAD70Jg/AQAAAA==";
+                var entity = (TestAggregate)ReadBson<Entity>(new StateObjectConverter(), bson);
                 
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);
                 Assert.Equal("My Aggregate", entity.Name);

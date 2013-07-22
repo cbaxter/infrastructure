@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Eventing;
@@ -23,7 +22,7 @@ namespace Spark.Infrastructure.Domain
     /// <summary>
     /// A uniquely identifiable <see cref="Object"/> within a given <see cref="Aggregate"/> root.
     /// </summary>
-    public abstract class Entity
+    public abstract class Entity : StateObject
     {
         protected static class Property
         {
@@ -49,36 +48,6 @@ namespace Spark.Infrastructure.Domain
                 throw new InvalidOperationException(Exceptions.NoCommandContext);
 
             context.Raise(e);
-        }
-
-        /// <summary>
-        /// Get the <see cref="Entity"/> field type for the specified attribute <paramref name="name"/>.
-        /// </summary>
-        /// <param name="name">The name of the field.</param>
-        protected internal virtual Type GetFieldType(String name)
-        {
-            var type = ObjectMapper.GetFieldType(GetType(), name);
-
-            return type;
-        }
-
-        /// <summary>
-        /// Get the underlying <see cref="Entity"/> mutable state information.
-        /// </summary>
-        protected internal virtual IDictionary<String, Object> GetState()
-        {
-            var state = ObjectMapper.GetState(this);
-
-            return state;
-        }
-
-        /// <summary>
-        /// Set the underlying <see cref="Entity"/> mutable state information.
-        /// </summary>
-        /// <param name="state">The state dictionary to be mapped to this entity instance.</param>
-        protected internal virtual void SetState(IDictionary<String, Object> state)
-        {
-            ObjectMapper.SetState(this, state);
         }
     }
 }

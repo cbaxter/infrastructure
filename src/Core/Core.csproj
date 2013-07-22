@@ -214,6 +214,7 @@
     <Compile Include="GuidStrategy.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\ISerializeObjects.cs" />
+    <Compile Include="StateObject.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="SystemTime.cs" />

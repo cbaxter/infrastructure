@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json;
-using Spark.Infrastructure.Domain;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -21,12 +20,12 @@ using Spark.Infrastructure.Domain;
 namespace Spark.Infrastructure.Serialization.Converters
 {
     /// <summary>
-    /// Converts a <see cref="Entity"/> to and from JSON.
+    /// Converts a <see cref="StateObject"/> to and from JSON.
     /// </summary>
-    public sealed class EntityConverter : JsonConverter
+    public sealed class StateObjectConverter : JsonConverter
     {
         private const String TypePropertyName = "$type";
-        private static readonly Type EntityType = typeof(Entity);
+        private static readonly Type StateObjectType = typeof(StateObject);
         private static readonly IDictionary<Type, String> TypeShortAssemblyQualifiedName = new ConcurrentDictionary<Type, String>();
 
         // NOTE: Serialization Guide: http://james.newtonking.com/projects/json/help/index.html?topic=html/SerializationGuide.htm
@@ -64,18 +63,18 @@ namespace Spark.Infrastructure.Serialization.Converters
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return EntityType.IsAssignableFrom(objectType); //TODO: Will want to introduce an interface that may be shared with Saga as well (since will require identical handling).
+            return StateObjectType.IsAssignableFrom(objectType);
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="Entity"/> instance.
+        /// Writes the JSON representation of an <see cref="StateObject"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var entity = value as Entity;
+            var entity = value as StateObject;
 
             if (entity == null)
             {
@@ -101,7 +100,7 @@ namespace Spark.Infrastructure.Serialization.Converters
         }
 
         /// <summary>
-        /// Reads the JSON representation of an <see cref="Entity"/> instance.
+        /// Reads the JSON representation of an <see cref="StateObject"/> instance.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
         /// <param name="objectType">The type of object.</param>
@@ -119,17 +118,17 @@ namespace Spark.Infrastructure.Serialization.Converters
                 continue; //NOTE: Given that JSON.NET expects `$type` to be the first property, we can make the same assumption to keep life simple.
 
             var type = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
-            var entity = (Entity)Activator.CreateInstance(type);
+            var stateObject = (StateObject)Activator.CreateInstance(type);
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
                 if (!reader.TryGetProperty(out propertyName))
                     continue;
 
-                var fieldType = entity.GetFieldType(propertyName);
+                var fieldType = stateObject.GetFieldType(propertyName);
                 state.Add(propertyName, serializer.Deserialize(reader, fieldType.IsEnum || ImplicitTypes.Contains(fieldType) ? fieldType : typeof(Object)));
             }
 
-            return entity;
+            return stateObject;
         }
 
         /// <summary>
