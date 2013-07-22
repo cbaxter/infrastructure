@@ -81,6 +81,33 @@
     <Compile Include="Eventing\EventContext.cs" />
     <Compile Include="Eventing\EventVersion.cs" />
     <Compile Include="Eventing\IPublishEvents.cs" />
+    <Compile Include="Eventing\Mappings\EventHandlerAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleByAttributeAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleByConventionAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleByReflectionAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleByRegistrationAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleByStrategyAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleMethodAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleMethodCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Eventing\Mappings\HandleMethodMapping.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />

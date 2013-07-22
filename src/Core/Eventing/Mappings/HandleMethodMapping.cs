@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,22 +14,22 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Represents an explicit <see cref="Aggregate"/> handle method mapping.
+    /// Represents an explicit <see cref="EventHandlerAttribute"/> handle method mapping.
     /// </summary>
     public abstract class HandleMethodMapping
     {
         /// <summary>
-        /// Handle method mapping builder.
+        /// Apply method mapping builder.
         /// </summary>
         protected sealed class HandleMethodMappingBuilder
         {
-            private readonly IDictionary<Type, Action<Aggregate, Command>> handleMethods = new Dictionary<Type, Action<Aggregate, Command>>();
+            private readonly IDictionary<Type, Action<Object, Event>> handleMethods = new Dictionary<Type, Action<Object, Event>>();
             private readonly IServiceProvider serviceProvider;
 
-            internal IDictionary<Type, Action<Aggregate, Command>> Mappings { get { return handleMethods; } }
+            internal IDictionary<Type, Action<Object, Event>> Mappings { get { return handleMethods; } }
 
             /// <summary>
             /// Initializes a new instance of <see cref="HandleMethodMapping"/> with the specified <paramref name="serviceProvider"/>.
@@ -44,17 +43,17 @@ namespace Spark.Infrastructure.Domain.Mappings
             }
 
             /// <summary>
-            /// Register the handle method for the specified <paramref name="commandType"/>.
+            /// Register the handle method for the specified <paramref name="eventType"/>.
             /// </summary>
-            /// <param name="commandType">The command type associated with the specified <paramref name="handleMethod"/>.</param>
-            /// <param name="handleMethod">The handle method to be invoked for commands of <paramref name="commandType"/>.</param>
-            public void Register(Type commandType, Action<Aggregate, Command> handleMethod)
+            /// <param name="eventType">The event type associated with the specified <paramref name="handleMethod"/>.</param>
+            /// <param name="handleMethod">The handle method to be invoked for events of <paramref name="eventType"/>.</param>
+            public void Register(Type eventType, Action<Object, Event> handleMethod)
             {
-                Verify.NotNull(commandType, "commandType");
+                Verify.NotNull(eventType, "eventType");
                 Verify.NotNull(handleMethod, "handleMethod");
-                Verify.TypeDerivesFrom(typeof(Command), commandType, "commandType");
+                Verify.TypeDerivesFrom(typeof(Event), eventType, "eventType");
 
-                handleMethods.Add(commandType, handleMethod);
+                handleMethods.Add(eventType, handleMethod);
             }
 
             /// <summary>
@@ -80,7 +79,7 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// <summary>
         /// Gets the explicitly registered handle methods.
         /// </summary>
-        internal IDictionary<Type, Action<Aggregate, Command>> GetMappings(IServiceProvider serviceProvider)
+        internal IDictionary<Type, Action<Object, Event>> GetMappings(IServiceProvider serviceProvider)
         {
             var builder = new HandleMethodMappingBuilder(serviceProvider);
 
@@ -90,9 +89,9 @@ namespace Spark.Infrastructure.Domain.Mappings
         }
 
         /// <summary>
-        /// Register the command type handle methods for a given aggregate type.
+        /// Register the event type handle methods for a given event handler type.
         /// </summary>
-        /// <param name="builder">The <see cref="HandleMethodMappingBuilder"/> for the underlying aggregate type.</param>
+        /// <param name="builder">The <see cref="HandleMethodMappingBuilder"/> for the underlying event handler type.</param>
         protected abstract void RegisterMappings(HandleMethodMappingBuilder builder);
     }
 }

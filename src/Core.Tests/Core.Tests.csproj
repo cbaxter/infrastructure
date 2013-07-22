@@ -80,8 +80,22 @@
     <Compile Include="Domain\Mappings\ApplyByConventionAttributeTests.cs" />
     <Compile Include="Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
     <Compile Include="Domain\Mappings\ApplyMethodMappingTests.cs" />
+    <Compile Include="Domain\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Domain\Mappings\HandleByConventionAttributeTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Domain\Mappings\HandleByRegistrationAttributeTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Domain\Mappings\HandleMethodMappingTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
+    <Compile Include="Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Eventing\Mappings\HandleByConventionAttributeTests.cs" />
+    <Compile Include="Eventing\Mappings\HandleMethodMappingTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />

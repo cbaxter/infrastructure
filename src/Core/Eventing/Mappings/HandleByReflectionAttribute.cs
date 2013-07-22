@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Resources;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -18,10 +18,10 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Base attribute to support aggregate handle methods mapped by reflection.
+    /// Base attribute to support event handler methods mapped by reflection.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class HandleByReflectionAttribute : HandleByStrategyAttribute
@@ -42,28 +42,28 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// <summary>
         /// Maps the handle methods on the specified type.
         /// </summary>
-        /// <param name="aggregateType">The aggregate type on which to locate handle methods.</param>
+        /// <param name="handlerType">The event handler type on which to locate handle methods.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        protected override HandleMethodCollection MapHandleMethodsFor(Type aggregateType, IServiceProvider serviceProvider)
+        protected override HandleMethodCollection MapHandleMethodsFor(Type handlerType, IServiceProvider serviceProvider)
         {
             var bindingFlags = GetBindingFlags(PublicOnly);
-            var handleMethods = aggregateType.GetMethods(bindingFlags).Where(MatchesHandleMethodDefinition);
-            var mappings = new Dictionary<Type, Action<Aggregate, Command>>();
+            var handleMethods = handlerType.GetMethods(bindingFlags).Where(MatchesHandleMethodDefinition);
+            var mappings = new Dictionary<Type, Action<Object, Event>>();
 
             foreach (var handleMethod in handleMethods)
             {
-                var commandType = handleMethod.GetParameters().First().ParameterType;
-                var compiledAction = CompileAction(handleMethod, commandType, serviceProvider);
+                var eventType = handleMethod.GetParameters().First().ParameterType;
+                var compiledAction = CompileAction(handleMethod, eventType, serviceProvider);
 
-                if (mappings.ContainsKey(commandType))
-                    throw new MappingException(Exceptions.HandleMethodOverloaded.FormatWith(aggregateType, handleMethod));
+                if (mappings.ContainsKey(eventType))
+                    throw new MappingException(Exceptions.HandleMethodOverloaded.FormatWith(handlerType, handleMethod));
 
-                mappings.Add(commandType, compiledAction);
+                mappings.Add(eventType, compiledAction);
             }
 
             return new HandleMethodCollection(mappings);
         }
-
+        
         /// <summary>
         /// Gets the reflection binding flags to be used when locating handle methods.
         /// </summary>
@@ -77,11 +77,11 @@ namespace Spark.Infrastructure.Domain.Mappings
 
             return bindingFlags;
         }
-
+        
         /// <summary>
         /// Determine if the specified <paramref name="method"/> conforms to the configured handle method specification.
         /// </summary>
-        /// <param name="method">The method info for the apply method candidate.</param>
+        /// <param name="method">The method info for the handle method candidate.</param>
         protected abstract Boolean MatchesHandleMethodDefinition(MethodInfo method);
     }
 }

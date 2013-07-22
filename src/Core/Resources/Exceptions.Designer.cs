@@ -123,34 +123,12 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ambiguous command handler maping strategy,
+        ///   Looks up a localized string similar to Ambiguous command handler mapping strategy,
         ///Aggregate Type: {0}.
         /// </summary>
         internal static string AggregateHandleByStrategyAmbiguous {
             get {
                 return ResourceManager.GetString("AggregateHandleByStrategyAmbiguous", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
-        ///Reflected Type: {1}
-        ///Method Name: {2}.
-        /// </summary>
-        internal static string AggregateHandleMethodInvalidParameters {
-            get {
-                return ResourceManager.GetString("AggregateHandleMethodInvalidParameters", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A method marked with ApplyMethodAttribute must return void.
-        ///Reflected Type: {0}
-        ///Method Name: {1}.
-        /// </summary>
-        internal static string AggregateHandleMethodMustHaveVoidReturn {
-            get {
-                return ResourceManager.GetString("AggregateHandleMethodMustHaveVoidReturn", resourceCulture);
             }
         }
         
@@ -317,6 +295,17 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
+        ///Reflected Type: {1}
+        ///Method Name: {2}.
+        /// </summary>
+        internal static string HandleMethodInvalidParameters {
+            get {
+                return ResourceManager.GetString("HandleMethodInvalidParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A command may only be handled by a single aggregate type.
         ///Aggregate Type: {0}
         ///Command Type: {1}.
@@ -324,6 +313,28 @@ namespace Spark.Infrastructure.Resources {
         internal static string HandleMethodMustBeAssociatedWithSingleAggregate {
             get {
                 return ResourceManager.GetString("HandleMethodMustBeAssociatedWithSingleAggregate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method marked with HandleMethodAttribute must return void.
+        ///Reflected Type: {0}
+        ///Method Name: {1}.
+        /// </summary>
+        internal static string HandleMethodMustHaveVoidReturn {
+            get {
+                return ResourceManager.GetString("HandleMethodMustHaveVoidReturn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overloaded method not allowed.
+        ///Reflected Type: {0}
+        ///Method: {1}.
+        /// </summary>
+        internal static string HandleMethodOverloaded {
+            get {
+                return ResourceManager.GetString("HandleMethodOverloaded", resourceCulture);
             }
         }
         

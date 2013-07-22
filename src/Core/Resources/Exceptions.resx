@@ -144,18 +144,8 @@ Event Type: {1}</value>
 Aggregate Type: {0}</value>
   </data>
   <data name="AggregateHandleByStrategyAmbiguous" xml:space="preserve">
-    <value>Ambiguous command handler maping strategy,
+    <value>Ambiguous command handler mapping strategy,
 Aggregate Type: {0}</value>
-  </data>
-  <data name="AggregateHandleMethodInvalidParameters" xml:space="preserve">
-    <value>A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
-Reflected Type: {1}
-Method Name: {2}</value>
-  </data>
-  <data name="AggregateHandleMethodMustHaveVoidReturn" xml:space="preserve">
-    <value>A method marked with ApplyMethodAttribute must return void.
-Reflected Type: {0}
-Method Name: {1}</value>
   </data>
   <data name="AggregateTypeUndiscovered" xml:space="preserve">
     <value>Aggregate type was not discovered by type locator.
@@ -217,10 +207,25 @@ Commit Id: {0}</value>
   <data name="EventContextInvalidThread" xml:space="preserve">
     <value>This EventContext is being disposed out of order.</value>
   </data>
+  <data name="HandleMethodInvalidParameters" xml:space="preserve">
+    <value>A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
+Reflected Type: {1}
+Method Name: {2}</value>
+  </data>
   <data name="HandleMethodMustBeAssociatedWithSingleAggregate" xml:space="preserve">
     <value>A command may only be handled by a single aggregate type.
 Aggregate Type: {0}
 Command Type: {1}</value>
+  </data>
+  <data name="HandleMethodMustHaveVoidReturn" xml:space="preserve">
+    <value>A method marked with HandleMethodAttribute must return void.
+Reflected Type: {0}
+Method Name: {1}</value>
+  </data>
+  <data name="HandleMethodOverloaded" xml:space="preserve">
+    <value>Overloaded method not allowed.
+Reflected Type: {0}
+Method: {1}</value>
   </data>
   <data name="HttpContextNotAvailable" xml:space="preserve">
     <value>The current HTTP context is not available on this thread.</value>

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -13,12 +15,19 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Handle method marker attribute for <see cref="HandleByAttributeAttribute"/>.
+    /// A read-only mapping of object type to event handler method.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public sealed class HandleMethodAttribute : Attribute
-    { }
+    public sealed class HandleMethodCollection : ReadOnlyDictionary<Type, Action<Object, Event>>
+    {
+        /// <summary>
+        /// Initializes a new instance of <see cref="HandleMethodCollection"/>.
+        /// </summary>
+        /// <param name="dictionary">The underlying dictionary map of event type to event handle method.</param>
+        public HandleMethodCollection(IDictionary<Type, Action<Object, Event>> dictionary)
+            : base(dictionary)
+        { }
+    }
 }

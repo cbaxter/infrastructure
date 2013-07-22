@@ -43,11 +43,11 @@ namespace Spark.Infrastructure.Domain.Mappings
                 return false;
 
             if (method.ReturnParameter == null || method.ReturnParameter.ParameterType != typeof(void))
-                throw new MappingException(Exceptions.AggregateHandleMethodMustHaveVoidReturn.FormatWith(method.ReflectedType, method.Name));
+                throw new MappingException(Exceptions.HandleMethodMustHaveVoidReturn.FormatWith(method.ReflectedType, method.Name));
 
             var parameters = method.GetParameters();
             if (parameters.Length == 0 || !parameters[0].ParameterType.DerivesFrom(typeof(Command)))
-                throw new MappingException(Exceptions.AggregateHandleMethodInvalidParameters.FormatWith(typeof(Command), method.ReflectedType, method.Name));
+                throw new MappingException(Exceptions.HandleMethodInvalidParameters.FormatWith(typeof(Command), method.ReflectedType, method.Name));
 
             return true;
         }

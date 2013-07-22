@@ -13,12 +13,12 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Handle method marker attribute for <see cref="HandleByAttributeAttribute"/>.
+    /// Event handler marker attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public sealed class HandleMethodAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    public sealed class EventHandlerAttribute : Attribute
     { }
 }

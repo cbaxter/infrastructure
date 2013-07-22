@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -18,10 +17,10 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Base attribute for indicating handle method mapping strategy.
+    /// Base attribute for indicating event handle method mapping strategy.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class HandleByStrategyAttribute : Attribute
@@ -29,38 +28,37 @@ namespace Spark.Infrastructure.Domain.Mappings
         public static readonly HandleByStrategyAttribute Default = new HandleByConventionAttribute();
 
         /// <summary>
-        /// Gets the handle method collection associated with the given aggregate type.
+        /// Gets the handle method collection associated with the given event handler type.
         /// </summary>
-        /// <param name="aggregateType">The aggregate type.</param>
+        /// <param name="handlerType">The event handler type.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        internal HandleMethodCollection GetHandleMethods(Type aggregateType, IServiceProvider serviceProvider)
+        internal HandleMethodCollection GetHandleMethods(Type handlerType, IServiceProvider serviceProvider)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
+            Verify.NotNull(handlerType, "handlerType");
             Verify.NotNull(serviceProvider, "serviceProvider");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
 
-            return MapHandleMethodsFor(aggregateType, serviceProvider);
+            return MapHandleMethodsFor(handlerType, serviceProvider);
         }
 
         /// <summary>
-        /// Creates the handle method collection for a given aggregate type.
+        /// Creates the handle method collection for a given event handler type.
         /// </summary>
-        /// <param name="aggregateType">The aggregate type.</param>
+        /// <param name="handlerType">The event handler type.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        protected abstract HandleMethodCollection MapHandleMethodsFor(Type aggregateType, IServiceProvider serviceProvider);
+        protected abstract HandleMethodCollection MapHandleMethodsFor(Type handlerType, IServiceProvider serviceProvider);
 
         /// <summary>
         /// Compiles a handle method in to an invokable action.
         /// </summary>
         /// <param name="handleMethod">The reflected handle method.</param>
-        /// <param name="commandType">The command type handled.</param>
+        /// <param name="eventType">The event type handled.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        protected Action<Aggregate, Command> CompileAction(MethodInfo handleMethod, Type commandType, IServiceProvider serviceProvider)
+        protected Action<Object, Event> CompileAction(MethodInfo handleMethod, Type eventType, IServiceProvider serviceProvider)
         {
-            var commandParameter = Expression.Parameter(typeof(Command), "command");
-            var aggregateParameter = Expression.Parameter(typeof(Aggregate), "aggregate");
-            var body = Expression.Call(Expression.Convert(aggregateParameter, handleMethod.ReflectedType), handleMethod, GetMethodArguments(handleMethod, commandParameter, serviceProvider));
-            var expression = Expression.Lambda<Action<Aggregate, Command>>(body, new[] { aggregateParameter, commandParameter });
+            var eventParameter = Expression.Parameter(typeof(Event), "e");
+            var eventHandlerParameter = Expression.Parameter(typeof(Object), "eventHandler");
+            var body = Expression.Call(Expression.Convert(eventHandlerParameter, handleMethod.ReflectedType), handleMethod, GetMethodArguments(handleMethod, eventParameter, serviceProvider));
+            var expression = Expression.Lambda<Action<Object, Event>>(body, new[] { eventHandlerParameter, eventParameter });
 
             return expression.Compile();
         }
@@ -69,13 +67,13 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// Get the set of method arguments to pass in to the underlying call expression.
         /// </summary>
         /// <param name="method">The method definition.</param>
-        /// <param name="commandParameter">The command parameter reference.</param>
+        /// <param name="eventParameter">The event parameter reference.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        private static IEnumerable<Expression> GetMethodArguments(MethodInfo method, ParameterExpression commandParameter, IServiceProvider serviceProvider)
+        private static IEnumerable<Expression> GetMethodArguments(MethodInfo method, ParameterExpression eventParameter, IServiceProvider serviceProvider)
         {
             var parameters = method.GetParameters();
 
-            yield return Expression.TypeAs(commandParameter, parameters.First().ParameterType);
+            yield return Expression.TypeAs(eventParameter, parameters.First().ParameterType);
 
             foreach (var parameter in parameters.Skip(1))
                 yield return Expression.Convert(Expression.Constant(serviceProvider.GetService(parameter.ParameterType)), parameter.ParameterType);

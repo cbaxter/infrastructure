@@ -13,12 +13,12 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Indicates that aggregate command handle methods are explicitly mapped by sthe pecified <see cref="HandleMethodMapping"/> type.
+    /// Indicates that event handler event handle methods are explicitly mapped by specified <see cref="HandleMethodMapping"/> type.
     /// </summary>
-    /// <remarks>Intended for use in medium trust environments while maintaining non-public apply methods.</remarks>
+    /// <remarks>Intended for use in medium trust environments while maintaining non-public handle methods.</remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class HandleByRegistrationAttribute : HandleByStrategyAttribute
     {
@@ -27,7 +27,7 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// <summary>
         /// Initializes a new instance of <see cref="HandleByRegistrationAttribute"/>.
         /// </summary>
-        /// <param name="type">The <see cref="ApplyMethodMapping"/> containing the explicit handle method mapping.</param>
+        /// <param name="type">The <see cref="HandleMethodMapping"/> containing the explicit handle method mapping.</param>
         public HandleByRegistrationAttribute(Type type)
         {
             Verify.NotNull(type, "type");
@@ -39,9 +39,9 @@ namespace Spark.Infrastructure.Domain.Mappings
         /// <summary>
         /// Maps the handle methods on the specified type.
         /// </summary>
-        /// <param name="aggregateType">The aggregate type on which to locate handle+ methods.</param>
+        /// <param name="handlerType">The event handler type on which to locate handle methods.</param>
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
-        protected override HandleMethodCollection MapHandleMethodsFor(Type aggregateType, IServiceProvider serviceProvider)
+        protected override HandleMethodCollection MapHandleMethodsFor(Type handlerType, IServiceProvider serviceProvider)
         {
             var mappingBuilder = (HandleMethodMapping)Activator.CreateInstance(handleMethodMappingType);
             var handleMethods = mappingBuilder.GetMappings(serviceProvider);

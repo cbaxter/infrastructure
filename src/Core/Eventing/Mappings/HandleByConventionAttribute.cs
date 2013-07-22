@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Spark.Infrastructure.Commanding;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -15,17 +14,17 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Infrastructure.Eventing.Mappings
 {
     /// <summary>
-    /// Indicates that aggregate command handler methods are mapped by convention (Default).
+    /// Indicates that event handler methods are mapped by convention (Default).
     /// </summary>
     /// <remarks>
     /// Methods must by of the form:
     /// <code>
-    /// [public|protected] void Handle(Command command[, Object service, ...]);
+    /// [public|protected] void Handle(Event e[, Object service, ...]);
     /// </code>
-    /// unless <see cref="MethodName"/> overriden.
+    /// unless <see cref="MethodName"/>overriden.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class HandleByConventionAttribute : HandleByReflectionAttribute
@@ -42,7 +41,7 @@ namespace Spark.Infrastructure.Domain.Mappings
         {
             MethodName = "Handle";
         }
-
+        
         /// <summary>
         /// Determine if the specified <paramref name="method"/> conforms to the configured handle method specification.
         /// </summary>
@@ -54,7 +53,7 @@ namespace Spark.Infrastructure.Domain.Mappings
             return method.ReturnParameter != null &&
                    method.ReturnParameter.ParameterType == typeof(void) &&
                    method.Name.Equals(MethodName, StringComparison.InvariantCultureIgnoreCase) &&
-                   parameters.Length > 0 && parameters[0].ParameterType.DerivesFrom(typeof(Command));
+                   parameters.Length > 0 && parameters[0].ParameterType.DerivesFrom(typeof(Event));
         }
     }
 }
