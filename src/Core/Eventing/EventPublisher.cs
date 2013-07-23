@@ -51,7 +51,7 @@ namespace Spark.Infrastructure.Eventing
 
             Log.TraceFormat("Publishing {0} to {1}", payload.Event, payload.AggregateId);
 
-            //TODO: messageSender.Send(messageFactory.Create(headers, payload));
+            messageSender.Send(messageFactory.Create(headers, payload));
         }
     }
 }

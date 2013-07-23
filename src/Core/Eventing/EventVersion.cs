@@ -98,7 +98,7 @@ namespace Spark.Infrastructure.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("Version {0} (Event {1} of {2})", Version, Item, Count);
+            return String.Format("{0} (Event {1} of {2})", Version, Item, Count);
         }
     }
 }

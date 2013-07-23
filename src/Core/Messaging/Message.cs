@@ -20,6 +20,23 @@ namespace Spark.Infrastructure.Messaging
     /// <summary>
     /// A message envelope containing a unique identifier, message headers and associated payload.
     /// </summary>
+    public static class Message
+    {
+        /// <summary>
+        /// Creates a new instance of <see cref="Message{TPayload}"/>.
+        /// </summary>
+        /// <param name="id">The unique message identifier</param>
+        /// <param name="headers">The set of headers associated with this message.</param>
+        /// <param name="payload">The message payload.</param>
+        public static Message<TPayload> Create<TPayload>(Guid id, HeaderCollection headers, TPayload payload)
+        {
+            return new Message<TPayload>(id, headers, payload);
+        }
+    }
+
+    /// <summary>
+    /// A message envelope containing a unique identifier, message headers and associated payload.
+    /// </summary>
     [Serializable]
     public sealed class Message<TPayload> : IMessage
     {

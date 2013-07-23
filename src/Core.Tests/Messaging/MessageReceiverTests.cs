@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Moq;
-using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Messaging;
 using Xunit;
 
@@ -18,28 +18,28 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Commanding
+namespace Spark.Infrastructure.Tests.Messaging
 {
-    public static class UsingCommandReceiver
+    public static class UsingMessageReceiver
     {
         public class WhenCreatingNewReceiver
         {
             [Fact]
             public void MessageReceiverCannotBeNull()
             {
-                var commandProcessor = new Mock<IProcessCommands>();
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandReceiver(null, commandProcessor.Object));
+                var messageProcessor = new Mock<IProcessMessages<Object>>();
+                var ex = Assert.Throws<ArgumentNullException>(() => new MessageReceiver<Object>(null, messageProcessor.Object));
 
                 Assert.Equal("messageReceiver", ex.ParamName);
             }
 
             [Fact]
-            public void CommandProcessorCannotBeNull()
+            public void MessageProcessorCannotBeNull()
             {
-                var messageReceiver = new Mock<IReceiveMessages<CommandEnvelope>>();
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandReceiver(messageReceiver.Object, null));
+                var messageReceiver = new Mock<IReceiveMessages<Object>>();
+                var ex = Assert.Throws<ArgumentNullException>(() => new MessageReceiver<Object>(messageReceiver.Object, null));
 
-                Assert.Equal("commandProcessor", ex.ParamName);
+                Assert.Equal("messageProcessor", ex.ParamName);
             }
         }
 
@@ -48,28 +48,28 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void PassPayloadOnToCommandProcessor()
             {
-                var commandProcessor = new FakeCommandProcessor();
+                var messageProcessor = new FakeCommandProcessor();
 
-                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
-                using (new CommandReceiver(messageBus, commandProcessor))
+                using (var messageBus = new BlockingCollectionMessageBus<Object>())
+                using (new MessageReceiver<Object>(messageBus, messageProcessor))
                 {
-                    messageBus.Send(new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty));
+                    messageBus.Send(new Message<Object>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new Object()));
                     messageBus.Dispose();
                 }
 
-                Assert.True(commandProcessor.WaitUntilProcessed());
+                Assert.True(messageProcessor.WaitUntilProcessed());
             }
 
             [Fact]
             public void CanTolerateProcessorExceptions()
             {
-                var message = new Message<CommandEnvelope>(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
-                var commandProcessor = new Mock<IProcessCommands>();
+                var message = new Message<Object>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new Object());
+                var messageProcessor = new Mock<IProcessMessages<Object>>();
 
-                commandProcessor.Setup(mock => mock.Process(message.Id, message.Headers, message.Payload)).Throws(new InvalidOperationException());
+                messageProcessor.Setup(mock => mock.ProcessAsync(message)).Throws(new InvalidOperationException());
 
-                using (var messageBus = new BlockingCollectionMessageBus<CommandEnvelope>())
-                using (new CommandReceiver(messageBus, commandProcessor.Object))
+                using (var messageBus = new BlockingCollectionMessageBus<Object>())
+                using (new MessageReceiver<Object>(messageBus, messageProcessor.Object))
                 {
                     messageBus.Send(message);
                     messageBus.Dispose();
@@ -77,13 +77,15 @@ namespace Spark.Infrastructure.Tests.Commanding
             }
         }
 
-        private sealed class FakeCommandProcessor : IProcessCommands
+        private sealed class FakeCommandProcessor : IProcessMessages<Object>
         {
             private readonly ManualResetEvent commandProcessed = new ManualResetEvent(false);
 
-            public void Process(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
+            public Task ProcessAsync(Message<Object> message)
             {
                 commandProcessed.Set();
+
+                return Task.FromResult(default(Object));
             }
 
             public Boolean WaitUntilProcessed()

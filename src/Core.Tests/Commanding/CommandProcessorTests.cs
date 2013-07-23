@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Messaging;
@@ -29,13 +26,18 @@ namespace Spark.Infrastructure.Tests.Commanding
     {
         public abstract class UsingCommandProcessorBase
         {
+            protected readonly Mock<IProcessCommandSettings>  Settings = new Mock<IProcessCommandSettings>();
             protected readonly Mock<IRetrieveCommandHandlers> HandlerRegistry = new Mock<IRetrieveCommandHandlers>();
             protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
             protected readonly CommandProcessor Processor;
 
             protected UsingCommandProcessorBase()
             {
-                Processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object);
+                Settings.Setup(mock => mock.BoundedCapacity).Returns(100);
+                Settings.Setup(mock => mock.MaximumConcurrencyLevel).Returns(10);
+                Settings.Setup(mock => mock.RetryTimeout).Returns(TimeSpan.FromSeconds(10));
+
+                Processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, Settings.Object);
             }
         }
 
@@ -68,11 +70,12 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
 
                 HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), (a, c) => { }));
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
 
-                Processor.Process(Guid.NewGuid(), HeaderCollection.Empty, envelope);
+                Processor.Process(message);
 
                 AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Once());
             }
@@ -87,6 +90,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
                 var ex = new ConcurrencyException();
 
                 HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), (a, c) => { }));
@@ -97,7 +101,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                             throw ex;
                     });
 
-                Processor.Process(Guid.NewGuid(), HeaderCollection.Empty, envelope);
+                Processor.Process(message);
 
                 AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId), Times.Exactly(2));
             }
@@ -105,10 +109,13 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void WillTimeoutEventuallyIfCannotSave()
             {
+                Settings.Setup(mock => mock.RetryTimeout).Returns(TimeSpan.FromMilliseconds(20));
+
                 var command = new FakeCommand();
                 var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
-                var processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, TimeSpan.FromMilliseconds(20));
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
+                var processor = new CommandProcessor(HandlerRegistry.Object, AggregateStore.Object, Settings.Object);
 
                 SystemTime.ClearOverride();
 
@@ -116,7 +123,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
                 AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
 
-                Assert.Throws<TimeoutException>(() => processor.Process(Guid.NewGuid(), HeaderCollection.Empty, envelope));
+                Assert.Throws<TimeoutException>(() => processor.Process(message));
             }
         }
 

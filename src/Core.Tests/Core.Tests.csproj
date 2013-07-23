@@ -67,9 +67,10 @@
     <Compile Include="Commanding\CommandContextTests.cs" />
     <Compile Include="Commanding\CommandHandlerRegistryTests.cs" />
     <Compile Include="Commanding\CommandHandlerTests.cs" />
-    <Compile Include="Commanding\CommandProcessorTests.cs" />
+    <Compile Include="Commanding\CommandProcessorTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Commanding\CommandPublisherTests.cs" />
-    <Compile Include="Commanding\CommandReceiverTests.cs" />
     <Compile Include="Commanding\CommandTests.cs" />
     <Compile Include="Domain\AggregateStateValidatorTests.cs" />
     <Compile Include="Domain\AggregateStoreTests.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
     <Compile Include="Eventing\EventCollectionTests.cs" />
+    <Compile Include="Messaging\MessageReceiverTests.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />
     <Compile Include="Messaging\HeaderCollectionTests.cs" />
     <Compile Include="EventStore\PagedResultTests.cs" />

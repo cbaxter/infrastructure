@@ -19,7 +19,7 @@ namespace Example
         {
             GuidStrategy.Initialize(SqlServerSequentialGuid.NewGuid);
 
-            var count = 250000;
+            var count = 50000;
             var builder = new ContainerBuilder();
             var benchmarkHook = new BenchmarkHook(count);
 
@@ -27,7 +27,6 @@ namespace Example
             builder.RegisterInstance(benchmarkHook).As<PipelineHook>();
 
             var container = builder.Build();
-            var commandReceiver = container.Resolve<CommandReceiver>();
             var commandPublisher = container.Resolve<IPublishCommands>();
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();

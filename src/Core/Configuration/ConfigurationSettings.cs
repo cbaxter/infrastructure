@@ -32,11 +32,6 @@ namespace Spark.Infrastructure.Configuration
         IProcessCommandSettings CommandProcessor { get; }
 
         /// <summary>
-        /// The <see cref="CommandReceiver"/> configuration settings.
-        /// </summary>
-        IReceiveCommandSettings CommandReceiver { get; }
-
-        /// <summary>
         /// The <see cref="IStoreEvents"/> configuration settings.
         /// </summary>
         IStoreEventSettings EventStore { get; }
@@ -56,10 +51,6 @@ namespace Spark.Infrastructure.Configuration
         [ConfigurationProperty("commandProcessor", IsRequired = false)]
         public CommandProcessorElement CommandProcessor { get { return (CommandProcessorElement)base["commandProcessor"] ?? new CommandProcessorElement(); } }
         IProcessCommandSettings ISettings.CommandProcessor { get { return CommandProcessor; } }
-
-        [ConfigurationProperty("commandReceiver", IsRequired = false)]
-        public CommandReceiverElement CommandReceiver { get { return (CommandReceiverElement)base["commandReceiver"] ?? new CommandReceiverElement(); } }
-        IReceiveCommandSettings ISettings.CommandReceiver { get { return CommandReceiver; } }
 
         [ConfigurationProperty("eventStore", IsRequired = false)]
         public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"] ?? new EventStoreElement(); } }

@@ -60,14 +60,11 @@
     <Compile Include="Commanding\CommandHandler.cs" />
     <Compile Include="Commanding\CommandHandlerRegistry.cs" />
     <Compile Include="Commanding\CommandProcessor.cs" />
-    <Compile Include="Commanding\CommandReceiver.cs" />
-    <Compile Include="Commanding\IProcessCommands.cs" />
     <Compile Include="Commanding\IPublishCommands.cs" />
     <Compile Include="Commanding\IRetrieveCommandHandlers.cs" />
     <Compile Include="Configuration\AggregateStoreElement.cs" />
     <Compile Include="Configuration\CommandProcessorElement.cs" />
     <Compile Include="Configuration\ConfigurationSettings.cs" />
-    <Compile Include="Configuration\CommandReceiverElement.cs" />
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
@@ -108,6 +105,9 @@
     <Compile Include="Eventing\Mappings\HandleMethodMapping.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Eventing\Sagas\Saga.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />
@@ -130,7 +130,9 @@
     <Compile Include="EventStore\Sql\ISqlDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Messaging\IProcessMessages.cs" />
     <Compile Include="Messaging\IMessage.cs" />
+    <Compile Include="Messaging\MessageReceiver.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Domain\AggregateStore.cs" />
     <Compile Include="Domain\CachedAggregateStore.cs" />

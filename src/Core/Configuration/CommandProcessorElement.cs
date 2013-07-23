@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using Spark.Infrastructure.Commanding;
+using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -23,6 +24,16 @@ namespace Spark.Infrastructure.Configuration
     public interface IProcessCommandSettings
     {
         /// <summary>
+        /// The bounded capacity associated with the <see cref="CommandProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 1000).
+        /// </summary>
+        Int32 BoundedCapacity { get; }
+        
+        /// <summary>
+        /// The maximum concurrency level associated with the <see cref="CommandProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 47).
+        /// </summary>
+        Int32 MaximumConcurrencyLevel { get; }
+
+        /// <summary>
         /// The maximum amount of time to spend trying to process a command (default 00:00:10).
         /// </summary>
         TimeSpan RetryTimeout { get; }
@@ -30,6 +41,12 @@ namespace Spark.Infrastructure.Configuration
 
     internal sealed class CommandProcessorElement : ConfigurationElement, IProcessCommandSettings
     {
+        [ConfigurationProperty("boundedCapacity", IsRequired = false, DefaultValue = 1000)]
+        public Int32 BoundedCapacity { get { return (Int32)base["boundedCapacity"]; } }
+
+        [ConfigurationProperty("maximumConcurrencyLevel", IsRequired = false, DefaultValue = 47)]
+        public Int32 MaximumConcurrencyLevel { get { return (Int32)base["maximumConcurrencyLevel"]; } }
+
         [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
         public TimeSpan RetryTimeout { get { return (TimeSpan)base["retryTimeout"]; } }
     }

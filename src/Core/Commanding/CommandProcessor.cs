@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
@@ -25,11 +27,13 @@ namespace Spark.Infrastructure.Commanding
     /// <summary>
     /// Executes <see cref="Command"/> instances with the associated <see cref="Aggregate"/> <see cref="CommandHandler"/>.
     /// </summary>
-    public sealed class CommandProcessor : IProcessCommands
+    public sealed class CommandProcessor : IProcessMessages<CommandEnvelope>
     {
+        private static readonly TaskCreationOptions TaskCreationOptions = TaskCreationOptions.AttachedToParent | TaskCreationOptions.HideScheduler;
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IRetrieveCommandHandlers commandHandlerRegistry;
         private readonly IStoreAggregates aggregateStore;
+        private readonly TaskScheduler taskScheduler;
         private readonly TimeSpan retryTimeout;
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace Spark.Infrastructure.Commanding
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
         /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
         public CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore)
-            : this(commandHandlerRegistry, aggregateStore, Settings.CommandProcessor.RetryTimeout)
+            : this(commandHandlerRegistry, aggregateStore, Settings.CommandProcessor)
         { }
 
         /// <summary>
@@ -46,34 +50,54 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
         /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
-        /// <param name="retryTimeout">The maximum amount of time to try processing a given command.</param>
-        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore, TimeSpan retryTimeout)
+        /// <param name="settings">The command processor configuration settings.</param>
+        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IStoreAggregates aggregateStore, IProcessCommandSettings settings)
         {
             Verify.NotNull(commandHandlerRegistry, "commandHandlerRegistry");
             Verify.NotNull(aggregateStore, "aggregateStore");
+            Verify.NotNull(settings, "settings");
 
+            this.retryTimeout = settings.RetryTimeout;
+            this.taskScheduler = new PartitionedTaskScheduler(GetAggregateId, settings.MaximumConcurrencyLevel, settings.BoundedCapacity);
             this.commandHandlerRegistry = commandHandlerRegistry;
             this.aggregateStore = aggregateStore;
-            this.retryTimeout = retryTimeout;
         }
 
         /// <summary>
-        /// Processes a given <see cref="Command"/> instance.
+        /// Gets the task partition id based on the underlying command's target aggregate id.
         /// </summary>
-        /// <param name="commandId">The unique <see cref="Command"/> instance id.</param>
-        /// <param name="headers">The message headers associated with the <paramref name="envelope"/>.</param>
-        /// <param name="envelope">The <see cref="Command"/> envelope to process.</param>
-        public void Process(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
+        /// <param name="task">The task to partition.</param>
+        private static Object GetAggregateId(Task task)
         {
-            Verify.NotEqual(Guid.Empty, commandId, "commandId");
-            Verify.NotNull(envelope, "envelope");
-            Verify.NotNull(headers, "headers");
+            var message = (Message<CommandEnvelope>)task.AsyncState;
 
-            using (var context = new CommandContext(commandId, headers))
+            return message.Payload.AggregateId;
+        }
+
+        /// <summary>
+        /// Process the received <see cref="Command"/> message instance asynchronously.
+        /// </summary>
+        /// <param name="message">The <see cref="Command"/> message.</param>
+        public Task ProcessAsync(Message<CommandEnvelope> message)
+        {
+            Verify.NotNull(message, "message");
+
+            return Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+        }
+
+        /// <summary>
+        /// Process the received <see cref="Command"/> message instance synchronously.
+        /// </summary>
+        /// <param name="message">The <see cref="Command"/> message.</param>
+        private void Process(Message<CommandEnvelope> message)
+        {
+            using (Log.PushContext("Message", message))
+            using (var context = new CommandContext(message.Id, message.Headers))
             {
-                var commandHandler = commandHandlerRegistry.GetHandlerFor(envelope.Command);
-                var backoffContext = default(ExponentialBackoff);
                 var done = false;
+                var envelope = message.Payload;
+                var backoffContext = default(ExponentialBackoff);
+                var commandHandler = commandHandlerRegistry.GetHandlerFor(envelope.Command);
 
                 do
                 {

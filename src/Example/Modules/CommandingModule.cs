@@ -35,9 +35,8 @@ namespace Example.Modules
             builder.Register(context => new SqlEventStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreEvents>().SingleInstance();
             builder.Register(context => new SqlSnapshotStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreSnapshots>().SingleInstance();
 
-
-            builder.RegisterType<CommandReceiver>().AsSelf().SingleInstance();
-            builder.RegisterType<CommandProcessor>().As<IProcessCommands>().SingleInstance();
+            builder.RegisterType<MessageReceiver<CommandEnvelope>>().AsSelf().SingleInstance().AutoActivate();
+            builder.RegisterType<CommandProcessor>().As<IProcessMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
 
             builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new CachedAggregateStore(aggregateStore), "AggregateStore").Named<IStoreAggregates>("CachedAggregateStore").SingleInstance();

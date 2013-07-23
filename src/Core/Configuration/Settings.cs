@@ -54,14 +54,6 @@ namespace Spark.Infrastructure.Configuration
         }
 
         /// <summary>
-        /// The <see cref="CommandReceiver"/> configuration settings.
-        /// </summary>
-        public static IReceiveCommandSettings CommandReceiver
-        {
-            get { return configuration.CommandReceiver; }
-        }
-
-        /// <summary>
         /// The <see cref="IStoreEvents"/> configuration settings.
         /// </summary>
         public static IStoreEventSettings Eventstore
