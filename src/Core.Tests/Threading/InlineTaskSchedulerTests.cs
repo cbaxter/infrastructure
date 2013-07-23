@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Spark.Infrastructure.Tests.Threading
 {
-    public static class UsingSynchronousTaskScheduler
+    public static class UsingInlineTaskScheduler
     {
         public class WhenQueuingTasks
         {
@@ -29,7 +29,7 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 Int32? managedThreadId = null;
 
-                Task.Factory.StartNew(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None, SynchronousTaskScheduler.Instance);
+                Task.Factory.StartNew(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None, InlineTaskScheduler.Instance);
 
                 Assert.True(managedThreadId.HasValue);
                 Assert.Equal(Thread.CurrentThread.ManagedThreadId, managedThreadId.Value);
@@ -38,13 +38,13 @@ namespace Spark.Infrastructure.Tests.Threading
             [Fact]
             public void MaximumConcurrencyLevelIsOne()
             {
-                Assert.Equal(1, SynchronousTaskScheduler.Instance.MaximumConcurrencyLevel);
+                Assert.Equal(1, InlineTaskScheduler.Instance.MaximumConcurrencyLevel);
             }
 
             [Fact]
             public void ScheduledTasksAlwaysEmpty()
             {
-                Assert.Equal(0, SynchronousTaskScheduler.Instance.ScheduledTasks.Count());
+                Assert.Equal(0, InlineTaskScheduler.Instance.ScheduledTasks.Count());
             }
         }
 
@@ -55,7 +55,7 @@ namespace Spark.Infrastructure.Tests.Threading
             {
                 Int32? managedThreadId = null;
 
-                new Task(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None).RunSynchronously(SynchronousTaskScheduler.Instance);
+                new Task(() => managedThreadId = Thread.CurrentThread.ManagedThreadId, CancellationToken.None, TaskCreationOptions.None).RunSynchronously(InlineTaskScheduler.Instance);
 
                 Assert.True(managedThreadId.HasValue);
                 Assert.Equal(Thread.CurrentThread.ManagedThreadId, managedThreadId.Value);

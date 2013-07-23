@@ -103,6 +103,7 @@
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
     <Compile Include="Eventing\EventCollectionTests.cs" />
+    <Compile Include="Messaging\InlineMessageBusTests.cs" />
     <Compile Include="Messaging\MessageReceiverTests.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />
     <Compile Include="Messaging\HeaderCollectionTests.cs" />
@@ -134,7 +135,7 @@
     <Compile Include="Threading\FakeMonitor.cs" />
     <Compile Include="Threading\FakeThreadPool.cs" />
     <Compile Include="Threading\PartitionedTaskSchedulerTests.cs" />
-    <Compile Include="Threading\SynchronousTaskSchedulerTests.cs" />
+    <Compile Include="Threading\InlineTaskSchedulerTests.cs" />
     <Compile Include="Threading\MonitorWrapperTests.cs" />
     <Compile Include="Threading\ThreadPoolWrapperTests.cs" />
     <Compile Include="TypeExtensionTests.cs" />

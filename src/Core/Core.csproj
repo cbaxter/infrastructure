@@ -130,6 +130,7 @@
     <Compile Include="EventStore\Sql\ISqlDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Messaging\InlineMessageBus.cs" />
     <Compile Include="Messaging\IProcessMessages.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\MessageReceiver.cs" />
@@ -223,7 +224,7 @@
     <Compile Include="Threading\BlockingThreadPoolTaskScheduler.cs" />
     <Compile Include="Threading\ExponentialBackoff.cs" />
     <Compile Include="Threading\ISynchronizeAccess.cs" />
-    <Compile Include="Threading\SynchronousTaskScheduler.cs" />
+    <Compile Include="Threading\InlineTaskScheduler.cs" />
     <Compile Include="Threading\IQueueUserWorkItems.cs" />
     <Compile Include="Threading\MonitorWrapper.cs" />
     <Compile Include="Threading\PartitionedTaskScheduler.cs" />

@@ -22,14 +22,14 @@ namespace Spark.Infrastructure.Threading
     /// <summary>
     /// Provides a task scheduler that runs tasks on the current thread immediately.
     /// </summary>
-    public sealed class SynchronousTaskScheduler : TaskScheduler
+    public sealed class InlineTaskScheduler : TaskScheduler
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// Default instance of <see cref="SynchronousTaskScheduler"/>.
+        /// Default instance of <see cref="InlineTaskScheduler"/>.
         /// </summary>
-        public static readonly SynchronousTaskScheduler Instance = new SynchronousTaskScheduler();
+        public static readonly InlineTaskScheduler Instance = new InlineTaskScheduler();
 
         /// <summary>
         /// Indicates the maximum concurrency level this <see cref="TaskScheduler"/> is able to support.
