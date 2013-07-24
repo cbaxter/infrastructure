@@ -168,7 +168,8 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), version);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    aggregateStore.Save(aggregate, context);
 
                 Assert.Equal(version + 1, aggregate.Version);
             }
@@ -179,7 +180,8 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 0);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    aggregateStore.Save(aggregate, context);
 
                 eventStore.Verify(mock => mock.Save(It.Is<Commit>(c => c.Headers[Header.Aggregate] == typeof(FakeAggregate).GetFullNameWithAssembly())), Times.Once());
             }
@@ -190,7 +192,8 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 9);
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, settings.Object);
 
-                aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty));
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    aggregateStore.Save(aggregate, context);
 
                 snapshotStore.Verify(mock => mock.Save(It.Is<Snapshot>(s => s.StreamId == aggregate.Id && s.Version == 10)), Times.Once());
             }
@@ -203,7 +206,10 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<DuplicateCommitException>();
 
-                Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, context));
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -214,7 +220,10 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<ConcurrencyException>();
 
-                Assert.Throws<ConcurrencyException>(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    Assert.Throws<ConcurrencyException>(() => aggregateStore.Save(aggregate, context));
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -226,7 +235,10 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Callback(() => { if (throwException) { throwException = false; throw new InvalidOperationException(); } });
 
-                Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, context));
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -237,7 +249,10 @@ namespace Spark.Infrastructure.Tests.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<InvalidOperationException>();
 
-                Assert.Throws<TimeoutException>(() => aggregateStore.Save(aggregate, new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty)));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    Assert.Throws<TimeoutException>(() => aggregateStore.Save(aggregate, context));
+                // ReSharper restore AccessToDisposedClosure
             }
 
             private class FakeAggregate : Aggregate

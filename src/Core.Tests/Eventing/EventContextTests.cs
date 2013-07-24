@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Eventing;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Resources;
@@ -20,78 +19,59 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Commanding
+namespace Spark.Infrastructure.Tests.Eventing
 {
-    public static class UsingCommandContext
+    public static class UsingEventContext
     {
         public class WhenCreatingNewContext
         {
             [Fact]
             public void HeaderCollectionCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandContext(Guid.NewGuid(), null, CommandEnvelope.Empty));
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventContext(Guid.NewGuid(), null, new FakeEvent()));
 
                 Assert.Equal("headers", ex.ParamName);
             }
 
             [Fact]
-            public void CommandEnvelopeCannotBeNull()
+            public void EventCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventContext(Guid.NewGuid(), HeaderCollection.Empty, null));
 
-                Assert.Equal("envelope", ex.ParamName);
+                Assert.Equal("e", ex.ParamName);
             }
 
             [Fact]
-            public void CurrentContextSetToNewCommandContextInstance()
+            public void CurrentContextSetToNewEventContextInstance()
             {
-                var commandId = Guid.NewGuid();
-                using (var context = new CommandContext(commandId, HeaderCollection.Empty, CommandEnvelope.Empty))
+                var @event = new FakeEvent();
+                var aggregateId = Guid.NewGuid();
+
+                using (var context = new EventContext(aggregateId, HeaderCollection.Empty, @event))
                 {
-                    Assert.Same(context, CommandContext.Current);
-                    Assert.Equal(commandId, CommandContext.Current.CommandId);
-                    Assert.Equal(HeaderCollection.Empty, CommandContext.Current.Headers);
-                }
-            }
-        }
-
-        public class WhenRaisingEvents
-        {
-            [Fact]
-            public void RaiseMaintainsEventOrder()
-            {
-                FakeEvent e1 = new FakeEvent(), e2 = new FakeEvent(), e3 = new FakeEvent();
-
-                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                {
-                    context.Raise(e1);
-                    context.Raise(e2);
-                    context.Raise(e3);
-
-                    var raisedEvents = context.GetRaisedEvents();
-                    Assert.Equal(3, raisedEvents.Count);
-                    Assert.Same(e1, raisedEvents[0]);
-                    Assert.Same(e2, raisedEvents[1]);
-                    Assert.Same(e3, raisedEvents[2]);
+                    Assert.Same(context, EventContext.Current);
+                    Assert.Same(@event, EventContext.Current.Event);
+                    Assert.Equal(aggregateId, EventContext.Current.AggregateId);
+                    Assert.Equal(HeaderCollection.Empty, EventContext.Current.Headers);
                 }
             }
 
-            private class FakeEvent : Event
+            protected sealed class FakeEvent : Event
             { }
         }
 
         public class WhenDisposing
         {
             [Fact]
-            public void CannotDisposeContextFromAnotherThread()
+            public void CannotDisposeEventFromAnotherThread()
             {
                 var contextDisposedEvent = new ManualResetEvent(false);
                 var contextCreatedEvent = new ManualResetEvent(false);
-                var context = default(CommandContext);
+                var context = default(EventContext);
 
                 Task.Factory.StartNew(() =>
                     {
-                        context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
+                        context = new EventContext(Guid.NewGuid(), HeaderCollection.Empty, new FakeEvent());
                         contextCreatedEvent.Set();
                         contextDisposedEvent.WaitOne();
                         context.Dispose();
@@ -101,7 +81,7 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 var ex = Assert.Throws<InvalidOperationException>(() => context.Dispose());
 
-                Assert.Equal(Exceptions.CommandContextInterleaved, ex.Message);
+                Assert.Equal(Exceptions.EventContextInterleaved, ex.Message);
 
                 contextDisposedEvent.Set();
             }
@@ -109,8 +89,8 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void CannotDisposeContextOutOfOrder()
             {
-                var context1 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
-                var context2 = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty);
+                var context1 = new EventContext(Guid.NewGuid(), HeaderCollection.Empty, new FakeEvent());
+                var context2 = new EventContext(Guid.NewGuid(), HeaderCollection.Empty, new FakeEvent());
 
                 // ReSharper disable AccessToDisposedClosure
                 var ex = Assert.Throws<InvalidOperationException>(() => context1.Dispose());
@@ -119,18 +99,21 @@ namespace Spark.Infrastructure.Tests.Commanding
                 context2.Dispose();
                 context1.Dispose();
 
-                Assert.Equal(Exceptions.CommandContextInvalidThread, ex.Message);
+                Assert.Equal(Exceptions.EventContextInvalidThread, ex.Message);
             }
 
             [Fact]
             public void CanCallDisposeMoreThanOnce()
             {
-                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                using (var context = new EventContext(Guid.NewGuid(), HeaderCollection.Empty, new FakeEvent()))
                 {
                     context.Dispose();
                     context.Dispose();
                 }
             }
+
+            protected sealed class FakeEvent : Event
+            { }
         }
     }
 }

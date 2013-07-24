@@ -54,6 +54,7 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Denormalizers\ClientDenormalizer.cs" />
     <Compile Include="Domain\Client.cs" />
     <Compile Include="Domain\Commands\ClientCommands.cs" />
     <Compile Include="Domain\Events\ClientRegistered.cs" />

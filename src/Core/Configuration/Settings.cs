@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using Spark.Infrastructure.EventStore;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -54,11 +53,19 @@ namespace Spark.Infrastructure.Configuration
         }
 
         /// <summary>
-        /// The <see cref="IStoreEvents"/> configuration settings.
+        /// The <see cref="EventStore"/> configuration settings.
         /// </summary>
-        public static IStoreEventSettings Eventstore
+        public static IStoreEventSettings EventStore
         {
             get { return configuration.EventStore; }
+        }
+
+        /// <summary>
+        /// The <see cref="EventProcessor"/> configuration settings.
+        /// </summary>
+        public static IProcessEventSettings EventProcessor
+        {
+            get { return configuration.EventProcessor; }
         }
 
         /// <summary>

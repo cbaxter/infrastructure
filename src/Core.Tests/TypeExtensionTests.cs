@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -27,7 +25,7 @@ namespace Spark.Infrastructure.Tests
             [Fact]
             public void TypeCanBeGenericTypeDefinition()
             {
-                Assert.True(typeof (CustomList).DerivesFrom(typeof (List<>)));
+                Assert.True(typeof(CustomList).DerivesFrom(typeof(List<>)));
             }
 
             [Fact]
@@ -58,6 +56,30 @@ namespace Spark.Infrastructure.Tests
             public void ReturnNullIfNotFound()
             {
                 Assert.Null(typeof(CustomList).FindBaseType(typeof(Dictionary<,>)));
+            }
+
+            private class CustomList : List<Object>
+            { }
+        }
+
+        public class WhenRetrievingTypeHierarchy
+        {
+            [Fact]
+            public void FirstEntryAlwaysCurrentType()
+            {
+                Assert.Equal(typeof(CustomList), typeof(CustomList).GetTypeHierarchy().First());
+            }
+
+            [Fact]
+            public void IntermediateEntriesAreBaseTypes()
+            {
+                Assert.Equal(typeof(List<Object>), typeof(CustomList).GetTypeHierarchy().Skip(1).First());
+            }
+
+            [Fact]
+            public void LastEntryAlwaysObjectType()
+            {
+                Assert.Equal(typeof(Object), typeof(CustomList).GetTypeHierarchy().Last());
             }
 
             private class CustomList : List<Object>

@@ -8,7 +8,7 @@ namespace Example.Domain
     {
         public void Handle(RegisterClient command)
         {
-            //TODO: Should really enforce new aggregate... CreateWith(...)
+            //TODO: Should consider enforcing new aggregate... CreateWith(...)
 
             Raise(new ClientRegistered(command.Name));
         }

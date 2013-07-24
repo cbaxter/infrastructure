@@ -35,7 +35,7 @@ namespace Spark.Infrastructure.Eventing
         /// <param name="eventStore">The event store.</param>
         /// <param name="eventPublisher">The event publisher.</param>
         public EventDispatcher(IStoreEvents eventStore, IPublishEvents eventPublisher)
-            : this(eventStore, eventPublisher, Settings.Eventstore)
+            : this(eventStore, eventPublisher, Settings.EventStore)
         { }
 
         /// <summary>
@@ -81,6 +81,8 @@ namespace Spark.Infrastructure.Eventing
         {
             if (commit != null && commit.Id.HasValue)
                 DispatchCommit(commit);
+            else
+                Log.WarnFormat("Commit not dispatched");
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -13,25 +13,17 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Mappings
+namespace Spark.Infrastructure.Eventing
 {
     /// <summary>
-    /// Event handler marker attribute.
+    /// An <see cref="EventHandler"/> registry.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-    public sealed class EventHandlerAttribute : Attribute
+    public interface IRetrieveEventHandlers
     {
         /// <summary>
-        /// Returns <value>true</value> if this event handler is reusable (singleton); otherwise <value>false</value> if this event handler is not reusable (transient).
+        /// Gets the set of <see cref="EventHandler"/> instances associated with the specified <paramref name="e"/>.
         /// </summary>
-        public Boolean IsReusable { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="EventHandlerAttribute"/>.
-        /// </summary>
-        public EventHandlerAttribute()
-        {
-            IsReusable = true;
-        }
+        /// <param name="e">The event for which to retrieve all <see cref="EventHandler"/> instances.</param>
+        IEnumerable<EventHandler> GetHandlersFor(Event e);
     }
 }

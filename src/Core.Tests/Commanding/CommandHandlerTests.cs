@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Moq;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.Messaging;
 using Xunit;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -29,7 +29,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void AggregateTypeCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(null, (a, c) => { }));
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(null, typeof(FakeCommand), new Mock<IStoreAggregates>().Object, (a, c) => { }));
 
                 Assert.Equal("aggregateType", ex.ParamName);
             }
@@ -37,68 +37,125 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void AggregateTypeMustBeAnAggregateType()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new CommandHandler(typeof(Object), (a, c) => { }));
+                var ex = Assert.Throws<ArgumentException>(() => new CommandHandler(typeof(Object), typeof(FakeCommand), new Mock<IStoreAggregates>().Object, (a, c) => { }));
 
                 Assert.Equal("aggregateType", ex.ParamName);
             }
 
             [Fact]
+            public void CommandTypeCannotBeNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(typeof(FakeAggregate), null, new Mock<IStoreAggregates>().Object, (a, c) => { }));
+
+                Assert.Equal("commandType", ex.ParamName);
+            }
+
+            [Fact]
+            public void CommandTypeMustBeAnAggregateType()
+            {
+                var ex = Assert.Throws<ArgumentException>(() => new CommandHandler(typeof(FakeAggregate), typeof(Object), new Mock<IStoreAggregates>().Object, (a, c) => { }));
+
+                Assert.Equal("commandType", ex.ParamName);
+            }
+
+            [Fact]
+            public void AggregateStoreCannotBeNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), null, (a, c) => { }));
+
+                Assert.Equal("aggregateStore", ex.ParamName);
+            }
+
+            [Fact]
             public void ExecutorCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(typeof(FakeAggregate), null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), new Mock<IStoreAggregates>().Object, null));
 
                 Assert.Equal("executor", ex.ParamName);
             }
         }
 
-        public class WhenInvoking
+
+        // ReSharper disable AccessToDisposedClosure
+        public class WhenHandlingCommandContext
         {
+            protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
+
             [Fact]
-            public void AggregateCannotBeNull()
+            public void ContextCanBeNull()
             {
-                var commandHandler = new CommandHandler(typeof (FakeAggregate), (a, c) => { });
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
 
-                var ex = Assert.Throws<ArgumentNullException>(() => commandHandler.Handle(null, new FakeCommand()));
-
-                Assert.Equal("aggregate", ex.ParamName);
+                Assert.DoesNotThrow(() => commandHandler.Handle(null, TimeSpan.FromSeconds(1)));
             }
 
             [Fact]
-            public void CommandCannotBeNull()
+            public void SaveAggregateOnSuccess()
             {
-                var commandHandler = new CommandHandler(typeof(FakeAggregate), (a, c) => { });
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
 
-                var ex = Assert.Throws<ArgumentNullException>(() => commandHandler.Handle(new FakeAggregate(), null));
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
 
-                Assert.Equal("command", ex.ParamName);
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    commandHandler.Handle(context, TimeSpan.FromSeconds(1));
+
+                AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Once());
             }
 
             [Fact]
-            public void InvokesUnderlyingAggregateCommandHandler()
+            public void ReloadAggregateWithLatestStateAfterConcurrencyException()
             {
-                var executed = false;
-                var commandHandler = new CommandHandler(typeof(FakeAggregate), (a, c) => executed = true);
+                var save = 0;
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
 
-                commandHandler.Handle(new FakeAggregate(), new FakeCommand());
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() =>
+                    {
+                        if (++save == 1)
+                            throw new ConcurrencyException();
+                    });
 
-                Assert.True(executed);
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    commandHandler.Handle(context, TimeSpan.FromSeconds(1));
+
+                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId), Times.Exactly(2));
+            }
+
+            [Fact]
+            public void TimeoutEventuallyIfCannotSave()
+            {
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
+
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    Assert.Throws<TimeoutException>(() => commandHandler.Handle(context, TimeSpan.FromMilliseconds(20)));
             }
         }
+        // ReSharper restore AccessToDisposedClosure
 
         public class WhenConvertingToString
         {
             [Fact]
             public void ReturnFriendlyDescription()
             {
-                var command = new CommandHandler(typeof(FakeAggregate), (a, c) => { });
+                var command = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), new Mock<IStoreAggregates>().Object, (a, c) => { });
 
-                Assert.Equal(String.Format("{0} Command Handler", typeof(FakeAggregate)), command.ToString());
+                Assert.Equal(String.Format("{0} Command Handler ({1})", typeof(FakeCommand), typeof(FakeAggregate)), command.ToString());
             }
         }
 
         private class FakeAggregate : Aggregate
         { }
 
+        [UsedImplicitly]
         private class FakeCommand : Command
         { }
     }

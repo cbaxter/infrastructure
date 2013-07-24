@@ -76,6 +76,8 @@ namespace Spark.Infrastructure.Domain.Mappings
             var parameters = method.GetParameters();
 
             yield return Expression.TypeAs(commandParameter, parameters.First().ParameterType);
+            
+            //TODO: Consider adding support for [Singleton] and [Transient] method parameter attributes to allow for control of behavior (default singleton).
 
             foreach (var parameter in parameters.Skip(1))
                 yield return Expression.Convert(Expression.Constant(serviceProvider.GetService(parameter.ParameterType)), parameter.ParameterType);

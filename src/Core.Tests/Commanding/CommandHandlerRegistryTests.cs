@@ -4,6 +4,7 @@ using Moq;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.Domain.Mappings;
+using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Resources;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace Spark.Infrastructure.Tests.Commanding
         public class WhenCreatingNewRegistry
         {
             private readonly Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
+            private readonly Mock<IStoreAggregates> aggregateStore = new Mock<IStoreAggregates>();
             private readonly Mock<ILocateTypes> typeLocator = new Mock<ILocateTypes>();
 
             [Fact]
@@ -34,7 +36,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new Type[0]);
 
-                Assert.DoesNotThrow(() => new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object));
+                Assert.DoesNotThrow(() => new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object));
             }
 
             [Fact]
@@ -42,7 +44,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(MultipleStrategiesAggregate) });
 
-                var ex = Assert.Throws<MappingException>(() => new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object));
+                var ex = Assert.Throws<MappingException>(() => new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object));
 
                 Assert.Equal(Exceptions.AggregateHandleByStrategyAmbiguous.FormatWith(typeof(MultipleStrategiesAggregate)), ex.Message);
             }
@@ -52,7 +54,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ImplicitStrategyAggregate), typeof(ExplicitStrategyAggregate) });
 
-                var ex = Assert.Throws<MappingException>(() => new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object));
+                var ex = Assert.Throws<MappingException>(() => new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object));
 
                 Assert.Equal(Exceptions.HandleMethodMustBeAssociatedWithSingleAggregate.FormatWith(typeof(ImplicitStrategyAggregate), typeof(FakeCommand)), ex.Message);
             }
@@ -62,7 +64,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ImplicitStrategyAggregate) });
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
                 var handler = registry.GetHandlerFor(new FakeCommand());
 
                 Assert.NotNull(handler);
@@ -73,7 +75,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ExplicitStrategyAggregate) });
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
                 var handler = registry.GetHandlerFor(new FakeCommand());
 
                 Assert.NotNull(handler);
@@ -83,9 +85,9 @@ namespace Spark.Infrastructure.Tests.Commanding
             public void CanResolveRegisteredServices()
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ServicedAggregate) });
-                serviceProvider.Setup(mock => mock.GetService(typeof (FakeService))).Returns(new FakeService());
+                serviceProvider.Setup(mock => mock.GetService(typeof(FakeService))).Returns(new FakeService());
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
                 var handler = registry.GetHandlerFor(new FakeCommand());
 
                 Assert.NotNull(handler);
@@ -94,26 +96,32 @@ namespace Spark.Infrastructure.Tests.Commanding
             [Fact]
             public void RegisteredServiceOnlyResolvedOncePerHandler()
             {
+                var aggregateId = GuidStrategy.NewGuid();
+
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ServicedAggregate) });
+                aggregateStore.Setup(mock => mock.Get(typeof(ServicedAggregate), aggregateId)).Returns(new ServicedAggregate());
                 serviceProvider.Setup(mock => mock.GetService(typeof(FakeService))).Returns(new FakeService());
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
-               
-                var handler1 = registry.GetHandlerFor(new FakeCommand());
-                handler1.Handle(new ServicedAggregate(), new FakeCommand());
-                handler1.Handle(new ServicedAggregate(), new FakeCommand());
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand())))
+                {
+                    var handler1 = registry.GetHandlerFor(new FakeCommand());
+                    handler1.Handle(context, TimeSpan.FromSeconds(1));
+                    handler1.Handle(context, TimeSpan.FromSeconds(1));
 
-                var handler2 = registry.GetHandlerFor(new FakeCommand());
-                handler2.Handle(new ServicedAggregate(), new FakeCommand());
-                handler2.Handle(new ServicedAggregate(), new FakeCommand());
+                    var handler2 = registry.GetHandlerFor(new FakeCommand());
+                    handler2.Handle(context, TimeSpan.FromSeconds(1));
+                    handler2.Handle(context, TimeSpan.FromSeconds(1));
+                }
 
-                serviceProvider.Verify(mock => mock.GetService(typeof (FakeService)), Times.Once());
+                serviceProvider.Verify(mock => mock.GetService(typeof(FakeService)), Times.Once());
             }
         }
 
         public class WhenGettingHandlers
         {
             private readonly Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
+            private readonly Mock<IStoreAggregates> aggregateStore = new Mock<IStoreAggregates>();
             private readonly Mock<ILocateTypes> typeLocator = new Mock<ILocateTypes>();
 
             [Fact]
@@ -121,7 +129,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(ImplicitStrategyAggregate), typeof(AlternateImplicitStrategyAggregate) });
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
                 var handler = registry.GetHandlerFor(new FakeCommand());
 
                 Assert.Equal(typeof(ImplicitStrategyAggregate), handler.AggregateType);
@@ -132,7 +140,7 @@ namespace Spark.Infrastructure.Tests.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(AlternateImplicitStrategyAggregate) });
 
-                var registry = new CommandHandlerRegistry(typeLocator.Object, serviceProvider.Object);
+                var registry = new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object);
                 var ex = Assert.Throws<MappingException>(() => registry.GetHandlerFor(new FakeCommand()));
 
                 Assert.Equal(Exceptions.CommandHandlerNotFound.FormatWith(typeof(FakeCommand)), ex.Message);
@@ -175,6 +183,7 @@ namespace Spark.Infrastructure.Tests.Commanding
         private class FakeCommand : Command
         { }
 
+        [UsedImplicitly]
         private class AlternateFakeCommand : Command
         { }
 

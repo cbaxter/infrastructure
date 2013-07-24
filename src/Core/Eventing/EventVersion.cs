@@ -50,8 +50,9 @@ namespace Spark.Infrastructure.Eventing
         public EventVersion(Int32 version, Int32 count, Int32 item)
         {
             Verify.GreaterThan(0, version, "version");
-            Verify.GreaterThan(0, count, "count");
-            Verify.GreaterThan(0, item, "item");
+            Verify.GreaterThanOrEqual(0, count, "count");
+            Verify.GreaterThanOrEqual(0, item, "item");
+            Verify.LessThanOrEqual(count, item, "item");
 
             this.version = version;
             this.count = count;

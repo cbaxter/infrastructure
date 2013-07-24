@@ -295,6 +295,16 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambiguous event handler mapping strategy,
+        ///Handler Type: {0}.
+        /// </summary>
+        internal static string EventHandlerHandleByStrategyAmbiguous {
+            get {
+                return ResourceManager.GetString("EventHandlerHandleByStrategyAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
         ///Reflected Type: {1}
         ///Method Name: {2}.
@@ -420,6 +430,16 @@ namespace Spark.Infrastructure.Resources {
         internal static string ReservedHeaderName {
             get {
                 return ResourceManager.GetString("ReservedHeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handler must have a single public default constructor.
+        ///Handler Type: {0}.
+        /// </summary>
+        internal static string SagaDefaultConstructorRequired {
+            get {
+                return ResourceManager.GetString("SagaDefaultConstructorRequired", resourceCulture);
             }
         }
         

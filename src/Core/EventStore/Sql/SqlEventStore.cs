@@ -52,7 +52,7 @@ namespace Spark.Infrastructure.EventStore.Sql
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
         public SqlEventStore(ISerializeObjects serializer, String connectionName)
-            : this(serializer, Settings.Eventstore, DialectProvider.GetEventStoreDialect(connectionName))
+            : this(serializer, Settings.EventStore, DialectProvider.GetEventStoreDialect(connectionName))
         { }
 
         /// <summary>

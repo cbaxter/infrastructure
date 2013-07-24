@@ -37,6 +37,11 @@ namespace Spark.Infrastructure.Configuration
         IStoreEventSettings EventStore { get; }
 
         /// <summary>
+        /// The <see cref="EventProcessor"/> configuration settings.
+        /// </summary>
+        IProcessEventSettings EventProcessor { get; }
+
+        /// <summary>
         /// The <see cref="IStoreSnapshots"/> configuration settings.
         /// </summary>
         IStoreSnapshotSettings SnapshotStore { get; }
@@ -55,6 +60,10 @@ namespace Spark.Infrastructure.Configuration
         [ConfigurationProperty("eventStore", IsRequired = false)]
         public EventStoreElement EventStore { get { return (EventStoreElement)base["eventStore"] ?? new EventStoreElement(); } }
         IStoreEventSettings ISettings.EventStore { get { return EventStore; } }
+
+        [ConfigurationProperty("eventProcessor", IsRequired = false)]
+        public EventProcessorElement EventProcessor { get { return (EventProcessorElement)base["eventProcessor"] ?? new EventProcessorElement(); } }
+        IProcessEventSettings ISettings.EventProcessor { get { return EventProcessor; } }
 
         [ConfigurationProperty("snapshotStore", IsRequired = false)]
         public SnapshotStoreElement SnapshotStore { get { return (SnapshotStoreElement)base["snapshotStore"] ?? new SnapshotStoreElement(); } }

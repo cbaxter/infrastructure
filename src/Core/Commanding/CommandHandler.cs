@@ -1,5 +1,9 @@
 ﻿using System;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.Logging;
+using Spark.Infrastructure.Resources;
+using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -21,8 +25,11 @@ namespace Spark.Infrastructure.Commanding
     /// </summary>
     public sealed class CommandHandler
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly Action<Aggregate, Command> executor;
+        private readonly IStoreAggregates aggregateStore;
         private readonly Type aggregateType;
+        private readonly Type commandType;
 
         /// <summary>
         /// The aggregate <see cref="Type"/> associated with this command handler executor.
@@ -30,31 +37,83 @@ namespace Spark.Infrastructure.Commanding
         public Type AggregateType { get { return aggregateType; } }
 
         /// <summary>
+        /// The aggregate <see cref="Type"/> associated with this command handler executor.
+        /// </summary>
+        public Type CommandType { get { return commandType; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="CommandHandler"/>.
         /// </summary>
         /// <param name="aggregateType">The aggregate type.</param>
+        /// <param name="commandType">The command type.</param>
+        /// <param name="aggregateStore">The aggregate store.</param>
         /// <param name="executor">The command handler executor.</param>
-        public CommandHandler(Type aggregateType, Action<Aggregate, Command> executor)
+        public CommandHandler(Type aggregateType, Type commandType, IStoreAggregates aggregateStore, Action<Aggregate, Command> executor)
         {
             Verify.NotNull(executor, "executor");
+            Verify.NotNull(commandType, "commandType");
             Verify.NotNull(aggregateType, "aggregateType");
+            Verify.NotNull(aggregateStore, "aggregateStore");
+            Verify.TypeDerivesFrom(typeof(Command), commandType, "commandType");
             Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
 
+            this.aggregateStore = aggregateStore;
             this.aggregateType = aggregateType;
+            this.commandType = commandType;
             this.executor = executor;
         }
 
         /// <summary>
         /// Invokes the underlying <see cref="Aggregate"/> command handler method for <see cref="Command"/>.
         /// </summary>
-        /// <param name="aggregate"></param>
-        /// <param name="command"></param>
-        public void Handle(Aggregate aggregate, Command command)
+        /// <param name="context">The current command context.</param>
+        /// <param name="retryTimeout">The maximum amount of time to spend trying to process a command.</param>
+        public void Handle(CommandContext context, TimeSpan retryTimeout)
         {
-            Verify.NotNull(aggregate, "aggregate");
-            Verify.NotNull(command, "command");
+            var backoffContext = default(ExponentialBackoff);
+            var done = false;
 
-            executor.Invoke(aggregate, command);
+            do
+            {
+                if (context == null)
+                    return;
+
+                try
+                {
+                    UpdateAggregate(context);
+                    done = true;
+                }
+                catch (ConcurrencyException ex)
+                {
+                    if (backoffContext == null)
+                        backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    if (!backoffContext.CanRetry)
+                        throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(context), ex);
+
+                    Log.WarnFormat("Concurrency conflict: {0}", context);
+                    backoffContext.WaitUntilRetry();
+                }
+            } while (!done);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        private void UpdateAggregate(CommandContext context)
+        {
+            var aggregate = aggregateStore.Get(AggregateType, context.AggregateId);
+
+            Log.DebugFormat("Executing {0} command on aggregate {1}", context.Command, aggregate);
+
+            executor(aggregate, context.Command);
+
+            Log.Trace("Saving aggregate state");
+
+            aggregateStore.Save(aggregate, context);
+
+            Log.Trace("Aggregate state saved");
         }
 
         /// <summary>
@@ -62,7 +121,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} Command Handler", AggregateType);
+            return String.Format("{0} Command Handler ({1})", CommandType, AggregateType);
         }
     }
 }

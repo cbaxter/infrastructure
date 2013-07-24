@@ -75,5 +75,24 @@ namespace Spark.Infrastructure
 
             return result;
         }
+
+        /// <summary>
+        /// Get the type hierarchy for the specified <paramref name="type"/> starting with <paramref name="type"/> and ending with <see cref="Object"/>.
+        /// </summary>
+        /// <param name="type">The type for which the type hierarchy is to be retrieved.</param>
+        public static IEnumerable<Type> GetTypeHierarchy(this Type type)
+        {
+            Verify.NotNull(type, "type");
+
+            yield return type;
+
+            var baseType = type.BaseType;
+            while (baseType != null)
+            {
+                yield return baseType;
+
+                baseType = baseType.BaseType;
+            }
+        }
     }
 }

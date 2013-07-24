@@ -66,7 +66,9 @@
     </Compile>
     <Compile Include="Commanding\CommandContextTests.cs" />
     <Compile Include="Commanding\CommandHandlerRegistryTests.cs" />
-    <Compile Include="Commanding\CommandHandlerTests.cs" />
+    <Compile Include="Commanding\CommandHandlerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Commanding\CommandProcessorTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -93,7 +95,13 @@
     </Compile>
     <Compile Include="Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Eventing\EventHandlerTests.cs" />
+    <Compile Include="Eventing\EventProcessorTests.cs" />
+    <Compile Include="Eventing\EventDispatcherTests.cs" />
+    <Compile Include="Eventing\EventPublisherTests.cs" />
+    <Compile Include="Eventing\EventContextTests.cs" />
     <Compile Include="Eventing\EventTests.cs" />
+    <Compile Include="Eventing\EventVersionTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByConventionAttributeTests.cs" />

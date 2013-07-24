@@ -6,7 +6,7 @@ namespace Spark.Infrastructure.Eventing.Sagas
     //TODO: Reminder... save state and then publish commands... to handle failure, can write sagas such that a timeout is scheduled and cleared if the corresponding completion event is received...
     //      Thus state is saved, command is published and if required and if failed, can be re-published on timeout if design requires it... (i.e., saga handler doesn't need to deal with it)...
 
-    [EventHandler]
+    [EventHandler(IsReusable = false)]
     public abstract class Saga : StateObject
     {
         public Guid CorrelationId { get; internal set; }

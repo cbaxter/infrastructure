@@ -207,6 +207,10 @@ Commit Id: {0}</value>
   <data name="EventContextInvalidThread" xml:space="preserve">
     <value>This EventContext is being disposed out of order.</value>
   </data>
+  <data name="EventHandlerHandleByStrategyAmbiguous" xml:space="preserve">
+    <value>Ambiguous event handler mapping strategy,
+Handler Type: {0}</value>
+  </data>
   <data name="HandleMethodInvalidParameters" xml:space="preserve">
     <value>A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
 Reflected Type: {1}
@@ -257,6 +261,10 @@ Parameter Name: {0}</value>
   <data name="ReservedHeaderName" xml:space="preserve">
     <value>Reserved system header.
 Name: {0}</value>
+  </data>
+  <data name="SagaDefaultConstructorRequired" xml:space="preserve">
+    <value>Event handler must have a single public default constructor.
+Handler Type: {0}</value>
   </data>
   <data name="StateAccessException" xml:space="preserve">
     <value>State may only be changed via an event apply method when saving an aggregate.

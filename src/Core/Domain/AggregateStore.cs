@@ -204,10 +204,10 @@ namespace Spark.Infrastructure.Domain
             if (commit.Version != expectedVersion)
                 throw new InvalidOperationException(Exceptions.MissingAggregateCommits.FormatWith(expectedVersion, commit.Version));
 
-            using (new EventContext(aggregate.Id, commit.Headers))
+            aggregate.Version = commit.Version;
+            foreach (var e in commit.Events)
             {
-                aggregate.Version = commit.Version;
-                foreach (var e in commit.Events)
+                using (new EventContext(aggregate.Id, commit.Headers, e))
                     aggregateUpdater.Apply(e, aggregate);
             }
         }

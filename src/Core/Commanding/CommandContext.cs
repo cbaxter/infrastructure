@@ -31,6 +31,7 @@ namespace Spark.Infrastructure.Commanding
         private readonly CommandContext originalContext;
         private readonly IList<Event> raisedEvents;
         private readonly HeaderCollection headers;
+        private readonly CommandEnvelope envelope;
         private readonly Guid commandId;
         private readonly Thread thread;
         private Boolean disposed;
@@ -46,24 +47,36 @@ namespace Spark.Infrastructure.Commanding
         public HeaderCollection Headers { get { return headers; } }
 
         /// <summary>
+        /// The unique <see cref="Aggregate"/> id associated with this <see cref="CommandContext"/>.
+        /// </summary>
+        public Guid AggregateId { get { return envelope.AggregateId; } }
+
+        /// <summary>
         /// The unique <see cref="Command"/> message id associated with this <see cref="CommandContext"/>.
         /// </summary>
         public Guid CommandId { get { return commandId; } }
+
+        /// <summary>
+        /// The <see cref="Command"/> associated with this <see cref="CommandContext"/>.
+        /// </summary>
+        public Command Command { get { return envelope.Command; } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="CommandContext"/> with the specified <paramref name="commandId"/> and <paramref name="headers"/>.
         /// </summary>
         /// <param name="commandId">The unique <see cref="Command"/> identifier.</param>
         /// <param name="headers">The <see cref="Command"/> headers.</param>
-        public CommandContext(Guid commandId, HeaderCollection headers)
+        /// <param name="envelope">The <see cref="CommandEnvelope"/> associated with this context.</param>
+        public CommandContext(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
         {
-            Verify.NotEqual(Guid.Empty, commandId, "commandId");
             Verify.NotNull(headers, "headers");
+            Verify.NotNull(envelope, "envelope");
 
             this.raisedEvents = new List<Event>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.commandId = commandId;
+            this.envelope = envelope;
             this.headers = headers;
 
             currentContext = this;
@@ -112,7 +125,7 @@ namespace Spark.Infrastructure.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", GetType(), CommandId);
+            return String.Format("{0} - {1}", CommandId, Command);
         }
     }
 }

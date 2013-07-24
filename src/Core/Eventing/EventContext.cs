@@ -30,6 +30,7 @@ namespace Spark.Infrastructure.Eventing
         private readonly HeaderCollection headers;
         private readonly Guid aggregateId;
         private readonly Thread thread;
+        private readonly Event @event;
         private Boolean disposed;
 
         /// <summary>
@@ -48,19 +49,27 @@ namespace Spark.Infrastructure.Eventing
         public Guid AggregateId { get { return aggregateId; } }
 
         /// <summary>
+        /// The <see cref="Event"/> associated with this <see cref="EventContext"/>.
+        /// </summary>
+        public Event Event { get { return @event; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="EventContext"/> with the specified <paramref name="aggregateId"/> and <paramref name="headers"/>.
         /// </summary>
         /// <param name="aggregateId">The unique <see cref="Aggregate"/> identifier.</param>
         /// <param name="headers">The <see cref="Event"/> headers.</param>
-        public EventContext(Guid aggregateId, HeaderCollection headers)
+        /// <param name="e">The <see cref="Event"/>.</param>
+        public EventContext(Guid aggregateId, HeaderCollection headers, Event e)
         {
             Verify.NotEqual(Guid.Empty, aggregateId, "aggregateId");
             Verify.NotNull(headers, "headers");
+            Verify.NotNull(e, "e");
 
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.aggregateId = aggregateId;
             this.headers = headers;
+            this.@event = e;
 
             currentContext = this;
         }
@@ -88,7 +97,7 @@ namespace Spark.Infrastructure.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", GetType(), AggregateId);
+            return String.Format("{0} - {1}", AggregateId, Event);
         }
     }
 }

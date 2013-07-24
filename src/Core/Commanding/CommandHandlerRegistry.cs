@@ -34,27 +34,29 @@ namespace Spark.Infrastructure.Commanding
         /// <summary>
         /// Initializes a new instance of <see cref="CommandHandlerRegistry"/> with the specified <paramref name="typeLocator"/> and <paramref name="serviceProvider"/>.
         /// </summary>
+        /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Aggregate"/> types.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton command handler dependencies.</param>
-        public CommandHandlerRegistry(ILocateTypes typeLocator, IServiceProvider serviceProvider)
+        public CommandHandlerRegistry(IStoreAggregates aggregateStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
         {
             Verify.NotNull(typeLocator, "typeLocator");
             Verify.NotNull(serviceProvider, "serviceProvider");
 
-            knownCommandHandlers = DiscoverCommandHandlers(typeLocator, serviceProvider);
+            knownCommandHandlers = DiscoverCommandHandlers(aggregateStore, typeLocator, serviceProvider);
         }
 
         /// <summary>
         /// Discover all command handlers associated with any locatable <see cref="Aggregate"/> type.
         /// </summary>
+        /// <param name="aggregateStore">The <see cref="Aggregate"/> store.</param>
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Aggregate"/> types.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton command handler dependencies.</param>
-        private static Dictionary<Type, CommandHandler> DiscoverCommandHandlers(ILocateTypes typeLocator, IServiceProvider serviceProvider)
+        private static Dictionary<Type, CommandHandler> DiscoverCommandHandlers(IStoreAggregates aggregateStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
         {
             var knownHandleMethods = DiscoverHandleMethods(typeLocator, serviceProvider);
             var result = new Dictionary<Type, CommandHandler>();
             var logMessage = new StringBuilder();
-            
+
             logMessage.Append("Discovered command handler methods:");
             foreach (var aggregateMapping in knownHandleMethods.OrderBy(kvp => kvp.Key.FullName))
             {
@@ -71,7 +73,7 @@ namespace Spark.Infrastructure.Commanding
                     if (result.ContainsKey(handleMethodMapping.Key))
                         throw new MappingException(Exceptions.HandleMethodMustBeAssociatedWithSingleAggregate.FormatWith(aggregateMapping.Key, handleMethodMapping.Key));
 
-                    result.Add(handleMethodMapping.Key, new CommandHandler(aggregateMapping.Key, handleMethodMapping.Value));
+                    result.Add(handleMethodMapping.Key, new CommandHandler(aggregateMapping.Key, handleMethodMapping.Key, aggregateStore, handleMethodMapping.Value));
                 }
             }
 

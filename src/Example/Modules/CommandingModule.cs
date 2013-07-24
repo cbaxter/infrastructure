@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Autofac;
 using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.EventStore.Sql;
 using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.Eventing.Mappings;
 using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
+using Module = Autofac.Module;
 
 namespace Example.Modules
 {
@@ -44,8 +46,12 @@ namespace Example.Modules
 
             //TODO: Cleanup...
             builder.RegisterType<EventDispatcher>().As<PipelineHook>().SingleInstance();
-            builder.RegisterType<BlockingCollectionMessageBus<EventEnvelope>>().As<ISendMessages<EventEnvelope>>().As<IReceiveMessages<EventEnvelope>>().SingleInstance();
             builder.RegisterType<EventPublisher>().As<IPublishEvents>().SingleInstance();
+            builder.RegisterType<EventHandlerRegistry>().As<IRetrieveEventHandlers>().SingleInstance();
+            builder.RegisterType<EventProcessor>().As<IProcessMessages<EventEnvelope>>().SingleInstance();
+            builder.RegisterType<MessageReceiver<EventEnvelope>>().AsSelf().SingleInstance().AutoActivate();
+            builder.RegisterType<BlockingCollectionMessageBus<EventEnvelope>>().As<ISendMessages<EventEnvelope>>().As<IReceiveMessages<EventEnvelope>>().SingleInstance();
+            builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies()).Where(type => type.GetCustomAttribute<EventHandlerAttribute>() != null);
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider

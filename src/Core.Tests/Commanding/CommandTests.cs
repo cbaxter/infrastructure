@@ -31,7 +31,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(Enumerable.Empty<Header>());
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Same(headers, command.Headers);
             }
 
@@ -49,7 +49,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(new[] { new Header(Header.Origin, "MyOrigin", checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Equal("MyOrigin", command.GetOrigin());
             }
 
@@ -60,7 +60,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Equal(now, command.GetTimestamp());
             }
 
@@ -70,7 +70,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Equal(IPAddress.Loopback, command.GetRemoteAddress());
             }
 
@@ -80,7 +80,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Equal(IPAddress.Loopback, command.GetUserAddress());
             }
 
@@ -90,7 +90,7 @@ namespace Spark.Infrastructure.Tests.Commanding
                 var command = new FakeCommand();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false) });
 
-                using (new CommandContext(GuidStrategy.NewGuid(), headers))
+                using (new CommandContext(GuidStrategy.NewGuid(), headers, CommandEnvelope.Empty))
                     Assert.Equal("nbawdy@sparksoftware.net", command.GetUserName());
             }
         }

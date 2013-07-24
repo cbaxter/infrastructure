@@ -30,7 +30,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var aggregateId = GuidStrategy.NewGuid();
 
-                using (new EventContext(aggregateId, HeaderCollection.Empty))
+                using (new EventContext(aggregateId, HeaderCollection.Empty, e))
                     Assert.Equal(aggregateId, e.FakeId);
             }
 
@@ -51,7 +51,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(Enumerable.Empty<Header>());
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Same(headers, e.Headers);
             }
 
@@ -69,7 +69,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.Origin, "MyOrigin", checkReservedNames: false) });
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Equal("MyOrigin", e.GetOrigin());
             }
 
@@ -80,7 +80,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) });
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Equal(now, e.GetTimestamp());
             }
 
@@ -90,7 +90,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Equal(IPAddress.Loopback, e.GetRemoteAddress());
             }
 
@@ -100,7 +100,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false) });
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Equal(IPAddress.Loopback, e.GetUserAddress());
             }
 
@@ -110,7 +110,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var e = new FakeEvent();
                 var headers = new HeaderCollection(new[] { new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false) });
 
-                using (new EventContext(GuidStrategy.NewGuid(), headers))
+                using (new EventContext(GuidStrategy.NewGuid(), headers, e))
                     Assert.Equal("nbawdy@sparksoftware.net", e.GetUserName());
             }
         }

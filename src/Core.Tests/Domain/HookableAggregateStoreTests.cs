@@ -161,14 +161,19 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new Mock<Aggregate>();
                 var pipelineHook = new Mock<PipelineHook>();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
-                var commandContext = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
                 var aggregateStore = new HookableAggregateStore(decoratedAggregateStore.Object, new[] { pipelineHook.Object });
 
-                pipelineHook.Setup(mock => mock.PreSave(aggregate.Object, commandContext)).Throws(new InvalidOperationException());
 
-                Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, commandContext));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    pipelineHook.Setup(mock => mock.PreSave(aggregate.Object, context)).Throws(new InvalidOperationException());
 
-                decoratedAggregateStore.Verify(mock => mock.Save(aggregate.Object, commandContext), Times.Never());
+                    Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, context));
+
+                    decoratedAggregateStore.Verify(mock => mock.Save(aggregate.Object, context), Times.Never());
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -178,15 +183,20 @@ namespace Spark.Infrastructure.Tests.Domain
                 var pipelineHook = new Mock<PipelineHook>();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
                 var commit = (Commit)FormatterServices.GetUninitializedObject(typeof(Commit));
-                var commandContext = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
                 var aggregateStore = new HookableAggregateStore(decoratedAggregateStore.Object, new[] { pipelineHook.Object });
 
-                decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, commandContext)).Returns(new SaveResult(aggregate.Object, commit));
-                pipelineHook.Setup(mock => mock.PostSave(aggregate.Object, commit, null)).Throws(new InvalidOperationException());
 
-                Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, commandContext));
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, context)).Returns(new SaveResult(aggregate.Object, commit));
+                    pipelineHook.Setup(mock => mock.PostSave(aggregate.Object, commit, null)).Throws(new InvalidOperationException());
 
-                decoratedAggregateStore.Verify(mock => mock.Save(aggregate.Object, commandContext), Times.Once());
+                    Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, context));
+
+                    decoratedAggregateStore.Verify(mock => mock.Save(aggregate.Object, context), Times.Once());
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -196,14 +206,18 @@ namespace Spark.Infrastructure.Tests.Domain
                 var pipelineHook = new Mock<PipelineHook>();
                 var error = new InvalidOperationException();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
-                var commandContext = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
                 var aggregateStore = new HookableAggregateStore(decoratedAggregateStore.Object, new[] { pipelineHook.Object });
 
-                decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, commandContext)).Throws(error);
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, context)).Throws(error);
 
-                Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, commandContext));
+                    Assert.Throws<InvalidOperationException>(() => aggregateStore.Save(aggregate.Object, context));
 
-                pipelineHook.Verify(mock => mock.PostSave(aggregate.Object, null, error), Times.Once());
+                    pipelineHook.Verify(mock => mock.PostSave(aggregate.Object, null, error), Times.Once());
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -213,13 +227,17 @@ namespace Spark.Infrastructure.Tests.Domain
                 var pipelineHook = new Mock<PipelineHook>();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
                 var commit = (Commit)FormatterServices.GetUninitializedObject(typeof(Commit));
-                var commandContext = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty);
                 var aggregateStore = new HookableAggregateStore(decoratedAggregateStore.Object, new[] { pipelineHook.Object });
                 var saveResult = new SaveResult(aggregate.Object, commit);
 
-                decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, commandContext)).Returns(saveResult);
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(Guid.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    decoratedAggregateStore.Setup(mock => mock.Save(aggregate.Object, context)).Returns(saveResult);
 
-                Assert.Same(saveResult, aggregateStore.Save(aggregate.Object, commandContext));
+                    Assert.Same(saveResult, aggregateStore.Save(aggregate.Object, context));
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
         }
 

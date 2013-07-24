@@ -65,6 +65,7 @@
     <Compile Include="Configuration\AggregateStoreElement.cs" />
     <Compile Include="Configuration\CommandProcessorElement.cs" />
     <Compile Include="Configuration\ConfigurationSettings.cs" />
+    <Compile Include="Configuration\EventProcessorElement.cs" />
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
@@ -73,11 +74,15 @@
     <Compile Include="Domain\Entity.cs" />
     <Compile Include="Domain\EntityCollection.cs" />
     <Compile Include="Domain\SaveResult.cs" />
+    <Compile Include="Eventing\EventHandler.cs" />
+    <Compile Include="Eventing\EventHandlerRegistry.cs" />
+    <Compile Include="Eventing\EventProcessor.cs" />
     <Compile Include="Eventing\EventPublisher.cs" />
     <Compile Include="Eventing\EventEnvelope.cs" />
     <Compile Include="Eventing\EventContext.cs" />
     <Compile Include="Eventing\EventVersion.cs" />
     <Compile Include="Eventing\IPublishEvents.cs" />
+    <Compile Include="Eventing\IRetrieveEventHandlers.cs" />
     <Compile Include="Eventing\Mappings\EventHandlerAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -108,6 +113,7 @@
     <Compile Include="Eventing\Sagas\Saga.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Eventing\Sagas\SagaEventHandler.cs" />
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />
@@ -173,7 +179,6 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Eventing\Event.cs" />
     <Compile Include="Eventing\EventDispatcher.cs" />
-    <Compile Include="Eventing\Thoughts.cs" />
     <Compile Include="EventStore\Commit.cs" />
     <Compile Include="EventStore\ConcurrencyException.cs" />
     <Compile Include="EventStore\DuplicateCommitException.cs" />

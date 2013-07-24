@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Caching;
-using System.Runtime.Serialization;
 using Moq;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
@@ -92,12 +91,15 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
                 var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
-                var commandContext = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty);
                 var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object, TimeSpan.FromMinutes(1), memoryCache);
 
-                cachedAggregateStore.Save(aggregate, commandContext);
-
-                decoratedAggregateStore.Verify(mock => mock.Save(It.Is<Aggregate>(copy => !ReferenceEquals(aggregate, copy)), commandContext), Times.Once());
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    cachedAggregateStore.Save(aggregate, context);
+                    decoratedAggregateStore.Verify(mock => mock.Save(It.Is<Aggregate>(copy => !ReferenceEquals(aggregate, copy)), context), Times.Once());
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
 
             [Fact]
@@ -106,12 +108,12 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
                 var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
-                var commandContext = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty);
                 var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object, TimeSpan.FromMinutes(1), memoryCache);
 
                 memoryCache.Add(aggregate.CacheKey, aggregate, new CacheItemPolicy());
 
-                cachedAggregateStore.Save(aggregate, commandContext);
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                    cachedAggregateStore.Save(aggregate, context);
 
                 Assert.NotSame(aggregate, memoryCache.Get(aggregate.CacheKey));
             }
@@ -122,14 +124,18 @@ namespace Spark.Infrastructure.Tests.Domain
                 var aggregate = new FakeAggregate();
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
                 var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
-                var commandContext = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty);
                 var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object, TimeSpan.FromMinutes(1), memoryCache);
 
-                memoryCache.Add(aggregate.CacheKey, aggregate, new CacheItemPolicy());
-                decoratedAggregateStore.Setup(mock => mock.Save(It.Is<Aggregate>(copy => !ReferenceEquals(aggregate, copy)), commandContext)).Throws<ConcurrencyException>();
+                // ReSharper disable AccessToDisposedClosure
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
+                {
+                    memoryCache.Add(aggregate.CacheKey, aggregate, new CacheItemPolicy());
+                    decoratedAggregateStore.Setup(mock => mock.Save(It.Is<Aggregate>(copy => !ReferenceEquals(aggregate, copy)), context)).Throws<ConcurrencyException>();
 
-                Assert.Throws<ConcurrencyException>(() => cachedAggregateStore.Save(aggregate, commandContext));
-                Assert.False(memoryCache.Contains(aggregate.CacheKey));
+                    Assert.Throws<ConcurrencyException>(() => cachedAggregateStore.Save(aggregate, context));
+                    Assert.False(memoryCache.Contains(aggregate.CacheKey));
+                }
+                // ReSharper restore AccessToDisposedClosure
             }
         }
 

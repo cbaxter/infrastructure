@@ -1,0 +1,106 @@
+﻿using System;
+using JetBrains.Annotations;
+using Moq;
+using Spark.Infrastructure.Eventing;
+using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.EventStore;
+using Spark.Infrastructure.Messaging;
+using Xunit;
+using EventHandler = Spark.Infrastructure.Eventing.EventHandler;
+
+/* Copyright (c) 2012 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
+namespace Spark.Infrastructure.Tests.Eventing
+{
+    public static class UsingEventHandler
+    {
+        public class WhenCreatingNewHandler
+        {
+            [Fact]
+            public void AggregateTypeCannotBeNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventHandler(null, typeof(Event), (h, e) => { }, () => new Object()));
+
+                Assert.Equal("handlerType", ex.ParamName);
+            }
+
+            [Fact]
+            public void AggregateTypeMustBeAnAggregateType()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventHandler(typeof(Object), null, (h, e) => { }, () => new Object()));
+
+                Assert.Equal("eventType", ex.ParamName);
+            }
+
+            [Fact]
+            public void AggregateStoreCannotBeNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventHandler(typeof(Object), typeof(Event), null, () => new Object()));
+
+                Assert.Equal("executor", ex.ParamName);
+            }
+
+            [Fact]
+            public void ExecutorCannotBeNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventHandler(typeof(Object), typeof(Event), (h, e) => { }, null));
+
+                Assert.Equal("eventHandlerFactory", ex.ParamName);
+            }
+        }
+
+
+        // ReSharper disable AccessToDisposedClosure
+        public class WhenHandlingEventContext
+        {
+            [Fact]
+            public void ContextCanBeNull()
+            {
+                var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (h, e) => { }, () => new Object());
+
+                Assert.DoesNotThrow(() => eventHandler.Handle(null, TimeSpan.FromSeconds(1)));
+            }
+
+            [Fact]
+            public void InvokeUnderlyingExecutorWithEventAndHandlerInstance()
+            {
+                var handled = false;
+                var e = new FakeEvent();
+                var handler = new Object();
+                var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { handled = a == handler && b == e; }, () => handler);
+
+                using (var context = new EventContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, e))
+                    eventHandler.Handle(context, TimeSpan.FromSeconds(1));
+
+                Assert.True(handled);
+            }
+        }
+        // ReSharper restore AccessToDisposedClosure
+
+        public class WhenConvertingToString
+        {
+            [Fact]
+            public void ReturnFriendlyDescription()
+            {
+                var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (h, e) => { }, () => new Object());
+
+                Assert.Equal(String.Format("{0} Event Handler ({1})", typeof(FakeEvent), typeof(Object)), eventHandler.ToString());
+            }
+        }
+
+        [UsedImplicitly]
+        private class FakeEvent : Event
+        { }
+    }
+}
