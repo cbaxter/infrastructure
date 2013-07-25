@@ -59,7 +59,12 @@ namespace Spark.Infrastructure.Eventing
 
             foreach (var eventType in knownEvents.OrderBy(type => type.FullName))
             {
-                var eventHandlers = eventType.GetTypeHierarchy().Reverse().Where(knownHandlers.ContainsKey).SelectMany(type => knownHandlers[type]).OrderBy(handler => handler is SagaEventHandler).ToArray();
+                var eventHandlers = eventType.GetTypeHierarchy().Reverse()
+                                             .Where(knownHandlers.ContainsKey)
+                                             .SelectMany(type => knownHandlers[type])
+                                             .OrderBy(handler => handler is SagaEventHandler)
+                                             .ThenBy(handler => handler.HandlerType.AssemblyQualifiedName)
+                                             .ToArray();
 
                 logMessage.Append("    ");
                 logMessage.Append(eventType);

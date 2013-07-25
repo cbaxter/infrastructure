@@ -434,8 +434,8 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Event handler must have a single public default constructor.
-        ///Handler Type: {0}.
+        ///   Looks up a localized string similar to Saga must have a single public default constructor.
+        ///Saga Type: {0}.
         /// </summary>
         internal static string SagaDefaultConstructorRequired {
             get {

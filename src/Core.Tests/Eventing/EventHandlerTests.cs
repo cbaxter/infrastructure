@@ -1,9 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Moq;
 using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Messaging;
 using Xunit;
 using EventHandler = Spark.Infrastructure.Eventing.EventHandler;

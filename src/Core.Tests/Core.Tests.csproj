@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Eventing\EventHandlerRegistryTests.cs" />
     <Compile Include="Eventing\EventHandlerTests.cs" />
     <Compile Include="Eventing\EventProcessorTests.cs" />
     <Compile Include="Eventing\EventDispatcherTests.cs" />

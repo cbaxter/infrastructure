@@ -263,8 +263,8 @@ Parameter Name: {0}</value>
 Name: {0}</value>
   </data>
   <data name="SagaDefaultConstructorRequired" xml:space="preserve">
-    <value>Event handler must have a single public default constructor.
-Handler Type: {0}</value>
+    <value>Saga must have a single public default constructor.
+Saga Type: {0}</value>
   </data>
   <data name="StateAccessException" xml:space="preserve">
     <value>State may only be changed via an event apply method when saving an aggregate.
