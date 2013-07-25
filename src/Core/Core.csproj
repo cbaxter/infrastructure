@@ -234,6 +234,7 @@
     <Compile Include="Threading\MonitorWrapper.cs" />
     <Compile Include="Threading\PartitionedTaskScheduler.cs" />
     <Compile Include="Threading\ThreadPoolWrapper.cs" />
+    <Compile Include="MarkerAttributes.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLocator.cs" />
     <Compile Include="Verify.cs" />

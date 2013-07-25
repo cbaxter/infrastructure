@@ -1,8 +1,8 @@
-﻿using Example.Domain.Commands;
-using Example.Domain.Events;
-using Spark.Infrastructure.Domain;
+﻿using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.Example.Domain.Commands;
+using Spark.Infrastructure.Example.Domain.Events;
 
-namespace Example.Domain
+namespace Spark.Infrastructure.Example.Domain
 {
     public sealed class Client : Aggregate
     {

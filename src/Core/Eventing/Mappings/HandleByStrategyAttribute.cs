@@ -25,6 +25,7 @@ namespace Spark.Infrastructure.Eventing.Mappings
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class HandleByStrategyAttribute : Attribute
     {
+        private static readonly MethodInfo GetServiceMethod = typeof(IServiceProvider).GetMethod("GetService", new[] { typeof(Type) });
         public static readonly HandleByStrategyAttribute Default = new HandleByConventionAttribute();
 
         /// <summary>
@@ -75,10 +76,14 @@ namespace Spark.Infrastructure.Eventing.Mappings
 
             yield return Expression.TypeAs(eventParameter, parameters.First().ParameterType);
 
-            //TODO: Consider adding support for [Singleton] and [Transient] method parameter attributes to allow for control of behavior (default singleton).
-
             foreach (var parameter in parameters.Skip(1))
-                yield return Expression.Convert(Expression.Constant(serviceProvider.GetService(parameter.ParameterType)), parameter.ParameterType);
+            {
+                var expression = parameter.GetCustomAttribute<TransientAttribute>() == null
+                                     ? Expression.Constant(serviceProvider.GetService(parameter.ParameterType)) as Expression
+                                     : Expression.Call(Expression.Constant(serviceProvider), GetServiceMethod, new Expression[] { Expression.Constant(parameter.ParameterType) });
+
+                yield return Expression.Convert(expression, parameter.ParameterType);
+            }
         }
     }
 }

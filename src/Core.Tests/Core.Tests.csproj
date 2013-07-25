@@ -90,6 +90,7 @@
     <Compile Include="Domain\Mappings\HandleByRegistrationAttributeTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Domain\Mappings\HandleByStrategyAttributeTests.cs" />
     <Compile Include="Domain\Mappings\HandleMethodMappingTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +106,7 @@
     <Compile Include="Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleByConventionAttributeTests.cs" />
+    <Compile Include="Eventing\Mappings\HandleByStrategyAttributeTests.cs" />
     <Compile Include="Eventing\Mappings\HandleMethodMappingTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />

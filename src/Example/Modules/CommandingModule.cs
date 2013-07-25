@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
-using Spark.Infrastructure;
 using Spark.Infrastructure.Commanding;
 using Spark.Infrastructure.Domain;
 using Spark.Infrastructure.EventStore;
@@ -13,7 +12,7 @@ using Spark.Infrastructure.Messaging;
 using Spark.Infrastructure.Serialization;
 using Module = Autofac.Module;
 
-namespace Example.Modules
+namespace Spark.Infrastructure.Example.Modules
 {
     public sealed class CommandingModule : Module
     {
