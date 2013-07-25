@@ -68,6 +68,49 @@ namespace Spark.Infrastructure.Tests.Commanding
 
                 HandlerRegistry.Verify(mock => mock.GetHandlerFor(command), Times.Once());
             }
+
+            [Fact]
+            public void ReloadAggregateOnConcurrencyException()
+            {
+                var save = 0;
+                var command = new FakeCommand();
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
+                var ex = new ConcurrencyException();
+
+                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { }));
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() =>
+                {
+                    if (++save == 1)
+                        throw ex;
+                });
+
+                Processor.Process(message);
+
+                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId), Times.Exactly(2));
+            }
+
+            [Fact]
+            public void WillTimeoutEventuallyIfCannotSave()
+            {
+                Settings.Setup(mock => mock.RetryTimeout).Returns(TimeSpan.FromMilliseconds(20));
+
+                var command = new FakeCommand();
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
+                var processor = new CommandProcessor(HandlerRegistry.Object, Settings.Object);
+
+                SystemTime.ClearOverride();
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
+                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { }));
+
+                Assert.Throws<TimeoutException>(() => processor.Process(message));
+            }
         }
 
         private class FakeAggregate : Aggregate

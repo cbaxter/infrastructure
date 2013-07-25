@@ -130,7 +130,7 @@ BEGIN
         [StreamId]      UNIQUEIDENTIFIER NOT NULL,
         [Version]       INT              NOT NULL,
         [Dispatched]    BIT              NOT NULL,
-        [Data]        VARBINARY(MAX)   NOT NULL,
+        [Data]          VARBINARY(MAX)   NOT NULL,
 
         CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED ([Id]),
         CONSTRAINT [UQ_Commit_StreamVersion] UNIQUE ([StreamId],[Version])

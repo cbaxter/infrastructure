@@ -3,8 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Spark.Infrastructure.Configuration;
 using Spark.Infrastructure.Domain;
+using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
 using Spark.Infrastructure.Messaging;
+using Spark.Infrastructure.Resources;
 using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
@@ -85,13 +87,44 @@ namespace Spark.Infrastructure.Commanding
         private void Process(Message<CommandEnvelope> message)
         {
             using (Log.PushContext("Message", message))
-            using (var context = new CommandContext(message.Id, message.Headers, message.Payload))
             {
-                var envelope = message.Payload;
-                var commandHandler = commandHandlerRegistry.GetHandlerFor(envelope.Command);
+                var commandHandler = commandHandlerRegistry.GetHandlerFor(message.Payload.Command);
 
-                commandHandler.Handle(context, retryTimeout);
+                ExecuteHandler(commandHandler, message);
             }
+        }
+
+        /// <summary>
+        ///  Process the received <see cref="Command"/> message instance using the specified <paramref name="commandHandler"/>.
+        /// </summary>
+        /// <param name="commandHandler">The <see cref="CommandHandler"/> instance that will process the <paramref name="message"/>.</param>
+        /// <param name="message">The <see cref="Command"/> message.</param>
+        private void ExecuteHandler(CommandHandler commandHandler, Message<CommandEnvelope> message)
+        {
+            var backoffContext = default(ExponentialBackoff);
+            var done = false;
+
+            do
+            {
+                try
+                {
+                    using (var context = new CommandContext(message.Id, message.Headers, message.Payload))
+                        commandHandler.Handle(context);
+
+                    done = true;
+                }
+                catch (ConcurrencyException ex)
+                {
+                    if (backoffContext == null)
+                        backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    if (!backoffContext.CanRetry)
+                        throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(message.Payload), ex);
+
+                    Log.WarnFormat("Concurrency conflict: {0}", message.Payload);
+                    backoffContext.WaitUntilRetry();
+                }
+            } while (!done);
         }
     }
 }

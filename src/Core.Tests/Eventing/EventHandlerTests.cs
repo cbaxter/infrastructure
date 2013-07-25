@@ -66,7 +66,7 @@ namespace Spark.Infrastructure.Tests.Eventing
             {
                 var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (h, e) => { }, () => new Object());
 
-                Assert.DoesNotThrow(() => eventHandler.Handle(null, TimeSpan.FromSeconds(1)));
+                Assert.DoesNotThrow(() => eventHandler.Handle(null));
             }
 
             [Fact]
@@ -78,7 +78,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { handled = a == handler && b == e; }, () => handler);
 
                 using (var context = new EventContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, e))
-                    eventHandler.Handle(context, TimeSpan.FromSeconds(1));
+                    eventHandler.Handle(context);
 
                 Assert.True(handled);
             }

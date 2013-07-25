@@ -82,14 +82,6 @@ namespace Spark.Infrastructure.Tests.Commanding
             protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
 
             [Fact]
-            public void ContextCanBeNull()
-            {
-                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
-
-                Assert.DoesNotThrow(() => commandHandler.Handle(null, TimeSpan.FromSeconds(1)));
-            }
-
-            [Fact]
             public void SaveAggregateOnSuccess()
             {
                 var aggregate = new FakeAggregate();
@@ -99,44 +91,9 @@ namespace Spark.Infrastructure.Tests.Commanding
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
 
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
-                    commandHandler.Handle(context, TimeSpan.FromSeconds(1));
+                    commandHandler.Handle(context);
 
                 AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Once());
-            }
-
-            [Fact]
-            public void ReloadAggregateWithLatestStateAfterConcurrencyException()
-            {
-                var save = 0;
-                var aggregate = new FakeAggregate();
-                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
-                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
-
-                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
-                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() =>
-                    {
-                        if (++save == 1)
-                            throw new ConcurrencyException();
-                    });
-
-                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
-                    commandHandler.Handle(context, TimeSpan.FromSeconds(1));
-
-                AggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId), Times.Exactly(2));
-            }
-
-            [Fact]
-            public void TimeoutEventuallyIfCannotSave()
-            {
-                var aggregate = new FakeAggregate();
-                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
-                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { });
-
-                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
-                AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
-
-                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
-                    Assert.Throws<TimeoutException>(() => commandHandler.Handle(context, TimeSpan.FromMilliseconds(20)));
             }
         }
         // ReSharper restore AccessToDisposedClosure

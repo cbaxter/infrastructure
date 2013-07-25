@@ -262,6 +262,12 @@ Parameter Name: {0}</value>
     <value>Reserved system header.
 Name: {0}</value>
   </data>
+  <data name="SagaContextInterleaved" xml:space="preserve">
+    <value>This SagaContext is being disposed on a different thread than it was created.</value>
+  </data>
+  <data name="SagaContextInvalidThread" xml:space="preserve">
+    <value>This SagaContext is being disposed out of order.</value>
+  </data>
   <data name="SagaDefaultConstructorRequired" xml:space="preserve">
     <value>Saga must have a single public default constructor.
 Saga Type: {0}</value>

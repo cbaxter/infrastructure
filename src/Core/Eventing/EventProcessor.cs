@@ -91,7 +91,7 @@ namespace Spark.Infrastructure.Eventing
                 var eventHandlers = eventHandlerRegistry.GetHandlersFor(envelope.Event);
 
                 foreach (var eventHandler in eventHandlers)
-                    eventHandler.Handle(context, retryTimeout);
+                    eventHandler.Handle(context);
             }
         }
     }

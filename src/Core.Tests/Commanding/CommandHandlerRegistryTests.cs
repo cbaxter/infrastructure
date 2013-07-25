@@ -106,12 +106,12 @@ namespace Spark.Infrastructure.Tests.Commanding
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand())))
                 {
                     var handler1 = registry.GetHandlerFor(new FakeCommand());
-                    handler1.Handle(context, TimeSpan.FromSeconds(1));
-                    handler1.Handle(context, TimeSpan.FromSeconds(1));
+                    handler1.Handle(context);
+                    handler1.Handle(context);
 
                     var handler2 = registry.GetHandlerFor(new FakeCommand());
-                    handler2.Handle(context, TimeSpan.FromSeconds(1));
-                    handler2.Handle(context, TimeSpan.FromSeconds(1));
+                    handler2.Handle(context);
+                    handler2.Handle(context);
                 }
 
                 serviceProvider.Verify(mock => mock.GetService(typeof(FakeService)), Times.Once());

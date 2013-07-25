@@ -79,9 +79,9 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         ///        [StreamId]      UNIQUEIDENTIFIER NOT NULL,
         ///        [Version]       INT              NOT NULL,
         ///        [Dispatched]    BIT              NOT NULL,
-        ///        [Data]        VARBINARY(MAX)   NOT NULL,
+        ///        [Data]          VARBINARY(MAX)   NOT NULL,
         ///
-        ///       [rest of string was truncated]&quot;;.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EnsureCommitTableExists {
             get {

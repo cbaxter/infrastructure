@@ -81,7 +81,7 @@ namespace Spark.Infrastructure.Tests.Eventing
                 : base(handlerType, eventType, executor, eventHandlerFactory)
             { }
 
-            public override void Handle(EventContext context, TimeSpan retryTimeout)
+            public override void Handle(EventContext context)
             {
                 Handled = true;
             }

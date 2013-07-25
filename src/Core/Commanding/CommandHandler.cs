@@ -1,9 +1,6 @@
 ﻿using System;
 using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
 using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
-using Spark.Infrastructure.Threading;
 
 /* Copyright (c) 2012 Spark Software Ltd.
  * 
@@ -67,41 +64,7 @@ namespace Spark.Infrastructure.Commanding
         /// Invokes the underlying <see cref="Aggregate"/> command handler method for <see cref="Command"/>.
         /// </summary>
         /// <param name="context">The current command context.</param>
-        /// <param name="retryTimeout">The maximum amount of time to spend trying to process a command.</param>
-        public void Handle(CommandContext context, TimeSpan retryTimeout)
-        {
-            var backoffContext = default(ExponentialBackoff);
-            var done = false;
-
-            do
-            {
-                if (context == null)
-                    return;
-
-                try
-                {
-                    UpdateAggregate(context);
-                    done = true;
-                }
-                catch (ConcurrencyException ex)
-                {
-                    if (backoffContext == null)
-                        backoffContext = new ExponentialBackoff(retryTimeout);
-
-                    if (!backoffContext.CanRetry)
-                        throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(context), ex);
-
-                    Log.WarnFormat("Concurrency conflict: {0}", context);
-                    backoffContext.WaitUntilRetry();
-                }
-            } while (!done);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        private void UpdateAggregate(CommandContext context)
+        public void Handle(CommandContext context)
         {
             var aggregate = aggregateStore.Get(AggregateType, context.AggregateId);
 

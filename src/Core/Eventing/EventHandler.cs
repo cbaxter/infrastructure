@@ -79,8 +79,7 @@ namespace Spark.Infrastructure.Eventing
         /// Invokes the underlying <see cref="Object"/> event handler method using the specified <see cref="context"/>.
         /// </summary>
         /// <param name="context">The current event context.</param>
-        /// <param name="retryTimeout">The maximum amount of time to spend trying to process an event.</param>
-        public virtual void Handle(EventContext context, TimeSpan retryTimeout)
+        public virtual void Handle(EventContext context)
         {
             if (context == null)
                 return;

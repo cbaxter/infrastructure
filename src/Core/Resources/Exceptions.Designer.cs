@@ -434,6 +434,24 @@ namespace Spark.Infrastructure.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This SagaContext is being disposed on a different thread than it was created..
+        /// </summary>
+        internal static string SagaContextInterleaved {
+            get {
+                return ResourceManager.GetString("SagaContextInterleaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This SagaContext is being disposed out of order..
+        /// </summary>
+        internal static string SagaContextInvalidThread {
+            get {
+                return ResourceManager.GetString("SagaContextInvalidThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saga must have a single public default constructor.
         ///Saga Type: {0}.
         /// </summary>
