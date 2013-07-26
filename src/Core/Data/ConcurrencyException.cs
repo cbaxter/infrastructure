@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore
+namespace Spark.Data
 {
     /// <summary>
     /// Represents errors that occur when a snapshot or commit version already exists.

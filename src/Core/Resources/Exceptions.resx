@@ -186,8 +186,9 @@ Stream Id: {1}</value>
   </data>
   <data name="ConcurrencyException" xml:space="preserve">
     <value>Concurrency Exception.
-Stream Id: {0}
-Version: {1}</value>
+Type: {0}
+Stream Id: {1}
+Version: {2}</value>
   </data>
   <data name="ConnectionNotFound" xml:space="preserve">
     <value>Connection string not found.

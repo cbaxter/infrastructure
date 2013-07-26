@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Spark.Resources {
+namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Spark.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Messages {
+    internal class SqlServerDialectStatements {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Messages() {
+        internal SqlServerDialectStatements() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Spark.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.Resources.Messages", typeof(Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.Cqrs.Eventing.Sagas.Sql.Dialects.SqlServerDialectStatements", typeof(SqlServerDialectStatements).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,33 +57,6 @@ namespace Spark.Resources {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Logical operation {0} started.
-        /// </summary>
-        internal static string LogicalOperationStarted {
-            get {
-                return ResourceManager.GetString("LogicalOperationStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Logical operation {0} stopped after {1}.
-        /// </summary>
-        internal static string LogicalOperationStopped {
-            get {
-                return ResourceManager.GetString("LogicalOperationStopped", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Transfer from {0} to {1}.
-        /// </summary>
-        internal static string LogicalOperationTransfered {
-            get {
-                return ResourceManager.GetString("LogicalOperationTransfered", resourceCulture);
             }
         }
     }

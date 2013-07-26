@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Spark.Data;
+using Spark.Data.SqlClient;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -21,51 +21,6 @@ using Spark.Resources;
 
 namespace Spark.EventStore.Sql.Dialects
 {
-    /// <summary>
-    /// The base SQL RDBMS dialect.
-    /// </summary>
-    public abstract class SqlDialect : IDbDialect
-    {
-        protected const Int32 Max = -1;
-        private readonly String connectionString;
-
-        public DbProviderFactory Provider { get { return SqlClientFactory.Instance; } }
-        public String ConnectionString { get { return connectionString; } }
-
-        internal SqlDialect(String connectionName)
-        {
-            Verify.NotNullOrWhiteSpace(connectionName, "connectionName");
-
-            connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
-        }
-
-        public Exception Translate(IDbCommand command, DbException ex)
-        {
-            var sqlException = ex as SqlException;
-            if (sqlException == null)
-                return ex;
-            
-            const Int32 uniqueIndexViolation = 2601;
-            if (sqlException.Number == uniqueIndexViolation)
-            {
-                var commitId = command.GetParameterValue("@id");
-
-                return new DuplicateCommitException(Exceptions.DuplicateCommitException.FormatWith(commitId));
-            }
-            
-            const Int32 uniqueConstraintViolation = 2627;
-            if (sqlException.Number == uniqueConstraintViolation)
-            {
-                var streamId = command.GetParameterValue("@streamId");
-                var version = command.GetParameterValue("@version");
-
-                return new ConcurrencyException(Exceptions.ConcurrencyException.FormatWith(streamId, version));
-            }
-
-            return ex;
-        }
-    }
-
     /// <summary>
     /// The SQL RDBMS dialect statements associated with an <see cref="SqlEventStore"/> instance.
     /// </summary>
@@ -98,8 +53,24 @@ namespace Spark.EventStore.Sql.Dialects
         public IDataParameter CreateDataParameter(Byte[] data) { return new SqlParameter("@data", SqlDbType.VarBinary, Max) { SourceColumn = "data", Value = data }; }
         public IDataParameter CreateSkipParameter(Int64 skip) { return new SqlParameter("@skip", SqlDbType.BigInt) { SourceColumn = "skip", Value = skip }; }
         public IDataParameter CreateTakeParameter(Int64 take) { return new SqlParameter("@take", SqlDbType.BigInt) { SourceColumn = "take", Value = take }; }
+
+        // Translate Method
+        public override Exception Translate(IDbCommand command, DbException ex)
+        {
+            var sqlException = ex as SqlException;
+            if (sqlException == null)
+                return ex;
+
+            if (sqlException.Number == SqlErrorCode.UniqueIndexViolation)
+                return new DuplicateCommitException(Exceptions.DuplicateCommitException.FormatWith(command.GetParameterValue("@id")));
+
+            if (sqlException.Number == SqlErrorCode.UniqueConstraintViolation)
+                return new ConcurrencyException(Exceptions.ConcurrencyException.FormatWith(typeof(Commit), command.GetParameterValue("@streamId"), command.GetParameterValue("@version")));
+
+            return base.Translate(command, ex);
+        }
     }
-    
+
     /// <summary>
     /// The SQL RDBMS dialect statements associated with a <see cref="SqlSnapshotStore"/> instance.
     /// </summary>
@@ -119,5 +90,15 @@ namespace Spark.EventStore.Sql.Dialects
         public IDataParameter CreateStreamIdParameter(Guid streamId) { return new SqlParameter("@streamId", SqlDbType.UniqueIdentifier) { SourceColumn = "streamId", Value = streamId }; }
         public IDataParameter CreateVersionParameter(Int32 version) { return new SqlParameter("@version", SqlDbType.Int) { SourceColumn = "version", Value = version }; }
         public IDataParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
+
+        // Translate Method
+        public override Exception Translate(IDbCommand command, DbException ex)
+        {
+            var sqlException = ex as SqlException;
+            if (sqlException != null && sqlException.Number == SqlErrorCode.UniqueConstraintViolation)
+                return new ConcurrencyException(Exceptions.ConcurrencyException.FormatWith(typeof(Snapshot), command.GetParameterValue("@streamId"), command.GetParameterValue("@version")));
+
+            return base.Translate(command, ex);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Spark.Cqrs.Commanding;
 using Spark.Configuration;
 using Spark.Cqrs.Eventing;
+using Spark.Data;
 using Spark.EventStore;
 using Spark.Logging;
 using Spark.Messaging;

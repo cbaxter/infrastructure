@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Spark.Configuration;
-using Spark.EventStore;
+using Spark.Data;
 using Spark.Logging;
 using Spark.Resources;
 using Spark.Threading;

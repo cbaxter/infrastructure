@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Spark;
 using Spark.Cqrs.Eventing;
+using Spark.Data;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;

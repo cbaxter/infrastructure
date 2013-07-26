@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Spark.Configuration;
 using Spark.Cqrs.Domain;
-using Spark.EventStore;
+using Spark.Data;
 using Spark.Logging;
 using Spark.Messaging;
 using Spark.Resources;

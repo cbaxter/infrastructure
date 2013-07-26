@@ -237,8 +237,9 @@ namespace Spark.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to Concurrency Exception.
-        ///Stream Id: {0}
-        ///Version: {1}.
+        ///Type: {0}
+        ///Stream Id: {1}
+        ///Version: {2}.
         /// </summary>
         internal static string ConcurrencyException {
             get {

@@ -6,6 +6,7 @@ using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
+using Spark.Data;
 using Spark.EventStore;
 using Spark.Messaging;
 using Spark.Resources;

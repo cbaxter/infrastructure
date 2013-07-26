@@ -69,11 +69,21 @@
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialect.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialectStatements.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SqlServerDialectStatements.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Cqrs\Eventing\Sagas\Sql\ISagaStoreDialect.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Sql\SagaStore.cs" />
     <Compile Include="Data\DbDataRecordExtensions.cs" />
     <Compile Include="Data\DbCommandExtensions.cs" />
     <Compile Include="Data\DbBatchOperation.cs" />
     <Compile Include="Data\IDbDialect.cs" />
     <Compile Include="Data\DbDialectExtensions.cs" />
+    <Compile Include="Data\SqlClient\SqlDialect.cs" />
+    <Compile Include="Data\SqlClient\SqlErrorCode.cs" />
     <Compile Include="Data\SqlClient\SqlSequentialGuid.cs" />
     <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
@@ -185,7 +195,7 @@
     <Compile Include="Cqrs\Eventing\Event.cs" />
     <Compile Include="Cqrs\Eventing\EventDispatcher.cs" />
     <Compile Include="EventStore\Commit.cs" />
-    <Compile Include="EventStore\ConcurrencyException.cs" />
+    <Compile Include="Data\ConcurrencyException.cs" />
     <Compile Include="EventStore\DuplicateCommitException.cs" />
     <Compile Include="EventStore\Page.cs" />
     <Compile Include="EventStore\PagedResult.cs" />
@@ -250,6 +260,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialectStatements.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SqlServerDialectStatements.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="EventStore\Sql\Dialects\SqlServerDialectStatements.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlServerDialectStatements.Designer.cs</LastGenOutput>

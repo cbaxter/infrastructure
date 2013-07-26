@@ -2,7 +2,7 @@
 using System.Runtime.Caching;
 using Spark.Cqrs.Commanding;
 using Spark.Configuration;
-using Spark.EventStore;
+using Spark.Data;
 using Spark.Logging;
 
 /* Copyright (c) 2013 Spark Software Ltd.

@@ -4,7 +4,7 @@ using Moq;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
-using Spark.EventStore;
+using Spark.Data;
 using Spark.Messaging;
 using Test.Spark.Configuration;
 using Xunit;
