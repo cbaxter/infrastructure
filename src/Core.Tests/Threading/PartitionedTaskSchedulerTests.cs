@@ -134,22 +134,6 @@ namespace Spark.Tests.Threading
             }
 
             [Fact]
-            public void RunOnSameThreadIfAdditionalTaskQueuedOnSamePartition()
-            {
-                var threadIds = new List<Int32>();
-                var tasksQueued = new ManualResetEvent(false);
-                var taskScheduler = new PartitionedTaskScheduler();
-
-                var task1 = Task.Factory.StartNew(() => { tasksQueued.WaitOne(); threadIds.Add(Thread.CurrentThread.ManagedThreadId); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
-                var task2 = Task.Factory.StartNew(() => { tasksQueued.WaitOne(); threadIds.Add(Thread.CurrentThread.ManagedThreadId); }, CancellationToken.None, TaskCreationOptions.AttachedToParent, taskScheduler);
-
-                tasksQueued.Set();
-
-                Task.WaitAll(task1, task2);
-                Assert.Equal(1, threadIds.Distinct().Count());
-            }
-
-            [Fact]
             public void RunAllTasksOnSamePartitionInOrder()
             {
                 var tasks = new Task[200];
@@ -158,7 +142,7 @@ namespace Spark.Tests.Threading
                 var tasksQueued = new ManualResetEvent(false);
                 var taskScheduler = new PartitionedTaskScheduler(task => task.AsyncState, 2, tasks.Length);
 
-                for (var i = 0; i < 200; i++)
+                for (var i = 0; i < tasks.Length; i++)
                 {
                     var taskGroupOrder = i % 2 == 0 ? taskGroup1Order : taskGroup2Order;
                     var taskId = i;
@@ -190,7 +174,7 @@ namespace Spark.Tests.Threading
                 {
                     tasks[i] = Task.Factory.StartNew(state =>
                         {
-                            var taskId = (Int32) state;
+                            var taskId = (Int32)state;
 
                             lock (taskOrder)
                             {
@@ -220,7 +204,7 @@ namespace Spark.Tests.Threading
 
                 var task3 = Task.Factory.StartNew(_ =>
                     {
-                        tasksQueued.WaitOne(); 
+                        tasksQueued.WaitOne();
                         partition1Active.Set();
                         partition2Active.WaitOne();
                         task1.RunSynchronously();
@@ -229,7 +213,7 @@ namespace Spark.Tests.Threading
                     {
                         tasksQueued.WaitOne();
                         partition2Active.Set();
-                        partition1Active.WaitOne(); 
+                        partition1Active.WaitOne();
                         task2.RunSynchronously();
                     }, 1, CancellationToken.None, TaskCreationOptions.LongRunning, taskScheduler);
 
