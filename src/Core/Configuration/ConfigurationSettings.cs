@@ -19,7 +19,7 @@ namespace Spark.Configuration
     /// <summary>
     /// The main configuration section where all custom settings are contained.
     /// </summary>
-    public interface ISettings
+    internal interface ISettings
     {
         /// <summary>
         /// The <see cref="AggregateStore"/> configuration settings.

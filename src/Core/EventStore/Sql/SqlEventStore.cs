@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Spark.Configuration;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.Logging;
 using Spark.Messaging;
 using Spark.Serialization;

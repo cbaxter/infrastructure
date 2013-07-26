@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
-using Spark.Commanding;
-using Spark.Domain;
+using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Domain;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
-using Spark.Eventing;
-using Spark.Eventing.Mappings;
+using Spark.Cqrs.Eventing;
+using Spark.Cqrs.Eventing.Mappings;
 using Spark.Messaging;
 using Spark.Serialization;
 using Module = Autofac.Module;

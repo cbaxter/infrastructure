@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Configuration;
-using Spark.Commanding;
+using Spark.Cqrs.Commanding;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -20,7 +20,7 @@ namespace Spark.Configuration
     /// <summary>
     /// <see cref="CommandProcessor"/> configuration settings.
     /// </summary>
-    public interface IStoreAggregateSettings
+    internal interface IStoreAggregateSettings
     {
         /// <summary>
         /// The maximum amount of time an aggregate will remain cached if not accessed.

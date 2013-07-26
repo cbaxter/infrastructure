@@ -64,56 +64,61 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Commanding\CommandContextTests.cs" />
-    <Compile Include="Commanding\CommandHandlerRegistryTests.cs" />
-    <Compile Include="Commanding\CommandHandlerTests.cs">
+    <Compile Include="Configuration\AggregateStoreSettings.cs" />
+    <Compile Include="Configuration\CommandProcessorSettings.cs" />
+    <Compile Include="Configuration\EventProcessorSettings.cs" />
+    <Compile Include="Configuration\EventStoreSettings.cs" />
+    <Compile Include="Configuration\SnapshotStoreSettings.cs" />
+    <Compile Include="Cqrs\Commanding\CommandContextTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandlerRegistryTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandlerTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commanding\CommandProcessorTests.cs">
+    <Compile Include="Cqrs\Commanding\CommandProcessorTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commanding\CommandPublisherTests.cs" />
-    <Compile Include="Commanding\CommandTests.cs" />
-    <Compile Include="Domain\AggregateStateValidatorTests.cs" />
-    <Compile Include="Domain\AggregateStoreTests.cs" />
-    <Compile Include="Domain\AggregateUpdaterTests.cs" />
-    <Compile Include="Domain\CachedAggregateStoreTests.cs" />
-    <Compile Include="Domain\HookableAggregateStoreTests.cs" />
-    <Compile Include="Domain\Mappings\ApplyByAttributeAttributeTests.cs" />
-    <Compile Include="Domain\Mappings\ApplyByConventionAttributeTests.cs" />
-    <Compile Include="Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
-    <Compile Include="Domain\Mappings\ApplyMethodMappingTests.cs" />
-    <Compile Include="Domain\Mappings\HandleByAttributeAttributeTests.cs" />
-    <Compile Include="Domain\Mappings\HandleByConventionAttributeTests.cs">
+    <Compile Include="Cqrs\Commanding\CommandPublisherTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateStateValidatorTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateUpdaterTests.cs" />
+    <Compile Include="Cqrs\Domain\CachedAggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\HookableAggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByConventionAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyMethodMappingTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByConventionAttributeTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\Mappings\HandleByRegistrationAttributeTests.cs">
+    <Compile Include="Cqrs\Domain\Mappings\HandleByRegistrationAttributeTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\Mappings\HandleByStrategyAttributeTests.cs" />
-    <Compile Include="Domain\Mappings\HandleMethodMappingTests.cs">
+    <Compile Include="Cqrs\Domain\Mappings\HandleByStrategyAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleMethodMappingTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\PipelineHookTests.cs" />
+    <Compile Include="Cqrs\Domain\PipelineHookTests.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
-    <Compile Include="Eventing\EventHandlerRegistryTests.cs" />
-    <Compile Include="Eventing\EventHandlerTests.cs" />
-    <Compile Include="Eventing\EventProcessorTests.cs" />
-    <Compile Include="Eventing\EventDispatcherTests.cs" />
-    <Compile Include="Eventing\EventPublisherTests.cs" />
-    <Compile Include="Eventing\EventContextTests.cs" />
-    <Compile Include="Eventing\EventTests.cs" />
-    <Compile Include="Eventing\EventVersionTests.cs" />
-    <Compile Include="Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
-    <Compile Include="Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
-    <Compile Include="Eventing\Mappings\HandleByConventionAttributeTests.cs" />
-    <Compile Include="Eventing\Mappings\HandleByStrategyAttributeTests.cs" />
-    <Compile Include="Eventing\Mappings\HandleMethodMappingTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandlerRegistryTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandlerTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventProcessorTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventDispatcherTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventPublisherTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventVersionTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByConventionAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByStrategyAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleMethodMappingTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
-    <Compile Include="Eventing\EventCollectionTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventCollectionTests.cs" />
     <Compile Include="Messaging\InlineMessageBusTests.cs" />
     <Compile Include="Messaging\MessageReceiverTests.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />

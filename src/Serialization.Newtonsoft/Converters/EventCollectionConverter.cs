@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 

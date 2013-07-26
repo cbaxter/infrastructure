@@ -55,13 +55,13 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Annotations.cs" />
-    <Compile Include="Commanding\CommandContext.cs" />
-    <Compile Include="Commanding\CommandEnvelope.cs" />
-    <Compile Include="Commanding\CommandHandler.cs" />
-    <Compile Include="Commanding\CommandHandlerRegistry.cs" />
-    <Compile Include="Commanding\CommandProcessor.cs" />
-    <Compile Include="Commanding\IPublishCommands.cs" />
-    <Compile Include="Commanding\IRetrieveCommandHandlers.cs" />
+    <Compile Include="Cqrs\Commanding\CommandContext.cs" />
+    <Compile Include="Cqrs\Commanding\CommandEnvelope.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandler.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandlerRegistry.cs" />
+    <Compile Include="Cqrs\Commanding\CommandProcessor.cs" />
+    <Compile Include="Cqrs\Commanding\IPublishCommands.cs" />
+    <Compile Include="Cqrs\Commanding\IRetrieveCommandHandlers.cs" />
     <Compile Include="Configuration\AggregateStoreElement.cs" />
     <Compile Include="Configuration\CommandProcessorElement.cs" />
     <Compile Include="Configuration\ConfigurationSettings.cs" />
@@ -70,56 +70,56 @@
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="DateTimeFormat.cs" />
-    <Compile Include="Domain\AggregateStateValidator.cs" />
-    <Compile Include="Domain\Entity.cs" />
-    <Compile Include="Domain\EntityCollection.cs" />
-    <Compile Include="Domain\SaveResult.cs" />
-    <Compile Include="Eventing\EventHandler.cs" />
-    <Compile Include="Eventing\EventHandlerRegistry.cs" />
-    <Compile Include="Eventing\EventProcessor.cs" />
-    <Compile Include="Eventing\EventPublisher.cs" />
-    <Compile Include="Eventing\EventEnvelope.cs" />
-    <Compile Include="Eventing\EventContext.cs" />
-    <Compile Include="Eventing\EventVersion.cs" />
-    <Compile Include="Eventing\IPublishEvents.cs" />
-    <Compile Include="Eventing\IRetrieveEventHandlers.cs" />
-    <Compile Include="Eventing\Mappings\EventHandlerAttribute.cs">
+    <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
+    <Compile Include="Cqrs\Domain\Entity.cs" />
+    <Compile Include="Cqrs\Domain\EntityCollection.cs" />
+    <Compile Include="Cqrs\Domain\SaveResult.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandler.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandlerRegistry.cs" />
+    <Compile Include="Cqrs\Eventing\EventProcessor.cs" />
+    <Compile Include="Cqrs\Eventing\EventPublisher.cs" />
+    <Compile Include="Cqrs\Eventing\EventEnvelope.cs" />
+    <Compile Include="Cqrs\Eventing\EventContext.cs" />
+    <Compile Include="Cqrs\Eventing\EventVersion.cs" />
+    <Compile Include="Cqrs\Eventing\IPublishEvents.cs" />
+    <Compile Include="Cqrs\Eventing\IRetrieveEventHandlers.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\EventHandlerAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleByAttributeAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByAttributeAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleByConventionAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByConventionAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleByReflectionAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByReflectionAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleByRegistrationAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByRegistrationAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleByStrategyAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByStrategyAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleMethodAttribute.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleMethodAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleMethodCollection.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleMethodCollection.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Mappings\HandleMethodMapping.cs">
+    <Compile Include="Cqrs\Eventing\Mappings\HandleMethodMapping.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Sagas\IStoreSagas.cs" />
-    <Compile Include="Eventing\Sagas\Saga.cs">
+    <Compile Include="Cqrs\Eventing\Sagas\IStoreSagas.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Saga.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Eventing\Sagas\SagaConfiguration.cs" />
-    <Compile Include="Eventing\Sagas\SagaContext.cs" />
-    <Compile Include="Eventing\Sagas\SagaEventHandler.cs" />
-    <Compile Include="Eventing\Sagas\SagaLock.cs" />
-    <Compile Include="Eventing\Sagas\SagaLockToken.cs" />
-    <Compile Include="Eventing\Sagas\SagaReference.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaConfiguration.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaContext.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandler.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLock.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLockToken.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaReference.cs" />
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />
@@ -147,44 +147,44 @@
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\MessageReceiver.cs" />
     <Compile Include="ObjectHasher.cs" />
-    <Compile Include="Domain\AggregateStore.cs" />
-    <Compile Include="Domain\CachedAggregateStore.cs" />
-    <Compile Include="Domain\HookableAggregateStore.cs" />
-    <Compile Include="Domain\PipelineHook.cs" />
-    <Compile Include="Domain\IRetrieveAggregates.cs" />
-    <Compile Include="Domain\IStoreAggregates.cs" />
-    <Compile Include="Domain\Mappings\HandleMethodCollection.cs" />
-    <Compile Include="Domain\Mappings\HandleByAttributeAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleByConventionAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleByReflectionAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleByRegistrationAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleByStrategyAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleMethodAttribute.cs" />
-    <Compile Include="Domain\Mappings\HandleMethodMapping.cs" />
-    <Compile Include="Eventing\EventCollection.cs" />
-    <Compile Include="Commanding\Command.cs">
+    <Compile Include="Cqrs\Domain\AggregateStore.cs" />
+    <Compile Include="Cqrs\Domain\CachedAggregateStore.cs" />
+    <Compile Include="Cqrs\Domain\HookableAggregateStore.cs" />
+    <Compile Include="Cqrs\Domain\PipelineHook.cs" />
+    <Compile Include="Cqrs\Domain\IRetrieveAggregates.cs" />
+    <Compile Include="Cqrs\Domain\IStoreAggregates.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleMethodCollection.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByAttributeAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByConventionAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByReflectionAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByRegistrationAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByStrategyAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleMethodAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleMethodMapping.cs" />
+    <Compile Include="Cqrs\Eventing\EventCollection.cs" />
+    <Compile Include="Cqrs\Commanding\Command.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commanding\CommandPublisher.cs">
+    <Compile Include="Cqrs\Commanding\CommandPublisher.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\Aggregate.cs">
+    <Compile Include="Cqrs\Domain\Aggregate.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\MappingException.cs" />
-    <Compile Include="Domain\AggregateUpdater.cs" />
-    <Compile Include="Domain\Mappings\ApplyByReflectionAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyMethodAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyByAttributeAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyByConventionAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyByRegistrationAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyByStrategyAttribute.cs" />
-    <Compile Include="Domain\Mappings\ApplyMethodCollection.cs" />
-    <Compile Include="Domain\Mappings\ApplyMethodMapping.cs" />
-    <Compile Include="Domain\IApplyEvents.cs" />
+    <Compile Include="Cqrs\Domain\MappingException.cs" />
+    <Compile Include="Cqrs\Domain\AggregateUpdater.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByReflectionAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyMethodAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByAttributeAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByConventionAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByRegistrationAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByStrategyAttribute.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyMethodCollection.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyMethodMapping.cs" />
+    <Compile Include="Cqrs\Domain\IApplyEvents.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="Eventing\Event.cs" />
-    <Compile Include="Eventing\EventDispatcher.cs" />
+    <Compile Include="Cqrs\Eventing\Event.cs" />
+    <Compile Include="Cqrs\Eventing\EventDispatcher.cs" />
     <Compile Include="EventStore\Commit.cs" />
     <Compile Include="EventStore\ConcurrencyException.cs" />
     <Compile Include="EventStore\DuplicateCommitException.cs" />

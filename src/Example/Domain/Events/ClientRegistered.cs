@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 
 namespace Spark.Example.Domain.Events
 {

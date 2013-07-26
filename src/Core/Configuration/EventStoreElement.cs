@@ -20,7 +20,7 @@ namespace Spark.Configuration
     /// <summary>
     /// <see cref="IStoreEvents"/> configuration settings.
     /// </summary>
-    public interface IStoreEventSettings
+    internal interface IStoreEventSettings
     {
         /// <summary>
         /// Returns <value>true</value> if commits should be marked as dispatched asynchronously; otherwise <value>false</value> to synchronously mark commits as dispatched (default = <value>true</value>).

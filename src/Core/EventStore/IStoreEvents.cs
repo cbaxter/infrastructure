@@ -1,5 +1,5 @@
 ﻿using System;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.Messaging;
 
 /* Copyright (c) 2013 Spark Software Ltd.

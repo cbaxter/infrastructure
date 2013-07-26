@@ -1,5 +1,5 @@
 ﻿using System;
-using Spark.Commanding;
+using Spark.Cqrs.Commanding;
 using Spark.Messaging;
 using Spark.Serialization.Converters;
 using Xunit;

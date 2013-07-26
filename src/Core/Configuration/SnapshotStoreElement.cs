@@ -20,7 +20,7 @@ namespace Spark.Configuration
     /// <summary>
     /// <see cref="IStoreSnapshots"/> configuration settings.
     /// </summary>
-    public interface IStoreSnapshotSettings
+    internal interface IStoreSnapshotSettings
     {
         /// <summary>
         /// Returns <value>true</value> if snapshots should be written asynchronously in the background; otherwise <value>false</value> to immediately save snapshot (default = <value>true</value>).

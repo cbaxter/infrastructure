@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.Messaging;
 

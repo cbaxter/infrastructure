@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Configuration;
-using Spark.Commanding;
+using Spark.Cqrs.Commanding;
 using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -21,7 +21,7 @@ namespace Spark.Configuration
     /// <summary>
     /// <see cref="CommandProcessor"/> configuration settings.
     /// </summary>
-    public interface IProcessCommandSettings
+    internal interface IProcessCommandSettings
     {
         /// <summary>
         /// The bounded capacity associated with the <see cref="CommandProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 1000).

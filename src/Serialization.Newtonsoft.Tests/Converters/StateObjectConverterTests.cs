@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Spark.Domain;
+using Spark.Cqrs.Domain;
 using Spark.Serialization.Converters;
 using Xunit;
 
@@ -40,7 +40,7 @@ namespace Spark.Serialization.Tests.Converters
                 var json = WriteJson(new StateObjectConverter(), entity);
 
                 Validate(
-                    "{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Domain.EntityCollection`1[[Spark.Domain.Entity, Spark.Core]], Spark.Core\",\"$values\":[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}",
+                    "{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Cqrs.Domain.EntityCollection`1[[Spark.Cqrs.Domain.Entity, Spark.Core]], Spark.Core\",\"$values\":[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}",
                     json
                 );
             }
@@ -57,7 +57,7 @@ namespace Spark.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Domain.EntityCollection`1[[Spark.Domain.Entity, Spark.Core]], Spark.Core\",\"$values\":[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}";
+                var json = "{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests\",\"c\":{\"$type\":\"Spark.Cqrs.Domain.EntityCollection`1[[Spark.Cqrs.Domain.Entity, Spark.Core]], Spark.Core\",\"$values\":[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests\",\"id\":\"8cb5f171-5505-4313-b8a8-0345d70cfb46\",\"n\":\"My Entity\"}]},\"d\":8.9,\"f\":456.7,\"i\":123,\"n\":\"My Aggregate\",\"s\":1,\"t\":\"2013-07-01T00:00:00\"}";
                 var entity = (TestAggregate)ReadJson<Entity>(new StateObjectConverter(), json);
 
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);
@@ -79,7 +79,7 @@ namespace Spark.Serialization.Tests.Converters
                 var bson = WriteBson(new StateObjectConverter(), entity);
 
                 Validate(
-                    "5wEAAAIkdHlwZQBzAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjABoBAAACJHR5cGUATwAAAFNwYXJrLkRvbWFpbi5FbnRpdHlDb2xsZWN0aW9uYDFbW1NwYXJrLkRvbWFpbi5FbnRpdHksIFNwYXJrLkNvcmVdXSwgU3BhcmsuQ29yZQAEJHZhbHVlcwCyAAAAAzAAqgAAAAIkdHlwZQBwAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAAFkAM3MzMzMzCFAAWYAMzMzMzOLfEASaQB7AAAAAAAAAAJuAA0AAABNeSBBZ2dyZWdhdGUAEHMAAQAAAAl0AAD70Jg/AQAAAA==", 
+                    "8QEAAAIkdHlwZQBzAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjACQBAAACJHR5cGUAWQAAAFNwYXJrLkNxcnMuRG9tYWluLkVudGl0eUNvbGxlY3Rpb25gMVtbU3BhcmsuQ3Fycy5Eb21haW4uRW50aXR5LCBTcGFyay5Db3JlXV0sIFNwYXJrLkNvcmUABCR2YWx1ZXMAsgAAAAMwAKoAAAACJHR5cGUAcAAAAFNwYXJrLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ1N0YXRlT2JqZWN0Q29udmVydGVyK1Rlc3RFbnRpdHksIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwAFaWQAEAAAAARx8bWMBVUTQ7ioA0XXDPtGAm4ACgAAAE15IEVudGl0eQAAAAABZADNzMzMzMwhQAFmADMzMzMzi3xAEmkAewAAAAAAAAACbgANAAAATXkgQWdncmVnYXRlABBzAAEAAAAJdAAA+9CYPwEAAAA=", 
                     bson
                 );
             }
@@ -90,7 +90,7 @@ namespace Spark.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "5wEAAAIkdHlwZQBzAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjABoBAAACJHR5cGUATwAAAFNwYXJrLkRvbWFpbi5FbnRpdHlDb2xsZWN0aW9uYDFbW1NwYXJrLkRvbWFpbi5FbnRpdHksIFNwYXJrLkNvcmVdXSwgU3BhcmsuQ29yZQAEJHZhbHVlcwCyAAAAAzAAqgAAAAIkdHlwZQBwAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAAFkAM3MzMzMzCFAAWYAMzMzMzOLfEASaQB7AAAAAAAAAAJuAA0AAABNeSBBZ2dyZWdhdGUAEHMAAQAAAAl0AAD70Jg/AQAAAA==";
+                var bson = "8QEAAAIkdHlwZQBzAAAAU3BhcmsuU2VyaWFsaXphdGlvbi5UZXN0cy5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEFnZ3JlZ2F0ZSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAANjACQBAAACJHR5cGUAWQAAAFNwYXJrLkNxcnMuRG9tYWluLkVudGl0eUNvbGxlY3Rpb25gMVtbU3BhcmsuQ3Fycy5Eb21haW4uRW50aXR5LCBTcGFyay5Db3JlXV0sIFNwYXJrLkNvcmUABCR2YWx1ZXMAsgAAAAMwAKoAAAACJHR5cGUAcAAAAFNwYXJrLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ1N0YXRlT2JqZWN0Q29udmVydGVyK1Rlc3RFbnRpdHksIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwAFaWQAEAAAAARx8bWMBVUTQ7ioA0XXDPtGAm4ACgAAAE15IEVudGl0eQAAAAABZADNzMzMzMwhQAFmADMzMzMzi3xAEmkAewAAAAAAAAACbgANAAAATXkgQWdncmVnYXRlABBzAAEAAAAJdAAA+9CYPwEAAAA=";
                 var entity = (TestAggregate)ReadBson<Entity>(new StateObjectConverter(), bson);
                 
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);

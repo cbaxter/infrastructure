@@ -1,5 +1,5 @@
 ﻿using System;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.Messaging;
 using Spark.Serialization.Converters;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Configuration;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -21,7 +21,7 @@ namespace Spark.Configuration
     /// <summary>
     /// <see cref="EventProcessor"/> configuration settings.
     /// </summary>
-    public interface IProcessEventSettings
+    internal interface IProcessEventSettings
     {
         /// <summary>
         /// The bounded capacity associated with the <see cref="EventProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 1000).

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Spark.Commanding;
+using Spark.Cqrs.Commanding;
 
 namespace Spark.Example.Domain.Commands
 {

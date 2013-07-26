@@ -1,5 +1,5 @@
 ﻿using System;
-using Spark.Domain;
+using Spark.Cqrs.Domain;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Domain.Events;
 

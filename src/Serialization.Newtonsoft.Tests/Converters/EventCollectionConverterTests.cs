@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.Serialization.Converters;
 using Xunit;
 

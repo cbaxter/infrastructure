@@ -19,7 +19,7 @@ namespace Spark.Configuration
     /// <summary>
     /// Static settings class to access `spark.infrastructure` configuration section.
     /// </summary>
-    public static class Settings
+    internal static class Settings
     {
         private static readonly ISettings configuration;
 

@@ -7,6 +7,7 @@ using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
 using Spark.Serialization;
+using Spark.Tests.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -28,8 +29,7 @@ namespace Spark.Tests.EventStore.Dialects
     {
         public abstract class UsingInitializedSnapshotStore : IDisposable
         {
-            protected readonly IStoreSnapshots SnapshotStore;
-            protected readonly Mock<IStoreSnapshotSettings> Settings;
+            internal readonly IStoreSnapshots SnapshotStore;
 
             internal UsingInitializedSnapshotStore()
                 : this(true)
@@ -41,13 +41,7 @@ namespace Spark.Tests.EventStore.Dialects
 
             internal UsingInitializedSnapshotStore(Boolean replaceExisting, Boolean async)
             {
-                Settings = new Mock<IStoreSnapshotSettings>();
-                Settings.Setup(mock => mock.Async).Returns(async);
-                Settings.Setup(mock => mock.BatchSize).Returns(10);
-                Settings.Setup(mock => mock.ReplaceExisting).Returns(replaceExisting);
-                Settings.Setup(mock => mock.FlushInterval).Returns(TimeSpan.FromMilliseconds(20));
-
-                SnapshotStore = new SqlSnapshotStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
+                SnapshotStore = new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = async, ReplaceExisting = replaceExisting }, new SqlServerDialect(SqlServerConnection.Name));
             }
 
             public void Dispose()
@@ -103,25 +97,19 @@ namespace Spark.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanDisposeSynchronousStore()
             {
-                var settings = new Mock<IStoreSnapshotSettings>();
-                settings.Setup(mock => mock.Async).Returns(false);
-
-                new SqlSnapshotStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = false }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanDisposeAsynchronousStore()
             {
-                var settings = new Mock<IStoreSnapshotSettings>();
-                settings.Setup(mock => mock.Async).Returns(true);
-
-                new SqlSnapshotStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = true }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSnapshotStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
+                var snapshotStore = new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
 
                 snapshotStore.Dispose();
 

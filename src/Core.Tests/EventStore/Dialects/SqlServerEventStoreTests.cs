@@ -4,12 +4,13 @@ using System.Data.SqlClient;
 using System.Linq;
 using Moq;
 using Spark.Configuration;
-using Spark.Eventing;
+using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
 using Spark.Messaging;
 using Spark.Serialization;
+using Spark.Tests.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -31,17 +32,11 @@ namespace Spark.Tests.EventStore.Dialects
     {
         public abstract class UsingInitializedEventStore : IDisposable
         {
-            protected readonly IStoreEvents EventStore;
-            protected readonly Mock<IStoreEventSettings> Settings;
+            internal readonly IStoreEvents EventStore;
 
             internal UsingInitializedEventStore()
             {
-                Settings = new Mock<IStoreEventSettings>();
-
-                Settings.Setup(mock => mock.PageSize).Returns(5);
-                Settings.Setup(mock => mock.DetectDuplicateCommits).Returns(true);
-
-                EventStore = new SqlEventStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
+                EventStore = new SqlEventStore(new BinarySerializer(), new EventStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
             }
 
             public void Dispose()
@@ -97,25 +92,19 @@ namespace Spark.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanDisposeSynchronousStore()
             {
-                var settings = new Mock<IStoreEventSettings>();
-                settings.Setup(mock => mock.Async).Returns(false);
-
-                new SqlEventStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlEventStore(new BinarySerializer(), new EventStoreSettings { Async = false }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanDisposeAsynchronousStore()
             {
-                var settings = new Mock<IStoreEventSettings>();
-                settings.Setup(mock => mock.Async).Returns(true);
-
-                new SqlEventStore(new BinarySerializer(), settings.Object, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlEventStore(new BinarySerializer(), new EventStoreSettings { Async = true }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlEventStore(new BinarySerializer(), Settings.Object, new SqlServerDialect(SqlServerConnection.Name));
+                var snapshotStore = new SqlEventStore(new BinarySerializer(), new EventStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
 
                 snapshotStore.Dispose();
 
@@ -308,7 +297,7 @@ namespace Spark.Tests.EventStore.Dialects
             {
                 var streamId = Guid.NewGuid();
                 var startTime = DateTime.UtcNow.Subtract(TimeSpan.FromHours(10));
-                
+
                 EventStore.Purge();
 
                 for (var i = 1; i <= 10; i++)
