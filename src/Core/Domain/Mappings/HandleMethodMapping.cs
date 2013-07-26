@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Spark.Infrastructure.Commanding;
+using Spark.Commanding;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Domain.Mappings
 {
     /// <summary>
     /// Represents an explicit <see cref="Aggregate"/> handle method mapping.

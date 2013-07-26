@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Linq;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Sql
+namespace Spark.EventStore.Sql
 {
     /// <summary>
     /// Extension methods of <see cref="DbCommand"/>.

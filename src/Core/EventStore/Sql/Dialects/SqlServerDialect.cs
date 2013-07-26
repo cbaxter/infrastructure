@@ -3,9 +3,9 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using Spark.Infrastructure.Resources;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Sql.Dialects
+namespace Spark.EventStore.Sql.Dialects
 {
     internal sealed class SqlServerDialect : IEventStoreDialect, ISnapshotStoreDialect
     {

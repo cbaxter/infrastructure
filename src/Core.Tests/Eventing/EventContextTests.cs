@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Eventing;
+using Spark.Messaging;
+using Spark.Resources;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -19,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Eventing
+namespace Spark.Tests.Eventing
 {
     public static class UsingEventContext
     {

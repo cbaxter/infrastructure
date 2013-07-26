@@ -1,6 +1,6 @@
 ﻿using System;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,7 +13,7 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Messaging
+namespace Spark.Messaging
 {
     /// <summary>
     /// An inline message bus for use by single-process applications when the result must be processed immediately to ensure messages are not lost.

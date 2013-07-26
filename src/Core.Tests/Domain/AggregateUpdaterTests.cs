@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Domain.Mappings;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Resources;
-using Spark.Infrastructure.Tests.Commanding;
+using Spark.Domain;
+using Spark.Domain.Mappings;
+using Spark.Eventing;
+using Spark.Resources;
+using Spark.Tests.Commanding;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -23,7 +23,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Tests.Domain
 {
     public static class UsingAggregateUpdater
     {

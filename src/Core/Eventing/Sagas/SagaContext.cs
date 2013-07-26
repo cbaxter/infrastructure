@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Commanding;
+using Spark.Messaging;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Sagas
+namespace Spark.Eventing.Sagas
 {
     /// <summary>
     /// The saga context wrapper used when handling an event within an saga.

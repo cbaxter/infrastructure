@@ -1,14 +1,14 @@
 ﻿using System;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
-using Spark.Infrastructure.Threading;
+using Spark.Commanding;
+using Spark.Configuration;
+using Spark.Eventing;
+using Spark.EventStore;
+using Spark.Logging;
+using Spark.Messaging;
+using Spark.Resources;
+using Spark.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -21,7 +21,7 @@ using Spark.Infrastructure.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// The primary <see cref="IStoreAggregates"/> implementation that loads/persists aggregate instances to underlying <see cref="IStoreEvents"/> and <see cref="IStoreSnapshots"/> implementations.

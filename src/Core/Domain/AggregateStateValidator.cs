@@ -1,8 +1,8 @@
 ﻿using System;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.EventStore;
+using Spark.Commanding;
+using Spark.EventStore;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using Spark.Infrastructure.EventStore;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// Enables <see cref="Aggregate"/> state validation to ensure that an <see cref="Aggregate"/> instance has not been modified outside of a the regular workflow.

@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Newtonsoft.Json.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization
+namespace Spark.Serialization
 {
     /// <summary>
     /// An <see cref="IContractResolver"/> implementation that assigns a default <see cref="JsonConverter"/> for a given <see cref="JsonContract"/>.

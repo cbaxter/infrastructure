@@ -1,9 +1,9 @@
 ﻿using System;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Example.Domain.Commands;
-using Spark.Infrastructure.Example.Domain.Events;
+using Spark.Domain;
+using Spark.Example.Domain.Commands;
+using Spark.Example.Domain.Events;
 
-namespace Spark.Infrastructure.Example.Domain
+namespace Spark.Example.Domain
 {
     public class Client : Aggregate
     {

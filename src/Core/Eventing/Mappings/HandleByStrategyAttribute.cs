@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using System.Reflection;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Mappings
+namespace Spark.Eventing.Mappings
 {
     /// <summary>
     /// Base attribute for indicating event handle method mapping strategy.

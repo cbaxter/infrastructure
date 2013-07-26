@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Newtonsoft.Json;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization.Converters
+namespace Spark.Serialization.Converters
 {
     /// <summary>
     /// Converts a <see cref="StateObject"/> to and from JSON.

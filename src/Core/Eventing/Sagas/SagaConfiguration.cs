@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Spark.Infrastructure.Eventing.Sagas
+namespace Spark.Eventing.Sagas
 {
     public sealed class SagaConfiguration
     {

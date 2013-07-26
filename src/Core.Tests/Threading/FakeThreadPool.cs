@@ -1,9 +1,9 @@
-﻿using Spark.Infrastructure.Threading;
+﻿using Spark.Threading;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using System.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Threading
+namespace Spark.Tests.Threading
 {
     public class FakeThreadPool : IQueueUserWorkItems
     {

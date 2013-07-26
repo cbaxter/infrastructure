@@ -1,7 +1,7 @@
-﻿using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Example.Domain.Events;
+﻿using Spark.Eventing.Mappings;
+using Spark.Example.Domain.Events;
 
-namespace Spark.Infrastructure.Example.Denormalizers
+namespace Spark.Example.Denormalizers
 {
     [EventHandler]
     public sealed class ClientDenormalizer

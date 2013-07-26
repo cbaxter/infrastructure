@@ -1,14 +1,14 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Moq;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Domain.Mappings;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Commanding;
+using Spark.Domain;
+using Spark.Domain.Mappings;
+using Spark.Messaging;
+using Spark.Resources;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -21,7 +21,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Commanding
+namespace Spark.Tests.Commanding
 {
     public static class UsingCommandHandlerRegistry
     {

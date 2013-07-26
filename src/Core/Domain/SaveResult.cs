@@ -1,6 +1,6 @@
-﻿using Spark.Infrastructure.EventStore;
+﻿using Spark.EventStore;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,7 +13,7 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// The resulting <see cref="Aggregate"/> and <see cref="Commit"/> after successfully invoking <see cref="IStoreAggregates.Save"/>.

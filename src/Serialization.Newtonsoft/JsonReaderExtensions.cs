@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using Newtonsoft.Json;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization
+namespace Spark.Serialization
 {
     internal static class JsonReaderExtensions
     {

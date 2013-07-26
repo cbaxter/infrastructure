@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using System.Collections.Generic;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
     /// Represents an object whose internal state may be captured and externalized without violating encapsulation.

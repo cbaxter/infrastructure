@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
-using Spark.Infrastructure.Threading;
+using Spark.Threading;
 using Xunit;
 
 // ReSharper disable AccessToDisposedClosure
-namespace Spark.Infrastructure.Tests.Threading
+namespace Spark.Tests.Threading
 {
     public static class UsingThreadPoolWrapper
     {

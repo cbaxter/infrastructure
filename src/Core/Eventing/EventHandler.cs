@@ -1,6 +1,6 @@
 ﻿using System;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,7 +13,7 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing
+namespace Spark.Eventing
 {
     /// <summary>
     /// Represents an <see cref="Event"/> handler method executor.

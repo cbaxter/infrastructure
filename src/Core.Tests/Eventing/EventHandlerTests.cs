@@ -1,11 +1,11 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Messaging;
+using Spark.Eventing;
+using Spark.Messaging;
 using Xunit;
-using EventHandler = Spark.Infrastructure.Eventing.EventHandler;
+using EventHandler = Spark.Eventing.EventHandler;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using EventHandler = Spark.Infrastructure.Eventing.EventHandler;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Eventing
+namespace Spark.Tests.Eventing
 {
     public static class UsingEventHandler
     {

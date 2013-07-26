@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
-using Spark.Infrastructure.EventStore;
+using Spark.EventStore;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using Spark.Infrastructure.EventStore;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Configuration
+namespace Spark.Configuration
 {
     /// <summary>
     /// Static settings class to access `spark.infrastructure` configuration section.

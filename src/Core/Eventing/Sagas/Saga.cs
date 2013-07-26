@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Commanding;
+using Spark.Eventing.Mappings;
+using Spark.Messaging;
+using Spark.Resources;
 
-namespace Spark.Infrastructure.Eventing.Sagas
+namespace Spark.Eventing.Sagas
 {
     //TODO: Reminder... save state and then publish commands... to handle failure, can write sagas such that a timeout is scheduled and cleared if the corresponding completion event is received...
     //      Thus state is saved, command is published and if required and if failed, can be re-published on timeout if design requires it... (i.e., saga handler doesn't need to deal with it)...

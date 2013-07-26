@@ -5,7 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using Newtonsoft.Json.Bson;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization
+namespace Spark.Serialization
 {    
     /// <summary>
     /// A BSON serializer using on JSON.NET.

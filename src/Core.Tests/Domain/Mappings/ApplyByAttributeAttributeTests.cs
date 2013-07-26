@@ -1,12 +1,12 @@
 ﻿using System;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Domain.Mappings;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Domain.Mappings;
+using Spark.Eventing;
+using Spark.Resources;
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -19,7 +19,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain.Mappings
+namespace Spark.Tests.Domain.Mappings
 {
     public static class UsingApplyByAttributeAttribute
     {
@@ -38,7 +38,7 @@ namespace Spark.Infrastructure.Tests.Domain.Mappings
             public void MethodMustHaveVoidReturn()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithReturn)));
+                var ex = Assert.Throws<MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithReturn)));
 
                 Assert.Equal(Exceptions.AggregateApplyMethodMustHaveVoidReturn.FormatWith(typeof(FakeAggregateWithReturn), "OnFakeEvent"), ex.Message);
             }
@@ -47,7 +47,7 @@ namespace Spark.Infrastructure.Tests.Domain.Mappings
             public void MethodMustHaveSingleEventParameter()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithNoParameters)));
+                var ex = Assert.Throws<MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithNoParameters)));
 
                 Assert.Equal(Exceptions.AggregateApplyMethodInvalidParameters.FormatWith(typeof(Event), typeof(FakeAggregateWithNoParameters), "OnFakeEvent"), ex.Message);
             }
@@ -56,7 +56,7 @@ namespace Spark.Infrastructure.Tests.Domain.Mappings
             public void MethodNotMustHaveMultipleEventParameter()
             {
                 var attribute = new ApplyByAttributeAttribute();
-                var ex = Assert.Throws<Infrastructure.Domain.MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithMultipleParameters)));
+                var ex = Assert.Throws<MappingException>(() => attribute.GetApplyMethods(typeof(FakeAggregateWithMultipleParameters)));
 
                 Assert.Equal(Exceptions.AggregateApplyMethodInvalidParameters.FormatWith(typeof(Event), typeof(FakeAggregateWithMultipleParameters), "OnFakeEvent"), ex.Message);
             }

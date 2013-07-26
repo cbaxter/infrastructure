@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using Xunit.Extensions;
  */
 
 #pragma warning disable 1720
-namespace Spark.Infrastructure.Tests
+namespace Spark.Tests
 {
     public static class UsingStringExtensions
     {

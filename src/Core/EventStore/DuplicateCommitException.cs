@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.EventStore
 {
     /// <summary>
     /// Represents errors that occur when a specific stream version already exists.

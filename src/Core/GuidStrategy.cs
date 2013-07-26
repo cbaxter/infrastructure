@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
     /// he guid strategy to be used when creating <see cref="Guid"/> structures.

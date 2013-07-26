@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Threading;
+using Spark.Configuration;
+using Spark.Logging;
+using Spark.Messaging;
+using Spark.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -19,7 +19,7 @@ using Spark.Infrastructure.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing
+namespace Spark.Eventing
 {
     /// <summary>
     /// Executes <see cref="Event"/> instances with the associated <see cref="EventHandler"/>.

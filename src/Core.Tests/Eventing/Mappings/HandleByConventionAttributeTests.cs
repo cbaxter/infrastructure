@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Moq;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Eventing;
+using Spark.Eventing.Mappings;
+using Spark.Resources;
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -21,7 +21,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Eventing.Mappings
+namespace Spark.Tests.Eventing.Mappings
 {
     public static class UsingHandleByConventionAttribute
     {

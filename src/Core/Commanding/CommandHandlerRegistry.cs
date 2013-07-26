@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Domain.Mappings;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Domain.Mappings;
+using Spark.Logging;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -21,7 +21,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Commanding
+namespace Spark.Commanding
 {
     /// <summary>
     /// A <see cref="CommandHandler"/> registry associating <see cref="Aggregate"/> handle methods with specific <see cref="Command"/> types.

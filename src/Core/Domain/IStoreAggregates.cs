@@ -1,7 +1,7 @@
 ﻿using System;
-using Spark.Infrastructure.Commanding;
+using Spark.Commanding;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using Spark.Infrastructure.Commanding;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// Saves aggregate changes to the underlying event store.

@@ -7,8 +7,8 @@
     <ProjectGuid>{E5D9F6ED-F8AD-4903-A2D7-FCBECD77E786}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure.Example</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Example</AssemblyName>
+    <RootNamespace>Spark.Example</RootNamespace>
+    <AssemblyName>Spark.Example</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Moq;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Commanding;
+using Spark.Configuration;
+using Spark.Domain;
+using Spark.Eventing;
+using Spark.EventStore;
+using Spark.Messaging;
+using Spark.Resources;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -24,7 +24,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Domain
+namespace Spark.Tests.Domain
 {
     public static class UsingAggregateStore
     {

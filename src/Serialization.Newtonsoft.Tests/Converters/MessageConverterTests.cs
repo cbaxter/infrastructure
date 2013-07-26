@@ -1,10 +1,10 @@
 ﻿using System;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Serialization.Converters;
+using Spark.Commanding;
+using Spark.Messaging;
+using Spark.Serialization.Converters;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization.Tests.Converters
+namespace Spark.Serialization.Tests.Converters
 {
     public static class UsingMessageConverter
     {
@@ -40,7 +40,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
                 var json = WriteJson(new MessageConverter(), message);
 
                 Validate(
-                    String.Format("﻿{{\"id\":\"{0}\",\"h\":{{}},\"p\":{{\"a\":\"{1}\",\"c\":{{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}}}}}", id, aggregateId), 
+                    String.Format("﻿{{\"id\":\"{0}\",\"h\":{{}},\"p\":{{\"a\":\"{1}\",\"c\":{{\"$type\":\"Spark.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}}}}}", id, aggregateId), 
                     json
                 );
             }
@@ -57,7 +57,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿{\"id\":\"f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d\",\"h\":{},\"p\":{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}}";
+                var json = "﻿{\"id\":\"f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d\",\"h\":{},\"p\":{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Spark.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}}";
                 var message = ReadJson<Message<CommandEnvelope>>(new MessageConverter(), json);
 
                 Assert.Equal(Guid.Parse("f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d"), message.Id);
@@ -66,7 +66,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             [Fact]
             public void PropertyOrderIrrelevant()
             {
-                var json = "﻿{\"p\":{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Spark.Infrastructure.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Infrastructure.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}},\"h\":{},\"id\":\"f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d\"}";
+                var json = "﻿{\"p\":{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Spark.Serialization.Tests.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}},\"h\":{},\"id\":\"f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d\"}";
                 var message = ReadJson<Message<CommandEnvelope>>(new MessageConverter(), json);
 
                 Assert.Equal(Guid.Parse("f3487646-bd4d-4bc4-8fb2-1f7f2e2a232d"), message.Id);
@@ -92,7 +92,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
                 var message = new Message<CommandEnvelope>(id, HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand("My Command")));
                 var json = WriteBson(new MessageConverter(), message);
 
-                Validate("﻿/QAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwANQAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwC0AAAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==", json);
+                Validate("﻿3wAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALYAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCWAAAAAiR0eXBlAG0AAABTcGFyay5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==", json);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Spark.Infrastructure.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "﻿/QAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwANQAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwC0AAAAAiR0eXBlAIsAAABTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5JbmZyYXN0cnVjdHVyZS5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==";
+                var bson = "3wAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALYAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCWAAAAAiR0eXBlAG0AAABTcGFyay5TZXJpYWxpemF0aW9uLlRlc3RzLkNvbnZlcnRlcnMuVXNpbmdNZXNzYWdlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAAAA==";
                 var message = ReadBson<Message<CommandEnvelope>>(new MessageConverter(), bson);
 
                 Assert.Equal(Guid.Parse("A96662A6-ABA8-4CF9-9882-86E7F52BF18C"), message.Id);

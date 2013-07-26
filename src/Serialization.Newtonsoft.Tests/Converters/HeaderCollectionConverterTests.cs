@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Serialization.Converters;
+using Spark.Messaging;
+using Spark.Serialization.Converters;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization.Tests.Converters
+namespace Spark.Serialization.Tests.Converters
 {
     public static class UsingHeaderCollectionConverter
     {

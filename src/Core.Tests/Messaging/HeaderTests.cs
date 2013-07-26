@@ -1,10 +1,10 @@
 ﻿using System;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
+using Spark.Messaging;
+using Spark.Resources;
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Messaging
+namespace Spark.Tests.Messaging
 {
     public static class UsingHeader
     {

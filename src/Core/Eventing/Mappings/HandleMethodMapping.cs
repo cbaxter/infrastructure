@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using System.Collections.Generic;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Mappings
+namespace Spark.Eventing.Mappings
 {
     /// <summary>
     /// Represents an explicit <see cref="EventHandlerAttribute"/> handle method mapping.

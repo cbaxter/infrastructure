@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using System.IO;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Serialization
+namespace Spark.Serialization
 {
     /// <summary>
     /// Serializes or Deserializes an object graph to or from the provided <see cref="Stream"/>.

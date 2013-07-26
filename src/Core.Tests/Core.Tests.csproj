@@ -7,8 +7,8 @@
     <ProjectGuid>{CFF3E57D-1325-4E10-8E14-4898814487BE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure.Tests</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Core.Tests</AssemblyName>
+    <RootNamespace>Spark.Tests</RootNamespace>
+    <AssemblyName>Spark.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

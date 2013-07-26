@@ -1,6 +1,6 @@
 ﻿using System;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,7 +13,7 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Domain.Mappings
 {
     /// <summary>
     /// Indicates that aggregate command handle methods are explicitly mapped by sthe pecified <see cref="HandleMethodMapping"/> type.

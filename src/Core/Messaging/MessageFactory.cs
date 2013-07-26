@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using System.Net.NetworkInformation;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Messaging
+namespace Spark.Messaging
 {
     /// <summary>
     /// Base message factory implementation.

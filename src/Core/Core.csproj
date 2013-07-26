@@ -7,8 +7,8 @@
     <ProjectGuid>{DFD230FA-76D5-4EF4-8035-80E848CF798B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Core</AssemblyName>
+    <RootNamespace>Spark</RootNamespace>
+    <AssemblyName>Spark.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

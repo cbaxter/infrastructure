@@ -3,11 +3,11 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Threading;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Logging;
+using Spark.Resources;
 
-namespace Spark.Infrastructure.EventStore.Sql
+namespace Spark.EventStore.Sql
 {
     /// <summary>
     /// An auto flushing async buffered batch command executor.

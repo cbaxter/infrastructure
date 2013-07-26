@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using System.Collections.ObjectModel;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Mappings
+namespace Spark.Eventing.Mappings
 {
     /// <summary>
     /// A read-only mapping of object type to event handler method.

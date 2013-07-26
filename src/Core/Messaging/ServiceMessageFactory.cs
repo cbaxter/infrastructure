@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using System.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Messaging
+namespace Spark.Messaging
 {
     /// <summary>
     /// Message factory implementation for use in console, forms and service applications.

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using Spark.Infrastructure.EventStore.Sql.Dialects;
-using Spark.Infrastructure.Resources;
+using Spark.EventStore.Sql.Dialects;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Sql
+namespace Spark.EventStore.Sql
 {
     /// <summary>
     /// Gets the appropriate RDBMS dialect based on the specified connection provider name.

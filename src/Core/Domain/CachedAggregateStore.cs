@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Runtime.Caching;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
+using Spark.Commanding;
+using Spark.Configuration;
+using Spark.EventStore;
+using Spark.Logging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using Spark.Infrastructure.Logging;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// A <see cref="IStoreAggregates"/> wrapper class to enable <see cref="MemoryCache"/> storage of <see cref="Aggregate"/> instances to reduce <see cref="Get"/> overhead.

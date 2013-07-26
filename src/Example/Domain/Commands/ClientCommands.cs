@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Spark.Infrastructure.Commanding;
+using Spark.Commanding;
 
-namespace Spark.Infrastructure.Example.Domain.Commands
+namespace Spark.Example.Domain.Commands
 {
     [DataContract]
     public sealed class RegisterClient : Command

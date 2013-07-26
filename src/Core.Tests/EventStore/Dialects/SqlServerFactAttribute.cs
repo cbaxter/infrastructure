@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore.Dialects
+namespace Spark.Tests.EventStore.Dialects
 {
     /// <summary>
     /// Constant for configured SQL-Server connection name.

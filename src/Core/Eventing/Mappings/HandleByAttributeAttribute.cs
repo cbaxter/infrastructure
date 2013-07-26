@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing.Mappings
+namespace Spark.Eventing.Mappings
 {
     /// <summary>
     /// Indicates that event handler methods are mapped by explicit usage of <see cref="Domain.Mappings.HandleMethodAttribute"/>.

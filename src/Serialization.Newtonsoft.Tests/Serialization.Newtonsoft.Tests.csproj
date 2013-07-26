@@ -7,8 +7,8 @@
     <ProjectGuid>{01A8FEB0-1121-4D81-B6EA-6DF639C059FC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure.Serialization.Tests</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Serialization.Newtonsoft.Tests</AssemblyName>
+    <RootNamespace>Spark.Serialization.Tests</RootNamespace>
+    <AssemblyName>Spark.Serialization.Newtonsoft.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

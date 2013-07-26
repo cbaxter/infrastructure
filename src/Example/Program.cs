@@ -2,14 +2,14 @@
 using System.Diagnostics;
 using System.Threading;
 using Autofac;
-using Spark.Infrastructure;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Sql;
-using Spark.Infrastructure.EventStore.Sql.Dialects;
-using Spark.Infrastructure.Example.Domain.Commands;
-using Spark.Infrastructure.Example.Modules;
+using Spark;
+using Spark.Commanding;
+using Spark.Domain;
+using Spark.EventStore;
+using Spark.EventStore.Sql;
+using Spark.EventStore.Sql.Dialects;
+using Spark.Example.Domain.Commands;
+using Spark.Example.Modules;
 
 namespace Example
 {

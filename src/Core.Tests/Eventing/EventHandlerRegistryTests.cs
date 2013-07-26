@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Eventing.Sagas;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Eventing;
+using Spark.Eventing.Mappings;
+using Spark.Eventing.Sagas;
+using Spark.Resources;
 using Xunit;
 //using EventHandler = Spark.Infrastructure.Eventing.Mappings.EventHandlerAttribute;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -24,7 +24,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Eventing
+namespace Spark.Tests.Eventing
 {
     public static class UsingEventHandlerRegistry
     {

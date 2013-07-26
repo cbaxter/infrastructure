@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Resources;
-using Spark.Infrastructure.Threading;
+using Spark.Configuration;
+using Spark.Domain;
+using Spark.EventStore;
+using Spark.Logging;
+using Spark.Messaging;
+using Spark.Resources;
+using Spark.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -22,7 +22,7 @@ using Spark.Infrastructure.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Commanding
+namespace Spark.Commanding
 {
     /// <summary>
     /// Executes <see cref="Command"/> instances with the associated <see cref="Aggregate"/> <see cref="CommandHandler"/>.

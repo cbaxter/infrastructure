@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Configuration;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Threading;
+using Spark.Eventing;
+using Spark.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,7 +16,7 @@ using Spark.Infrastructure.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Configuration
+namespace Spark.Configuration
 {
     /// <summary>
     /// <see cref="EventProcessor"/> configuration settings.

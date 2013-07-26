@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Spark.Infrastructure.Eventing;
+using Spark.Eventing;
 
-namespace Spark.Infrastructure.Example.Domain.Events
+namespace Spark.Example.Domain.Events
 {
     [DataContract]
     public sealed class ClientRegistered : Event

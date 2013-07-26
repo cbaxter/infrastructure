@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using System.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Sql.Dialects
+namespace Spark.EventStore.Sql.Dialects
 {
     /// <summary>
     /// Provides sequential-like Guids for database b-tree friendly inserts

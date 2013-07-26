@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Spark.Infrastructure.EventStore.Sql.Dialects {
+namespace Spark.EventStore.Sql.Dialects {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Spark.Infrastructure.EventStore.Sql.Dialects {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.Infrastructure.EventStore.Sql.Dialects.SqlServerDialectStatements", typeof(SqlServerDialectStatements).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Spark.EventStore.Sql.Dialects.SqlServerDialectStatements", typeof(SqlServerDialectStatements).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
-using Spark.Infrastructure.Threading;
+using Spark.Configuration;
+using Spark.EventStore;
+using Spark.Logging;
+using Spark.Resources;
+using Spark.Threading;
 
-namespace Spark.Infrastructure.Eventing.Sagas
+namespace Spark.Eventing.Sagas
 {
     public sealed class SagaEventHandler : EventHandler
     {

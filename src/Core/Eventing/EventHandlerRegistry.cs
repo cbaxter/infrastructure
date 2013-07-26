@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Eventing.Sagas;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
+using Spark.Domain;
+using Spark.Eventing.Mappings;
+using Spark.Eventing.Sagas;
+using Spark.Logging;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -22,7 +22,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing
+namespace Spark.Eventing
 {
     /// <summary>
     /// An <see cref="EventHandler"/> registry associating event handler handle methods with specific <see cref="Event"/> types.

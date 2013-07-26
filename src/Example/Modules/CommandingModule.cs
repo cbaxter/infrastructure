@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Sql;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Eventing.Mappings;
-using Spark.Infrastructure.Messaging;
-using Spark.Infrastructure.Serialization;
+using Spark.Commanding;
+using Spark.Domain;
+using Spark.EventStore;
+using Spark.EventStore.Sql;
+using Spark.Eventing;
+using Spark.Eventing.Mappings;
+using Spark.Messaging;
+using Spark.Serialization;
 using Module = Autofac.Module;
 
-namespace Spark.Infrastructure.Example.Modules
+namespace Spark.Example.Modules
 {
     public sealed class CommandingModule : Module
     {

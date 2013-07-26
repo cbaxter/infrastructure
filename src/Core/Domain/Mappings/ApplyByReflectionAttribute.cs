@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Spark.Infrastructure.Eventing;
+using Spark.Eventing;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Spark.Infrastructure.Eventing;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain.Mappings
+namespace Spark.Domain.Mappings
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class ApplyByReflectionAttribute : ApplyByStrategyAttribute

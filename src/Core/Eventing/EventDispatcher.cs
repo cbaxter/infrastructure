@@ -1,10 +1,10 @@
 ﻿using System;
-using Spark.Infrastructure.Configuration;
-using Spark.Infrastructure.Domain;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
+using Spark.Configuration;
+using Spark.Domain;
+using Spark.EventStore;
+using Spark.Logging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Spark.Infrastructure.Logging;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing
+namespace Spark.Eventing
 {
     /// <summary>
     /// An <see cref="HookableAggregateStore"/> pipeline hook used to dispatch events after successfully commited to the underlying data store.

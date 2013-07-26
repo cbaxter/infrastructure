@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Spark.Infrastructure.Configuration;
+using Spark.Configuration;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using Spark.Infrastructure.Configuration;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.EventStore
 {
     /// <summary>
     /// Extension methods of <see cref="IRetrieveEvents"/> and  <see cref="IStoreEvents"/>.

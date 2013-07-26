@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using System.Runtime.Serialization;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Messaging
+namespace Spark.Messaging
 {
     /// <summary>
     /// A message envelope containing a unique identifier, message headers and associated payload.

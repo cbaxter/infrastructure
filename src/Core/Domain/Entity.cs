@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.Eventing;
-using Spark.Infrastructure.Resources;
+using Spark.Commanding;
+using Spark.Eventing;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// A uniquely identifiable <see cref="Object"/> within a given <see cref="Aggregate"/> root.

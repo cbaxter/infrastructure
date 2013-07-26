@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Spark.Infrastructure.Commanding;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Logging;
+using Spark.Commanding;
+using Spark.EventStore;
+using Spark.Logging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using Spark.Infrastructure.Logging;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Domain
+namespace Spark.Domain
 {
     /// <summary>
     /// A pluggable <see cref="IStoreAggregates"/> wrapper that enables one or more <see cref="PipelineHook"/> implementations to extend <see cref="Get"/> and/or <see cref="Save"/> behavior.

@@ -1,10 +1,10 @@
-﻿using Spark.Infrastructure.Resources;
+﻿using Spark.Resources;
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using System.Text;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Logging
+namespace Spark.Logging
 {
     /// <summary>
     /// Diagnostic context without trace events for transfer, start and stop of logical operations.

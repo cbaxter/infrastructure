@@ -1,10 +1,10 @@
-﻿using Spark.Infrastructure.Logging;
+﻿using Spark.Logging;
 using System;
 using System.Configuration;
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Logging
+namespace Spark.Tests.Logging
 {
     public class UsingLogManager
     {
@@ -116,7 +116,7 @@ namespace Spark.Infrastructure.Tests.Logging
             [Fact]
             public void LoggerIsNamedAfterDeclaringClassFullName()
             {
-                Assert.Equal("Spark.Infrastructure.Tests.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
+                Assert.Equal("Spark.Tests.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
             }
         }
 

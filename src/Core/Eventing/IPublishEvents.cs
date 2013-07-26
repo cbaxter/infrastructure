@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Spark.Infrastructure.Messaging;
+using Spark.Messaging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using Spark.Infrastructure.Messaging;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Eventing
+namespace Spark.Eventing
 {
     /// <summary>
     /// Event publisher.

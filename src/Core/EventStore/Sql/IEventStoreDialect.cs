@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,7 +14,7 @@ using System.Data.Common;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore.Sql
+namespace Spark.EventStore.Sql
 {
     /// <summary>
     /// The SQL RDBMS dialect statements associated with an <see cref="SqlEventStore"/> instance.

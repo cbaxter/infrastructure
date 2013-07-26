@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Spark.Infrastructure.Logging;
+using Spark.Logging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,7 @@ using Spark.Infrastructure.Logging;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Messaging
+namespace Spark.Messaging
 {
     /// <summary>
     /// Receives messages from the underlying <see cref="IReceiveMessages{T}"/> message bus and delegates to a <see cref="IProcessMessages{T}"/> processor instance.
