@@ -110,10 +110,16 @@
     <Compile Include="Eventing\Mappings\HandleMethodMapping.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Eventing\Sagas\IStoreSagas.cs" />
     <Compile Include="Eventing\Sagas\Saga.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Eventing\Sagas\SagaConfiguration.cs" />
+    <Compile Include="Eventing\Sagas\SagaContext.cs" />
     <Compile Include="Eventing\Sagas\SagaEventHandler.cs" />
+    <Compile Include="Eventing\Sagas\SagaLock.cs" />
+    <Compile Include="Eventing\Sagas\SagaLockToken.cs" />
+    <Compile Include="Eventing\Sagas\SagaReference.cs" />
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />
