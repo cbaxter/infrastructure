@@ -69,6 +69,12 @@
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Data\DbDataRecordExtensions.cs" />
+    <Compile Include="Data\DbCommandExtensions.cs" />
+    <Compile Include="Data\DbBatchOperation.cs" />
+    <Compile Include="Data\IDbDialect.cs" />
+    <Compile Include="Data\DbDialectExtensions.cs" />
+    <Compile Include="Data\SqlClient\SqlSequentialGuid.cs" />
     <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
     <Compile Include="Cqrs\Domain\Entity.cs" />
@@ -125,21 +131,14 @@
     <Compile Include="EventStore\IRetrieveSnapshots.cs" />
     <Compile Include="EventStore\IRetrieveEvents.cs" />
     <Compile Include="EventStore\SnapshotStoreExtensions.cs" />
-    <Compile Include="EventStore\Sql\DataRecordExtensions.cs" />
-    <Compile Include="EventStore\Sql\DbCommandExtensions.cs" />
-    <Compile Include="EventStore\Sql\SqlBulkOperation.cs" />
-    <Compile Include="EventStore\Sql\SqlDialectExtensions.cs" />
-    <Compile Include="EventStore\Sql\DialectProvider.cs" />
-    <Compile Include="EventStore\Sql\Dialects\SqlServerDialect.cs" />
+    <Compile Include="EventStore\Sql\Dialects\SqlServerDialects.cs" />
     <Compile Include="EventStore\Sql\Dialects\SqlServerDialectStatements.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SqlServerDialectStatements.resx</DependentUpon>
     </Compile>
-    <Compile Include="EventStore\Sql\Dialects\SqlServerSequentialGuid.cs" />
     <Compile Include="EventStore\Sql\IEventStoreDialect.cs" />
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
-    <Compile Include="EventStore\Sql\ISqlDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
     <Compile Include="Messaging\InlineMessageBus.cs" />

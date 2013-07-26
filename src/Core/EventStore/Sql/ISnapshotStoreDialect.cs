@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Data.Common;
+using System.Data;
+using Spark.Data;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -19,7 +20,7 @@ namespace Spark.EventStore.Sql
     /// <summary>
     /// The SQL RDBMS dialect statements associated with an <see cref="SqlSnapshotStore"/> instance.
     /// </summary>
-    internal interface ISnapshotStoreDialect : ISqlDialect
+    public interface ISnapshotStoreDialect : IDbDialect
     {
         String EnsureSnapshotTableExists { get; }
 
@@ -28,8 +29,8 @@ namespace Spark.EventStore.Sql
         String ReplaceSnapshot { get; }
         String DeleteSnapshots { get; }
 
-        DbParameter CreateStreamIdParameter(Guid streamId);
-        DbParameter CreateVersionParameter(Int32 version);
-        DbParameter CreateStateParameter(Byte[] state);
+        IDataParameter CreateStreamIdParameter(Guid streamId);
+        IDataParameter CreateVersionParameter(Int32 version);
+        IDataParameter CreateStateParameter(Byte[] state);
     }
 }

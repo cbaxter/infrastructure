@@ -18,18 +18,18 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore.Sql
+namespace Spark.Data
 {
     /// <summary>
-    /// Extension methods of <see cref="ISqlDialect"/>.
+    /// Extension methods of <see cref="IDbDialect"/>.
     /// </summary>
-    internal static class SqlDialectExtensions
+    internal static class DbDialectExtensions
     {
         /// <summary>
         /// Opens a new database connection.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
-        public static DbConnection OpenConnection(this ISqlDialect dialect)
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
+        public static IDbConnection OpenConnection(this IDbDialect dialect)
         {
             var connection = dialect.Provider.CreateConnection();
 
@@ -52,9 +52,9 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Creates a new database command.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
-        /// <param name="commandText">The SQL statement associated with this <see cref="DbCommand"/>.</param>
-        public static DbCommand CreateCommand(this ISqlDialect dialect, String commandText)
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
+        /// <param name="commandText">The SQL statement associated with this <see cref="IDbCommand"/>.</param>
+        public static IDbCommand CreateCommand(this IDbDialect dialect, String commandText)
         {
             var command = dialect.Provider.CreateCommand();
 
@@ -68,9 +68,9 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Executes a SQL statement against a connection object.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
-        public static Int32 ExecuteNonQuery(this ISqlDialect dialect, DbCommand command)
+        public static Int32 ExecuteNonQuery(this IDbDialect dialect, IDbCommand command)
         {
             return dialect.ExecuteCommand(command, command.ExecuteNonQuery);
         }
@@ -78,9 +78,9 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Executes the query and returns the first column of the first row in the result set returned by the query. All other columns and rows are ignored.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
-        public static Object ExecuteScalar(this ISqlDialect dialect, DbCommand command)
+        public static Object ExecuteScalar(this IDbDialect dialect, IDbCommand command)
         {
             return dialect.ExecuteCommand(command, command.ExecuteScalar);
         }
@@ -88,10 +88,10 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Queries the databse for a single database record returning default <typeparamref name="T"/> if not found.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="recordBuilder">The record builder that maps an <see cref="IDataRecord"/> to <typeparamref name="T"/>.</param>
-        public static T QuerySingle<T>(this ISqlDialect dialect, DbCommand command, Func<IDataRecord, T> recordBuilder)
+        public static T QuerySingle<T>(this IDbDialect dialect, IDbCommand command, Func<IDataRecord, T> recordBuilder)
         {
             return dialect.ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult | CommandBehavior.SingleRow, recordBuilder).SingleOrDefault());
         }
@@ -99,27 +99,29 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Queries the databse for a zero or more database records.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="recordBuilder">The record builder that maps an <see cref="IDataRecord"/> to <typeparamref name="T"/>.</param>
-        public static List<T> QueryMultiple<T>(this ISqlDialect dialect, DbCommand command, Func<IDataRecord, T> recordBuilder)
+        public static List<T> QueryMultiple<T>(this IDbDialect dialect, IDbCommand command, Func<IDataRecord, T> recordBuilder)
         {
             return dialect.ExecuteCommand(command, () => ExecuteReader(command, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult, recordBuilder));
         }
 
         /// <summary>
-        /// Builds a list of <typeparamref name="T"/> from the underlying <see cref="DbDataReader"/>.
+        /// Builds a list of <typeparamref name="T"/> from the underlying <see cref="IDataReader"/>.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="command">The command to execute.</param>
-        /// <param name="commandBehavior">The <see cref="DbDataReader"/> command behavior.</param>
+        /// <param name="commandBehavior">The <see cref="IDataReader"/> command behavior.</param>
         /// <param name="recordBuilder">The record builder that maps an <see cref="IDataRecord"/> to <typeparamref name="T"/>.</param>
-        private static List<T> ExecuteReader<T>(DbCommand command, CommandBehavior commandBehavior, Func<IDataRecord, T> recordBuilder)
+        private static List<T> ExecuteReader<T>(IDbCommand command, CommandBehavior commandBehavior, Func<IDataRecord, T> recordBuilder)
         {
             var result = new List<T>();
 
             using (var dataReader = command.ExecuteReader(commandBehavior))
             {
+                Debug.Assert(dataReader != null);
+
                 while (dataReader.Read())
                     result.Add(recordBuilder(dataReader));
             }
@@ -130,10 +132,10 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Executes the specified command.
         /// </summary>
-        /// <param name="dialect">The <see cref="ISqlDialect"/>.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/>.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="executor">The executor used to execute the command.</param>
-        private static TResult ExecuteCommand<TResult>(this ISqlDialect dialect, DbCommand command, Func<TResult> executor)
+        private static TResult ExecuteCommand<TResult>(this IDbDialect dialect, IDbCommand command, Func<TResult> executor)
         {
             TResult result;
 

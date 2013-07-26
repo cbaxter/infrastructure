@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using Spark.Configuration;
+using Spark.Data;
 using Spark.Logging;
 using Spark.Serialization;
 
@@ -27,7 +28,7 @@ namespace Spark.EventStore.Sql
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly ISnapshotStoreDialect dialect;
         private readonly ISerializeObjects serializer;
-        private readonly SqlBatchOperation buffer;
+        private readonly DbBatchOperation buffer;
         private readonly Boolean replaceExisting;
         private readonly Boolean useAsyncWrite;
         private Boolean disposed;
@@ -42,10 +43,10 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Initializes a new instance of <see cref="SqlSnapshotStore"/>.
         /// </summary>
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlSnapshotStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlSnapshotStore"/>.</param>
-        public SqlSnapshotStore(ISerializeObjects serializer, String connectionName)
-            : this(serializer, Settings.SnapshotStore, DialectProvider.GetSnapshotStoreDialect(connectionName))
+        public SqlSnapshotStore(ISnapshotStoreDialect dialect, ISerializeObjects serializer)
+            : this(dialect, serializer, Settings.SnapshotStore)
         { }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Spark.EventStore.Sql
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="settings">The snapshot store settings.</param>
         /// <param name="dialect">The database dialect associated with this <see cref="SqlSnapshotStore"/>.</param>
-        internal SqlSnapshotStore(ISerializeObjects serializer, IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
+        internal SqlSnapshotStore(ISnapshotStoreDialect dialect, ISerializeObjects serializer, IStoreSnapshotSettings settings)
         {
             Verify.NotNull(serializer, "serializer");
             Verify.NotNull(settings, "settings");
@@ -86,7 +87,7 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Creates a <see cref="DataTable"/> based on the required insert/update command parameters.
         /// </summary>
-        private static SqlBatchOperation CreateBuffer(IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
+        private static DbBatchOperation CreateBuffer(IStoreSnapshotSettings settings, ISnapshotStoreDialect dialect)
         {
             using (var command = dialect.CreateCommand(settings.ReplaceExisting ? dialect.ReplaceSnapshot : dialect.InsertSnapshot))
             {
@@ -94,7 +95,7 @@ namespace Spark.EventStore.Sql
                 command.Parameters.Add(dialect.CreateVersionParameter(default(Int32)));
                 command.Parameters.Add(dialect.CreateStateParameter(default(Byte[])));
 
-                return new SqlBatchOperation(dialect, command, settings.BatchSize, settings.FlushInterval);
+                return new DbBatchOperation(dialect, command, settings.BatchSize, settings.FlushInterval);
             }
         }
 

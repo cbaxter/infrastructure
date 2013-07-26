@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using Moq;
 using Spark;
-using Spark.Configuration;
 using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
@@ -37,7 +35,7 @@ namespace Test.Spark.EventStore.Dialects
 
             internal UsingInitializedEventStore()
             {
-                EventStore = new SqlEventStore(new BinarySerializer(), new EventStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
+                EventStore = new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings());
             }
 
             public void Dispose()
@@ -53,15 +51,15 @@ namespace Test.Spark.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
-                Assert.DoesNotThrow(() => new SqlEventStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -93,19 +91,19 @@ namespace Test.Spark.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanDisposeSynchronousStore()
             {
-                new SqlEventStore(new BinarySerializer(), new EventStoreSettings { Async = false }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings { Async = false }).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanDisposeAsynchronousStore()
             {
-                new SqlEventStore(new BinarySerializer(), new EventStoreSettings { Async = true }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings { Async = true }).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlEventStore(new BinarySerializer(), new EventStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
+                var snapshotStore = new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings());
 
                 snapshotStore.Dispose();
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -15,21 +15,21 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore.Sql
+namespace Spark.Data
 {
     /// <summary>
-    /// Extension methods of <see cref="DbCommand"/>.
+    /// Extension methods of <see cref="IDbCommand"/>.
     /// </summary>
     internal static class DbCommandExtensions
     {
         /// <summary>
-        /// Creates a new <see cref="DbCommand"/> that is a copy of the current instance.
+        /// Creates a new <see cref="IDbCommand"/> that is a copy of the current instance.
         /// </summary>
-        /// <param name="command">The <see cref="DbCommand"/> to clone.</param>
-        public static DbCommand Clone(this DbCommand command)
+        /// <param name="command">The <see cref="IDbCommand"/> to clone.</param>
+        public static IDbCommand Clone(this IDbCommand command)
         {
             // NOTE: All known implementations of DbCommand also implement ICloneable; should this change method will need to be more robust.
-            return (DbCommand)((ICloneable)command).Clone();
+            return (IDbCommand)((ICloneable)command).Clone();
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace Spark.EventStore.Sql
         /// </summary>
         /// <param name="command">The command on which to locate a named parameter.</param>
         /// <param name="parameterName">The name of the parameter to locate.</param>
-        public static Object GetParameterValue(this DbCommand command, String parameterName)
+        public static Object GetParameterValue(this IDbCommand command, String parameterName)
         {
-            return command.Parameters.Cast<DbParameter>().Where(parameter => parameter.ParameterName == parameterName).Select(parameter => parameter.Value).SingleOrDefault();
+            return command.Parameters.Cast<IDataParameter>().Where(parameter => parameter.ParameterName == parameterName).Select(parameter => parameter.Value).SingleOrDefault();
         }
     }
 }

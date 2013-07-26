@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading;
-using Moq;
-using Spark.Configuration;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
@@ -41,7 +39,7 @@ namespace Test.Spark.EventStore.Dialects
 
             internal UsingInitializedSnapshotStore(Boolean replaceExisting, Boolean async)
             {
-                SnapshotStore = new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = async, ReplaceExisting = replaceExisting }, new SqlServerDialect(SqlServerConnection.Name));
+                SnapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = async, ReplaceExisting = replaceExisting });
             }
 
             public void Dispose()
@@ -57,15 +55,15 @@ namespace Test.Spark.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new BinarySerializer(), SqlServerConnection.Name));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -97,19 +95,19 @@ namespace Test.Spark.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanDisposeSynchronousStore()
             {
-                new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = false }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = false }).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanDisposeAsynchronousStore()
             {
-                new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings { Async = true }, new SqlServerDialect(SqlServerConnection.Name)).Dispose();
+                new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = true }).Dispose();
             }
 
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSnapshotStore(new BinarySerializer(), new SnapshotStoreSettings(), new SqlServerDialect(SqlServerConnection.Name));
+                var snapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings());
 
                 snapshotStore.Dispose();
 

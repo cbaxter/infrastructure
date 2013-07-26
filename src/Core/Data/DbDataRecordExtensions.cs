@@ -14,12 +14,12 @@ using System.Data;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore.Sql
+namespace Spark.Data
 {
     /// <summary>
     /// Extension methods of <see cref="IDataRecord"/>.
     /// </summary>
-    public static class DataRecordExtensions
+    public static class DbDataRecordExtensions
     {
         /// <summary>
         /// Return the value of the specified field.

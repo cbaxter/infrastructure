@@ -7,19 +7,32 @@ using Spark.Cqrs.Domain;
 using Spark.Logging;
 using Spark.Resources;
 
-namespace Spark.EventStore.Sql
+/* Copyright (c) 2013 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
+namespace Spark.Data
 {
     /// <summary>
     /// An auto flushing async buffered batch command executor.
     /// </summary>
-    internal sealed class SqlBatchOperation : IDisposable
+    internal sealed class DbBatchOperation : IDisposable
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly EventWaitHandle waitHandle;
-        private readonly DbCommand commandTemplate;
+        private readonly IDbCommand commandTemplate;
         private readonly Thread backgroundWorker;
         private readonly TimeSpan flushInterval;
-        private readonly ISqlDialect dialect;
+        private readonly IDbDialect dialect;
         private readonly DataTable buffer;
         private readonly Int32 batchSize;
         private Boolean autoFlush;
@@ -36,13 +49,13 @@ namespace Spark.EventStore.Sql
         public Boolean AutoFlush { get { return autoFlush; } set { autoFlush = value; if (value) { waitHandle.Set(); } } }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SqlBatchOperation"/>.
+        /// Initializes a new instance of <see cref="DbBatchOperation"/>.
         /// </summary>
-        /// <param name="commandTemplate">The <see cref="DbCommand"/> template on which the <see cref="SqlBatchOperation"/> is based.</param>
-        /// <param name="dialect">The <see cref="ISqlDialect"/> associated with this <see cref="SqlBatchOperation"/>.</param>
+        /// <param name="commandTemplate">The <see cref="DbCommand"/> template on which the <see cref="DbBatchOperation"/> is based.</param>
+        /// <param name="dialect">The <see cref="IDbDialect"/> associated with this <see cref="DbBatchOperation"/>.</param>
         /// <param name="batchSize">The maximum number of items to be written in a batch.</param>
         /// <param name="flushInterval">The frequency with which the current batch is to be flushed.</param>
-        public SqlBatchOperation(ISqlDialect dialect, DbCommand commandTemplate, Int32 batchSize, TimeSpan flushInterval)
+        public DbBatchOperation(IDbDialect dialect, IDbCommand commandTemplate, Int32 batchSize, TimeSpan flushInterval)
         {
             this.autoFlush = true;
             this.dialect = dialect;
@@ -56,7 +69,7 @@ namespace Spark.EventStore.Sql
         }
 
         /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="SqlBatchOperation"/> class.
+        /// Releases all managed resources used by the current instance of the <see cref="DbBatchOperation"/> class.
         /// </summary>
         public void Dispose()
         {
@@ -73,11 +86,11 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Creates a <see cref="DataTable"/> based on the <paramref name="commandTemplate"/>  parameters.
         /// </summary>
-        private static DataTable CreateBuffer(DbCommand commandTemplate)
+        private static DataTable CreateBuffer(IDbCommand commandTemplate)
         {
             var buffer = new DataTable();
 
-            foreach (DbParameter parameter in commandTemplate.Parameters)
+            foreach (IDataParameter parameter in commandTemplate.Parameters)
                 buffer.Columns.Add(GetColumnName(parameter), typeof(Object));
 
             return buffer;
@@ -87,7 +100,7 @@ namespace Spark.EventStore.Sql
         /// Gets the column name for the specified <paramref name="parameter"/> (source column must be set).
         /// </summary>
         /// <param name="parameter">The parameter for which the source column is to be retrieved.</param>
-        private static String GetColumnName(DbParameter parameter)
+        private static String GetColumnName(IDataParameter parameter)
         {
             Verify.NotNull(parameter, "parameter");
 
@@ -100,7 +113,7 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Adds a new record to the underlying batch.
         /// </summary>
-        /// <param name="values">The set of values representing <see cref="DbParameter"/> values for a new batch item.</param>
+        /// <param name="values">The set of values representing <see cref="IDataParameter"/> values for a new batch item.</param>
         /// <remarks>Value indices should map to the original command template parameter indicies.</remarks>
         public void Add(params Object[] values)
         {
@@ -184,9 +197,9 @@ namespace Spark.EventStore.Sql
                 command.Transaction = transaction;
                 command.UpdatedRowSource = UpdateRowSource.None;
 
+                dataAdapter.InsertCommand = (DbCommand)command;
                 dataAdapter.ContinueUpdateOnError = true;
                 dataAdapter.UpdateBatchSize = batchSize;
-                dataAdapter.InsertCommand = command;
                 dataAdapter.Update(batch);
 
                 transaction.Commit();

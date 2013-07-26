@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Spark.Configuration;
 using Spark.Cqrs.Eventing;
+using Spark.Data;
 using Spark.Logging;
 using Spark.Messaging;
 using Spark.Serialization;
@@ -28,7 +29,7 @@ namespace Spark.EventStore.Sql
     public sealed class SqlEventStore : IStoreEvents, IDisposable
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly SqlBatchOperation dispatchedBuffer;
+        private readonly DbBatchOperation dispatchedBuffer;
         private readonly Boolean detectDuplicateCommits;
         private readonly ISerializeObjects serializer;
         private readonly IEventStoreDialect dialect;
@@ -49,19 +50,19 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Initializes a new instance of <see cref="SqlEventStore"/>.
         /// </summary>
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlEventStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
-        /// <param name="connectionName">The name of the connection string associated with this <see cref="SqlEventStore"/>.</param>
-        public SqlEventStore(ISerializeObjects serializer, String connectionName)
-            : this(serializer, Settings.EventStore, DialectProvider.GetEventStoreDialect(connectionName))
+        public SqlEventStore(IEventStoreDialect dialect, ISerializeObjects serializer)
+            : this(dialect, serializer, Settings.EventStore)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlEventStore"/> with a custom <see cref="IEventStoreDialect"/>.
         /// </summary>
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlEventStore"/>.</param>
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="settings">The event store settings.</param>
-        /// <param name="dialect">The database dialect associated with this <see cref="SqlEventStore"/>.</param>
-        internal SqlEventStore(ISerializeObjects serializer, IStoreEventSettings settings, IEventStoreDialect dialect)
+        internal SqlEventStore(IEventStoreDialect dialect, ISerializeObjects serializer, IStoreEventSettings settings)
         {
             Verify.NotNull(serializer, "serializer");
             Verify.NotNull(settings, "settings");
@@ -94,13 +95,13 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Creates a <see cref="DataTable"/> based on the required insert/update command parameters.
         /// </summary>
-        private static SqlBatchOperation CreateBuffer(IStoreEventSettings settings, IEventStoreDialect dialect)
+        private static DbBatchOperation CreateBuffer(IStoreEventSettings settings, IEventStoreDialect dialect)
         {
             using (var command = dialect.CreateCommand(dialect.MarkDispatched))
             {
                 command.Parameters.Add(dialect.CreateIdParameter(default(Int64)));
 
-                return new SqlBatchOperation(dialect, command, settings.BatchSize, settings.FlushInterval);
+                return new DbBatchOperation(dialect, command, settings.BatchSize, settings.FlushInterval);
             }
         }
 

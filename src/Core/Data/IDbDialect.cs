@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -14,12 +15,12 @@ using System.Data.Common;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore.Sql
+namespace Spark.Data
 {
     /// <summary>
     /// Base SQL RDBMS dialect contract.
     /// </summary>
-    internal interface ISqlDialect
+    public interface IDbDialect
     {
         /// <summary>
         /// Get the <see cref="DbProviderFactory"/> for this SQL dialect.
@@ -34,8 +35,8 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Translate the specified <see cref="DbException"/> if required.
         /// </summary>
-        /// <param name="command">The <see cref="DbCommand"/> that generated the exception.</param>
+        /// <param name="command">The <see cref="IDbCommand"/> that generated the exception.</param>
         /// <param name="ex">The exception to translate.</param>
-        Exception Translate(DbCommand command, DbException ex);
+        Exception Translate(IDbCommand command, DbException ex);
     }
 }

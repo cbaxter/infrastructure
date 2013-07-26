@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Data.Common;
+using System.Data;
+using Spark.Data;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -19,7 +20,7 @@ namespace Spark.EventStore.Sql
     /// <summary>
     /// The SQL RDBMS dialect statements associated with an <see cref="SqlEventStore"/> instance.
     /// </summary>
-    internal interface IEventStoreDialect : ISqlDialect
+    public interface IEventStoreDialect : IDbDialect
     {
         String GetRange { get; }
         String GetStream { get; }
@@ -35,13 +36,13 @@ namespace Spark.EventStore.Sql
         String EnsureDuplicateCommitsDetected { get; }
         String EnsureDuplicateCommitsSuppressed { get; }
 
-        DbParameter CreateIdParameter(Int64 id);
-        DbParameter CreateTimestampParameter(DateTime timestamp);
-        DbParameter CreateCorrelationIdParameter(Guid correlationId);
-        DbParameter CreateStreamIdParameter(Guid streamId);
-        DbParameter CreateVersionParameter(Int32 version);
-        DbParameter CreateDataParameter(Byte[] data);
-        DbParameter CreateSkipParameter(Int64 skip);
-        DbParameter CreateTakeParameter(Int64 take);
+        IDataParameter CreateIdParameter(Int64 id);
+        IDataParameter CreateTimestampParameter(DateTime timestamp);
+        IDataParameter CreateCorrelationIdParameter(Guid correlationId);
+        IDataParameter CreateStreamIdParameter(Guid streamId);
+        IDataParameter CreateVersionParameter(Int32 version);
+        IDataParameter CreateDataParameter(Byte[] data);
+        IDataParameter CreateSkipParameter(Int64 skip);
+        IDataParameter CreateTakeParameter(Int64 take);
     }
 }

@@ -5,9 +5,9 @@ using Autofac;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
+using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
-using Spark.EventStore.Sql.Dialects;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
 
@@ -17,7 +17,7 @@ namespace Example
     {
         static void Main()
         {
-            GuidStrategy.Initialize(SqlServerSequentialGuid.NewGuid);
+            GuidStrategy.Initialize(SqlSequentialGuid.NewGuid);
 
             var count = 50000;
             var builder = new ContainerBuilder();

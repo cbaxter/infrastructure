@@ -8,6 +8,7 @@ using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
+using Spark.EventStore.Sql.Dialects;
 using Spark.Messaging;
 using Spark.Serialization;
 using Module = Autofac.Module;
@@ -29,12 +30,15 @@ namespace Spark.Example.Modules
             builder.RegisterType<TypeLocator>().As<ILocateTypes>().SingleInstance();
             builder.RegisterType<NewtonsoftJsonSerializer>().As<ISerializeObjects>().SingleInstance();
             builder.Register(context => new AutofacServiceProvider(context.Resolve<ILifetimeScope>())).As<IServiceProvider>().SingleInstance();
+            
+            builder.RegisterType<SqlEventStoreDialect>().As<IEventStoreDialect>().SingleInstance();
+            builder.RegisterType<SqlEventStore>().As<IStoreEvents>().SingleInstance();
 
+            builder.RegisterType<SqlSnapshotStoreDialect>().As<ISnapshotStoreDialect>().SingleInstance();
+            builder.RegisterType<SqlSnapshotStore>().As<IStoreSnapshots>().SingleInstance();
 
             builder.RegisterType<AggregateUpdater>().As<IApplyEvents>().SingleInstance();
             builder.RegisterType<AggregateStore>().Named<IStoreAggregates>("AggregateStore").SingleInstance();
-            builder.Register(context => new SqlEventStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreEvents>().SingleInstance();
-            builder.Register(context => new SqlSnapshotStore(context.Resolve<ISerializeObjects>(), "eventStore")).As<IStoreSnapshots>().SingleInstance();
 
             builder.RegisterType<MessageReceiver<CommandEnvelope>>().AsSelf().SingleInstance().AutoActivate();
             builder.RegisterType<CommandProcessor>().As<IProcessMessages<CommandEnvelope>>().SingleInstance();

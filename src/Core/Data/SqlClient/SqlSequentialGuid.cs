@@ -15,13 +15,13 @@ using System.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.EventStore.Sql.Dialects
+namespace Spark.Data.SqlClient
 {
     /// <summary>
     /// Provides sequential-like Guids for database b-tree friendly inserts
     /// </summary>
     /// <remarks>SQL-Server Byte Sort Order --> 3,2,1,0,5,4,7,6,9,8,15,14,13,12,11,10</remarks>
-    public static class SqlServerSequentialGuid
+    public static class SqlSequentialGuid
     {
         private static readonly Int64 UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
         private static readonly Byte[] MachineId = GetMachineId();
