@@ -16,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Threading
+namespace Test.Spark.Threading
 {
     public static class UsingSMonitorWrapper
     {

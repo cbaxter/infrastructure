@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Moq;
+using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.EventStore;
@@ -20,7 +21,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Domain
+namespace Test.Spark.Cqrs.Domain
 {
     public static class UsingHookableAggregateStore
     {

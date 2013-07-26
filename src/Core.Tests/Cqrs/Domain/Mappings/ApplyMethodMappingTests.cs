@@ -1,4 +1,5 @@
 ﻿using System;
+using Spark;
 using Spark.Cqrs.Domain.Mappings;
 using Spark.Cqrs.Eventing;
 using Spark.Resources;
@@ -17,7 +18,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Domain.Mappings
+namespace Test.Spark.Cqrs.Domain.Mappings
 {
     public static class ApplyMethodMappingTests
     {

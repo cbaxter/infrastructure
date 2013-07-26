@@ -1,10 +1,11 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Moq;
+using Spark;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
-using Spark.Tests.Configuration;
+using Test.Spark.Configuration;
 using Xunit;
 using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
@@ -21,7 +22,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing
+namespace Test.Spark.Cqrs.Eventing
 {
     public static class UsingEventProcessor
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Spark;
 using Spark.Messaging;
 using Spark.Serialization.Converters;
 using Xunit;
@@ -17,7 +18,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Serialization.Tests.Converters
+namespace Test.Spark.Serialization.Converters
 {
     public static class UsingHeaderCollectionConverter
     {

@@ -1,11 +1,12 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Moq;
+using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.EventStore;
 using Spark.Messaging;
-using Spark.Tests.Configuration;
+using Test.Spark.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -21,7 +22,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Commanding
+namespace Test.Spark.Cqrs.Commanding
 {
     public static class UsingCommandProcessor
     {

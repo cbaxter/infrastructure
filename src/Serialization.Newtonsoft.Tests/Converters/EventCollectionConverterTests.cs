@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Spark.Cqrs.Eventing;
+using Spark.Serialization;
 using Spark.Serialization.Converters;
 using Xunit;
 
@@ -19,7 +20,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Serialization.Tests.Converters
+namespace Test.Spark.Serialization.Converters
 {
     public static class UsingEventCollectionConverter
     {
@@ -39,7 +40,7 @@ namespace Spark.Serialization.Tests.Converters
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
                 var json = WriteJson(new EventCollectionConverter(), events);
 
-                Validate("[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]", json);
+                Validate("[{\"$type\":\"Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]", json);
             }
         }
 
@@ -54,7 +55,7 @@ namespace Spark.Serialization.Tests.Converters
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿[{\"$type\":\"Spark.Serialization.Tests.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]";
+                var json = "﻿[{\"$type\":\"Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]";
                 var events = ReadJson<EventCollection>(new EventCollectionConverter(), json);
 
                 Assert.Equal("My Property", events.OfType<FakeEvent>().Single().Property);
@@ -69,7 +70,7 @@ namespace Spark.Serialization.Tests.Converters
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
                 var bson = WriteBson(new EventCollectionConverter(), events);
 
-                Validate("pQAAAAMwAJ0AAAACJHR5cGUAcwAAAFNwYXJrLlNlcmlhbGl6YXRpb24uVGVzdHMuQ29udmVydGVycy5Vc2luZ0V2ZW50Q29sbGVjdGlvbkNvbnZlcnRlcitGYWtlRXZlbnQsIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkADAAAAE15IFByb3BlcnR5AAAA", bson);
+                Validate("pAAAAAMwAJwAAAACJHR5cGUAcgAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nRXZlbnRDb2xsZWN0aW9uQ29udmVydGVyK0Zha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAMAAAATXkgUHJvcGVydHkAAAA=", bson);
             }
         }
 

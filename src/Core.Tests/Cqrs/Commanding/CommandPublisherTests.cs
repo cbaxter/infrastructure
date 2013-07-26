@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Messaging;
 using Xunit;
@@ -18,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Commanding
+namespace Test.Spark.Cqrs.Commanding
 {
     public static class UsingCommandPublisher
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Spark.Serialization;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -17,7 +18,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Serialization.Tests
+namespace Test.Spark.Serialization
 {
     public static class UsingNewtonsoftJsonSerializer
     {

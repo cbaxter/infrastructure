@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.NetworkInformation;
+using Spark;
 using Spark.Messaging;
 using Xunit;
 
@@ -16,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Messaging
+namespace Test.Spark.Messaging
 {
     public static class UsingMessageFactory
     {

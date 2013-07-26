@@ -16,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Logging
+namespace Test.Spark.Logging
 {
     public static class UsingDisabledDiagnosticContext
     {

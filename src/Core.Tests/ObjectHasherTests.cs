@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Spark;
 using Xunit;
 using Xunit.Extensions;
 
@@ -17,7 +18,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests
+namespace Test.Spark
 {
     public static class UsingObjectHasher
     {

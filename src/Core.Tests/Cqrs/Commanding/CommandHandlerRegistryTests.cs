@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Moq;
+using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Domain.Mappings;
@@ -21,7 +22,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Commanding
+namespace Test.Spark.Cqrs.Commanding
 {
     public static class UsingCommandHandlerRegistry
     {

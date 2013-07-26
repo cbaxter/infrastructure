@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using Spark;
 using Spark.Threading;
 using Xunit;
 
@@ -16,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Threading
+namespace Test.Spark.Threading
 {
     public static class UsingExponentialBackoff
     {

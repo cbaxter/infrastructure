@@ -4,7 +4,7 @@ using Spark.Threading;
 using Xunit;
 
 // ReSharper disable AccessToDisposedClosure
-namespace Spark.Tests.Threading
+namespace Test.Spark.Threading
 {
     public static class UsingThreadPoolWrapper
     {
@@ -26,7 +26,6 @@ namespace Spark.Tests.Threading
                     Assert.True(manualResetEvent.WaitOne(TimeSpan.FromMilliseconds(100)));
                     Assert.True(usedThreadPoolThread);
                 }
-
             }
         }
 

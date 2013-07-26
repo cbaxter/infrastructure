@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Spark;
 using Spark.Resources;
 using Xunit;
 using Xunit.Extensions;
@@ -17,7 +18,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests
+namespace Test.Spark
 {
     // ReSharper disable NotResolvedInText
     public static class UsingVerify

@@ -16,7 +16,7 @@ using System.Threading;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Threading
+namespace Test.Spark.Threading
 {
     public class FakeThreadPool : IQueueUserWorkItems
     {

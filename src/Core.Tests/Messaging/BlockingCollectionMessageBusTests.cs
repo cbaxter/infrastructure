@@ -17,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Messaging
+namespace Test.Spark.Messaging
 {
     public static class UsingBlockingCollectionMessageBus
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spark;
 using Spark.EventStore;
 using Spark.Resources;
 using Xunit;
@@ -18,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.EventStore
+namespace Test.Spark.EventStore
 {
     public static class UsingPagedResult
     {

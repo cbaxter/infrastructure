@@ -1,10 +1,11 @@
 ﻿using System;
 using Moq;
+using Spark;
 using Spark.Configuration;
 using Spark.EventStore;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
-using Spark.Tests.Configuration;
+using Test.Spark.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -20,7 +21,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing
+namespace Test.Spark.Cqrs.Eventing
 {
     public static class UsingEventDispatcher
     {

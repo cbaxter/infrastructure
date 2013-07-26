@@ -18,7 +18,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Serialization.Tests.Converters
+namespace Test.Spark.Serialization.Converters
 {
     public static class UsingCommitDataConverter
     {

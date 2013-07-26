@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Spark;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -16,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests
+namespace Test.Spark
 {
     public static class UsingObjectMapper
     {

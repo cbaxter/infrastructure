@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Spark.Serialization;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -18,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Serialization.Tests.Converters
+namespace Test.Spark.Serialization.Converters
 {
     public abstract class UsingJsonConverter
     {

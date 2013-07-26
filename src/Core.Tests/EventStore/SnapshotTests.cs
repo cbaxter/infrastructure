@@ -1,4 +1,5 @@
 ﻿using System;
+using Spark;
 using Spark.EventStore;
 using Spark.Resources;
 using Xunit;
@@ -16,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.EventStore
+namespace Test.Spark.EventStore
 {
     // ReSharper disable NotResolvedInText
     public static class UsingSnapshot

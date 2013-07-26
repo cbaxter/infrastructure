@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Moq;
+using Spark;
 using Spark.Configuration;
 using Spark.Cqrs.Eventing;
 using Spark.EventStore;
@@ -10,7 +11,7 @@ using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
 using Spark.Messaging;
 using Spark.Serialization;
-using Spark.Tests.Configuration;
+using Test.Spark.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -26,7 +27,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.EventStore.Dialects
+namespace Test.Spark.EventStore.Dialects
 {
     public static class UsingEventStoreWithSqlServer
     {

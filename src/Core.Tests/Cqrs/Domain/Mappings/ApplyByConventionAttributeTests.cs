@@ -19,7 +19,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Domain.Mappings
+namespace Test.Spark.Cqrs.Domain.Mappings
 {
     public static class UsingApplyByConventionAttribute
     {

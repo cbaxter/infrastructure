@@ -15,7 +15,7 @@ using System.Diagnostics;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Logging
+namespace Test.Spark.Logging
 {
     internal sealed class FakeTraceListener : TraceListener
     {

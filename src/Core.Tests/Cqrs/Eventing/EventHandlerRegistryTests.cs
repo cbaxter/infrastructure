@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
+using Spark;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
@@ -24,7 +25,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing
+namespace Test.Spark.Cqrs.Eventing
 {
     public static class UsingEventHandlerRegistry
     {

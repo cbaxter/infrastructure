@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spark;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -17,7 +18,7 @@ using Xunit;
  */
 
 #pragma warning disable 1720
-namespace Spark.Tests
+namespace Test.Spark
 {
     public static class UsingEnumerableExtensions
     {
@@ -124,14 +125,14 @@ namespace Spark.Tests
             [Fact]
             public void CanAppendNullItemToExistingSet()
             {
-                Assert.Null(Enumerable.Empty<Object>().Concat(null).Single());
+                Assert.Null(Enumerable.Empty<Object>().Concat(default(Object)).Single());
             }
 
             [Fact]
             public void ItemAlwaysAddedToEndOfSet()
             {
                 var item = new Object();
-                var items = new[] { new Object(), new Object(), new Object(), };
+                var items = new[] { new Object(), new Object(), new Object() };
 
                 Assert.Same(item, items.Concat(item).Last());
             }
@@ -171,7 +172,7 @@ namespace Spark.Tests
                 var items = new[] { new Item { Key = "Key1" }, new Item { Key = "Key2" }, new Item { Key = "Key1" } };
                 var distinct = items.Distinct(item => item.Key);
 
-                Assert.Same(items[0], items.First());
+                Assert.Same(items[0], distinct.First());
             }
 
             [Fact]

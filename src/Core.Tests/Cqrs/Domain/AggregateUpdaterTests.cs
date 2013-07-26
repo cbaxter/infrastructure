@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
+using Spark;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Domain.Mappings;
 using Spark.Cqrs.Eventing;
 using Spark.Resources;
-using Spark.Tests.Cqrs.Commanding;
+using Test.Spark.Cqrs.Commanding;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -23,7 +24,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Domain
+namespace Test.Spark.Cqrs.Domain
 {
     public static class UsingAggregateUpdater
     {

@@ -18,7 +18,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing
+namespace Test.Spark.Cqrs.Eventing
 {
     public static class UsingEventPublisher
     {

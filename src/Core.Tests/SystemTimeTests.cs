@@ -1,4 +1,5 @@
 ﻿using System;
+using Spark;
 using Spark.Resources;
 using Xunit;
 
@@ -15,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests
+namespace Test.Spark
 {
     // ReSharper disable NotResolvedInText
     public static class UsingSystemTime

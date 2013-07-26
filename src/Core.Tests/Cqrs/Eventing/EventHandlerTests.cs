@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Spark;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
 using Xunit;
@@ -18,7 +19,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing
+namespace Test.Spark.Cqrs.Eventing
 {
     public static class UsingEventHandler
     {

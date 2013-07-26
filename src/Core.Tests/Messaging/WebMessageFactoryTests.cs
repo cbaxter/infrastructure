@@ -23,7 +23,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Messaging
+namespace Test.Spark.Messaging
 {
     public static class UsingWebMessageFactory
     {

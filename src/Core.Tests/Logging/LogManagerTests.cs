@@ -1,4 +1,5 @@
-﻿using Spark.Logging;
+﻿using Spark;
+using Spark.Logging;
 using System;
 using System.Configuration;
 using Xunit;
@@ -17,7 +18,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Logging
+namespace Test.Spark.Logging
 {
     public class UsingLogManager
     {
@@ -116,7 +117,7 @@ namespace Spark.Tests.Logging
             [Fact]
             public void LoggerIsNamedAfterDeclaringClassFullName()
             {
-                Assert.Equal("Spark.Tests.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
+                Assert.Equal("Test.Spark.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
             }
         }
 

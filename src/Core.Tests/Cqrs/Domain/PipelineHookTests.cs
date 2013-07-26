@@ -17,7 +17,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Domain
+namespace Test.Spark.Cqrs.Domain
 {
     public static class UsingPipelineHook
     {

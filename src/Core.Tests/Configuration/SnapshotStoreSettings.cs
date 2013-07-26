@@ -14,7 +14,7 @@ using Spark.Configuration;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Configuration
+namespace Test.Spark.Configuration
 {
     public sealed class SnapshotStoreSettings : IStoreSnapshotSettings
     {

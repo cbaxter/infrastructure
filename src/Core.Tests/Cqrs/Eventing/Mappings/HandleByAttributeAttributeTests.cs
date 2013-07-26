@@ -1,5 +1,6 @@
 ﻿using System;
 using Moq;
+using Spark;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
@@ -19,7 +20,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.Cqrs.Eventing.Mappings
+namespace Test.Spark.Cqrs.Eventing.Mappings
 {
     public static class UsingHandleByAttributeAttribute
     {

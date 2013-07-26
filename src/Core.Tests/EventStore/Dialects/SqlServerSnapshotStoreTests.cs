@@ -7,7 +7,7 @@ using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
 using Spark.Serialization;
-using Spark.Tests.Configuration;
+using Test.Spark.Configuration;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -23,7 +23,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Tests.EventStore.Dialects
+namespace Test.Spark.EventStore.Dialects
 {
     public static class UsingSnapshotStoreWithSqlServer
     {
