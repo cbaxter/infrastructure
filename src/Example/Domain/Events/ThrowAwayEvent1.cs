@@ -4,8 +4,8 @@ using Spark.Cqrs.Eventing;
 
 namespace Spark.Example.Domain.Events
 {
-    [DataContract]
-    public sealed class ClientRegistered : Event
+    [DataContract] //TODO: DELETE - Temporary event to test Saga code (need to create proper example).
+    public sealed class ThrowAwayEvent1 : Event
     {
         [IgnoreDataMember]
         public Guid ClientId { get { return AggregateId; } }
@@ -13,7 +13,7 @@ namespace Spark.Example.Domain.Events
         [DataMember(Name = "n")]
         public String Name { get; private set; }
 
-        public ClientRegistered(String name)
+        public ThrowAwayEvent1(String name)
         {
             Verify.NotNullOrWhiteSpace(name, "name");
 

@@ -62,11 +62,11 @@ namespace Spark.EventStore.Sql.Dialects
                 return ex;
 
             if (sqlException.Number == SqlErrorCode.UniqueIndexViolation)
-                return new DuplicateCommitException(Exceptions.DuplicateCommitException.FormatWith(command.GetParameterValue("@id")));
+                return new DuplicateCommitException(Exceptions.DuplicateCommit.FormatWith(command.GetParameterValue("@id")));
 
             if (sqlException.Number == SqlErrorCode.UniqueConstraintViolation)
-                return new ConcurrencyException(Exceptions.ConcurrencyException.FormatWith(typeof(Commit), command.GetParameterValue("@streamId"), command.GetParameterValue("@version")));
-
+                return new ConcurrencyException(Exceptions.CommitConcurrencyConflict.FormatWith(command.GetParameterValue("@streamId"), command.GetParameterValue("@version")));
+            
             return base.Translate(command, ex);
         }
     }
@@ -90,15 +90,5 @@ namespace Spark.EventStore.Sql.Dialects
         public IDataParameter CreateStreamIdParameter(Guid streamId) { return new SqlParameter("@streamId", SqlDbType.UniqueIdentifier) { SourceColumn = "streamId", Value = streamId }; }
         public IDataParameter CreateVersionParameter(Int32 version) { return new SqlParameter("@version", SqlDbType.Int) { SourceColumn = "version", Value = version }; }
         public IDataParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
-
-        // Translate Method
-        public override Exception Translate(IDbCommand command, DbException ex)
-        {
-            var sqlException = ex as SqlException;
-            if (sqlException != null && sqlException.Number == SqlErrorCode.UniqueConstraintViolation)
-                return new ConcurrencyException(Exceptions.ConcurrencyException.FormatWith(typeof(Snapshot), command.GetParameterValue("@streamId"), command.GetParameterValue("@version")));
-
-            return base.Translate(command, ex);
-        }
     }
 }

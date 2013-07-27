@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -45,7 +47,11 @@ namespace Spark.Data.SqlClient
         {
             Verify.NotNullOrWhiteSpace(connectionName, "connectionName");
 
-            connectionString = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
+            var connectionStringSettings = ConfigurationManager.ConnectionStrings[connectionName];
+            if(connectionStringSettings == null)
+                throw new KeyNotFoundException(Exceptions.ConnectionNotFound);
+
+            connectionString = connectionStringSettings.ConnectionString;
         }
 
         /// <summary>

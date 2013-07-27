@@ -21,7 +21,14 @@ namespace Spark.Cqrs.Eventing.Sagas
     public interface IStoreSagas
     {
         /// <summary>
-        /// Attempt to retrieve an existing saga identified by the specified <paramref name="type"/> and <paramref name="id"/>.
+        /// Creates a new saga instance identified by the specified <paramref name="type"/> and <paramref name="id"/>.
+        /// </summary>
+        /// <param name="type">The type of saga to be retrieved.</param>
+        /// <param name="id">The correlation id of the saga to be retrieved.</param>
+        Saga CreateSaga(Type type, Guid id);
+
+        /// <summary>
+        /// Attempt to retrieve an existing saga instance identified by the specified <paramref name="type"/> and <paramref name="id"/>.
         /// </summary>
         /// <param name="type">The type of saga to be retrieved.</param>
         /// <param name="id">The correlation id of the saga to be retrieved.</param>

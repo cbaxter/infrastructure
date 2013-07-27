@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing.Mappings;
 using Spark.Messaging;
 using Spark.Resources;
@@ -14,7 +16,29 @@ namespace Spark.Cqrs.Eventing.Sagas
     [EventHandler(IsReusable = false)]
     public abstract class Saga : StateObject
     {
+        [IgnoreDataMember]
         public Guid CorrelationId { get; internal set; }
+
+        [IgnoreDataMember]
+        public DateTime? Timeout { get; internal set; }
+
+        [IgnoreDataMember]
+        public Boolean Completed { get; internal set; }
+
+        [IgnoreDataMember]
+        internal Int32 Version { get; set; }
+
+        [IgnoreDataMember]
+        internal Guid TypeId { get; set; }
+
+        /// <summary>
+        /// Creates a deep-copy of the current saga object graph by traversing all public and non-public fields.
+        /// </summary>
+        /// <remarks>Aggregate object graph must be non-recursive.</remarks>
+        protected internal virtual Saga Copy()
+        {
+            return ObjectCopier.Copy(this);
+        }
 
         protected void Publish()
         {
@@ -40,15 +64,16 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             //TODO: Publish (use MessageFactory ... so will need to be accessible from sagacontext :9)
         }
-        
+
         protected abstract void RegisterEvents(); //TODO: Remove
 
         //TODO: Use SagaConfiguration instance to create SagaMetadata instance (i.e., ensure immutable after intial wire-up).
         //TODO: Ensure that number of mapped events matches number of known handle methods.
         //TODO: If both StartWith and handle called, throw exception.
         //TODO: Enforce public default ctor.
-        //protected abstract void Configure(SagaConfiguration saga);
-
+        //TODO: protected abstract void Configure(SagaConfiguration saga);
+        protected virtual void Configure(SagaConfiguration saga)
+        { }
 
         protected void ScheduleTimeout(TimeSpan timeout)
         {
@@ -70,11 +95,56 @@ namespace Spark.Cqrs.Eventing.Sagas
 
         }
 
+        public override string ToString()
+        {
+            return String.Format("{0} - {1}", GetType(), CorrelationId);
+        }
+
         protected void Handle(Object e)
         {
             ClearTimeout(); //TODO: If timeout stored with saga, need to ensure current timeout cleared when timeout handled.
 
             //TODO: Call some other virtual method for actual processing... 
+        }
+
+
+
+        internal static SagaMetadata GetMetadata(Type sagaType, HandleMethodCollection handleMethods)
+        {
+            Verify.NotNull(sagaType, "sagaType");
+            Verify.NotNull(handleMethods, "handleMethods");
+            Verify.TypeDerivesFrom(typeof(Saga), sagaType, "sagaType");
+
+            var saga = (Saga)Activator.CreateInstance(sagaType);
+            var metadata = saga.GetMetadata();
+            var initiatingEvents = 0;
+
+            foreach (var handleMethod in handleMethods)
+            {
+                if (metadata.CanStartWith(handleMethod.Key))
+                    initiatingEvents++;
+
+                if (metadata.CanHandle(handleMethod.Key))
+                    continue;
+
+                    throw new MappingException(Exceptions.EventTypeNotConfigured.FormatWith(sagaType, handleMethod.Key));
+            }
+            
+            if (initiatingEvents == 0)
+                throw new MappingException(Exceptions.SagaMustHaveAtLeastOneInitiatingEvent.FormatWith(sagaType));
+
+            return metadata;
+        }
+
+        private SagaMetadata GetMetadata()
+        {
+            var configuration = new SagaConfiguration(GetType());
+
+            //TODO: configuration.CanHandle((Timeout e) => e.SagaId);
+
+            Configure(configuration);
+
+            return configuration.GetMetadata();
         }
 
 

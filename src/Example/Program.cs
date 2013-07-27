@@ -5,6 +5,7 @@ using Autofac;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
+using Spark.Cqrs.Eventing.Sagas;
 using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
@@ -30,9 +31,16 @@ namespace Example
             var commandPublisher = container.Resolve<IPublishCommands>();
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
+            var sagaStore = container.Resolve<IStoreSagas>();
 
             Console.WriteLine("Purging event store...");
             eventStore.Purge();
+
+            Console.WriteLine("Purging snapshot store...");
+            snapshotStore.Purge();
+
+            Console.WriteLine("Purging saga store...");
+            sagaStore.Purge();
 
             Console.WriteLine("Starting performance test...");
             Console.WriteLine();

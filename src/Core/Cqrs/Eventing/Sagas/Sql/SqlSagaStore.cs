@@ -1,0 +1,279 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using Spark.Data;
+using Spark.Logging;
+using Spark.Resources;
+using Spark.Serialization;
+
+/* Copyright (c) 2013 Spark Software Ltd.
+ * 
+ * This source is subject to the GNU Lesser General Public License.
+ * See: http://www.gnu.org/copyleft/lesser.html
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * IN THE SOFTWARE. 
+ */
+
+namespace Spark.Cqrs.Eventing.Sagas.Sql
+{
+    /// <summary>
+    /// An RDBMS saga store.
+    /// </summary>
+    public sealed class SqlSagaStore : IStoreSagas
+    {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private readonly IReadOnlyDictionary<Type, Guid> knownSagas;
+        private readonly ISerializeObjects serializer;
+        private readonly ISagaStoreDialect dialect;
+
+        private static class Column
+        {
+            public const Int32 Id = 0;
+            public const Int32 TypeId = 1;
+            public const Int32 Version = 2;
+            public const Int32 Timeout = 3;
+            public const Int32 State = 4;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SqlSagaStore"/>.
+        /// </summary>
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlSagaStore"/>.</param>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
+        /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
+        public SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator)
+        {
+            Verify.NotNull(serializer, "serializer");
+            Verify.NotNull(dialect, "dialect");
+
+            this.dialect = dialect;
+            this.serializer = serializer;
+            this.knownSagas = GetKnownSagas(typeLocator);
+
+            Initialize();
+        }
+
+        /// <summary>
+        /// Generate unique saga type identifiers for all locatable <see cref="Saga"/> types.
+        /// </summary>
+        /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
+        private static Dictionary<Type, Guid> GetKnownSagas(ILocateTypes typeLocator)
+        {
+            var knownSagas = typeLocator.GetTypes(type => type.IsClass && !type.IsAbstract && type.DerivesFrom(typeof(Saga))).ToDictionary(type => type, HashType);
+            var logMessage = new StringBuilder();
+
+            logMessage.Append("Discovered sagas:");
+            foreach (var saga in knownSagas)
+            {
+                logMessage.Append("    ");
+                logMessage.AppendFormat("{0} - {1}", saga.Key, saga.Value);
+                logMessage.AppendLine();
+            }
+
+            Log.Debug(logMessage.ToString);
+
+            return knownSagas;
+        }
+
+        /// <summary>
+        /// Compute the MD5 hash of the specified saga <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The saga type.</param>
+        private static Guid HashType(Type type)
+        {
+            using (var hash = new MD5CryptoServiceProvider())
+                return new Guid(hash.ComputeHash(Encoding.UTF8.GetBytes(type.FullName)));
+        }
+
+        /// <summary>
+        /// Initializes a new saga store.
+        /// </summary>
+        private void Initialize()
+        {
+            using (var command = dialect.CreateCommand(dialect.EnsureSagaTableExists))
+            {
+                Log.Trace("Initializing saga store");
+
+                dialect.ExecuteNonQuery(command);
+            }
+        }
+
+        /// <summary>
+        /// Get the MD5 hash of the specified saga <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The saga type.</param>
+        private Guid GetTypeId(Type type)
+        {
+            Guid result;
+
+            //NOTE: Using a variable string value as a part of the saga primary key will degrade index performance significantly.
+            //      Although two guids still results in a wide index, overall allows for a much denser index than the text equivalent.
+            if (knownSagas.TryGetValue(type, out result))
+                return result;
+
+            throw new KeyNotFoundException(Exceptions.UnknownSaga.FormatWith(type));
+        }
+
+        /// <summary>
+        /// Creates a new saga instance identified by the specified <paramref name="type"/> and <paramref name="id"/>.
+        /// </summary>
+        /// <param name="type">The type of saga to be retrieved.</param>
+        /// <param name="id">The correlation id of the saga to be retrieved.</param>
+        public Saga CreateSaga(Type type, Guid id)
+        {
+            var saga = (Saga)Activator.CreateInstance(type);
+
+            saga.CorrelationId = id;
+            saga.TypeId = GetTypeId(type);
+            saga.Version = 0;
+
+            return saga;
+        }
+
+        /// <summary>
+        /// Attempt to retrieve an existing saga instance identified by the specified <paramref name="type"/> and <paramref name="id"/>.
+        /// </summary>
+        /// <param name="type">The type of saga to be retrieved.</param>
+        /// <param name="id">The correlation id of the saga to be retrieved.</param>
+        /// <param name="saga">The <see cref="Saga"/> instance if found; otherwise <value>null</value>.</param>
+        public Boolean TryGetSaga(Type type, Guid id, out Saga saga)
+        {
+            Verify.NotNull(type, "type");
+
+            using (var command = dialect.CreateCommand(dialect.GetSaga))
+            {
+                Log.TraceFormat("Getting saga {0} - {1}", type, id);
+
+                command.Parameters.Add(dialect.CreateIdParameter(id));
+                command.Parameters.Add(dialect.CreateTypeIdParameter(GetTypeId(type)));
+
+                saga = dialect.QuerySingle(command, CreateSaga);
+            }
+
+            return saga != null;
+        }
+
+
+
+
+        public void Save(Saga saga, SagaContext context)
+        {
+            Verify.NotNull(saga, "saga");
+
+            if (saga.Version == 1 && saga.Completed)
+                return;
+            
+            if (saga.Completed)
+            {
+                if (saga.Version > 0)
+                    DeleteSaga(saga);
+            }
+            else
+            {
+                if (saga.Version == 0)
+                    InsertSaga(saga);
+                else
+                    UpdateSaga(saga);
+            }
+        }
+
+        private void InsertSaga(Saga saga)
+        {
+            var state = serializer.Serialize(saga);
+
+            using (var command = dialect.CreateCommand(dialect.InsertSaga))
+            {
+                Log.TraceFormat("Starting new saga {0}", saga);
+
+                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
+                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version + 1));
+                command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
+                command.Parameters.Add(dialect.CreateStateParameter(state));
+
+                if(dialect.ExecuteNonQuery(command) == 0)
+                    throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
+            }
+               
+            saga.Version++;
+        }
+
+        private void UpdateSaga(Saga saga)
+        {
+            var state = serializer.Serialize(saga);
+
+            using (var command = dialect.CreateCommand(dialect.UpdateSaga))
+            {
+                Log.TraceFormat("Updating existing saga {0}", saga);
+
+                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
+                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version + 1));
+                command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
+                command.Parameters.Add(dialect.CreateStateParameter(state));
+
+                if (dialect.ExecuteNonQuery(command) == 0)
+                    throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
+            }
+                
+            saga.Version++;
+        }
+
+        private void DeleteSaga(Saga saga)
+        {
+            using (var command = dialect.CreateCommand(dialect.DeleteSaga))
+            {
+                Log.TraceFormat("Completing existing saga {0}", saga);
+
+                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
+
+                if (dialect.ExecuteNonQuery(command) == 0)
+                    throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
+            }
+        }
+
+
+
+        /// <summary>
+        /// Deletes all existing sagas from the saga store.
+        /// </summary>
+        public void Purge()
+        {
+            using (var command = dialect.CreateCommand(dialect.DeleteSagas))
+            {
+                Log.Trace("Purging saga store");
+
+                dialect.ExecuteNonQuery(command);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Saga"/>.
+        /// </summary>
+        /// <param name="record">The record from which to create the new <see cref="Saga"/>.</param>
+        private Saga CreateSaga(IDataRecord record)
+        {
+            var id = record.GetGuid(Column.Id);
+            var typeId = record.GetGuid(Column.TypeId);
+            var version = record.GetInt32(Column.Version);
+            var timeout = record.GetNullableDateTime(Column.Timeout);
+            var saga = serializer.Deserialize<Saga>(record.GetBytes(Column.State));
+
+            saga.CorrelationId = id;
+            saga.TypeId = typeId;
+            saga.Version = version;
+            saga.Timeout = timeout;
+
+            return saga;
+        }
+    }
+}

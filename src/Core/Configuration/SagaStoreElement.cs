@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using Spark.Cqrs.Eventing.Sagas;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -13,23 +15,22 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Cqrs.Eventing.Sagas.Sql
+namespace Spark.Configuration
 {
-    public sealed class SagaStore : IStoreSagas
+    /// <summary>
+    /// <see cref="IStoreSagas"/> configuration settings.
+    /// </summary>
+    internal interface IStoreSagaSettings
     {
-        public bool TryGetSaga(Type type, Guid id, out Saga saga)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// The maximum amount of time an aggregate will remain cached if not accessed.
+        /// </summary>
+        TimeSpan CacheSlidingExpiration { get; }
+    }
 
-        public void Save(Saga saga, SagaContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Purge()
-        {
-            throw new NotImplementedException();
-        }
+    internal sealed class SagaStoreElement : ConfigurationElement, IStoreSagaSettings
+    {
+        [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
+        public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
     }
 }

@@ -14,6 +14,8 @@ namespace Spark.Example.Domain
             //TODO: Should consider enforcing new aggregate... CreateWith(...)
 
             Raise(new ClientRegistered(command.Name));
+            Raise(new ThrowAwayEvent1(command.Name)); //TODO: DELETE - Temporary event to test Saga code (need to create proper example).
+            Raise(new ThrowAwayEvent2(command.Name)); //TODO: DELETE - Temporary event to test Saga code (need to create proper example).
         }
 
         protected void Apply(ClientRegistered e)

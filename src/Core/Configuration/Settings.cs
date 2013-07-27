@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Spark.Cqrs.Eventing.Sagas;
 using Spark.EventStore;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -66,6 +67,14 @@ namespace Spark.Configuration
         public static IProcessEventSettings EventProcessor
         {
             get { return configuration.EventProcessor; }
+        }
+
+        /// <summary>
+        /// The <see cref="IStoreSagas"/> configuration settings.
+        /// </summary>
+        public static IStoreSagaSettings SagaStore
+        {
+            get { return configuration.SagaStore; }
         }
 
         /// <summary>

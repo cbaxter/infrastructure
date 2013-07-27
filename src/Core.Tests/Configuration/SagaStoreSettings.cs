@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Data;
-using Spark.Data;
+using Spark.Configuration;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -15,22 +14,15 @@ using Spark.Data;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Cqrs.Eventing.Sagas.Sql
+namespace Test.Spark.Configuration
 {
-    public interface ISagaStoreDialect : IDbDialect
+    public sealed class SagaStoreSettings : IStoreSagaSettings
     {
-        String EnsureSagaTableExists { get; }
+        public TimeSpan CacheSlidingExpiration { get; set; }
 
-        String GetSaga { get; }
-        String InsertSaga { get; }
-        String UpdateSaga { get; }
-        String DeleteSaga { get; }
-        String DeleteSagas { get; }
-
-        IDataParameter CreateIdParameter(Guid sagaId);
-        IDataParameter CreateTypeIdParameter(Guid sagaType);
-        IDataParameter CreateVersionParameter(Int32 version);
-        IDataParameter CreateTimeoutParameter(DateTime? timeout);
-        IDataParameter CreateStateParameter(Byte[] state);
+        public SagaStoreSettings()
+        {
+            CacheSlidingExpiration = TimeSpan.FromMinutes(1);
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
-using System.Text;
 using Spark.Configuration;
 using Spark.Data;
 using Spark.Logging;
@@ -12,47 +10,38 @@ namespace Spark.Cqrs.Eventing.Sagas
     public sealed class SagaEventHandler : EventHandler
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private readonly SagaMetadata sagaMetadata;
+        private readonly IStoreSagas sagaStore;
         private readonly TimeSpan retryTimeout;
-        private readonly Guid sagaTypeId;
 
-        public SagaEventHandler(EventHandler eventHandler)
-            : this(eventHandler, Settings.EventProcessor)
+        public SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore)
+            : this(eventHandler, sagaMetadata, sagaStore, Settings.EventProcessor)
         { }
 
-        internal SagaEventHandler(EventHandler eventHandler, IProcessEventSettings settings)
+        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IProcessEventSettings settings)
             : base(eventHandler)
         {
+            this.sagaStore = sagaStore;
+            this.sagaMetadata = sagaMetadata;
             this.retryTimeout = settings.RetryTimeout;
-        }
-
-
-        private static Guid GetSagaTypeId(Type sagaType)
-        {
-            using (var hash = new MD5CryptoServiceProvider())
-            {
-                var bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(sagaType.FullName));
-
-                return new Guid(bytes);
-            }
-        }
-
-        public static Guid GetSagaIdFrom(Event e)
-        {
-            return Guid.Empty;
         }
 
         public override void Handle(EventContext context)
         {
+            var sagaId = sagaMetadata.GetCorrelationId(context.Event);
             var backoffContext = default(ExponentialBackoff);
-            var sagaId = GetSagaIdFrom(context.Event);
             var done = false;
 
             do
             {
                 try
                 {
-                    using (var sagaContext = new SagaContext(HandlerType, sagaId /*, context.Event*/))
+                    using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
+                    {
                         UpdateSaga(sagaContext);
+
+                        //TODO: Publish commands...
+                    }
 
                     done = true;
                 }
@@ -74,29 +63,30 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             var sagaType = context.SagaType;
             var sagaId = context.SagaId;
+            var e = context.Event;
 
-            using(Saga.AquireLock(context.SagaType, context.SagaId))
+            using (Saga.AquireLock(sagaType, sagaId))
             {
-                //Saga saga;
-                //if (!sagaStore.TryGetSaga(sagaType, sagaId, out saga) && CanStartWith(context.Event))
-                //    saga = (Saga)Activator.CreateInstance(sagaType);
+                Saga saga;
+                if (!sagaStore.TryGetSaga(sagaType, sagaId, out saga) && sagaMetadata.CanStartWith(e.GetType()))
+                    saga = sagaStore.CreateSaga(sagaType, sagaId);
 
-                //if (saga != null)
-                //{
-                //    Log.DebugFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
+                if (saga != null)
+                {
+                    Log.DebugFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
 
-                //    Executor(saga, e);
+                    Executor(saga, e);
 
-                //    Log.Trace("Saving saga state");
+                    Log.Trace("Saving saga state");
 
-                //    sagaStore.Save(saga, context);
+                    sagaStore.Save(saga, context);
 
-                //    Log.Trace("Saga state saved");
-                //}
-                //else
-                //{
-                //    Log.Trace("Saga {0} not initiated by event {1}", sagaType, context.Event);
-                //}
+                    Log.Trace("Saga state saved");
+                }
+                else
+                {
+                    Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
+                }
             }
         }
     }

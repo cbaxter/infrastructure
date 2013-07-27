@@ -162,8 +162,6 @@ namespace Spark.Cqrs.Domain
             //       Should the caller hold on to a reference to `this` aggregate instance, it is their responsibility to gaurd against
             //       modifications (via `aggregate.Copy()` call) if they require an unaltered instance of `aggregate`.
             ApplyCommitToAggregate(commit, aggregate);
-
-            // NOTE: We do not need multiple snapshots for a given aggregate; thus we will simply replace any existing snapshot if required.
             if (aggregate.Version > 0 && aggregate.Version % snapshotInterval == 0)
                 snapshotStore.Save(new Snapshot(aggregate.Id, aggregate.Version, aggregate));
 

@@ -59,5 +59,80 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;.
+        /// </summary>
+        internal static string DeleteSaga {
+            get {
+                return ResourceManager.GetString("DeleteSaga", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = &apos;Saga&apos; )
+        ///BEGIN
+        ///    CREATE TABLE [Saga] (
+        ///        [Id]       UNIQUEIDENTIFIER NOT NULL,
+        ///        [TypeId]   UNIQUEIDENTIFIER NOT NULL,
+        ///        [Version]  INT              NOT NULL,
+        ///        [Timeout]  DATETIME2        NULL,
+        ///        [State]    VARBINARY(MAX)   NOT NULL
+        ///     
+        ///        CONSTRAINT [PK_Saga] PRIMARY KEY CLUSTERED ([Id],[TypeId]) WITH (IGNORE_DUP_KEY = ON)
+        ///    );
+        ///
+        ///    CREATE NONCLUSTERED INDEX [IX_Saga_Timeou [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EnsureSagaTableExists {
+            get {
+                return ResourceManager.GetString("EnsureSagaTableExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT [Id],[TypeId],[Version],[Timeout],[State] FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId;.
+        /// </summary>
+        internal static string GetSaga {
+            get {
+                return ResourceManager.GetString("GetSaga", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT [Id],[TypeId] FROM Saga WHERE TBD;.
+        /// </summary>
+        internal static string GetScheduledTimeouts {
+            get {
+                return ResourceManager.GetString("GetScheduledTimeouts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,@version,@timeout,@state);.
+        /// </summary>
+        internal static string InsertSaga {
+            get {
+                return ResourceManager.GetString("InsertSaga", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TRUNCATE TABLE [Saga];.
+        /// </summary>
+        internal static string PurgeSagas {
+            get {
+                return ResourceManager.GetString("PurgeSagas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE [Saga] SET [Version] = @version, [Timeout] = @timeout, [State] = @state WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;.
+        /// </summary>
+        internal static string UpdateSaga {
+            get {
+                return ResourceManager.GetString("UpdateSaga", resourceCulture);
+            }
+        }
     }
 }

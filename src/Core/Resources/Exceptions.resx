@@ -179,16 +179,15 @@ Aggregate Type: {0}</value>
     <value>Command not handled by any known aggregate type.
 Command Type: {0}</value>
   </data>
+  <data name="CommitConcurrencyConflict" xml:space="preserve">
+    <value>Concurrency conflict.
+Stream Id: {0}
+Version: {1}</value>
+  </data>
   <data name="CommitTimeout" xml:space="preserve">
     <value>The commit operation has timed out.
 Commit Id: {0}
 Stream Id: {1}</value>
-  </data>
-  <data name="ConcurrencyException" xml:space="preserve">
-    <value>Concurrency Exception.
-Type: {0}
-Stream Id: {1}
-Version: {2}</value>
   </data>
   <data name="ConnectionNotFound" xml:space="preserve">
     <value>Connection string not found.
@@ -198,7 +197,7 @@ Name: {0}</value>
     <value>Connection string provider not specified.
 Name: {0}</value>
   </data>
-  <data name="DuplicateCommitException" xml:space="preserve">
+  <data name="DuplicateCommit" xml:space="preserve">
     <value>Duplicate commit.
 Commit Id: {0}</value>
   </data>
@@ -211,6 +210,21 @@ Commit Id: {0}</value>
   <data name="EventHandlerHandleByStrategyAmbiguous" xml:space="preserve">
     <value>Ambiguous event handler mapping strategy,
 Handler Type: {0}</value>
+  </data>
+  <data name="EventTypeAlreadyConfigured" xml:space="preserve">
+    <value>An event may be configured only once.
+Saga Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="EventTypeNotConfigured" xml:space="preserve">
+    <value>Event handling not configured.
+Saga Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="EventTypeNotHandledBySaga" xml:space="preserve">
+    <value>Event not handled by saga.
+Saga Type: {0}
+Event Type: {1}</value>
   </data>
   <data name="HandleMethodInvalidParameters" xml:space="preserve">
     <value>A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
@@ -263,6 +277,11 @@ Parameter Name: {0}</value>
     <value>Reserved system header.
 Name: {0}</value>
   </data>
+  <data name="SagaConcurrencyConflict" xml:space="preserve">
+    <value>Concurrency conflict.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
   <data name="SagaContextInterleaved" xml:space="preserve">
     <value>This SagaContext is being disposed on a different thread than it was created.</value>
   </data>
@@ -271,6 +290,10 @@ Name: {0}</value>
   </data>
   <data name="SagaDefaultConstructorRequired" xml:space="preserve">
     <value>Saga must have a single public default constructor.
+Saga Type: {0}</value>
+  </data>
+  <data name="SagaMustHaveAtLeastOneInitiatingEvent" xml:space="preserve">
+    <value>Saga must have at least one initiating event.
 Saga Type: {0}</value>
   </data>
   <data name="StateAccessException" xml:space="preserve">
@@ -287,6 +310,9 @@ Type: {1}</value>
   <data name="UnknownDialect" xml:space="preserve">
     <value>Unknown database dialect.
 Provider Name: {0}</value>
+  </data>
+  <data name="UnknownSaga" xml:space="preserve">
+    <value>Unknown saga type {0}.</value>
   </data>
   <data name="UnresolvedConcurrencyConflict" xml:space="preserve">
     <value>Unresolved Concurrency conflict: {0}</value>

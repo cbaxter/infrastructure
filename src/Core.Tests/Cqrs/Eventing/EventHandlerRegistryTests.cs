@@ -32,20 +32,21 @@ namespace Test.Spark.Cqrs.Eventing
         public class WhenCreatingNewRegistry
         {
             private readonly Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
+            private readonly Mock<IStoreSagas> sagaStore = new Mock<IStoreSagas>();
 
             [Fact]
             public void NoHandlersRequired()
             {
                 var typeLocator = new FakeTypeLocator();
 
-                Assert.DoesNotThrow(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object));
+                Assert.DoesNotThrow(() => new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object));
             }
 
             [Fact]
             public void ThrowMappingExceptionIfMoreThanOneMappingStrategyDefined()
             {
                 var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(MultipleStrategiesHandler));
-                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object));
+                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object));
 
                 Assert.Equal(Exceptions.EventHandlerHandleByStrategyAmbiguous.FormatWith(typeof(MultipleStrategiesHandler)), ex.Message);
             }
@@ -54,7 +55,7 @@ namespace Test.Spark.Cqrs.Eventing
             public void ThrowMappingExceptionIfSagaDoesNotHaveDefaultPublicConstructor()
             {
                 var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(FakeSaga));
-                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object));
+                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object));
 
                 Assert.Equal(Exceptions.SagaDefaultConstructorRequired.FormatWith(typeof(FakeSaga)), ex.Message);
             }
@@ -63,7 +64,7 @@ namespace Test.Spark.Cqrs.Eventing
             public void DefaultMappingStrategyUsedWhenNoExplicitStrategyDefined()
             {
                 var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(ImplicitStrategyAggregate));
-                var registry = new EventHandlerRegistry(typeLocator, serviceProvider.Object);
+                var registry = new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object);
                 var handler = registry.GetHandlersFor(new FakeEvent());
 
                 Assert.Equal(1, handler.Count());
@@ -73,7 +74,7 @@ namespace Test.Spark.Cqrs.Eventing
             public void CustomMappingStrategyUsedWhenExplicitStrategyDefined()
             {
                 var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(ExplicitStrategyAggregate));
-                var registry = new EventHandlerRegistry(typeLocator, serviceProvider.Object);
+                var registry = new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object);
                 var handler = registry.GetHandlersFor(new FakeEvent());
 
                 Assert.Equal(1, handler.Count());
@@ -115,12 +116,13 @@ namespace Test.Spark.Cqrs.Eventing
         public class WhenGettingHandlers
         {
             private readonly Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
-            
+            private readonly Mock<IStoreSagas> sagaStore = new Mock<IStoreSagas>();
+
             [Fact]
             public void ReturnBaseTypesBeforeDerivedTypes()
             {
                 var typeLocator = new FakeTypeLocator(typeof(PrimaryHandler), typeof(FakeEvent), typeof(DerivedFakeEvent));
-                var registry = new EventHandlerRegistry(typeLocator, serviceProvider.Object);
+                var registry = new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object);
                 var handlers = registry.GetHandlersFor(new DerivedFakeEvent()).ToArray();
 
                 Assert.Equal(typeof(FakeEvent), handlers[0].EventType);
@@ -131,7 +133,7 @@ namespace Test.Spark.Cqrs.Eventing
             public void ReturnEventHandlersBeforeSagaEventHandlers()
             {
                 var typeLocator = new FakeTypeLocator(typeof(PrimaryHandler), typeof(PrimarySaga), typeof(FakeEvent));
-                var registry = new EventHandlerRegistry(typeLocator, serviceProvider.Object);
+                var registry = new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object);
                 var handlers = registry.GetHandlersFor(new FakeEvent()).ToArray();
 
                 Assert.Equal(typeof(PrimaryHandler), handlers[0].HandlerType);
@@ -142,7 +144,7 @@ namespace Test.Spark.Cqrs.Eventing
             public void ReturnHandlersOfSameEventTypeSortedByHandlerFullName()
             {
                 var typeLocator = new FakeTypeLocator(typeof(PrimaryHandler), typeof(SecondaryHandler), typeof(PrimarySaga), typeof(SecondarySaga), typeof(FakeEvent));
-                var registry = new EventHandlerRegistry(typeLocator, serviceProvider.Object);
+                var registry = new EventHandlerRegistry(sagaStore.Object, typeLocator, serviceProvider.Object);
                 var handlers = registry.GetHandlersFor(new FakeEvent()).ToArray();
 
                 Assert.Equal(typeof(PrimaryHandler), handlers[0].HandlerType);
@@ -219,12 +221,15 @@ namespace Test.Spark.Cqrs.Eventing
                 { }
             }
 
+            [UsedImplicitly]
             private class FakeEvent : Event
             { }
 
+            [UsedImplicitly]
             private class AlternateFakeEvent : Event
             { }
 
+            [UsedImplicitly]
             private class DerivedFakeEvent : FakeEvent
             { }
         }

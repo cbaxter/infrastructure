@@ -30,6 +30,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         private readonly SagaContext originalContext;
         private readonly IList<Message<CommandEnvelope>> publishedCommands;
         private readonly Thread thread;
+        private readonly Event @event;
         private readonly Type sagaType;
         private readonly Guid sagaId;
         private Boolean disposed;
@@ -48,19 +49,26 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// The underlying saga <see cref="Type"/> associated with this <see cref="SagaContext"/>.
         /// </summary>
         public Type SagaType { get { return sagaType; } }
+
+        /// <summary>
+        /// The <see cref="Event"/> associated with this <see cref="SagaContext"/>.
+        /// </summary>
+        public Event Event { get { return @event; } }
         
         /// <summary>
         /// Initalizes a new instance of <see cref="SagaContext"/> with the specified <paramref name="sagaType"/> and <paramref name="sagaId"/>.
         /// </summary>
         /// <param name="sagaType">The underlying saga <see cref="Type"/> associated with this <see cref="SagaContext"/>.</param>
         /// <param name="sagaId">The <see cref="Saga"/> correlation id associated with this <see cref="SagaContext"/>.</param>
-        public SagaContext(Type sagaType, Guid sagaId)
+        /// <param name="e">The <see cref="Event"/>.</param>
+        public SagaContext(Type sagaType, Guid sagaId, Event e)
         {
             this.publishedCommands = new List<Message<CommandEnvelope>>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.sagaType = sagaType;
             this.sagaId = sagaId;
+            this.@event = e;
 
             currentContext = this;
         }

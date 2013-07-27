@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="Configuration\AggregateStoreSettings.cs" />
     <Compile Include="Configuration\CommandProcessorSettings.cs" />
+    <Compile Include="Configuration\SagaStoreSettings.cs" />
     <Compile Include="Configuration\EventProcessorSettings.cs" />
     <Compile Include="Configuration\EventStoreSettings.cs" />
     <Compile Include="Configuration\SnapshotStoreSettings.cs" />

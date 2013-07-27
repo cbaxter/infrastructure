@@ -32,5 +32,17 @@ namespace Spark.Data
 
             return (Byte[])dataRecord.GetValue(i);
         }
+
+        /// <summary>
+        /// Return the value of the specified field.
+        /// </summary>
+        /// <param name="dataRecord">The data record containing the field to find.</param>
+        /// <param name="i">The index of the field to find.</param>
+        public static DateTime? GetNullableDateTime(this IDataRecord dataRecord, Int32 i)
+        {
+            Verify.NotNull(dataRecord, "dataRecord");
+
+            return dataRecord.IsDBNull(i) ? default(DateTime?) : dataRecord.GetDateTime(i);
+        }
     }
 }

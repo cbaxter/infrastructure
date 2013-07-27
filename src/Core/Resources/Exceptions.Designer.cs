@@ -225,6 +225,17 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Concurrency conflict.
+        ///Stream Id: {0}
+        ///Version: {1}.
+        /// </summary>
+        internal static string CommitConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("CommitConcurrencyConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The commit operation has timed out.
         ///Commit Id: {0}
         ///Stream Id: {1}.
@@ -232,18 +243,6 @@ namespace Spark.Resources {
         internal static string CommitTimeout {
             get {
                 return ResourceManager.GetString("CommitTimeout", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Concurrency Exception.
-        ///Type: {0}
-        ///Stream Id: {1}
-        ///Version: {2}.
-        /// </summary>
-        internal static string ConcurrencyException {
-            get {
-                return ResourceManager.GetString("ConcurrencyException", resourceCulture);
             }
         }
         
@@ -271,9 +270,9 @@ namespace Spark.Resources {
         ///   Looks up a localized string similar to Duplicate commit.
         ///Commit Id: {0}.
         /// </summary>
-        internal static string DuplicateCommitException {
+        internal static string DuplicateCommit {
             get {
-                return ResourceManager.GetString("DuplicateCommitException", resourceCulture);
+                return ResourceManager.GetString("DuplicateCommit", resourceCulture);
             }
         }
         
@@ -302,6 +301,39 @@ namespace Spark.Resources {
         internal static string EventHandlerHandleByStrategyAmbiguous {
             get {
                 return ResourceManager.GetString("EventHandlerHandleByStrategyAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An event may be configured only once.
+        ///Saga Type: {0}
+        ///Event Type: {1}.
+        /// </summary>
+        internal static string EventTypeAlreadyConfigured {
+            get {
+                return ResourceManager.GetString("EventTypeAlreadyConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handling not configured.
+        ///Saga Type: {0}
+        ///Event Type: {1}.
+        /// </summary>
+        internal static string EventTypeNotConfigured {
+            get {
+                return ResourceManager.GetString("EventTypeNotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event not handled by saga.
+        ///Saga Type: {0}
+        ///Event Type: {1}.
+        /// </summary>
+        internal static string EventTypeNotHandledBySaga {
+            get {
+                return ResourceManager.GetString("EventTypeNotHandledBySaga", resourceCulture);
             }
         }
         
@@ -435,6 +467,17 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Concurrency conflict.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("SagaConcurrencyConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This SagaContext is being disposed on a different thread than it was created..
         /// </summary>
         internal static string SagaContextInterleaved {
@@ -459,6 +502,16 @@ namespace Spark.Resources {
         internal static string SagaDefaultConstructorRequired {
             get {
                 return ResourceManager.GetString("SagaDefaultConstructorRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saga must have at least one initiating event.
+        ///Saga Type: {0}.
+        /// </summary>
+        internal static string SagaMustHaveAtLeastOneInitiatingEvent {
+            get {
+                return ResourceManager.GetString("SagaMustHaveAtLeastOneInitiatingEvent", resourceCulture);
             }
         }
         
@@ -498,6 +551,15 @@ namespace Spark.Resources {
         internal static string UnknownDialect {
             get {
                 return ResourceManager.GetString("UnknownDialect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown saga type {0}..
+        /// </summary>
+        internal static string UnknownSaga {
+            get {
+                return ResourceManager.GetString("UnknownSaga", resourceCulture);
             }
         }
         

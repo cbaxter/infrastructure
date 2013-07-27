@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Configuration;
-using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Domain;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -18,7 +18,7 @@ using Spark.Cqrs.Commanding;
 namespace Spark.Configuration
 {
     /// <summary>
-    /// <see cref="CommandProcessor"/> configuration settings.
+    /// <see cref="IStoreAggregates"/> configuration settings.
     /// </summary>
     internal interface IStoreAggregateSettings
     {

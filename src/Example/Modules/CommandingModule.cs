@@ -4,6 +4,9 @@ using System.Reflection;
 using Autofac;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
+using Spark.Cqrs.Eventing.Sagas;
+using Spark.Cqrs.Eventing.Sagas.Sql;
+using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.Cqrs.Eventing;
@@ -55,6 +58,11 @@ namespace Spark.Example.Modules
             builder.RegisterType<MessageReceiver<EventEnvelope>>().AsSelf().SingleInstance().AutoActivate();
             builder.RegisterType<BlockingCollectionMessageBus<EventEnvelope>>().As<ISendMessages<EventEnvelope>>().As<IReceiveMessages<EventEnvelope>>().SingleInstance();
             builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies()).Where(type => type.GetCustomAttribute<EventHandlerAttribute>() != null);
+
+
+            builder.RegisterType<SqlSagaStoreDialect>().As<ISagaStoreDialect>().SingleInstance();
+            builder.RegisterType<SqlSagaStore>().Named<IStoreSagas>("SagaStore").SingleInstance();
+            builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "SagaStore").As<IStoreSagas>().SingleInstance();
         }
 
         private sealed class AutofacServiceProvider : IServiceProvider

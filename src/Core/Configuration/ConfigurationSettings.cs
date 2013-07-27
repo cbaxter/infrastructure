@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Spark.Cqrs.Eventing.Sagas;
 using Spark.EventStore;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -42,6 +43,11 @@ namespace Spark.Configuration
         IProcessEventSettings EventProcessor { get; }
 
         /// <summary>
+        /// The <see cref="IStoreSagas"/> configuration settings.
+        /// </summary>
+        IStoreSagaSettings SagaStore { get; }
+
+        /// <summary>
         /// The <see cref="IStoreSnapshots"/> configuration settings.
         /// </summary>
         IStoreSnapshotSettings SnapshotStore { get; }
@@ -64,6 +70,10 @@ namespace Spark.Configuration
         [ConfigurationProperty("eventProcessor", IsRequired = false)]
         public EventProcessorElement EventProcessor { get { return (EventProcessorElement)base["eventProcessor"] ?? new EventProcessorElement(); } }
         IProcessEventSettings ISettings.EventProcessor { get { return EventProcessor; } }
+
+        [ConfigurationProperty("sagaStore", IsRequired = false)]
+        public SagaStoreElement SagaStore { get { return (SagaStoreElement)base["sagaStore"] ?? new SagaStoreElement(); } }
+        IStoreSagaSettings ISettings.SagaStore { get { return SagaStore; } }
 
         [ConfigurationProperty("snapshotStore", IsRequired = false)]
         public SnapshotStoreElement SnapshotStore { get { return (SnapshotStoreElement)base["snapshotStore"] ?? new SnapshotStoreElement(); } }
