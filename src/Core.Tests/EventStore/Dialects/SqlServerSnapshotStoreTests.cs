@@ -6,6 +6,7 @@ using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
 using Spark.Serialization;
 using Test.Spark.Configuration;
+using Test.Spark.Data;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.

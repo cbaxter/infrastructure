@@ -5,12 +5,14 @@ using Autofac;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
+using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
+using Spark.Messaging;
 
 namespace Example
 {
@@ -50,8 +52,10 @@ namespace Example
 
             benchmarkHook.WaitForCommandDrain();
 
-            ((SqlSnapshotStore)container.Resolve<IStoreSnapshots>()).Dispose();
             ((SqlEventStore)container.Resolve<IStoreEvents>()).Dispose();
+            ((SqlSnapshotStore)container.Resolve<IStoreSnapshots>()).Dispose();
+            ((IDisposable)container.Resolve<IReceiveMessages<EventEnvelope>>()).Dispose();
+            container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
         }
 
         public class BenchmarkHook : PipelineHook

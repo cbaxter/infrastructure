@@ -51,6 +51,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
         public SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator)
         {
+            Verify.NotNull(typeLocator, "typeLocator");
             Verify.NotNull(serializer, "serializer");
             Verify.NotNull(dialect, "dialect");
 
@@ -60,6 +61,12 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             Initialize();
         }
+        
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="CachedSagaStore"/> class.
+        /// </summary>
+        public void Dispose()
+        { }
 
         /// <summary>
         /// Generate unique saga type identifiers for all locatable <see cref="Saga"/> types.
@@ -131,8 +138,8 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         {
             var saga = (Saga)Activator.CreateInstance(type);
 
-            saga.CorrelationId = id;
             saga.TypeId = GetTypeId(type);
+            saga.CorrelationId = id;
             saga.Version = 0;
 
             return saga;
@@ -161,14 +168,16 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
             return saga != null;
         }
 
-
-
-
+        /// <summary>
+        /// Save the specified <paramref name="context"/> changes for the given <paramref name="saga"/>.
+        /// </summary>
+        /// <param name="saga">The current saga version for which the context applies.</param>
+        /// <param name="context">The saga context containing the saga changes to be applied.</param>
         public void Save(Saga saga, SagaContext context)
         {
             Verify.NotNull(saga, "saga");
 
-            if (saga.Version == 1 && saga.Completed)
+            if (saga.Version == 0 && saga.Completed)
                 return;
             
             if (saga.Completed)
@@ -185,6 +194,10 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
             }
         }
 
+        /// <summary>
+        /// Insert a new saga instance.
+        /// </summary>
+        /// <param name="saga">The saga instance to insert.</param>
         private void InsertSaga(Saga saga)
         {
             var state = serializer.Serialize(saga);
@@ -195,7 +208,6 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
-                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version + 1));
                 command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
                 command.Parameters.Add(dialect.CreateStateParameter(state));
 
@@ -205,7 +217,11 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
                
             saga.Version++;
         }
-
+        
+        /// <summary>
+        /// Update an existing saga instance.
+        /// </summary>
+        /// <param name="saga">The saga instance to update.</param>
         private void UpdateSaga(Saga saga)
         {
             var state = serializer.Serialize(saga);
@@ -216,7 +232,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
-                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version + 1));
+                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version));
                 command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
                 command.Parameters.Add(dialect.CreateStateParameter(state));
 
@@ -227,6 +243,10 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
             saga.Version++;
         }
 
+        /// <summary>
+        /// Delete an existing saga instance.
+        /// </summary>
+        /// <param name="saga">The saga instance to delete.</param>
         private void DeleteSaga(Saga saga)
         {
             using (var command = dialect.CreateCommand(dialect.DeleteSaga))
@@ -235,13 +255,12 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
+                command.Parameters.Add(dialect.CreateVersionParameter(saga.Version));
 
                 if (dialect.ExecuteNonQuery(command) == 0)
                     throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
             }
         }
-
-
 
         /// <summary>
         /// Deletes all existing sagas from the saga store.

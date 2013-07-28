@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Spark.Cqrs.Eventing.Sagas;
+﻿using Spark.Cqrs.Eventing.Sagas;
 using Spark.Example.Domain.Events;
 
 namespace Spark.Example.Sagas
 {
     public sealed class TestSaga : Saga
     {
-        protected override void RegisterEvents()
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void Configure(SagaConfiguration saga)
         {
             saga.CanStartWith((ClientRegistered e) => e.ClientId);
@@ -34,7 +24,7 @@ namespace Spark.Example.Sagas
 
         public void Handle(ThrowAwayEvent2 e)
         {
-
+            MarkCompleted();
         }
     }
 }

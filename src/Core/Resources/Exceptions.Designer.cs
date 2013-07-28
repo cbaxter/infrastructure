@@ -411,7 +411,7 @@ namespace Spark.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The current CommandContext is null..
+        ///   Looks up a localized string similar to The current command context is null..
         /// </summary>
         internal static string NoCommandContext {
             get {
@@ -420,11 +420,20 @@ namespace Spark.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The current EventContext is null..
+        ///   Looks up a localized string similar to The current event context is null..
         /// </summary>
         internal static string NoEventContext {
             get {
                 return ResourceManager.GetString("NoEventContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current saga context is null..
+        /// </summary>
+        internal static string NoSagaContext {
+            get {
+                return ResourceManager.GetString("NoSagaContext", resourceCulture);
             }
         }
         
@@ -506,12 +515,56 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot aquire an additional lock until the current lock has been released.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaLockAlreadyHeld {
+            get {
+                return ResourceManager.GetString("SagaLockAlreadyHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot release a lock that has not been aquired.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaLockNotHeld {
+            get {
+                return ResourceManager.GetString("SagaLockNotHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saga must have at least one initiating event.
         ///Saga Type: {0}.
         /// </summary>
         internal static string SagaMustHaveAtLeastOneInitiatingEvent {
             get {
                 return ResourceManager.GetString("SagaMustHaveAtLeastOneInitiatingEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A saga timeout has already been scheduled; clear or reschedule existing timeout.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaTimeoutAlreadyScheduled {
+            get {
+                return ResourceManager.GetString("SagaTimeoutAlreadyScheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No saga timeout has not been scheduled; unable to clear saga timeout.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaTimeoutNotScheduled {
+            get {
+                return ResourceManager.GetString("SagaTimeoutNotScheduled", resourceCulture);
             }
         }
         
@@ -564,7 +617,7 @@ namespace Spark.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unresolved Concurrency conflict: {0}.
+        ///   Looks up a localized string similar to Unresolved concurrency conflict: {0}.
         /// </summary>
         internal static string UnresolvedConcurrencyConflict {
             get {

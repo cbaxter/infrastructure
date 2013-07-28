@@ -11,6 +11,7 @@ using Spark.EventStore.Sql.Dialects;
 using Spark.Messaging;
 using Spark.Serialization;
 using Test.Spark.Configuration;
+using Test.Spark.Data;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -56,7 +57,7 @@ namespace Test.Spark.EventStore.Dialects
                 Assert.True(TableExists());
             }
 
-            [SqlServerFactAttribute]
+            [SqlServerFact]
             public void WillNotTouchTableIfExists()
             {
                 Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));

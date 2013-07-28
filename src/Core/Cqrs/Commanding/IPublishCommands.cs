@@ -62,10 +62,9 @@ namespace Spark.Cqrs.Commanding
 
             publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
         }
-
-
+        
         /// <summary>
-        /// Publishes the specified <paramref name="command"/> on the underlying message bus.
+        /// Publishes the specified <paramref name="command"/> with the enumerable set of custom message headers.
         /// </summary>
         /// <param name="publisher">The command publisher.</param>
         /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>

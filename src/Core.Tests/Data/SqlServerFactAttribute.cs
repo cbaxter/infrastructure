@@ -16,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Test.Spark.EventStore.Dialects
+namespace Test.Spark.Data
 {
     /// <summary>
     /// Constant for configured SQL-Server connection name.

@@ -22,7 +22,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     /// <summary>
     /// A <see cref="IStoreSagas"/> wrapper class to enable <see cref="MemoryCache"/> storage of <see cref="Saga"/> instances to reduce <see cref="TryGetSaga"/> overhead.
     /// </summary>
-    public sealed class CachedSagaStore : IStoreSagas, IDisposable //TODO: Review if disposable shoul de on base class?
+    public sealed class CachedSagaStore : IStoreSagas
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly TimeSpan slidingExpiration;
@@ -60,6 +60,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public void Dispose()
         {
             memoryCache.Dispose();
+            sagaStore.Dispose();
         }
 
         /// <summary>
@@ -137,7 +138,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public void Purge()
         {
             sagaStore.Purge();
-            memoryCache.Trim(100); //TODO: Verify if this works...
+            memoryCache.Trim(100);
         }
 
         /// <summary>

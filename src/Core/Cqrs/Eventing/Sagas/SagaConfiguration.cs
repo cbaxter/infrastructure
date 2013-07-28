@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -22,7 +18,7 @@ using Spark.Resources;
 namespace Spark.Cqrs.Eventing.Sagas
 {
     /// <summary>
-    /// Collects saga metadata for a given saga instance.
+    /// Collects saga configuration metadata for a given saga instance.
     /// </summary>
     public sealed class SagaConfiguration
     {
@@ -30,13 +26,23 @@ namespace Spark.Cqrs.Eventing.Sagas
         private readonly HashSet<Type> initiatingEvents = new HashSet<Type>();
         private readonly Type sagaType;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="SagaConfiguration"/> for the specified <paramref name="sagaType"/>.
+        /// </summary>
+        /// <param name="sagaType">The saga type associated with this configuration instance.</param>
         internal SagaConfiguration(Type sagaType)
         {
             Verify.NotNull(sagaType, "sagaType");
+            Verify.TypeDerivesFrom(typeof(Saga), sagaType, "sagaType");
 
             this.sagaType = sagaType;
         }
 
+        /// <summary>
+        /// Registers a correlation ID resolver for <typeparamref name="TEvent"/> (<typeparamref name="TEvent"/> always handled)
+        /// </summary>
+        /// <typeparam name="TEvent">The type of <see cref="Event"/>.</typeparam>
+        /// <param name="resolver">The correlation ID resolver function for <typeparamref name="TEvent"/>.</param>
         public void CanStartWith<TEvent>(Func<TEvent, Guid> resolver)
             where TEvent : Event
         {
@@ -44,10 +50,14 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             CanHandle(resolver);
 
-            // NOTE: Using Dictionary<Type, Boolean> over HashSet<Type> as there is no IReadOnlySet<T> (only ISet<T>).
             initiatingEvents.Add(typeof(TEvent));
         }
 
+        /// <summary>
+        /// Registers a correlation ID resolver for <typeparamref name="TEvent"/> (<typeparamref name="TEvent"/> handled if saga instance already exists)
+        /// </summary>
+        /// <typeparam name="TEvent">The type of <see cref="Event"/>.</typeparam>
+        /// <param name="resolver">The correlation ID resolver function for <typeparamref name="TEvent"/>.</param>
         public void CanHandle<TEvent>(Func<TEvent, Guid> resolver)
             where TEvent : Event
         {
@@ -59,6 +69,9 @@ namespace Spark.Cqrs.Eventing.Sagas
             handledEvents.Add(typeof(TEvent), e => resolver((TEvent)e));
         }
 
+        /// <summary>
+        /// Get the configured <see cref="SagaMetadata"/> based on the current <see cref="SagaConfiguration"/> state.
+        /// </summary>
         internal SagaMetadata GetMetadata()
         {
             return new SagaMetadata(sagaType, initiatingEvents, handledEvents);

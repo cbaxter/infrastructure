@@ -19,6 +19,7 @@ namespace Spark
     /// <summary>
     /// Represents an object whose internal state may be captured and externalized without violating encapsulation.
     /// </summary>
+    [Serializable]
     public abstract class StateObject
     {
         /// <summary>

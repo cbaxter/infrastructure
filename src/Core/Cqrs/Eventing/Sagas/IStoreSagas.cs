@@ -18,7 +18,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     /// <summary>
     /// Data access contract for a saga store.
     /// </summary>
-    public interface IStoreSagas
+    public interface IStoreSagas : IDisposable
     {
         /// <summary>
         /// Creates a new saga instance identified by the specified <paramref name="type"/> and <paramref name="id"/>.

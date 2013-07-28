@@ -101,6 +101,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Cqrs\Domain\PipelineHookTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStoreTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Dialects\SqlSagaStoreTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaConfigurationTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandlerTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLockTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaMetadataTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaRefereneTets.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTests.cs" />
+    <Compile Include="Data\SqlServerFactAttribute.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
     <Compile Include="Cqrs\Eventing\EventHandlerRegistryTests.cs" />
     <Compile Include="Cqrs\Eventing\EventHandlerTests.cs" />
@@ -118,7 +128,6 @@
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
-    <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
     <Compile Include="Cqrs\Eventing\EventCollectionTests.cs" />
     <Compile Include="Messaging\InlineMessageBusTests.cs" />
     <Compile Include="Messaging\MessageReceiverTests.cs" />

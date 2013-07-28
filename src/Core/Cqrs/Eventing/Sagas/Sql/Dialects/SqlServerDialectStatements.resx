@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DeleteSaga" xml:space="preserve">
-    <value>DELETE FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;</value>
+    <value>DELETE FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version;</value>
   </data>
   <data name="EnsureSagaTableExists" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = 'Saga' )
@@ -143,12 +143,12 @@ END;</value>
     <value>SELECT [Id],[TypeId] FROM Saga WHERE TBD;</value>
   </data>
   <data name="InsertSaga" xml:space="preserve">
-    <value>INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,@version,@timeout,@state);</value>
+    <value>INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,1,@timeout,@state);</value>
   </data>
   <data name="PurgeSagas" xml:space="preserve">
     <value>TRUNCATE TABLE [Saga];</value>
   </data>
   <data name="UpdateSaga" xml:space="preserve">
-    <value>UPDATE [Saga] SET [Version] = @version, [Timeout] = @timeout, [State] = @state WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;</value>
+    <value>UPDATE [Saga] SET [Version] = @version + 1, [Timeout] = @timeout, [State] = @state WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version;</value>
   </data>
 </root>

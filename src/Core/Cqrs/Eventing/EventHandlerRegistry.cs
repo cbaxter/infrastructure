@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing.Mappings;
 using Spark.Cqrs.Eventing.Sagas;
@@ -38,12 +39,15 @@ namespace Spark.Cqrs.Eventing
         /// <param name="sagaStore">The saga store to pass on to any <see cref="SagaEventHandler"/> instances.</param>
         /// <param name="typeLocator">The type locator used to retrieve all known <see cref="Event"/> types.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
-        public EventHandlerRegistry(IStoreSagas sagaStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
+        /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
+        public EventHandlerRegistry(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
         {
+            Verify.NotNull(sagaStore, "sagaStore");
             Verify.NotNull(typeLocator, "typeLocator");
             Verify.NotNull(serviceProvider, "serviceProvider");
+            Verify.NotNull(commandPublisher, "commandPublisher");
 
-            knownEventHandlers = DiscoverEventHandlers(sagaStore, typeLocator, serviceProvider);
+            knownEventHandlers = DiscoverEventHandlers(typeLocator, serviceProvider, sagaStore, commandPublisher);
         }
 
         /// <summary>
@@ -52,10 +56,11 @@ namespace Spark.Cqrs.Eventing
         /// <param name="sagaStore">The saga store to pass on to any <see cref="SagaEventHandler"/> instances.</param>
         /// <param name="typeLocator">The type locator use to retrieve all known classes marked with <see cref="EventHandlerAttribute"/>.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
-        private static Dictionary<Type, EventHandler[]> DiscoverEventHandlers(IStoreSagas sagaStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
+        /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
+        private static Dictionary<Type, EventHandler[]> DiscoverEventHandlers(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
         {
             var knownEvents = typeLocator.GetTypes(type => !type.IsAbstract && type.IsClass && type.DerivesFrom(typeof(Event)));
-            var knownHandlers = DiscoverHandleMethods(sagaStore, typeLocator, serviceProvider);
+            var knownHandlers = DiscoverHandleMethods(typeLocator, serviceProvider, sagaStore, commandPublisher);
             var result = new Dictionary<Type, EventHandler[]>();
             var logMessage = new StringBuilder();
 
@@ -93,7 +98,8 @@ namespace Spark.Cqrs.Eventing
         /// <param name="sagaStore">The saga store to pass on to any <see cref="SagaEventHandler"/> instances.</param>
         /// <param name="typeLocator">The type locator use to retrieve all known classes marked with <see cref="EventHandlerAttribute"/>.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
-        private static Dictionary<Type, List<EventHandler>> DiscoverHandleMethods(IStoreSagas sagaStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
+        /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
+        private static Dictionary<Type, List<EventHandler>> DiscoverHandleMethods(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
         {
             var handlerTypes = typeLocator.GetTypes(type => !type.IsAbstract && type.IsClass && type.GetCustomAttribute<EventHandlerAttribute>() != null);
             var knownEventHandlers = new Dictionary<Type, List<EventHandler>>();
@@ -110,7 +116,7 @@ namespace Spark.Cqrs.Eventing
                         knownEventHandlers.Add(handleMethod.Key, eventHandlers = new List<EventHandler>());
 
                     var eventHandler = new EventHandler(handlerType, handleMethod.Key, handleMethod.Value, GetHandlerFactory(handlerType, serviceProvider));
-                    eventHandlers.Add(typeof(Saga).IsAssignableFrom(handlerType) ? new SagaEventHandler(eventHandler, sagaMetadata, sagaStore) : eventHandler);
+                    eventHandlers.Add(typeof(Saga).IsAssignableFrom(handlerType) ? new SagaEventHandler(eventHandler, sagaMetadata, sagaStore, commandPublisher) : eventHandler);
                 }
             }
 

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -18,24 +21,82 @@ namespace Spark.Cqrs.Eventing.Sagas
     /// <summary>
     /// A <see cref="Saga"/> synchronization lock object.
     /// </summary>
-    internal sealed class SagaLock
+    internal sealed class SagaLock : IDisposable
     {
-        private Int32 referenceCount;
+        private static readonly IDictionary<SagaReference, HashSet<SagaLock>> SagaLocks = new Dictionary<SagaReference, HashSet<SagaLock>>();
+        private static readonly Object GlobalLock = new Object();
+        private readonly SagaReference sagaReference;
+        private HashSet<SagaLock> lockReference;
 
         /// <summary>
-        /// Increment the current saga reference count.
+        /// The underlying saga <see cref="Type"/> associated with this saga lock instance.
         /// </summary>
-        internal Int32 Increment()
+        public Type SagaType { get { return sagaReference.SagaType; } }
+
+        /// <summary>
+        /// The underlying saga correlation ID associated with this saga lock instance.
+        /// </summary>
+        public Guid SagaId { get { return sagaReference.SagaId; } }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SagaLock"/>.
+        /// </summary>
+        /// <param name="sagaType">The saga type associated with this saga lock instance.</param>
+        /// <param name="sagaId">The saga correlation ID associated with this saga lock instance.</param>
+        public SagaLock(Type sagaType, Guid sagaId)
         {
-            return ++referenceCount;
+            sagaReference = new SagaReference(sagaType, sagaId);
         }
 
         /// <summary>
-        /// Decrement the current saga reference count.
+        /// Aquires the lock on the specified saga instance identified by <see cref="SagaType"/> and <see cref="SagaId"/>.
         /// </summary>
-        internal Int32 Decrement()
+        public void Aquire()
         {
-            return --referenceCount;
+            if(lockReference != null)
+                throw new InvalidOperationException(Exceptions.SagaLockAlreadyHeld.FormatWith(SagaType, SagaId));
+
+            lock (GlobalLock)
+            {
+                if (!SagaLocks.TryGetValue(sagaReference, out lockReference))
+                    SagaLocks.Add(sagaReference, lockReference = new HashSet<SagaLock>());
+
+                lockReference.Add(this);
+            }
+
+            Monitor.Enter(lockReference);
+        }
+
+        /// <summary>
+        /// Releases the lock on the specified saga instance identified by <see cref="SagaType"/> and <see cref="SagaId"/>.
+        /// </summary>
+        public void Release()
+        {
+            if (lockReference == null)
+                throw new InvalidOperationException(Exceptions.SagaLockNotHeld.FormatWith(SagaType, SagaId));
+
+            Monitor.Exit(lockReference);
+
+            lock (GlobalLock)
+            {
+                lockReference.Remove(this);
+
+                if (lockReference.Count == 0)
+                    SagaLocks.Remove(sagaReference);
+            }
+
+            lockReference = null;
+        }
+        
+        /// <summary>
+        /// Releases all managed resources used by the current instance of the <see cref="SagaContext"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            if (lockReference == null)
+                return;
+
+            Release();
         }
     }
 }

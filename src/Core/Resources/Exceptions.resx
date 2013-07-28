@@ -258,10 +258,13 @@ Actual Version: {1}</value>
     <value>Value must contain at least one non-whitespace character.</value>
   </data>
   <data name="NoCommandContext" xml:space="preserve">
-    <value>The current CommandContext is null.</value>
+    <value>The current command context is null.</value>
   </data>
   <data name="NoEventContext" xml:space="preserve">
-    <value>The current EventContext is null.</value>
+    <value>The current event context is null.</value>
+  </data>
+  <data name="NoSagaContext" xml:space="preserve">
+    <value>The current saga context is null.</value>
   </data>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
@@ -292,9 +295,29 @@ Saga Id: {1}</value>
     <value>Saga must have a single public default constructor.
 Saga Type: {0}</value>
   </data>
+  <data name="SagaLockAlreadyHeld" xml:space="preserve">
+    <value>Cannot aquire an additional lock until the current lock has been released.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaLockNotHeld" xml:space="preserve">
+    <value>Cannot release a lock that has not been aquired.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
   <data name="SagaMustHaveAtLeastOneInitiatingEvent" xml:space="preserve">
     <value>Saga must have at least one initiating event.
 Saga Type: {0}</value>
+  </data>
+  <data name="SagaTimeoutAlreadyScheduled" xml:space="preserve">
+    <value>A saga timeout has already been scheduled; clear or reschedule existing timeout.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaTimeoutNotScheduled" xml:space="preserve">
+    <value>No saga timeout has not been scheduled; unable to clear saga timeout.
+Saga Type: {0}
+Saga Id: {1}</value>
   </data>
   <data name="StateAccessException" xml:space="preserve">
     <value>State may only be changed via an event apply method when saving an aggregate.
@@ -315,6 +338,6 @@ Provider Name: {0}</value>
     <value>Unknown saga type {0}.</value>
   </data>
   <data name="UnresolvedConcurrencyConflict" xml:space="preserve">
-    <value>Unresolved Concurrency conflict: {0}</value>
+    <value>Unresolved concurrency conflict: {0}</value>
   </data>
 </root>

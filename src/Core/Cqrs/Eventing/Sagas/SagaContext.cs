@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Domain;
 using Spark.Messaging;
 using Spark.Resources;
 
@@ -28,11 +30,11 @@ namespace Spark.Cqrs.Eventing.Sagas
         [ThreadStatic]
         private static SagaContext currentContext;
         private readonly SagaContext originalContext;
-        private readonly IList<Message<CommandEnvelope>> publishedCommands;
         private readonly Thread thread;
         private readonly Event @event;
         private readonly Type sagaType;
         private readonly Guid sagaId;
+        private IList<SagaCommand> publishedCommands;
         private Boolean disposed;
 
         /// <summary>
@@ -63,7 +65,10 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The <see cref="Event"/>.</param>
         public SagaContext(Type sagaType, Guid sagaId, Event e)
         {
-            this.publishedCommands = new List<Message<CommandEnvelope>>();
+            Verify.NotNull(sagaType, "sagaType");
+            Verify.NotNull(e, "e");
+
+            //this.publishedCommands = new List<SagaCommand>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.sagaType = sagaType;
@@ -92,23 +97,26 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Publishes the specified <paramref name="message"/> on the underlying message bus after successful save.
+        /// Publishes the specified <paramref name="command"/> with the enumerable set of custom message headers.
         /// </summary>
-        /// <param name="message">The message to be published.</param>
-        internal void Publish(Message<CommandEnvelope> message)
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="command"/>.</param>
+        /// <param name="command">The command to be published.</param>
+        /// <param name="headers">The set of message headers associated with the command.</param>
+        internal void Publish(Guid aggregateId, IEnumerable<Header> headers, Command command)
         {
-            Verify.NotNull(message, "message");
+            if (publishedCommands == null)
+                publishedCommands = new List<SagaCommand>();
 
-            publishedCommands.Add(message);
+            publishedCommands.Add(new SagaCommand(aggregateId, headers, command));
         }
 
         /// <summary>
         /// Gets the set of <see cref="Message{CommandEnvelope}"/> instances published within the current <see cref="SagaContext"/>.
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<Message<CommandEnvelope>> GetPublishedCommands()
+        internal IEnumerable<SagaCommand> GetPublishedCommands()
         {
-            return publishedCommands;
+            return publishedCommands ?? Enumerable.Empty<SagaCommand>();
         }
 
         /// <summary>

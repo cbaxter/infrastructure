@@ -61,7 +61,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;.
+        ///   Looks up a localized string similar to DELETE FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version;.
         /// </summary>
         internal static string DeleteSaga {
             get {
@@ -109,7 +109,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,@version,@timeout,@state);.
+        ///   Looks up a localized string similar to INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,1,@timeout,@state);.
         /// </summary>
         internal static string InsertSaga {
             get {
@@ -127,7 +127,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UPDATE [Saga] SET [Version] = @version, [Timeout] = @timeout, [State] = @state WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version - 1;.
+        ///   Looks up a localized string similar to UPDATE [Saga] SET [Version] = @version + 1, [Timeout] = @timeout, [State] = @state WHERE [Id] = @id AND [TypeId] = @typeId AND [Version] = @version;.
         /// </summary>
         internal static string UpdateSaga {
             get {
