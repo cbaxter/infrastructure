@@ -22,6 +22,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         String EnsureSagaTableExists { get; }
 
         String GetSaga { get; }
+        String GetScheduledTimeouts { get; }
         String InsertSaga { get; }
         String UpdateSaga { get; }
         String DeleteSaga { get; }

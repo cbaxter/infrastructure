@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using Moq;
 using Spark;
 using Spark.Cqrs.Eventing;
@@ -148,6 +149,46 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 var saga = SagaStore.CreateSaga(typeof(FakeSaga), GuidStrategy.NewGuid());
 
                 Assert.Equal(0, saga.Version);
+            }
+        }
+
+        public class WhenGettingScheduledTimeouts : UsingInitializedSagaStore
+        {
+            [SqlServerFact]
+            public void TimeoutUpperBoundIsExclusive()
+            {
+                var timeout = DateTime.Now.AddMinutes(20);
+                var saga = new FakeSaga { Version = 0, Timeout = timeout };
+
+                SagaStore.Save(saga, SagaContext);
+
+                Assert.Equal(0, SagaStore.GetScheduledTimeouts(timeout).Count);
+            }
+
+            [SqlServerFact]
+            public void TimeoutContainsAllNonStateData()
+            {
+                var timeout = DateTime.Now.AddMinutes(20);
+                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), Version = 0, Timeout = timeout };
+
+                SagaStore.Save(saga, SagaContext);
+
+                var sagaTimeout = SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)).Single();
+                Assert.Equal(saga.CorrelationId, sagaTimeout.SagaId);
+                Assert.Equal(saga.GetType(), sagaTimeout.SagaType);
+                Assert.Equal(saga.Version, sagaTimeout.Version);
+                Assert.Equal(saga.Timeout, sagaTimeout.Timeout);
+            }
+
+            [Fact]
+            public void ThrowKeyNotFoundIfSagaTypeUnknown()
+            {
+                var timeout = DateTime.Now.AddMinutes(20);
+                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), TypeId = Guid.Empty, Version = 0, Timeout = timeout };
+
+                SagaStore.Save(saga, SagaContext);
+                
+                Assert.Throws<KeyNotFoundException>(() =>  SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)));
             }
         }
 

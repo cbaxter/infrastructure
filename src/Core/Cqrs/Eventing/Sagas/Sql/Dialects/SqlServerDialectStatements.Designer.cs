@@ -100,7 +100,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT [Id],[TypeId] FROM Saga WHERE TBD;.
+        ///   Looks up a localized string similar to SELECT [Id],[TypeId],[Version],[Timeout] FROM [Saga] WHERE [Timeout] &lt; @timeout.
         /// </summary>
         internal static string GetScheduledTimeouts {
             get {

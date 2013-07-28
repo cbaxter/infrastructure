@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using Spark;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
@@ -83,6 +84,23 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             {
                 protected override void Configure(SagaConfiguration saga)
                 { }
+            }
+        }
+
+        public class WhenGettingScheduledTimeouts
+        {
+            [Fact]
+            public void DelegateToDecoratedSagaStore()
+            {
+                var sagaStore = new Mock<IStoreSagas>();
+                var upperBound = DateTime.Now;
+
+                using (var cachedSagaStore = new CachedSagaStore(sagaStore.Object))
+                {
+                    cachedSagaStore.GetScheduledTimeouts(upperBound);
+
+                    sagaStore.Verify(mock => mock.GetScheduledTimeouts(upperBound), Times.Once());
+                }
             }
         }
 

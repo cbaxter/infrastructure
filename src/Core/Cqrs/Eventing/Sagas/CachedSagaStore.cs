@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Caching;
 using Spark.Configuration;
 using Spark.Data;
@@ -97,6 +98,15 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
 
             return saga != null;
+        }
+
+        /// <summary>
+        /// Get all scheduled saga timeouts before the specified maximum timeout.
+        /// </summary>
+        /// <param name="maximumTimeout">The exclusive timeout upper bound.</param>
+        public IReadOnlyList<SagaTimeout> GetScheduledTimeouts(DateTime maximumTimeout)
+        {
+            return sagaStore.GetScheduledTimeouts(maximumTimeout);
         }
 
         /// <summary>

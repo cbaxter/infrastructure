@@ -25,6 +25,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects
 
         // ISnapshotStoreDialect
         public String GetSaga { get { return SqlServerDialectStatements.GetSaga; } }
+        public String GetScheduledTimeouts { get { return SqlServerDialectStatements.GetScheduledTimeouts; } }
         public String InsertSaga { get { return SqlServerDialectStatements.InsertSaga; } }
         public String UpdateSaga { get { return SqlServerDialectStatements.UpdateSaga; } }
         public String DeleteSaga { get { return SqlServerDialectStatements.DeleteSaga; } }

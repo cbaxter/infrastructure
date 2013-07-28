@@ -80,6 +80,7 @@
       <DependentUpon>SqlServerDialectStatements.resx</DependentUpon>
     </Compile>
     <Compile Include="Cqrs\Eventing\Sagas\Sql\ISagaStoreDialect.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeout.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\SqlSagaStore.cs" />
     <Compile Include="Data\DbDataRecordExtensions.cs" />
     <Compile Include="Data\DbCommandExtensions.cs" />

@@ -133,14 +133,14 @@ BEGIN
         CONSTRAINT [PK_Saga] PRIMARY KEY CLUSTERED ([Id],[TypeId]) WITH (IGNORE_DUP_KEY = ON)
     );
 
-    CREATE NONCLUSTERED INDEX [IX_Saga_Timeout] ON [Saga]([Timeout]) WHERE [Timeout] IS NOT NULL
+    CREATE NONCLUSTERED INDEX [IX_Saga_Timeout] ON [Saga]([Timeout]) INCLUDE([Version]) WHERE [Timeout] IS NOT NULL ;
 END;</value>
   </data>
   <data name="GetSaga" xml:space="preserve">
     <value>SELECT [Id],[TypeId],[Version],[Timeout],[State] FROM [Saga] WHERE [Id] = @id AND [TypeId] = @typeId;</value>
   </data>
   <data name="GetScheduledTimeouts" xml:space="preserve">
-    <value>SELECT [Id],[TypeId] FROM Saga WHERE TBD;</value>
+    <value>SELECT [Id],[TypeId],[Version],[Timeout] FROM [Saga] WHERE [Timeout] &lt; @timeout</value>
   </data>
   <data name="InsertSaga" xml:space="preserve">
     <value>INSERT INTO [Saga] ([Id],[TypeId],[Version],[Timeout],[State]) VALUES(@id,@typeId,1,@timeout,@state);</value>

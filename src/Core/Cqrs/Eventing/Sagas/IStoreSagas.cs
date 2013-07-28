@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -34,6 +35,12 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="id">The correlation id of the saga to be retrieved.</param>
         /// <param name="saga">The <see cref="Saga"/> instance if found; otherwise <value>null</value>.</param>
         Boolean TryGetSaga(Type type, Guid id, out Saga saga);
+
+        /// <summary>
+        /// Get all scheduled saga timeouts before the specified maximum timeout.
+        /// </summary>
+        /// <param name="maximumTimeout">The exclusive timeout upper bound.</param>
+        IReadOnlyList<SagaTimeout> GetScheduledTimeouts(DateTime maximumTimeout);
 
         /// <summary>
         /// Save the specified <paramref name="context"/> changes for the given <paramref name="saga"/>.

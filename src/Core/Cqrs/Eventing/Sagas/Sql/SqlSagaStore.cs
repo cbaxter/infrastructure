@@ -30,7 +30,8 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
     public sealed class SqlSagaStore : IStoreSagas
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly IReadOnlyDictionary<Type, Guid> knownSagas;
+        private readonly IReadOnlyDictionary<Type, Guid> typeToGuidMap;
+        private readonly IReadOnlyDictionary<Guid, Type> guidToTypeMap;
         private readonly ISerializeObjects serializer;
         private readonly ISagaStoreDialect dialect;
 
@@ -57,11 +58,12 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             this.dialect = dialect;
             this.serializer = serializer;
-            this.knownSagas = GetKnownSagas(typeLocator);
+            this.typeToGuidMap = GetKnownSagas(typeLocator);
+            this.guidToTypeMap = typeToGuidMap.ToDictionary(item => item.Value, item => item.Key);
 
             Initialize();
         }
-        
+
         /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="CachedSagaStore"/> class.
         /// </summary>
@@ -114,16 +116,29 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         }
 
         /// <summary>
+        /// Get the saga type for the specified saga type identifier.
+        /// </summary>
+        /// <param name="typeId">The saga type identifier.</param>
+        private Type GetSagaType(Guid typeId)
+        {
+            Type result;
+            if (guidToTypeMap.TryGetValue(typeId, out result))
+                return result;
+
+            throw new KeyNotFoundException(Exceptions.UnknownSaga.FormatWith(typeId));
+        }
+
+        /// <summary>
         /// Get the MD5 hash of the specified saga <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The saga type.</param>
-        private Guid GetTypeId(Type type)
+        private Guid GetSagaTypeId(Type type)
         {
             Guid result;
 
             //NOTE: Using a variable string value as a part of the saga primary key will degrade index performance significantly.
             //      Although two guids still results in a wide index, overall allows for a much denser index than the text equivalent.
-            if (knownSagas.TryGetValue(type, out result))
+            if (typeToGuidMap.TryGetValue(type, out result))
                 return result;
 
             throw new KeyNotFoundException(Exceptions.UnknownSaga.FormatWith(type));
@@ -138,7 +153,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         {
             var saga = (Saga)Activator.CreateInstance(type);
 
-            saga.TypeId = GetTypeId(type);
+            saga.TypeId = GetSagaTypeId(type);
             saga.CorrelationId = id;
             saga.Version = 0;
 
@@ -160,12 +175,28 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
                 Log.TraceFormat("Getting saga {0} - {1}", type, id);
 
                 command.Parameters.Add(dialect.CreateIdParameter(id));
-                command.Parameters.Add(dialect.CreateTypeIdParameter(GetTypeId(type)));
+                command.Parameters.Add(dialect.CreateTypeIdParameter(GetSagaTypeId(type)));
 
                 saga = dialect.QuerySingle(command, CreateSaga);
             }
 
             return saga != null;
+        }
+
+        /// <summary>
+        /// Get all scheduled saga timeouts before the specified maximum timeout.
+        /// </summary>
+        /// <param name="maximumTimeout">The exclusive timeout upper bound.</param>
+        public IReadOnlyList<SagaTimeout> GetScheduledTimeouts(DateTime maximumTimeout)
+        {
+            using (var command = dialect.CreateCommand(dialect.GetScheduledTimeouts))
+            {
+                Log.TraceFormat("Getting saga timeouts before {0}", maximumTimeout);
+
+                command.Parameters.Add(dialect.CreateTimeoutParameter(maximumTimeout));
+
+                return dialect.QueryMultiple(command, CreateSagaTimeout);
+            }
         }
 
         /// <summary>
@@ -179,7 +210,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             if (saga.Version == 0 && saga.Completed)
                 return;
-            
+
             if (saga.Completed)
             {
                 if (saga.Version > 0)
@@ -211,13 +242,13 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
                 command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
                 command.Parameters.Add(dialect.CreateStateParameter(state));
 
-                if(dialect.ExecuteNonQuery(command) == 0)
+                if (dialect.ExecuteNonQuery(command) == 0)
                     throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
             }
-               
+
             saga.Version++;
         }
-        
+
         /// <summary>
         /// Update an existing saga instance.
         /// </summary>
@@ -239,7 +270,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
                 if (dialect.ExecuteNonQuery(command) == 0)
                     throw new ConcurrencyException(Exceptions.SagaConcurrencyConflict.FormatWith(saga.GetType(), saga.CorrelationId));
             }
-                
+
             saga.Version++;
         }
 
@@ -293,6 +324,15 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
             saga.Timeout = timeout;
 
             return saga;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Saga"/>.
+        /// </summary>
+        /// <param name="record">The record from which to create the new <see cref="Saga"/>.</param>
+        private SagaTimeout CreateSagaTimeout(IDataRecord record)
+        {
+            return new SagaTimeout(record.GetGuid(Column.Id), GetSagaType(record.GetGuid(Column.TypeId)), record.GetInt32(Column.Version), record.GetDateTime(Column.Timeout));
         }
     }
 }
