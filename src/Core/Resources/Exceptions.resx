@@ -309,6 +309,11 @@ Saga Id: {1}</value>
     <value>Saga must have at least one initiating event.
 Saga Type: {0}</value>
   </data>
+  <data name="SagaSaveTimeout" xml:space="preserve">
+    <value>The saga save operation has timed out.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
   <data name="SagaTimeoutAlreadyScheduled" xml:space="preserve">
     <value>A saga timeout has already been scheduled; clear or reschedule existing timeout.
 Saga Type: {0}

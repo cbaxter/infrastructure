@@ -114,7 +114,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         /// <param name="saga">The current saga version for which the context applies.</param>
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
-        public void Save(Saga saga, SagaContext context)
+        public Saga Save(Saga saga, SagaContext context)
         {
             Verify.NotNull(saga, "saga");
             Verify.NotNull(context, "context");
@@ -130,6 +130,8 @@ namespace Spark.Cqrs.Eventing.Sagas
                     memoryCache.Remove(key);
                 else
                     memoryCache.Set(key, copy, CreateCacheItemPolicy());
+
+                return copy;
             }
             catch (ConcurrencyException)
             {

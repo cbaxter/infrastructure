@@ -71,6 +71,8 @@
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStore.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStore.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialect.cs" />

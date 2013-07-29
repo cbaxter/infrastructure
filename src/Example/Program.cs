@@ -13,6 +13,7 @@ using Spark.EventStore.Sql;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
 using Spark.Messaging;
+using PipelineHook = Spark.Cqrs.Domain.PipelineHook;
 
 namespace Example
 {
@@ -26,7 +27,9 @@ namespace Example
             var builder = new ContainerBuilder();
             var benchmarkHook = new BenchmarkHook(count);
 
+            builder.RegisterModule<CommonModule>();
             builder.RegisterModule<CommandingModule>();
+            builder.RegisterModule<EventingModule>();
             builder.RegisterInstance(benchmarkHook).As<PipelineHook>();
 
             var container = builder.Build();

@@ -1,13 +1,11 @@
 ﻿using System;
-using Spark.Cqrs.Commanding;
 using Spark.Configuration;
+using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Eventing;
-using Spark.Data;
 using Spark.EventStore;
 using Spark.Logging;
 using Spark.Messaging;
 using Spark.Resources;
-using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -125,38 +123,15 @@ namespace Spark.Cqrs.Domain
             Verify.NotNull(aggregate, "aggregate");
             Verify.NotNull(context, "context");
 
-            var backoffContext = default(ExponentialBackoff);
             var commit = CreateCommit(aggregate, context);
-            var done = false;
-
-            do
+            try
             {
-                try
-                {
-                    eventStore.Save(commit);
-                    done = true;
-                }
-                catch (DuplicateCommitException)
-                {
-                    Log.WarnFormat("Duplicate commit: {0}", commit);
-                    done = true;
-                }
-                catch (ConcurrencyException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    if (backoffContext == null)
-                        backoffContext = new ExponentialBackoff(retryTimeout);
-
-                    if (!backoffContext.CanRetry)
-                        throw new TimeoutException(Exceptions.CommitTimeout.FormatWith(commit.Id, commit.StreamId), ex);
-
-                    Log.Warn(ex.Message);
-                    backoffContext.WaitUntilRetry();
-                }
-            } while (!done);
+                eventStore.Save(commit);
+            }
+            catch (DuplicateCommitException)
+            {
+                Log.WarnFormat("Duplicate commit: {0}", commit);
+            }
 
             // NOTE: Apply commit directly to existing aggregate. By default, each call to `Get` returns a new `Aggregate` instance.
             //       Should the caller hold on to a reference to `this` aggregate instance, it is their responsibility to gaurd against

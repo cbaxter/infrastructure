@@ -204,49 +204,6 @@ namespace Test.Spark.Cqrs.Domain
                 // ReSharper restore AccessToDisposedClosure
             }
 
-            [Fact]
-            public void ReThrowConcurrencyExceptions()
-            {
-                var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
-                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings());
-
-                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<ConcurrencyException>();
-
-                // ReSharper disable AccessToDisposedClosure
-                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                    Assert.Throws<ConcurrencyException>(() => aggregateStore.Save(aggregate, context));
-                // ReSharper restore AccessToDisposedClosure
-            }
-
-            [Fact]
-            public void ReAttemptCommitIfOtherException()
-            {
-                var throwException = true;
-                var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
-                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings());
-
-                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Callback(() => { if (throwException) { throwException = false; throw new InvalidOperationException(); } });
-
-                // ReSharper disable AccessToDisposedClosure
-                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                    Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, context));
-                // ReSharper restore AccessToDisposedClosure
-            }
-
-            [Fact]
-            public void ReAttemptCommitWillTimeoutEventually()
-            {
-                var aggregate = new FakeAggregate(GuidStrategy.NewGuid(), 8);
-                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings());
-
-                eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<InvalidOperationException>();
-
-                // ReSharper disable AccessToDisposedClosure
-                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                    Assert.Throws<TimeoutException>(() => aggregateStore.Save(aggregate, context));
-                // ReSharper restore AccessToDisposedClosure
-            }
-
             private class FakeAggregate : Aggregate
             {
                 [UsedImplicitly]

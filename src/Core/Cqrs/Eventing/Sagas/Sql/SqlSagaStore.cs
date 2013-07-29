@@ -4,10 +4,12 @@ using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Spark.Configuration;
 using Spark.Data;
 using Spark.Logging;
 using Spark.Resources;
 using Spark.Serialization;
+using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -34,6 +36,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         private readonly IReadOnlyDictionary<Guid, Type> guidToTypeMap;
         private readonly ISerializeObjects serializer;
         private readonly ISagaStoreDialect dialect;
+        private readonly TimeSpan retryTimeout;
 
         private static class Column
         {
@@ -51,6 +54,17 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
         public SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator)
+            : this(dialect, serializer, typeLocator, Settings.SagaStore)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SqlSagaStore"/>.
+        /// </summary>
+        /// <param name="dialect">The database dialect associated with this <see cref="SqlSagaStore"/>.</param>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> used to store binary data.</param>
+        /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
+        /// <param name="settings">The saga store configuration settings.</param>
+        internal SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator, IStoreSagaSettings settings)
         {
             Verify.NotNull(typeLocator, "typeLocator");
             Verify.NotNull(serializer, "serializer");
@@ -58,6 +72,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             this.dialect = dialect;
             this.serializer = serializer;
+            this.retryTimeout = settings.SaveRetryTimeout;
             this.typeToGuidMap = GetKnownSagas(typeLocator);
             this.guidToTypeMap = typeToGuidMap.ToDictionary(item => item.Value, item => item.Key);
 
@@ -204,25 +219,53 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// </summary>
         /// <param name="saga">The current saga version for which the context applies.</param>
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
-        public void Save(Saga saga, SagaContext context)
+        public Saga Save(Saga saga, SagaContext context)
         {
             Verify.NotNull(saga, "saga");
 
             if (saga.Version == 0 && saga.Completed)
-                return;
+                return saga;
 
-            if (saga.Completed)
+            var backoffContext = default(ExponentialBackoff);
+            var done = false;
+
+            do
             {
-                if (saga.Version > 0)
-                    DeleteSaga(saga);
-            }
-            else
-            {
-                if (saga.Version == 0)
-                    InsertSaga(saga);
-                else
-                    UpdateSaga(saga);
-            }
+                try
+                {
+                    if (saga.Completed)
+                    {
+                        if (saga.Version > 0)
+                            DeleteSaga(saga);
+                    }
+                    else
+                    {
+                        if (saga.Version == 0)
+                            InsertSaga(saga);
+                        else
+                            UpdateSaga(saga);
+                    }
+
+                    done = true;
+                }
+                catch (ConcurrencyException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    if (backoffContext == null)
+                        backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    if (!backoffContext.CanRetry)
+                        throw new TimeoutException(Exceptions.SagaSaveTimeout.FormatWith(saga.GetType(), saga.CorrelationId), ex);
+
+                    Log.Warn(ex.Message);
+                    backoffContext.WaitUntilRetry();
+                }
+            } while (!done);
+            
+            return saga;
         }
 
         /// <summary>

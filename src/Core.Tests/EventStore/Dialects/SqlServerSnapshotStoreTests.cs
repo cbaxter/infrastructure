@@ -41,6 +41,7 @@ namespace Test.Spark.EventStore.Dialects
             internal UsingInitializedSnapshotStore(Boolean replaceExisting, Boolean async)
             {
                 SnapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = async, ReplaceExisting = replaceExisting });
+                SnapshotStore.Purge();
             }
 
             public void Dispose()

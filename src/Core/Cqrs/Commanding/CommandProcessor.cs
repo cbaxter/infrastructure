@@ -3,10 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Spark.Configuration;
 using Spark.Cqrs.Domain;
-using Spark.Data;
 using Spark.Logging;
 using Spark.Messaging;
-using Spark.Resources;
 using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -113,15 +111,15 @@ namespace Spark.Cqrs.Commanding
 
                     done = true;
                 }
-                catch (ConcurrencyException ex)
+                catch (Exception ex)
                 {
                     if (backoffContext == null)
                         backoffContext = new ExponentialBackoff(retryTimeout);
 
                     if (!backoffContext.CanRetry)
-                        throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(message.Payload), ex);
+                        throw new TimeoutException(ex.Message, ex);
 
-                    Log.WarnFormat("Concurrency conflict: {0}", message.Payload);
+                    Log.WarnFormat(ex.Message);
                     backoffContext.WaitUntilRetry();
                 }
             } while (!done);

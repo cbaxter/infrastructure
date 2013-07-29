@@ -40,7 +40,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaStore">The saga store used to load/save saga state.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
         public SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IPublishCommands commandPublisher)
-            : this(eventHandler, sagaMetadata, sagaStore, commandPublisher, Settings.EventProcessor)
+            : this(eventHandler, sagaMetadata, sagaStore, commandPublisher, Settings.SagaStore)
         { }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaStore">The saga store used to load/save saga state.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
         /// <param name="settings">The event processor settings.</param>
-        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IPublishCommands commandPublisher, IProcessEventSettings settings)
+        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IPublishCommands commandPublisher, IStoreSagaSettings settings)
             : base(eventHandler)
         {
             Verify.NotNull(sagaStore, "sagaStore");
@@ -62,7 +62,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             this.sagaStore = sagaStore;
             this.sagaMetadata = sagaMetadata;
             this.commandPublisher = commandPublisher;
-            this.retryTimeout = settings.RetryTimeout;
+            this.retryTimeout = settings.SaveRetryTimeout;
         }
 
         /// <summary>
@@ -72,35 +72,14 @@ namespace Spark.Cqrs.Eventing.Sagas
         public override void Handle(EventContext context)
         {
             var sagaId = sagaMetadata.GetCorrelationId(context.Event);
-            var backoffContext = default(ExponentialBackoff);
-            var done = false;
-
-            do
+    
+            using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
             {
-                try
-                {
-                    using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
-                    {
-                        UpdateSaga(sagaContext);
+                UpdateSaga(sagaContext);
 
-                        foreach (var sagaCommand in sagaContext.GetPublishedCommands())
-                            commandPublisher.Publish(sagaCommand.AggregateId, sagaCommand.Command, sagaCommand.Headers);
-                    }
-
-                    done = true;
-                }
-                catch (ConcurrencyException ex)
-                {
-                    if (backoffContext == null)
-                        backoffContext = new ExponentialBackoff(retryTimeout);
-
-                    if (!backoffContext.CanRetry)
-                        throw new TimeoutException(Exceptions.UnresolvedConcurrencyConflict.FormatWith(context), ex);
-
-                    Log.WarnFormat("Concurrency conflict: {0}", context);
-                    backoffContext.WaitUntilRetry();
-                }
-            } while (!done);
+                foreach (var sagaCommand in sagaContext.GetPublishedCommands())
+                    commandPublisher.Publish(sagaCommand.AggregateId, sagaCommand.Command, sagaCommand.Headers);
+            }
         }
 
         /// <summary>

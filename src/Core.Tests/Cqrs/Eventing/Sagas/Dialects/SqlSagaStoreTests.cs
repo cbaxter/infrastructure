@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Moq;
 using Spark;
+using Spark.Configuration;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
 using Spark.Data;
 using Spark.Serialization;
+using Test.Spark.Configuration;
 using Test.Spark.Data;
 using Xunit;
 
@@ -32,19 +36,18 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
     {
         public abstract class UsingInitializedSagaStore : IDisposable
         {
+            protected readonly Mock<ILocateTypes> TypeLocator = new Mock<ILocateTypes>();
             protected readonly SagaContext SagaContext;
             protected readonly IStoreSagas SagaStore;
             protected readonly Guid SagaId;
 
             protected UsingInitializedSagaStore()
             {
-                var typeLocator = new Mock<ILocateTypes>();
-
-                typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(FakeSaga) });
-
                 SagaId = GuidStrategy.NewGuid();
                 SagaContext = new SagaContext(typeof(FakeSaga), SagaId, new FakeEvent());
-                SagaStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), typeLocator.Object);
+                TypeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(FakeSaga) });
+                SagaStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), TypeLocator.Object);
+                SagaStore.Purge();
             }
 
             public void Dispose()
@@ -187,8 +190,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), TypeId = Guid.Empty, Version = 0, Timeout = timeout };
 
                 SagaStore.Save(saga, SagaContext);
-                
-                Assert.Throws<KeyNotFoundException>(() =>  SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)));
+
+                Assert.Throws<KeyNotFoundException>(() => SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)));
             }
         }
 

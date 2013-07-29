@@ -67,6 +67,33 @@ namespace Test.Spark.Cqrs.Eventing
                 Assert.True(eventHandler1.Handled);
                 Assert.True(eventHandler2.Handled);
             }
+
+            [Fact]
+            public void CanTolerateTransientExceptions()
+            {
+                var execution = 0;
+                var e = new FakeEvent();
+                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { if (++execution == 1) { throw new InvalidOperationException(); } }, () => new Object());
+                var envelope = new EventEnvelope(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), new EventVersion(1, 1, 1), e);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
+
+                HandlerRegistry.Setup(mock => mock.GetHandlersFor(e)).Returns(new EventHandler[] { eventHandler });
+
+                Processor.Process(message);
+            }
+
+            [Fact]
+            public void WillTimeoutEventuallyIfCannotExecuteHandler()
+            {
+                var e = new FakeEvent();
+                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { throw new InvalidOperationException(); }, () => new Object());
+                var envelope = new EventEnvelope(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), new EventVersion(1, 1, 1), e);
+                var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
+
+                HandlerRegistry.Setup(mock => mock.GetHandlersFor(e)).Returns(new EventHandler[] { eventHandler });
+                
+                Assert.Throws<TimeoutException>(() => Processor.Process(message));
+            }
         }
 
         private class FakeEventHandler : EventHandler
@@ -79,6 +106,7 @@ namespace Test.Spark.Cqrs.Eventing
 
             public override void Handle(EventContext context)
             {
+                Executor(this, context.Event);
                 Handled = true;
             }
         }

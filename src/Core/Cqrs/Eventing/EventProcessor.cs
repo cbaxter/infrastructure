@@ -91,8 +91,40 @@ namespace Spark.Cqrs.Eventing
                 var eventHandlers = eventHandlerRegistry.GetHandlersFor(envelope.Event);
 
                 foreach (var eventHandler in eventHandlers)
-                    eventHandler.Handle(context);
+                    ExecuteHandler(eventHandler, context);
             }
+        }
+
+        /// <summary>
+        /// Process the received <see cref="Event"/> using the specified <paramref name="eventHandler"/>.
+        /// </summary>
+        /// <param name="eventHandler">The <see cref="EventHandler"/> to be executed.</param>
+        /// <param name="context">The underlying <see cref="EventContext"/> to use when executing the specified <paramref name="eventHandler"/>.</param>
+        private void ExecuteHandler(EventHandler eventHandler, EventContext context)
+        {
+            var backoffContext = default(ExponentialBackoff);
+            var done = false;
+
+            do
+            {
+                try
+                {
+                    eventHandler.Handle(context);
+
+                    done = true;
+                }
+                catch (Exception ex)
+                {
+                    if (backoffContext == null)
+                        backoffContext = new ExponentialBackoff(retryTimeout);
+
+                    if (!backoffContext.CanRetry)
+                        throw new TimeoutException(ex.Message, ex);
+
+                    Log.WarnFormat(ex.Message);
+                    backoffContext.WaitUntilRetry();
+                }
+            } while (!done);
         }
     }
 }

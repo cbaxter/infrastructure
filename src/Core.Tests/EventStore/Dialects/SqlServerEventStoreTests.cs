@@ -38,6 +38,7 @@ namespace Test.Spark.EventStore.Dialects
             internal UsingInitializedEventStore()
             {
                 EventStore = new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings());
+                EventStore.Purge();
             }
 
             public void Dispose()

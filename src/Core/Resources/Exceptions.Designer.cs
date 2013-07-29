@@ -547,6 +547,17 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The saga save operation has timed out.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaSaveTimeout {
+            get {
+                return ResourceManager.GetString("SagaSaveTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A saga timeout has already been scheduled; clear or reschedule existing timeout.
         ///Saga Type: {0}
         ///Saga Id: {1}.

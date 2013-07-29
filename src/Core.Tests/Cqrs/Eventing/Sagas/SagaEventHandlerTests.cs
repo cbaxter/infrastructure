@@ -93,33 +93,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
                 CommandPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<CommandEnvelope>()), Times.Never());
             }
-
-            [Fact]
-            public void ReloadSagaOnConcurrencyException()
-            {
-                var save = 0;
-                var saga = new FakeSaga();
-                var loadedSaga = default(Saga);
-
-                SagaStore.Setup(mock => mock.CreateSaga(typeof(FakeSaga), SagaId)).Returns(saga);
-                SagaStore.Setup(mock => mock.Save(saga, It.IsAny<SagaContext>())).Callback(() => { if (++save == 1) throw new ConcurrencyException(); });
-
-                SagaEventHandler.Handle(EventContext);
-
-                SagaStore.Verify(mock => mock.TryGetSaga(typeof(FakeSaga), SagaId, out loadedSaga), Times.Exactly(2));
-            }
-
-            [Fact]
-            public void WillTimeoutEventuallyIfCannotSave()
-            {
-                var saga = new FakeSaga();
-                var sagaEventHandler = new SagaEventHandler(EventHandler, SagaMetadata, SagaStore.Object, CommandPublisher.Object, new EventProcessorSettings());
-                
-                SagaStore.Setup(mock => mock.CreateSaga(typeof(FakeSaga), SagaId)).Returns(saga);
-                SagaStore.Setup(mock => mock.Save(saga, It.IsAny<SagaContext>())).Callback(() => { throw new ConcurrencyException(); });
-
-                Assert.Throws<TimeoutException>(() => sagaEventHandler.Handle(EventContext));
-            }
         }
 
         private class FakeSaga : Saga

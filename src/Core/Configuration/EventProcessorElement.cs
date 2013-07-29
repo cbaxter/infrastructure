@@ -34,7 +34,7 @@ namespace Spark.Configuration
         Int32 MaximumConcurrencyLevel { get; }
 
         /// <summary>
-        /// The maximum amount of time to spend trying to process an event (default 00:00:10).
+        /// The maximum amount of time to spend trying to execute an event handler (default 00:00:10).
         /// </summary>
         TimeSpan RetryTimeout { get; }
     }

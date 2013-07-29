@@ -47,7 +47,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         /// <param name="saga">The current saga version for which the context applies.</param>
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
-        void Save(Saga saga, SagaContext context);
+        Saga Save(Saga saga, SagaContext context);
         
         /// <summary>
         /// Deletes all existing sagas from the saga store.
