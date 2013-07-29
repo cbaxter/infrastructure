@@ -98,6 +98,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             var configuration = new SagaConfiguration(GetType());
 
+            configuration.CanHandle((Timeout e) => e.CorrelationId);
+
             Configure(configuration);
 
             return configuration.GetMetadata();
@@ -258,7 +260,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         private static IEnumerable<Header> GetUserHeadersFromEventContext()
         {
             var context = EventContext.Current;
-            if(context == null)
+            if (context == null)
                 throw new InvalidOperationException(Exceptions.NoEventContext);
 
             var value = String.Empty;
@@ -285,11 +287,17 @@ namespace Spark.Cqrs.Eventing.Sagas
 
 
         /* CLEANUP STILL REQUIRED */
-        protected void Handle(Object e)
+        [HandleMethod]
+        public void Handle(Timeout e)
         {
-            ClearTimeout(); //TODO: If timeout stored with saga, need to ensure current timeout cleared when timeout handled.
-
-            //TODO: Call some other virtual method for actual processing... 
+            if (Timeout.HasValue && Timeout.Value == e.Scheduled)
+            {
+                ClearTimeout();
+                OnTimeout(e);
+            }
         }
+
+        protected virtual void OnTimeout(Timeout e)
+        { }
     }
 }

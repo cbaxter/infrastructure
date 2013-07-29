@@ -84,6 +84,10 @@
     <Compile Include="Cqrs\Eventing\Sagas\Sql\ISagaStoreDialect.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeout.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\SqlSagaStore.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Timeout.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\TimeoutPublisher.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Data\DbDataRecordExtensions.cs" />
     <Compile Include="Data\DbCommandExtensions.cs" />
     <Compile Include="Data\DbBatchOperation.cs" />

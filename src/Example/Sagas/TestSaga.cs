@@ -1,4 +1,5 @@
-﻿using Spark.Cqrs.Eventing.Sagas;
+﻿using System;
+using Spark.Cqrs.Eventing.Sagas;
 using Spark.Example.Domain.Events;
 
 namespace Spark.Example.Sagas

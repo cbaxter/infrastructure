@@ -29,7 +29,7 @@ namespace Spark.Example.Modules
             builder.RegisterType<SqlSagaStoreDialect>().As<ISagaStoreDialect>().SingleInstance();
             builder.RegisterType<SqlSagaStore>().Named<IStoreSagas>("SagaStore").SingleInstance();
 
-            builder.Register(container => new TimeoutPipelineHook(container.ResolveNamed<IStoreSagas>("SagaStore"))).As<PipelineHook>().SingleInstance();
+            builder.Register(container => new TimeoutPublisher(container.ResolveNamed<IStoreSagas>("SagaStore"), container.Resolve<IPublishEvents>())).As<PipelineHook>().SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "SagaStore").Named<IStoreSagas>("CachedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new HookableSagaStore(sagaStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedSagaStore").As<IStoreSagas>().SingleInstance();
         }
