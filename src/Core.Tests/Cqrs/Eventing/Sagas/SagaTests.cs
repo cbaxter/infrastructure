@@ -105,29 +105,45 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void CanScheduleTimeoutIfNotScheduled()
             {
                 var saga = new FakeSaga();
+                var e = new FakeEvent();
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.NotNull(saga.Timeout);
+                    Assert.NotNull(saga.Timeout);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             [Fact]
             public void TimeoutRepresentedAsUtcDateTime()
             {
                 var saga = new FakeSaga();
+                var e = new FakeEvent();
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.Equal(DateTimeKind.Utc, saga.Timeout.GetValueOrDefault().Kind);
+                    Assert.Equal(DateTimeKind.Utc, saga.Timeout.GetValueOrDefault().Kind);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             [Fact]
             public void CannotScheduleTimeoutIfAlreadyScheduled()
             {
                 var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), Timeout = SystemTime.Now };
-                var ex = Assert.Throws<InvalidOperationException>(() => saga.Handle(new FakeEvent()));
+                var e = new FakeEvent();
 
-                Assert.Equal(Exceptions.SagaTimeoutAlreadyScheduled.FormatWith(saga.GetType(), saga.CorrelationId), ex.Message);
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    var ex = Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
+
+                    Assert.Equal(Exceptions.SagaTimeoutAlreadyScheduled.FormatWith(saga.GetType(), saga.CorrelationId), ex.Message);
+                    Assert.False(context.TimeoutChanged);
+                }
             }
 
             private class FakeSaga : Saga
@@ -150,10 +166,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void WillConvertDateTimeToUtcIfUnknown()
             {
                 var saga = new FakeSaga();
+                var e = new FakeEvent();
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.Equal(DateTimeKind.Utc, saga.Timeout.GetValueOrDefault().Kind);
+                    Assert.Equal(DateTimeKind.Utc, saga.Timeout.GetValueOrDefault().Kind);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             private class FakeSaga : Saga
@@ -176,10 +197,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void CanClearTimeoutIfScheduled()
             {
                 var saga = new FakeSaga { Timeout = SystemTime.Now };
+                var e = new FakeEvent();
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.Null(saga.Timeout);
+                    Assert.Null(saga.Timeout);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             [Fact]
@@ -210,22 +236,32 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void CanRescheduleIfTimeoutAlreadyScheduled()
             {
+                var e = new FakeEvent();
                 var timeout = SystemTime.Now;
                 var saga = new FakeSaga { Timeout = timeout };
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.NotEqual(timeout, saga.Timeout);
+                    Assert.NotEqual(timeout, saga.Timeout);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             [Fact]
             public void CanRescheduleIfTimeoutNotAlreadyScheduled()
             {
+                var e = new FakeEvent();
                 var saga = new FakeSaga { Timeout = null };
 
-                saga.Handle(new FakeEvent());
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
 
-                Assert.NotNull(saga.Timeout);
+                    Assert.NotNull(saga.Timeout);
+                    Assert.True(context.TimeoutChanged);
+                }
             }
 
             private class FakeSaga : Saga
