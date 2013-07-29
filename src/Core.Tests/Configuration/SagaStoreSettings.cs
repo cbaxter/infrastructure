@@ -19,12 +19,12 @@ namespace Test.Spark.Configuration
     public sealed class SagaStoreSettings : IStoreSagaSettings
     {
         public TimeSpan CacheSlidingExpiration { get; set; }
-        public TimeSpan SaveRetryTimeout { get; set; }
+        public TimeSpan TimeoutCacheDuration { get; set; }
 
         public SagaStoreSettings()
         {
             CacheSlidingExpiration = TimeSpan.FromMinutes(1);
-            SaveRetryTimeout = TimeSpan.FromMilliseconds(100);
+            TimeoutCacheDuration = TimeSpan.FromMilliseconds(100);
         }
     }
 }

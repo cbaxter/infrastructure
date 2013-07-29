@@ -23,14 +23,22 @@ namespace Spark.Configuration
     internal interface IStoreSagaSettings
     {
         /// <summary>
-        /// The maximum amount of time an aggregate will remain cached if not accessed.
+        /// The maximum amount of time a saga will remain cached if not accessed (default = <value>00:10:00</value>).
         /// </summary>
         TimeSpan CacheSlidingExpiration { get; }
+
+        /// <summary>
+        /// The saga timeout cache duration (default = <value>00:15:00</value>).
+        /// </summary>
+        TimeSpan TimeoutCacheDuration { get; }
     }
 
     internal sealed class SagaStoreElement : ConfigurationElement, IStoreSagaSettings
     {
         [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
         public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
+
+        [ConfigurationProperty("timeoutCacheDuration", IsRequired = false, DefaultValue = "00:15:00")]
+        public TimeSpan TimeoutCacheDuration { get { return (TimeSpan)base["timeoutCacheDuration"]; } }
     }
 }

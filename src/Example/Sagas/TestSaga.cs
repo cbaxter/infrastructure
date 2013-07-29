@@ -15,7 +15,7 @@ namespace Spark.Example.Sagas
 
         public void Handle(ClientRegistered e)
         {
-
+            ScheduleTimeout(TimeSpan.FromMilliseconds(10));
         }
 
         public void Handle(ThrowAwayEvent1 e)
@@ -24,6 +24,11 @@ namespace Spark.Example.Sagas
         }
 
         public void Handle(ThrowAwayEvent2 e)
+        {
+            //MarkCompleted();
+        }
+
+        protected override void OnTimeout(Timeout e)
         {
             MarkCompleted();
         }

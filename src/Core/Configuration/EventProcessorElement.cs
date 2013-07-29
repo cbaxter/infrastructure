@@ -24,17 +24,17 @@ namespace Spark.Configuration
     internal interface IProcessEventSettings
     {
         /// <summary>
-        /// The bounded capacity associated with the <see cref="EventProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 1000).
+        /// The bounded capacity associated with the <see cref="EventProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default = <value>1000</value>).
         /// </summary>
         Int32 BoundedCapacity { get; }
         
         /// <summary>
-        /// The maximum concurrency level associated with the <see cref="EventProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default 47).
+        /// The maximum concurrency level associated with the <see cref="EventProcessor"/>'s <see cref="PartitionedTaskScheduler"/> (default = <value>47</value>).
         /// </summary>
         Int32 MaximumConcurrencyLevel { get; }
 
         /// <summary>
-        /// The maximum amount of time to spend trying to execute an event handler (default 00:00:10).
+        /// The maximum amount of time to spend trying to execute an event handler (default = <value>00:00:10</value>).
         /// </summary>
         TimeSpan RetryTimeout { get; }
     }

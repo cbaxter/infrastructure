@@ -20,7 +20,7 @@ using Spark.Logging;
 namespace Spark.Cqrs.Eventing
 {
     /// <summary>
-    /// An <see cref="HookableAggregateStore"/> pipeline hook used to dispatch events after successfully commited to the underlying data store.
+    /// A <see cref="HookableAggregateStore"/> pipeline hook used to dispatch events after successfully commited to the underlying data store.
     /// </summary>
     public sealed class EventDispatcher : PipelineHook
     {

@@ -7,6 +7,7 @@ using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
+using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
@@ -55,8 +56,10 @@ namespace Example
 
             benchmarkHook.WaitForCommandDrain();
 
-            ((SqlEventStore)container.Resolve<IStoreEvents>()).Dispose();
             ((SqlSnapshotStore)container.Resolve<IStoreSnapshots>()).Dispose();
+            ((SqlEventStore)container.Resolve<IStoreEvents>()).Dispose();
+            (container.Resolve<IStoreSagas>()).Dispose();
+
             ((IDisposable)container.Resolve<IReceiveMessages<EventEnvelope>>()).Dispose();
             container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
         }

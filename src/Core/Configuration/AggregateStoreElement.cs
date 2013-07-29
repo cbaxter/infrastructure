@@ -23,17 +23,17 @@ namespace Spark.Configuration
     internal interface IStoreAggregateSettings
     {
         /// <summary>
-        /// The maximum amount of time an aggregate will remain cached if not accessed.
+        /// The maximum amount of time an aggregate will remain cached if not accessed (default = <value>00:10:00</value>).
         /// </summary>
         TimeSpan CacheSlidingExpiration { get; }
 
         /// <summary>
-        /// The maximum amount of time to spend trying to save a commit (default 00:00:10).
+        /// The maximum amount of time to spend trying to save a commit (default = <value>00:00:10</value>).
         /// </summary>
         TimeSpan SaveRetryTimeout { get; }
 
         /// <summary>
-        /// The number of aggregate versions between snapshots (default 100).
+        /// The number of aggregate versions between snapshots (default = <value>100</value>).
         /// </summary>
         Int32 SnapshotInterval { get; }
     }
