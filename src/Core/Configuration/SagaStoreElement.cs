@@ -26,19 +26,11 @@ namespace Spark.Configuration
         /// The maximum amount of time an aggregate will remain cached if not accessed.
         /// </summary>
         TimeSpan CacheSlidingExpiration { get; }
-
-        /// <summary>
-        /// The maximum amount of time to spend trying to save a commit (default 00:00:10).
-        /// </summary>
-        TimeSpan SaveRetryTimeout { get; }
     }
 
     internal sealed class SagaStoreElement : ConfigurationElement, IStoreSagaSettings
     {
         [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
         public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
-
-        [ConfigurationProperty("saveRetryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
-        public TimeSpan SaveRetryTimeout { get { return (TimeSpan)base["saveRetryTimeout"]; } }
     }
 }

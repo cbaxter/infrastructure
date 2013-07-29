@@ -1,10 +1,6 @@
-﻿using System;
-using Spark.Configuration;
+﻿using Spark.Configuration;
 using Spark.Cqrs.Commanding;
-using Spark.Data;
 using Spark.Logging;
-using Spark.Resources;
-using Spark.Threading;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -30,7 +26,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         private readonly IPublishCommands commandPublisher;
         private readonly SagaMetadata sagaMetadata;
         private readonly IStoreSagas sagaStore;
-        private readonly TimeSpan retryTimeout;
 
         /// <summary>
         /// Initializes a new instance of <see cref="SagaEventHandler"/>.
@@ -62,7 +57,6 @@ namespace Spark.Cqrs.Eventing.Sagas
             this.sagaStore = sagaStore;
             this.sagaMetadata = sagaMetadata;
             this.commandPublisher = commandPublisher;
-            this.retryTimeout = settings.SaveRetryTimeout;
         }
 
         /// <summary>

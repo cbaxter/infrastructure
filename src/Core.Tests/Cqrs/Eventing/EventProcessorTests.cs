@@ -90,6 +90,8 @@ namespace Test.Spark.Cqrs.Eventing
                 var envelope = new EventEnvelope(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), new EventVersion(1, 1, 1), e);
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
 
+                SystemTime.ClearOverride();
+
                 HandlerRegistry.Setup(mock => mock.GetHandlersFor(e)).Returns(new EventHandler[] { eventHandler });
                 
                 Assert.Throws<TimeoutException>(() => Processor.Process(message));

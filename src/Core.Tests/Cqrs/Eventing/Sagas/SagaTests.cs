@@ -418,7 +418,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 using (new EventContext(e.Id, headers, e))
                 using (var sagaContext = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
                 {
-                    saga.Handle(new FakeEvent { CustomHeaders = new[] { new Header(Header.UserName, customUserName, checkReservedNames: false) }});
+                    saga.Handle(new FakeEvent { CustomHeaders = new[] { new Header(Header.UserName, customUserName, checkReservedNames: false) } });
 
                     Assert.Equal(customUserName, sagaContext.GetPublishedCommands().Single().Headers.Single().Value);
                 }
@@ -443,7 +443,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 public Header[] CustomHeaders { get; set; }
             }
         }
-        
+
         public class WhenPublishingCommandWithEnumerableHeaders
         {
             [Fact]
