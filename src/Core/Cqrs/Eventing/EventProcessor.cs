@@ -115,14 +115,9 @@ namespace Spark.Cqrs.Eventing
                 }
                 catch (Exception ex)
                 {
-                    if (backoffContext == null)
-                        backoffContext = new ExponentialBackoff(retryTimeout);
-
-                    if (!backoffContext.CanRetry)
-                        throw new TimeoutException(ex.Message, ex);
-
+                    backoffContext = backoffContext ?? new ExponentialBackoff(retryTimeout);
+                    backoffContext.WaitOrTimeout(ex);
                     Log.WarnFormat(ex.Message);
-                    backoffContext.WaitUntilRetry();
                 }
             } while (!done);
         }

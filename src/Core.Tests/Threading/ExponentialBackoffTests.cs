@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Spark;
 using Spark.Threading;
 using Xunit;
@@ -48,7 +49,7 @@ namespace Test.Spark.Threading
                 Assert.False(backoff.CanRetry);
             }
         }
-        
+
         public class WhenWaitingUntilRetry
         {
             [Fact]
@@ -57,7 +58,7 @@ namespace Test.Spark.Threading
                 SystemTime.ClearOverride();
 
                 var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(100));
-             
+
                 Assert.Equal(TimeSpan.Zero, backoff.WaitUntilRetry());
             }
 
@@ -70,7 +71,7 @@ namespace Test.Spark.Threading
 
                 backoff.WaitUntilRetry();
 
-                Assert.NotEqual(TimeSpan.Zero, backoff.WaitUntilRetry());  
+                Assert.NotEqual(TimeSpan.Zero, backoff.WaitUntilRetry());
             }
 
             [Fact]
@@ -82,7 +83,7 @@ namespace Test.Spark.Threading
 
                 backoff.WaitUntilRetry();
 
-                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));  
+                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));
             }
 
             [Fact]
@@ -94,7 +95,32 @@ namespace Test.Spark.Threading
 
                 backoff.WaitUntilRetry();
 
-                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));  
+                Assert.InRange(backoff.WaitUntilRetry(), TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(5));
+            }
+        }
+
+        public class WhenWaitOrTimeout
+        {
+            [Fact]
+            public void WaitIfCanRetry()
+            {
+                SystemTime.ClearOverride();
+
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(100));
+
+                Assert.DoesNotThrow(() => backoff.WaitOrTimeout(new Exception()));
+            }
+
+            [Fact]
+            public void TimeoutIfCannotRetry()
+            {
+                SystemTime.ClearOverride();
+
+                var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(1));
+
+                Thread.Sleep(20);
+
+                Assert.Throws<TimeoutException>(() => backoff.WaitOrTimeout(new Exception()));
             }
         }
     }

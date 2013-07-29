@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -58,6 +59,9 @@ namespace Spark.Threading
         {
             var result = wait;
 
+            if(!CanRetry)
+                throw new TimeoutException();
+
             if (wait == TimeSpan.Zero)
             {
                 wait = TimeSpan.FromMilliseconds(5);
@@ -72,11 +76,23 @@ namespace Spark.Threading
                 if (wait > timeRemaining)
                     wait = timeRemaining;
 
-                if(wait > TimeSpan.Zero)
+                if (wait > TimeSpan.Zero)
                     Thread.Sleep(wait);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Blocks the current thread until the next retry attempt should be made or throws a <see cref="TimeoutException"/> if unable to retry.
+        /// </summary>
+        /// <param name="innerException">The <see cref="TimeoutException"/> inner exception if an exception is thrown.</param>
+        public void WaitOrTimeout(Exception innerException)
+        {
+            if (!CanRetry)
+                throw new TimeoutException(Exceptions.OperationTimeout, innerException);
+            
+            WaitUntilRetry();
         }
     }
 }

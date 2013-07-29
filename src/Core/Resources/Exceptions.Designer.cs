@@ -447,6 +447,15 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The operation has timed out..
+        /// </summary>
+        internal static string OperationTimeout {
+            get {
+                return ResourceManager.GetString("OperationTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum page size of {0} has been exceeded..
         /// </summary>
         internal static string PageSizeExceeded {

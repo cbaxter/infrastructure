@@ -139,10 +139,11 @@ namespace Spark.Cqrs.Eventing.Sagas
             const Int64 minimumInterval = 100;
             const Int64 maximumInterval = 60000;
             var nextTimeout = scheduledSagaTimeouts.Count > 0 ? sortedSagaTimeouts.First().Key : maximumCachedTimeout;
-            var dueTime = Math.Min(maximumInterval, Math.Max(nextTimeout.Subtract(SystemTime.Now).Ticks / TimeSpan.TicksPerMillisecond, minimumInterval));
 
             if (nextTimeout < scheduledTimeout && !disposed)
             {
+                var dueTime = Math.Min(maximumInterval, Math.Max(nextTimeout.Subtract(SystemTime.Now).Ticks / TimeSpan.TicksPerMillisecond, minimumInterval));
+
                 scheduledTimeout = nextTimeout;
                 timer.Change(dueTime, System.Threading.Timeout.Infinite);
             }

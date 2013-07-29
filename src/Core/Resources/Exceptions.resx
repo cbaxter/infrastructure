@@ -269,6 +269,9 @@ Actual Version: {1}</value>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="OperationTimeout" xml:space="preserve">
+    <value>The operation has timed out.</value>
+  </data>
   <data name="PageSizeExceeded" xml:space="preserve">
     <value>Maximum page size of {0} has been exceeded.</value>
   </data>
