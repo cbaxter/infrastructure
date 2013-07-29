@@ -174,6 +174,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
 
             Timeout = null;
+            FlagTimeoutChangedOnSagaContext();
             Log.Trace("Timeout cleared");
         }
 
@@ -197,8 +198,9 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (timeout.Kind != DateTimeKind.Utc)
                 timeout = timeout.ToUniversalTime();
-
+            
             Timeout = timeout;
+            FlagTimeoutChangedOnSagaContext();
             Log.TraceFormat("Timeout scheduled for {0}", timeout);
         }
 
@@ -221,6 +223,18 @@ namespace Spark.Cqrs.Eventing.Sagas
                 ClearTimeout();
 
             ScheduleTimeout(timeout);
+        }
+
+        /// <summary>
+        /// Update the saga context to reflect that the saga timeout has changed.
+        /// </summary>
+        private void FlagTimeoutChangedOnSagaContext()
+        {
+            var context = SagaContext.Current;
+            if (context == null)
+                throw new InvalidOperationException(Exceptions.NoSagaContext);
+
+            context.TimeoutChanged = true;
         }
 
         /// <summary>

@@ -53,6 +53,11 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Type SagaType { get { return sagaType; } }
 
         /// <summary>
+        /// The underlying saga <see cref="Type"/> associated with this <see cref="SagaContext"/>.
+        /// </summary>
+        public Boolean TimeoutChanged { get; internal set; }
+
+        /// <summary>
         /// The <see cref="Event"/> associated with this <see cref="SagaContext"/>.
         /// </summary>
         public Event Event { get { return @event; } }

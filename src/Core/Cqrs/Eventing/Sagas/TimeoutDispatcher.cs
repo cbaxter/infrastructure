@@ -34,6 +34,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         private readonly TimeSpan timeoutCacheDuration;
         private DateTime maximumCachedTimeout;
         private Boolean suppressReschedule;
+        private DateTime scheduledTimeout;
         private Boolean disposed;
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="settings">The saga store settings.</param>
         internal TimeoutDispatcher(IStoreSagas sagaStore, IPublishEvents eventPublisher, IStoreSagaSettings settings)
         {
+            Verify.NotNull(settings, "settings");
             Verify.NotNull(sagaStore, "sagaStore");
             Verify.NotNull(eventPublisher, "eventPublisher");
 
@@ -87,7 +89,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="error">The <see cref="Exception"/> thrown if the save was unsuccessful; otherwise <value>null</value>.</param>
         public override void PostSave(Saga saga, SagaContext context, Exception error)
         {
-            if (saga == null || error != null)
+            if (!context.TimeoutChanged || saga == null || error != null)
                 return;
 
             lock (syncLock)
@@ -139,8 +141,11 @@ namespace Spark.Cqrs.Eventing.Sagas
             var nextTimeout = scheduledSagaTimeouts.Count > 0 ? sortedSagaTimeouts.First().Key : maximumCachedTimeout;
             var dueTime = Math.Min(maximumInterval, Math.Max(nextTimeout.Subtract(SystemTime.Now).Ticks / TimeSpan.TicksPerMillisecond, minimumInterval));
 
-            if(!disposed)
+            if (nextTimeout < scheduledTimeout && !disposed)
+            {
+                scheduledTimeout = nextTimeout;
                 timer.Change(dueTime, System.Threading.Timeout.Infinite);
+            }
         }
 
         /// <summary>
