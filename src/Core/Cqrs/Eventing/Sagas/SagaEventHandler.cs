@@ -72,7 +72,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public override void Handle(EventContext context)
         {
             var sagaId = sagaMetadata.GetCorrelationId(context.Event);
-    
+
             using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
             {
                 UpdateSaga(sagaContext);
@@ -93,6 +93,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             var e = context.Event;
 
             using (Saga.AquireLock(sagaType, sagaId))
+            using (Log.PushContext("Saga", new SagaReference(sagaType, sagaId)))
             {
                 Saga saga;
                 if (!sagaStore.TryGetSaga(sagaType, sagaId, out saga) && sagaMetadata.CanStartWith(e.GetType()))

@@ -29,7 +29,7 @@ namespace Spark.Cqrs.Commanding
     public sealed class CommandHandlerRegistry : IRetrieveCommandHandlers
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly Dictionary<Type, CommandHandler> knownCommandHandlers;
+        private readonly IReadOnlyDictionary<Type, CommandHandler> knownCommandHandlers;
 
         /// <summary>
         /// Initializes a new instance of <see cref="CommandHandlerRegistry"/> with the specified <paramref name="typeLocator"/> and <paramref name="serviceProvider"/>.

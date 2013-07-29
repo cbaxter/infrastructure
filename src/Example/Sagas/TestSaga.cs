@@ -15,7 +15,7 @@ namespace Spark.Example.Sagas
 
         public void Handle(ClientRegistered e)
         {
-            
+
         }
 
         public void Handle(ThrowAwayEvent1 e)

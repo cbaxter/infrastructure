@@ -61,7 +61,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                             return;
 
                         var eventVersion = new EventVersion(sagaTimeout.Version, 1, 1);
-                        var e = new Timeout(sagaTimeout.Timeout);
+                        var e = new Timeout(sagaTimeout.SagaType, sagaTimeout.Timeout);
 
                         eventPublisher.Publish(HeaderCollection.Empty, new EventEnvelope(GuidStrategy.NewGuid(), sagaReference.SagaId, eventVersion, e));
                         publishedReferences.Add(sagaReference);

@@ -31,7 +31,8 @@ namespace Spark.Cqrs.Eventing
     public sealed class EventHandlerRegistry : IRetrieveEventHandlers
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly IDictionary<Type, EventHandler[]> knownEventHandlers;
+        private readonly IReadOnlyDictionary<Type, EventHandler[]> knownEventHandlers;
+        private readonly IReadOnlyDictionary<Type, EventHandler[]> knownSagaTimeoutHandlers;
 
         /// <summary>
         /// Initializes a new instance of <see cref="EventHandlerRegistry"/> with the specified <paramref name="typeLocator"/> and <paramref name="serviceProvider"/>.
@@ -48,6 +49,11 @@ namespace Spark.Cqrs.Eventing
             Verify.NotNull(commandPublisher, "commandPublisher");
 
             knownEventHandlers = DiscoverEventHandlers(typeLocator, serviceProvider, sagaStore, commandPublisher);
+            knownSagaTimeoutHandlers = knownEventHandlers.Where(item => typeof(Timeout).IsAssignableFrom(item.Key))
+                                                         .SelectMany(item => item.Value)
+                                                         .OfType<SagaEventHandler>()
+                                                         .Distinct(item => item.HandlerType)
+                                                         .ToDictionary(item => item.HandlerType, item => new EventHandler[] { item });
         }
 
         /// <summary>
@@ -166,13 +172,11 @@ namespace Spark.Cqrs.Eventing
             Verify.NotNull(e, "e");
 
             EventHandler[] eventHandlers;
-            if (!knownEventHandlers.TryGetValue(e.GetType(), out eventHandlers))
-                return Enumerable.Empty<EventHandler>();
+            Timeout timeout = e as Timeout;
+            if (timeout != null && knownSagaTimeoutHandlers.TryGetValue(timeout.SagaType, out eventHandlers))
+                return eventHandlers;
 
-            //TODO: If event is SagaTimeout (derive from Timeout to hide naming?)... grab handlers for type, but filter by saga type such that only one handler is returned.
-            //      May even go so far as to have a secondary map of saga to timeout to allow it to be O(1) lookup for sagatimeout to saga map.
-
-            return eventHandlers;
+            return knownEventHandlers.TryGetValue(e.GetType(), out eventHandlers) ? eventHandlers : Enumerable.Empty<EventHandler>();
         }
     }
 }

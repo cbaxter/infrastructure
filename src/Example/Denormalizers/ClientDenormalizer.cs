@@ -7,8 +7,6 @@ namespace Spark.Example.Denormalizers
     public sealed class ClientDenormalizer
     {
         public void Handle(ClientRegistered e)
-        {
-            //TODO: Implement
-        }
+        { }
     }
 }

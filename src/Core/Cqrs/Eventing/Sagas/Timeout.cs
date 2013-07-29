@@ -23,7 +23,12 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// The saga correlation identifier associated with this saga timeout event.
         /// </summary>
-        public Guid CorrelationId { get { return AggregateId; } }
+        public Guid SagaId { get { return AggregateId; } }
+
+        /// <summary>
+        /// The saga type associated with this saga timeout event.
+        /// </summary>
+        public Type SagaType { get; private set; }
 
         /// <summary>
         /// The date/time of when the scheduled timeout occurred.
@@ -36,9 +41,13 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Initializes a new instance of <see cref="Timeout"/>.
         /// </summary>
-        /// <param name="scheduled"></param>
-        public Timeout(DateTime scheduled)
+        /// <param name="sagaType">The saga type associated with this timeout instance.</param>
+        /// <param name="scheduled">The date/time of when the scheduled timeout occurred.</param>
+        public Timeout(Type sagaType, DateTime scheduled)
         {
+            Verify.NotNull(sagaType, "sagaType");
+
+            this.SagaType = sagaType;
             this.Scheduled = scheduled;
         }
     }

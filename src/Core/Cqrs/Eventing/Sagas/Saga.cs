@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing.Mappings;
+using Spark.Logging;
 using Spark.Messaging;
 using Spark.Resources;
 
@@ -29,6 +30,8 @@ namespace Spark.Cqrs.Eventing.Sagas
     [Serializable, EventHandler(IsReusable = false)]
     public abstract class Saga : StateObject
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The saga correlation identifier associated with this saga instance.
         /// </summary>
@@ -98,7 +101,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             var configuration = new SagaConfiguration(GetType());
 
-            configuration.CanHandle((Timeout e) => e.CorrelationId);
+            configuration.CanHandle((Timeout e) => e.SagaId);
 
             Configure(configuration);
 
@@ -129,7 +132,11 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             var sagaLock = new SagaLock(sagaType, sagaId);
 
+            Log.TraceFormat("Aquiring saga lock {0} - {1}", sagaType, sagaId);
+
             sagaLock.Aquire();
+
+            Log.TraceFormat("Saga lock {0} - {1} aquired", sagaType, sagaId);
 
             return sagaLock;
         }
@@ -142,7 +149,11 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             Verify.NotNull(token, "token");
 
+            Log.TraceFormat("Releasing saga lock {0} - {1}", token.SagaType, token.SagaId);
+
             token.Release();
+
+            Log.TraceFormat("Saga lock {0} - {1} released", token.SagaType, token.SagaId);
         }
 
         /// <summary>
@@ -151,6 +162,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         protected void MarkCompleted()
         {
             Completed = true;
+            Log.Trace("Saga completed");
         }
 
         /// <summary>
@@ -162,6 +174,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
 
             Timeout = null;
+            Log.Trace("Timeout cleared");
         }
 
         /// <summary>
@@ -186,6 +199,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                 timeout = timeout.ToUniversalTime();
 
             Timeout = timeout;
+            Log.TraceFormat("Timeout scheduled for {0}", timeout);
         }
 
         /// <summary>
@@ -216,11 +230,15 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="command">The command to be published.</param>
         protected void Publish(Guid aggregateId, Command command)
         {
+            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
+
             var context = SagaContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoSagaContext);
 
             context.Publish(aggregateId, GetUserHeadersFromEventContext(), command);
+
+            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>
@@ -231,12 +249,16 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="headers">The set of one or more custom message headers.</param>
         protected void Publish(Guid aggregateId, Command command, params Header[] headers)
         {
+            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
+
             var context = SagaContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoSagaContext);
 
             var baseHeaders = GetUserHeadersFromEventContext();
             context.Publish(aggregateId, headers != null && headers.Length > 0 ? headers.Concat(baseHeaders).Distinct(header => header.Name) : baseHeaders, command);
+
+            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>
@@ -247,11 +269,15 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="headers">The set of message headers associated with the command.</param>
         protected void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers)
         {
+            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
+
             var context = SagaContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoSagaContext);
 
             context.Publish(aggregateId, (headers ?? Enumerable.Empty<Header>()).Concat(GetUserHeadersFromEventContext()).Distinct(header => header.Name), command);
+
+            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>
@@ -277,16 +303,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Returns the saga description for this instance.
+        /// Handle saga timeout.
         /// </summary>
-        public override string ToString()
-        {
-            return String.Format("{0} - {1}", GetType(), CorrelationId);
-        }
-
-
-
-        /* CLEANUP STILL REQUIRED */
+        /// <param name="e">The saga timeout event.</param>
         [HandleMethod]
         public void Handle(Timeout e)
         {
@@ -295,9 +314,24 @@ namespace Spark.Cqrs.Eventing.Sagas
                 ClearTimeout();
                 OnTimeout(e);
             }
+            else
+            {
+                if (Timeout.HasValue)
+                    Log.WarnFormat("Unexpected timeout received for {0} when scheduled timeout is for {1}", e, Timeout.Value);
+                else
+                    Log.WarnFormat("Unexpected timeout received for {0} when no timeout is scheduled", e);
+            }
         }
 
         protected virtual void OnTimeout(Timeout e)
         { }
+
+        /// <summary>
+        /// Returns the saga description for this instance.
+        /// </summary>
+        public override string ToString()
+        {
+            return String.Format("{0} - {1}", GetType(), CorrelationId);
+        }
     }
 }
