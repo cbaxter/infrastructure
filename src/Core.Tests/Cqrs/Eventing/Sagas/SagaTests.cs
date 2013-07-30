@@ -102,6 +102,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
         public class WhenSchedulingTimeout
         {
             [Fact]
+            public void SagaContextRequired()
+            {
+                var saga = new FakeSaga();
+                var e = new FakeEvent();
+
+                Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
+            }
+
+            [Fact]
             public void CanScheduleTimeoutIfNotScheduled()
             {
                 var saga = new FakeSaga();
@@ -163,6 +172,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
         public class WhenSchedulingExplicitTimeout
         {
             [Fact]
+            public void SagaContextRequired()
+            {
+                var saga = new FakeSaga();
+                var e = new FakeEvent();
+
+                Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
+            }
+
+            [Fact]
             public void WillConvertDateTimeToUtcIfUnknown()
             {
                 var saga = new FakeSaga();
@@ -193,6 +211,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
         public class WhenClearingTimeout
         {
+            [Fact]
+            public void SagaContextRequired()
+            {
+                var saga = new FakeSaga();
+                var e = new FakeEvent();
+
+                Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
+            }
+
             [Fact]
             public void CanClearTimeoutIfScheduled()
             {
@@ -592,6 +619,80 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 public IEnumerable<Header> CustomHeaders { get; set; }
             }
         }
+
+        public class WhenHandlingTimeout
+        {
+            [Fact]
+            public void HandleTimeoutIfTimeoutScheduledAndMatchesExpectedTimeout()
+            {
+                var timeout = DateTime.UtcNow;
+                var saga = new FakeSaga { Timeout = timeout };
+                var e = new Timeout(typeof(FakeSaga), timeout);
+
+                using (new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                    saga.Handle(e);
+
+                Assert.True(saga.TimeoutHandled);
+            }
+
+            [Fact]
+            public void ClearTimeoutIfTimeoutHandled()
+            {
+                var timeout = DateTime.UtcNow;
+                var saga = new FakeSaga { Timeout = timeout };
+                var e = new Timeout(typeof(FakeSaga), timeout);
+
+                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                {
+                    saga.Handle(e);
+
+                    Assert.True(context.TimeoutChanged);
+                    Assert.Null(saga.Timeout);
+                }
+            }
+
+            [Fact]
+            public void IgnoreIfNoTimeoutScheduled()
+            {
+                var timeout = DateTime.UtcNow;
+                var saga = new FakeSaga { Timeout = null };
+                var e = new Timeout(typeof(FakeSaga), timeout);
+
+                using (new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                    saga.Handle(e);
+
+                Assert.False(saga.TimeoutHandled);
+            }
+
+            [Fact]
+            public void IgnoreIfTimeoutDoesNotMatchScheduled()
+            {
+                var now = DateTime.UtcNow;
+                var saga = new FakeSaga { Timeout = now.AddMinutes(10) };
+                var e = new Timeout(typeof(FakeSaga), now.AddMinutes(5));
+
+                using (new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                    saga.Handle(e);
+
+                Assert.False(saga.TimeoutHandled);
+            }
+
+            private class FakeSaga : Saga
+            {
+                public Boolean TimeoutHandled { get; set; }
+
+                protected override void Configure(SagaConfiguration saga)
+                { }
+
+                protected override void OnTimeout(Timeout e)
+                {
+                    base.OnTimeout(e);
+
+                    TimeoutHandled = true;
+                }
+            }
+        }
+
         public class WhenConvertingToString
         {
             [Fact]

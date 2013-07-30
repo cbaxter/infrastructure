@@ -61,5 +61,13 @@ namespace Spark.Cqrs.Eventing.Sagas
             this.version = version;
             this.timeout = timeout;
         }
+
+        /// <summary>
+        /// Returns the <see cref="SagaTimeout"/> description for this instance.
+        /// </summary>
+        public override String ToString()
+        {
+            return String.Format("{0} - {1} @ {2}", sagaType, sagaId, timeout);
+        }
     }
 }

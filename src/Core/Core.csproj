@@ -75,6 +75,7 @@
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCache.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialect.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialectStatements.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -256,10 +257,12 @@
     <Compile Include="Threading\ISynchronizeAccess.cs" />
     <Compile Include="Threading\InlineTaskScheduler.cs" />
     <Compile Include="Threading\IQueueUserWorkItems.cs" />
+    <Compile Include="Threading\ITimer.cs" />
     <Compile Include="Threading\MonitorWrapper.cs" />
     <Compile Include="Threading\PartitionedTaskScheduler.cs" />
     <Compile Include="Threading\ThreadPoolWrapper.cs" />
     <Compile Include="MarkerAttributes.cs" />
+    <Compile Include="Threading\TimerWrapper.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLocator.cs" />
     <Compile Include="Verify.cs" />
