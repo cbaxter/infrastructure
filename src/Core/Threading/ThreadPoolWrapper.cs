@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Spark.Infrastructure.Threading
+namespace Spark.Threading
 {
     /// <summary>
     /// Provides a instance wrapper for <see cref="ThreadPool"/>.

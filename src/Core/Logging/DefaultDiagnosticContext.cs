@@ -1,10 +1,10 @@
-﻿using Spark.Infrastructure.Resources;
+﻿using Spark.Resources;
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +17,7 @@ using System.Text;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Logging
+namespace Spark.Logging
 {
     /// <summary>
     /// Diagnostic context without trace events for transfer, start and stop of logical operations.
@@ -50,20 +50,11 @@ namespace Spark.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Releases all unmanaged resources used by the current instance of the <see cref="DefaultDiagnosticContext"/> class.
-        /// </summary>
-        ~DefaultDiagnosticContext()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="DefaultDiagnosticContext"/> class.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -105,19 +96,23 @@ namespace Spark.Infrastructure.Logging
 
             if (data != null)
             {
-                var enumerable = data as IEnumerable;
-                if (enumerable == null)
+                var list = data as IList;
+                if (list == null)
                 {
-                    sb.Append(", ");
+                    sb.Append(" = ");
                     sb.Append(data);
                 }
                 else
                 {
-                    foreach (var value in enumerable)
+                    sb.Append(" = [");
+                    for (var i = 0; i < list.Count; i++)
                     {
-                        sb.Append(", ");
-                        sb.Append(value);
+                        if (i > 0)
+                            sb.Append(", ");
+
+                        sb.Append(list[i]);
                     }
+                    sb.Append("]");
                 }
             }
 
@@ -133,7 +128,7 @@ namespace Spark.Infrastructure.Logging
         /// <param name="to">The new/target activity id.</param>
         private void Transfer(Guid from, Guid to)
         {
-            if (from == to) 
+            if (from == to)
                 return;
 
             OnTransfer(@from, to);

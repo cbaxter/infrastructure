@@ -7,8 +7,8 @@
     <ProjectGuid>{CFF3E57D-1325-4E10-8E14-4898814487BE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spark.Infrastructure.Tests</RootNamespace>
-    <AssemblyName>Spark.Infrastructure.Core.Tests</AssemblyName>
+    <RootNamespace>Test.Spark</RootNamespace>
+    <AssemblyName>Spark.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -38,13 +38,18 @@
     <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.2.0.0-alpha-build1611\lib\net45\xunit.dll</HintPath>
     </Reference>
@@ -59,13 +64,79 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\AggregateStoreSettings.cs" />
+    <Compile Include="Configuration\CommandProcessorSettings.cs" />
+    <Compile Include="Configuration\SagaStoreSettings.cs" />
+    <Compile Include="Configuration\EventProcessorSettings.cs" />
+    <Compile Include="Configuration\EventStoreSettings.cs" />
+    <Compile Include="Configuration\SnapshotStoreSettings.cs" />
+    <Compile Include="Cqrs\Commanding\CommandContextTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandlerRegistryTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandHandlerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cqrs\Commanding\CommandProcessorTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cqrs\Commanding\CommandPublisherTests.cs" />
+    <Compile Include="Cqrs\Commanding\CommandTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateStateValidatorTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateUpdaterTests.cs" />
+    <Compile Include="Cqrs\Domain\CachedAggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\HookableAggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByConventionAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyByRegistrationAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\ApplyMethodMappingTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleByConventionAttributeTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cqrs\Domain\Mappings\HandleByRegistrationAttributeTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cqrs\Domain\Mappings\HandleByStrategyAttributeTests.cs" />
+    <Compile Include="Cqrs\Domain\Mappings\HandleMethodMappingTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cqrs\Domain\PipelineHookTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStoreTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\Dialects\SqlSagaStoreTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStoreTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\PipelineHookTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaConfigurationTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandlerTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLockTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaMetadataTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaRefereneTets.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCacheTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\TimeoutDispatcherTests.cs" />
+    <Compile Include="Data\SqlServerFactAttribute.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandlerRegistryTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventHandlerTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventProcessorTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventDispatcherTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventPublisherTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventVersionTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByRegistrationAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByAttributeAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByConventionAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleByStrategyAttributeTests.cs" />
+    <Compile Include="Cqrs\Eventing\Mappings\HandleMethodMappingTests.cs" />
     <Compile Include="EventStore\CommitTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
-    <Compile Include="EventStore\Dialects\SqlServerFactAttribute.cs" />
-    <Compile Include="EventStore\EventCollectionTests.cs" />
-    <Compile Include="EventStore\HeaderCollectionTests.cs" />
+    <Compile Include="Cqrs\Eventing\EventCollectionTests.cs" />
+    <Compile Include="Messaging\InlineMessageBusTests.cs" />
+    <Compile Include="Messaging\MessageReceiverTests.cs" />
+    <Compile Include="Messaging\WebMessageFactoryTests.cs" />
+    <Compile Include="Messaging\HeaderCollectionTests.cs" />
     <Compile Include="EventStore\PagedResultTests.cs" />
     <Compile Include="EventStore\PageTests.cs" />
     <Compile Include="EventStore\SnapshotTests.cs" />
@@ -75,7 +146,14 @@
     <Compile Include="Logging\FakeTraceListener.cs" />
     <Compile Include="Logging\LoggerTests.cs" />
     <Compile Include="Logging\LogManagerTests.cs" />
+    <Compile Include="Messaging\HeaderTests.cs" />
+    <Compile Include="Messaging\MessageFactoryTests.cs" />
+    <Compile Include="Messaging\MessageTests.cs" />
+    <Compile Include="Messaging\BlockingCollectionMessageBusTests.cs" />
+    <Compile Include="Messaging\ServiceMessageFactoryTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
+    <Compile Include="ObjectHasherTests.cs" />
+    <Compile Include="ObjectMapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>
       </SubType>
@@ -83,10 +161,11 @@
     <Compile Include="StringExtensionTests.cs" />
     <Compile Include="SystemTimeTests.cs" />
     <Compile Include="Threading\BlockingThreadPoolTaskSchedulerTests.cs" />
+    <Compile Include="Threading\ExponentialBackoffTests.cs" />
     <Compile Include="Threading\FakeMonitor.cs" />
     <Compile Include="Threading\FakeThreadPool.cs" />
     <Compile Include="Threading\PartitionedTaskSchedulerTests.cs" />
-    <Compile Include="Threading\SynchronousTaskSchedulerTests.cs" />
+    <Compile Include="Threading\InlineTaskSchedulerTests.cs" />
     <Compile Include="Threading\MonitorWrapperTests.cs" />
     <Compile Include="Threading\ThreadPoolWrapperTests.cs" />
     <Compile Include="TypeExtensionTests.cs" />

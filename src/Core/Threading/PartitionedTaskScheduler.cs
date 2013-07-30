@@ -1,11 +1,11 @@
-﻿using Spark.Infrastructure.Logging;
+﻿using Spark.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Threading
+namespace Spark.Threading
 {
     /// <summary>
     /// An ordered limited-concurrency task scheduler that ensures a given task partition is only active on a single 
@@ -136,6 +136,7 @@ namespace Spark.Infrastructure.Threading
             Verify.NotNull(threadPool, "threadPool");
             Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
             Verify.GreaterThan(0, maximumConcurrencyLevel, "maximumConcurrencyLevel");
+            Verify.LessThanOrEqual(MaximumWorkerThreads, maximumConcurrencyLevel, "maximumConcurrencyLevel");
 
             Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, maximumConcurrencyLevel);
 
@@ -209,7 +210,7 @@ namespace Spark.Infrastructure.Threading
                 }
             }
 
-            Log.DebugFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
+            Log.TraceFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
 
             return partition;
         }
@@ -319,7 +320,7 @@ namespace Spark.Infrastructure.Threading
                 if (!taskExecuted)
                     taskExecuted = ExecuteTask(task);
 
-                Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
+                Log.TraceFormat("Releasing lock: partition {0}", partition.Id);
             }
 
             Pulse(queuedTasksExecuted);

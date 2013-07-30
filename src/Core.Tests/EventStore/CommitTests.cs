@@ -1,8 +1,8 @@
 ﻿using System;
-using Spark.Infrastructure.EventStore;
+using Spark.EventStore;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,24 +15,24 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore
+namespace Test.Spark.EventStore
 {
     public static class UsingCommit
     {
         public class WhenCreatingNewCommit
         {
             [Fact]
-            public void CommitIdCannotBeEmptyGuid()
+            public void CorrelationIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), 1, Guid.Empty, null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, Guid.NewGuid(), 1, null, null));
 
-                Assert.Equal("commitId", ex.ParamName);
+                Assert.Equal("correlationId", ex.ParamName);
             }
 
             [Fact]
             public void StreamIdCannotBeEmptyGuid()
             {
-                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.Empty, 1, Guid.NewGuid(), null, null));
+                var ex = Assert.Throws<ArgumentException>(() => new Commit(Guid.NewGuid(), Guid.Empty, 1, null, null));
 
                 Assert.Equal("streamId", ex.ParamName);
             }
@@ -40,15 +40,15 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void RevisionGreaterThanZero()
             {
-                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), 0, Guid.NewGuid(), null, null));
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(Guid.NewGuid(), Guid.NewGuid(), 0, null, null));
 
-                Assert.Equal("revision", ex.ParamName);
+                Assert.Equal("version", ex.ParamName);
             }
 
             [Fact]
             public void HeadersCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
 
                 Assert.NotNull(commit.Headers);
             }
@@ -56,7 +56,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void EventsCannotBeNull()
             {
-                var commit = new Commit(Guid.NewGuid(), 1, Guid.NewGuid(), null, null);
+                var commit = new Commit(Guid.NewGuid(), Guid.NewGuid(), 1, null, null);
 
                 Assert.NotNull(commit.Events);
             }

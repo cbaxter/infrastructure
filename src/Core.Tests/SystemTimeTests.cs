@@ -1,8 +1,9 @@
 ﻿using System;
-using Spark.Infrastructure.Resources;
+using Spark;
+using Spark.Resources;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +16,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests
+namespace Test.Spark
 {
     // ReSharper disable NotResolvedInText
     public static class UsingSystemTime
@@ -31,8 +32,8 @@ namespace Spark.Infrastructure.Tests
             [Fact]
             public void MustOverrideWithUtcTime()
             {
-                var expectedEx = new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(DateTimeKind.Utc), "timeRetriever");
-                var actualEx = Assert.Throws<ArgumentException>(() => SystemTime.OverrideWith(() => DateTime.Now));
+                var expectedEx = new ArgumentOutOfRangeException("timeRetriever", DateTimeKind.Local, Exceptions.ArgumentNotEqualToValue.FormatWith(DateTimeKind.Utc));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => SystemTime.OverrideWith(() => DateTime.Now));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }

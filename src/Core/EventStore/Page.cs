@@ -1,6 +1,6 @@
 ﻿using System;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,32 +13,32 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.EventStore
 {
     /// <summary>
     /// A record range representing a data page.
     /// </summary>
     public struct Page : IEquatable<Page>
     {
-        private readonly Int32 skip;
-        private readonly Int32 take;
+        private readonly Int64 skip;
+        private readonly Int64 take;
 
         /// <summary>
         /// The number of records to skip to reach the first record of this page.
         /// </summary>
-        public Int32 Skip { get { return skip; } }
+        public Int64 Skip { get { return skip; } }
 
         /// <summary>
         /// The number of records required to fill this page (page size).
         /// </summary>
-        public Int32 Take { get { return take; } }
+        public Int64 Take { get { return take; } }
 
         /// <summary>
         /// Initializes a new <see cref="Page"/>.
         /// </summary>
         /// <param name="skip">The number of records to skip.</param>
         /// <param name="take">The number of records to take.</param>
-        public Page(Int32 skip, Int32 take)
+        public Page(Int64 skip, Int64 take)
         {
             Verify.GreaterThanOrEqual(0, skip, "skip");
             Verify.GreaterThan(0, take, "take");
