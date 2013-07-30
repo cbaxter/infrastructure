@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Data.SqlClient;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.EventStore.Dialects;
-using Spark.Infrastructure.Serialization;
+using System.Threading;
+using Spark.EventStore;
+using Spark.EventStore.Sql;
+using Spark.EventStore.Sql.Dialects;
+using Spark.Serialization;
+using Test.Spark.Configuration;
+using Test.Spark.Data;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,18 +22,26 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore.Dialects
+namespace Test.Spark.EventStore.Dialects
 {
     public static class UsingSnapshotStoreWithSqlServer
     {
         public abstract class UsingInitializedSnapshotStore : IDisposable
         {
-            protected readonly IStoreSnapshots SnapshotStore;
+            internal readonly IStoreSnapshots SnapshotStore;
 
-            protected UsingInitializedSnapshotStore()
+            internal UsingInitializedSnapshotStore()
+                : this(true)
+            { }
+
+            internal UsingInitializedSnapshotStore(Boolean replaceExisting)
+                : this(replaceExisting, false)
+            { }
+
+            internal UsingInitializedSnapshotStore(Boolean replaceExisting, Boolean async)
             {
-                SnapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer(), new SqlServerDialect(5));
-                SnapshotStore.Initialize();
+                SnapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = async, ReplaceExisting = replaceExisting });
+                SnapshotStore.Purge();
             }
 
             public void Dispose()
@@ -43,23 +55,17 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             [SqlServerFactAttribute]
             public void WillCreateTableIfDoesNotExist()
             {
-                var snapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer());
-
                 DropExistingTable();
 
-                snapshotStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                var snapshotStore = new DbSnapshotStore(SqlServerConnection.Name, new BinarySerializer());
-
-                snapshotStore.Initialize();
-                snapshotStore.Initialize();
-
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -85,16 +91,46 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
             }
         }
 
-        public class WhenSavingSnapshot : UsingInitializedSnapshotStore
+        public class WhenDisposingSnapshotStore : UsingInitializedSnapshotStore
         {
+
             [SqlServerFactAttribute]
-            public void ThrowConcurrencyExceptionIfStreamVersionExists()
+            public void CanDisposeSynchronousStore()
+            {
+                new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = false }).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanDisposeAsynchronousStore()
+            {
+                new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings { Async = true }).Dispose();
+            }
+
+            [SqlServerFactAttribute]
+            public void CanSafelyCallDisposeMultipleTimes()
+            {
+                var snapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings());
+
+                snapshotStore.Dispose();
+
+                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+            }
+        }
+
+        public class WhenInsertingSnapshot : UsingInitializedSnapshotStore
+        {
+            public WhenInsertingSnapshot()
+                : base(false)
+            { }
+
+            [SqlServerFactAttribute]
+            public void IgnoreSnapshotIfStreamVersionExists()
             {
                 var snapshot = new Snapshot(Guid.NewGuid(), 1, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot);
+                SnapshotStore.Save(snapshot);
 
-                Assert.Throws<ConcurrencyException>(() => SnapshotStore.SaveSnapshot(snapshot));
+                Assert.DoesNotThrow(() => SnapshotStore.Save(snapshot));
             }
 
             [SqlServerFactAttribute]
@@ -104,8 +140,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot1 = new Snapshot(streamId, 1, new Object());
                 var snapshot2 = new Snapshot(streamId, 2, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.SaveSnapshot(snapshot2);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
             }
         }
 
@@ -118,8 +154,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot1 = new Snapshot(streamId, 1, new Object());
                 var snapshot2 = new Snapshot(streamId, 2, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.ReplaceSnapshot(snapshot2);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
 
                 Assert.Equal(1, CountSnapshots(streamId));
             }
@@ -130,7 +166,7 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var streamId = Guid.NewGuid();
                 var snapshot = new Snapshot(streamId, 1, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot);
+                SnapshotStore.Save(snapshot);
 
                 Assert.Equal(1, CountSnapshots(streamId));
             }
@@ -143,7 +179,40 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                     command.Parameters.AddWithValue("@StreamId", streamId);
                     connection.Open();
 
-                    return (Int32) command.ExecuteScalar();
+                    return (Int32)command.ExecuteScalar();
+                }
+            }
+        }
+
+        public class WhenUsingAsyncSnapshotStore : UsingInitializedSnapshotStore
+        {
+            public WhenUsingAsyncSnapshotStore()
+                : base(true, true)
+            { }
+
+            [SqlServerFact]
+            public void CanWriteBatchedSnapshots()
+            {
+                var snapshot = new Snapshot(Guid.NewGuid(), 1, new Object());
+                var attempt = 0;
+
+                SnapshotStore.Save(snapshot);
+
+                while (++attempt < 20 && CountSnapshots(snapshot.StreamId) == 0)
+                    Thread.Sleep(10);
+
+                Assert.True(attempt < 20);
+            }
+
+            private Int32 CountSnapshots(Guid streamId)
+            {
+                using (var connection = SqlServerConnection.Create())
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                {
+                    command.Parameters.AddWithValue("@StreamId", streamId);
+                    connection.Open();
+
+                    return (Int32)command.ExecuteScalar();
                 }
             }
         }
@@ -156,8 +225,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot1 = new Snapshot(Guid.NewGuid(), 1, new Object());
                 var snapshot2 = new Snapshot(Guid.NewGuid(), 1, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.SaveSnapshot(snapshot2);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
                 SnapshotStore.Purge();
 
                 Assert.Equal(0, CountSnapshots());
@@ -185,9 +254,9 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot2 = new Snapshot(streamId, 10, new Object());
                 var snapshot3 = new Snapshot(streamId, 20, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.SaveSnapshot(snapshot2);
-                SnapshotStore.SaveSnapshot(snapshot3);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
+                SnapshotStore.Save(snapshot3);
 
                 Assert.Equal(20, SnapshotStore.GetLastSnapshot(streamId).Version);
             }
@@ -202,8 +271,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot1 = new Snapshot(streamId, 1, new Object());
                 var snapshot2 = new Snapshot(streamId, 10, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.SaveSnapshot(snapshot2);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
 
                 Assert.Equal(10, SnapshotStore.GetSnapshot(streamId, 20).Version);
             }
@@ -215,8 +284,8 @@ namespace Spark.Infrastructure.Tests.EventStore.Dialects
                 var snapshot1 = new Snapshot(streamId, 1, new Object());
                 var snapshot2 = new Snapshot(streamId, 10, new Object());
 
-                SnapshotStore.SaveSnapshot(snapshot1);
-                SnapshotStore.SaveSnapshot(snapshot2);
+                SnapshotStore.Save(snapshot1);
+                SnapshotStore.Save(snapshot2);
 
                 Assert.Equal(10, SnapshotStore.GetSnapshot(streamId, 10).Version);
             }

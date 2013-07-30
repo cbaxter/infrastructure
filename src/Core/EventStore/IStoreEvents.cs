@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using Spark.Cqrs.Eventing;
+using Spark.Messaging;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,63 +15,38 @@ using System.Collections.Generic;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.EventStore
+namespace Spark.EventStore
 {
     /// <summary>
     /// Data access contract for an event store.
     /// </summary>
-    public interface IStoreEvents
+    public interface IStoreEvents : IRetrieveEvents
     {
-        /// <summary>
-        /// Initializes a new event store.
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
-        /// Gets all commits from the event store.
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<Commit> GetAll();
-
-        /// <summary>
-        /// Gets all commits from the event store commited on or after <paramref name="startTime"/>.
-        /// </summary>
-        /// <param name="startTime">The timestamp of the first commit to be returned (inclusive).</param>
-        /// <returns></returns>
-        IEnumerable<Commit> GetFrom(DateTime startTime);
-
-        /// <summary>
-        /// Gets all commits for the specified <paramref name="streamId"/>.
-        /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        IEnumerable<Commit> GetStream(Guid streamId);
-
-        /// <summary>
-        /// Gets all commits for the specified <paramref name="streamId"/> with a version greater than or equal to <paramref name="minimumVersion"/>.
-        /// </summary>
-        /// <param name="streamId">The unique stream identifier.</param>
-        /// <param name="minimumVersion">The minimum stream version (inclusive).</param>
-        IEnumerable<Commit> GetStreamFrom(Guid streamId, Int32 minimumVersion);
-
-        /// <summary>
-        /// Adds a new commit to the event store.
-        /// </summary>
-        /// <param name="commit">The commit to append to the event store.</param>
-        void SaveCommit(Commit commit);
-
-        /// <summary>
-        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="commitId"/>.
-        /// </summary>
-        /// <param name="commitId">The unique commit identifier.</param>
-        /// <param name="headers">The new commit headers.</param>
-        /// <param name="events">The new commit events.</param>
-        void Migrate(Guid commitId, HeaderCollection headers, EventCollection events);
-
         /// <summary>
         /// Deletes the specified event stream for <paramref name="streamId"/>.
         /// </summary>
         /// <param name="streamId">The unique stream identifier.</param>
-        void Purge(Guid streamId);
+        void DeleteStream(Guid streamId);
+
+        /// <summary>
+        /// Appends a new commit to the event store.
+        /// </summary>
+        /// <param name="commit">The commit to append to the event store.</param>
+        void Save(Commit commit);
+
+        /// <summary>
+        /// Mark the specified commit as being dispatched.
+        /// </summary>
+        /// <param name="id">The unique commit identifier that has been dispatched.</param>
+        void MarkDispatched(Int64 id);
+
+        /// <summary>
+        /// Migrates the commit <paramref name="headers"/> and <paramref name="events"/> for the specified <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The unique commit identifier.</param>
+        /// <param name="headers">The new commit headers.</param>
+        /// <param name="events">The new commit events.</param>
+        void Migrate(Int64 id, HeaderCollection headers, EventCollection events);
 
         /// <summary>
         /// Deletes all existing commits from the event store.

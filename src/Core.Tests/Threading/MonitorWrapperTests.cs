@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using Spark.Infrastructure.Threading;
+using Spark.Threading;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -16,9 +16,9 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Threading
+namespace Test.Spark.Threading
 {
-    public static class MonitorWrapperTests
+    public static class UsingSMonitorWrapper
     {
         public class WhenWaiting
         {

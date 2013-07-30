@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +16,7 @@ using System.Linq;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
     /// Extension methods of <see cref="IEnumerable{T}"/>.
@@ -50,6 +51,41 @@ namespace Spark.Infrastructure
         public static IReadOnlyList<T> AsReadOnly<T>(this IEnumerable<T> source)
         {
             return source as IReadOnlyList<T> ?? new ReadOnlyCollection<T>(source.AsList());
+        }
+
+        /// <summary>
+        /// Appends the <paramref name="item"/> to the end of the existing <paramref name="source"/> set.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements of source.</typeparam>
+        /// <param name="source">The <see cref="IEnumerable{T}"/> set on which to append <paramref name="item"/>.</param>
+        /// <param name="item">The item to append to <paramref name="source"/>.</param>
+        public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T item)
+        {
+            foreach (var value in source ?? Enumerable.Empty<T>())
+                yield return value;
+
+            yield return item;
+        }
+
+        /// <summary>
+        /// Releases all managed resources used by each <see cref="IDisposable"/> instance in <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source">The sequence of elements to dispose.</param>
+        public static void DisposeAll(this IEnumerable<IDisposable> source)
+        {
+            foreach(var disposable in source.EmptyIfNull())
+                disposable.Dispose();
+        }
+        
+        /// <summary>
+        /// Returns distinct elements from a sequence by using the the default equality comparer to compare <paramref name="keySelector"/> values.
+        /// </summary>
+        /// <param name="source">The sequence of elements to make distinct.</param>
+        /// <param name="keySelector">The key selector on which to base distinct values.</param>
+        public static IEnumerable<TItem> Distinct<TItem, TKey>(this IEnumerable<TItem> source, Func<TItem, TKey> keySelector)
+        {
+            var unique = new HashSet<TKey>();
+            return (source ?? Enumerable.Empty<TItem>()).Where(item => unique.Add(keySelector(item)));
         }
 
         /// <summary>

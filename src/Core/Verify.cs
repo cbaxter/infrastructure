@@ -1,8 +1,8 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Spark.Infrastructure.Resources;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -15,13 +15,25 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
     /// Code contract utility class.
     /// </summary>
     public static class Verify
     {
+        /// <summary>
+        /// Throws an <exception cref="ObjectDisposedException">ObjectDisposedException</exception> if <paramref name="disposed"/> is <value>true</value>.
+        /// </summary>
+        /// <param name="instance">The <see cref="IDisposable"/> instance.</param>
+        /// <param name="disposed">The flag indicating if the specified <paramref name="instance"/> has been disposed.</param>
+        public static void NotDisposed<T>(T instance, Boolean disposed)
+            where T : IDisposable
+        {
+            if (disposed)
+                throw new ObjectDisposedException(typeof(T).FullName);
+        }
+
         /// <summary>
         /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="condition"/> is <value>false</value>.
         /// </summary>
@@ -47,6 +59,18 @@ namespace Spark.Infrastructure
         }
 
         /// <summary>
+        /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if <paramref name="type"/> does not derive from <paramref name="baseType"/>.
+        /// </summary>
+        /// <param name="baseType">The expected base type.</param>
+        /// <param name="type">The type being checked.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void TypeDerivesFrom(Type baseType, Type type, [InvokerParameterName] String paramName)
+        {
+            if (!type.DerivesFrom(baseType))
+                throw new ArgumentException(Exceptions.TypeDoesNotDeriveFromBase.FormatWith(baseType, type), paramName);
+        }
+
+        /// <summary>
         /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is not equal to <paramref name="expected"/>.
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="expected"/> and <paramref name="actual"/>.</typeparam>
@@ -54,10 +78,10 @@ namespace Spark.Infrastructure
         /// <param name="actual">The value to check if not equal to <paramref name="expected"/>.</param>
         /// <param name="paramName">The name of the parameter being checked.</param>
         public static void Equal<T>(T expected, T actual, [InvokerParameterName]String paramName)
-          where T : IComparable
+            where T : IComparable
         {
             if (!Equals(expected, actual))
-                throw new ArgumentException(Exceptions.ArgumentNotEqualToValue.FormatWith(expected), paramName);
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotEqualToValue.FormatWith(expected, actual));
         }
 
         /// <summary>
@@ -68,7 +92,7 @@ namespace Spark.Infrastructure
         /// <param name="actual">The value to check if equal to <paramref name="notExpected"/>.</param>
         /// <param name="paramName">The name of the parameter being checked.</param>
         public static void NotEqual<T>(T notExpected, T actual, [InvokerParameterName]String paramName)
-          where T : IComparable
+            where T : IComparable
         {
             if (Equals(notExpected, actual))
                 throw new ArgumentException(Exceptions.ArgumentEqualToValue.FormatWith(notExpected), paramName);
@@ -82,10 +106,10 @@ namespace Spark.Infrastructure
         /// <param name="exclusiveLowerBound">The exlusive lower bound for <paramref name="actual"/>.</param>
         /// <param name="paramName">The name of the parameter being checked.</param>
         public static void GreaterThan<T>(T exclusiveLowerBound, T actual, [InvokerParameterName]String paramName)
-          where T : IComparable
+            where T : IComparable
         {
             if (ReferenceEquals(actual, null) || actual.CompareTo(exclusiveLowerBound) <= 0)
-                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanValue.FormatWith(exclusiveLowerBound));
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanValue.FormatWith(exclusiveLowerBound, actual));
         }
 
         /// <summary>
@@ -96,10 +120,38 @@ namespace Spark.Infrastructure
         /// <param name="inclusiveLowerBound">The inclusive lower bound for <paramref name="actual"/>.</param>
         /// <param name="paramName">The name of the parameter being checked.</param>
         public static void GreaterThanOrEqual<T>(T inclusiveLowerBound, T actual, [InvokerParameterName]String paramName)
-          where T : IComparable
+            where T : IComparable
         {
             if (ReferenceEquals(actual, null) || actual.CompareTo(inclusiveLowerBound) < 0)
-                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(inclusiveLowerBound));
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotGreaterThanOrEqualToValue.FormatWith(inclusiveLowerBound, actual));
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is greater than or equal to <paramref name="exclusiveUpperBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="exclusiveUpperBound"/>.</typeparam>
+        /// <param name="actual">The value to check if greater than or equal to <paramref name="exclusiveUpperBound"/>.</param>
+        /// <param name="exclusiveUpperBound">The exlusive upper bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void LessThan<T>(T exclusiveUpperBound, T actual, [InvokerParameterName]String paramName)
+            where T : IComparable
+        {
+            if (ReferenceEquals(actual, null) || actual.CompareTo(exclusiveUpperBound) >= 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotLessThanValue.FormatWith(exclusiveUpperBound, actual));
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception> if <paramref name="actual"/> is greater than <paramref name="inclusiveUpperBound"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="actual"/> and <paramref name="inclusiveUpperBound"/>.</typeparam>
+        /// <param name="actual">The value to check if greater than <paramref name="inclusiveUpperBound"/>.</param>
+        /// <param name="inclusiveUpperBound">The inclusive upper bound for <paramref name="actual"/>.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        public static void LessThanOrEqual<T>(T inclusiveUpperBound, T actual, [InvokerParameterName]String paramName)
+            where T : IComparable
+        {
+            if (ReferenceEquals(actual, null) || actual.CompareTo(inclusiveUpperBound) > 0)
+                throw new ArgumentOutOfRangeException(paramName, actual, Exceptions.ArgumentNotLessThanOrEqualToValue.FormatWith(inclusiveUpperBound, actual));
         }
 
         /// <summary>
@@ -110,9 +162,23 @@ namespace Spark.Infrastructure
         /// <param name="paramName">The name of the parameter being checked.</param>
         [ContractAnnotation("value: null => halt")]
         public static void NotNull<T>(T value, [InvokerParameterName]String paramName)
-          where T : class
+            where T : class
         {
             if (value == null)
+                throw new ArgumentNullException(paramName);
+        }
+
+        /// <summary>
+        /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if <paramref name="value"/> is <value>null</value>.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">The value to check if null</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        [ContractAnnotation("value: null => halt")]
+        public static void NotNull<T>(T? value, [InvokerParameterName]String paramName)
+            where T : struct
+        {
+            if (!value.HasValue)
                 throw new ArgumentNullException(paramName);
         }
 

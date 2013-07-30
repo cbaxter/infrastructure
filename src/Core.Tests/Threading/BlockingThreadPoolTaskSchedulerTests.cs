@@ -1,11 +1,11 @@
-﻿using Spark.Infrastructure.Threading;
+﻿using Spark.Threading;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,9 +18,9 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Threading
+namespace Test.Spark.Threading
 {
-    public static class BlockingThreadPoolTaskSchedulerTests
+    public static class UsingBlockingThreadPoolTaskScheduler
     {
         public class WhenInitializing
         {
@@ -55,7 +55,7 @@ namespace Spark.Infrastructure.Tests.Threading
                     });
 
                 Assert.True(task.Wait(TimeSpan.FromMilliseconds(100)));
-                Assert.Equal(0, taskScheduler.ScheduledTasks.Count());
+                Task.WaitAll(taskScheduler.ScheduledTasks.ToArray());
             }
 
             [Fact]

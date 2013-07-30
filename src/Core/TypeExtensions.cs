@@ -1,7 +1,9 @@
 ﻿using System;
-using Spark.Infrastructure.Resources;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Spark.Resources;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -14,13 +16,15 @@ using Spark.Infrastructure.Resources;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
     /// Extension methods of <see cref="Type"/>.
     /// </summary>
     public static class TypeExtensions
     {
+        private static readonly IDictionary<Type, String> AssemblyTypeNameCache = new ConcurrentDictionary<Type, String>();
+        
         /// <summary>
         /// Returns <value>true</value> if <paramref name="type"/> derives from <paramref name="baseType"/>; otherwise <value>false</value>.
         /// </summary>
@@ -41,7 +45,7 @@ namespace Spark.Infrastructure
             Verify.NotNull(type, "type");
             Verify.NotNull(baseType, "baseType");
             Verify.False(baseType.IsInterface, "baseType", Exceptions.TypeArgumentMustNotBeAnInterface);
-
+            
             var subType = type.BaseType;
             while (subType != null && !Equal(subType, baseType))
                 subType = subType.BaseType;
@@ -57,6 +61,38 @@ namespace Spark.Infrastructure
         private static Boolean Equal(Type type, Type targetType)
         {
             return targetType.IsGenericTypeDefinition ? type.IsGenericType && type.GetGenericTypeDefinition() == targetType : type == targetType;
+        }
+
+        /// <summary>
+        /// Gets the full name with assembly name for the specified <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> for which the full name and assembly name are to be retrieved.</param>
+        public static String GetFullNameWithAssembly(this Type type)
+        {
+            String result;
+            if (!AssemblyTypeNameCache.TryGetValue(type, out result))
+                AssemblyTypeNameCache[type] = result = String.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Get the type hierarchy for the specified <paramref name="type"/> starting with <paramref name="type"/> and ending with <see cref="Object"/>.
+        /// </summary>
+        /// <param name="type">The type for which the type hierarchy is to be retrieved.</param>
+        public static IEnumerable<Type> GetTypeHierarchy(this Type type)
+        {
+            Verify.NotNull(type, "type");
+
+            yield return type;
+
+            var baseType = type.BaseType;
+            while (baseType != null)
+            {
+                yield return baseType;
+
+                baseType = baseType.BaseType;
+            }
         }
     }
 }

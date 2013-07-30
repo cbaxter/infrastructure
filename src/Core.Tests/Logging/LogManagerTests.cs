@@ -1,10 +1,11 @@
-﻿using Spark.Infrastructure.Logging;
+﻿using Spark;
+using Spark.Logging;
 using System;
 using System.Configuration;
 using Xunit;
 using Xunit.Extensions;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +18,7 @@ using Xunit.Extensions;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Logging
+namespace Test.Spark.Logging
 {
     public class UsingLogManager
     {
@@ -116,9 +117,7 @@ namespace Spark.Infrastructure.Tests.Logging
             [Fact]
             public void LoggerIsNamedAfterDeclaringClassFullName()
             {
-                var logger = LogManager.GetCurrentClassLogger();
-
-                Assert.Equal("Spark.Infrastructure.Tests.Logging.UsingLogManager+WhenGettingCurrentClassLogger", logger.Name);
+                Assert.Equal("Test.Spark.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
             }
         }
 
@@ -166,6 +165,11 @@ namespace Spark.Infrastructure.Tests.Logging
             {
                 return element.GetHashCode();
             }
+        }
+
+        public sealed class LoggerClass
+        {
+            public static readonly ILog Log = LogManager.GetCurrentClassLogger();
         }
 
         public sealed class FakeSwitchElement : ConfigurationElement

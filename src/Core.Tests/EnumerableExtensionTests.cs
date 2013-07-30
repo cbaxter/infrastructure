@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spark;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -17,7 +18,7 @@ using Xunit;
  */
 
 #pragma warning disable 1720
-namespace Spark.Infrastructure.Tests
+namespace Test.Spark
 {
     public static class UsingEnumerableExtensions
     {
@@ -108,6 +109,87 @@ namespace Spark.Infrastructure.Tests
 
                 Assert.NotNull(actual);
                 Assert.Equal(0, actual.Count);
+            }
+        }
+
+        public class WhenAppendingItemToSet
+        {
+            [Fact]
+            public void CanAppendItemToNullSet()
+            {
+                var item = new Object();
+
+                Assert.Same(item, ((IEnumerable<Object>)null).Concat(item).Single());
+            }
+
+            [Fact]
+            public void CanAppendNullItemToExistingSet()
+            {
+                Assert.Null(Enumerable.Empty<Object>().Concat(default(Object)).Single());
+            }
+
+            [Fact]
+            public void ItemAlwaysAddedToEndOfSet()
+            {
+                var item = new Object();
+                var items = new[] { new Object(), new Object(), new Object() };
+
+                Assert.Same(item, items.Concat(item).Last());
+            }
+        }
+
+        public class WhenDisposingEnumerableSet
+        {
+            [Fact]
+            public void SetCanBeNull()
+            {
+                Assert.DoesNotThrow(() => default(IDisposable[]).DisposeAll());
+            }
+
+            [Fact]
+            public void DisposeEachItemInSet()
+            {
+                var disposable = new Disposable();
+                var disposables = new[] {disposable};
+                
+                disposables.DisposeAll();
+
+                Assert.True(disposable.Disposed);
+            }
+
+            private class Disposable : IDisposable
+            {
+                public Boolean Disposed { get; private set; }
+                public void Dispose() { Disposed = true; }
+            }
+        }
+
+        public class WhenGettingDistinctValues
+        {
+            [Fact]
+            public void ReturnFirstInstanceOfKey()
+            {
+                var items = new[] { new Item { Key = "Key1" }, new Item { Key = "Key2" }, new Item { Key = "Key1" } };
+                var distinct = items.Distinct(item => item.Key);
+
+                Assert.Same(items[0], distinct.First());
+            }
+
+            [Fact]
+            public void RemoveDuplicateKeys()
+            {
+                var items = new[] { new Item { Key = "Key1" }, new Item { Key = "Key2" }, new Item { Key = "Key1" }, new Item { Key = "Key3" } };
+                var distinctItems = items.Distinct(item => item.Key).ToArray();
+
+                Assert.Equal(3, distinctItems.Count());
+                Assert.Same(items[0], distinctItems[0]);
+                Assert.Same(items[1], distinctItems[1]);
+                Assert.Same(items[3], distinctItems[2]);
+            }
+
+            private class Item
+            {
+                public String Key { get; set; }
             }
         }
 

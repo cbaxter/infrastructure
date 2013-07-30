@@ -1,11 +1,11 @@
-﻿using Spark.Infrastructure.Logging;
+﻿using Spark.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Threading
+namespace Spark.Threading
 {
     /// <summary>
     /// Blocking <see cref="TaskScheduler"/> if number of queued tasks exceeds <see cref="BoundedCapacity"/>.

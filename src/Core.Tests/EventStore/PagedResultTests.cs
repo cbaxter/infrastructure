@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Spark.Infrastructure.EventStore;
-using Spark.Infrastructure.Resources;
+using Spark;
+using Spark.EventStore;
+using Spark.Resources;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -19,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.EventStore
+namespace Test.Spark.EventStore
 {
     public static class UsingPagedResult
     {
@@ -30,7 +30,7 @@ namespace Spark.Infrastructure.Tests.EventStore
             public void PageSizeMustBeGreaterThanZero()
             {
                 var expectedEx = new ArgumentOutOfRangeException("pageSize", 0, Exceptions.ArgumentNotGreaterThanValue.FormatWith(0));
-                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => new PagedResult<Object>(0, page => Enumerable.Empty<Object>()));
+                var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => new PagedResult<Object>(0, (lastResult, page) => Enumerable.Empty<Object>()));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }
@@ -51,14 +51,14 @@ namespace Spark.Infrastructure.Tests.EventStore
             [Fact]
             public void PageRetrieverCanReturnNullSafely()
             {
-                Assert.DoesNotThrow(() => new PagedResult<Object>(10, page => null).ToList());
+                Assert.DoesNotThrow(() => new PagedResult<Object>(10, (lastResult, page) => null).ToList());
             }
 
             [Fact]
             public void PageRetrieverMustReturnNoMoreThanPageSize()
             {
                 var expectedEx = new InvalidOperationException(Exceptions.PageSizeExceeded.FormatWith(10));
-                var actualEx = Assert.Throws<InvalidOperationException>(() => new PagedResult<Int32>(10, page => Enumerable.Repeat(1, 11)).ToList());
+                var actualEx = Assert.Throws<InvalidOperationException>(() => new PagedResult<Int32>(10, (lastResult, page) => Enumerable.Repeat(1, 11)).ToList());
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
             }
@@ -70,7 +70,7 @@ namespace Spark.Infrastructure.Tests.EventStore
 
                 pageQueue.Enqueue(Enumerable.Repeat(1, 9));
 
-                Assert.Equal(9, new PagedResult<Int32>(10, page => pageQueue.Dequeue()).Count());
+                Assert.Equal(9, new PagedResult<Int32>(10, (lastResult, page) => pageQueue.Dequeue()).Count());
                 Assert.Equal(0, pageQueue.Count);
             }
 
@@ -82,7 +82,7 @@ namespace Spark.Infrastructure.Tests.EventStore
                 pageQueue.Enqueue(Enumerable.Repeat(1, 10));
                 pageQueue.Enqueue(Enumerable.Empty<Int32>());
 
-                Assert.Equal(10,  new PagedResult<Int32>(10, page => pageQueue.Dequeue()).Count());
+                Assert.Equal(10, new PagedResult<Int32>(10, (lastResult, page) => pageQueue.Dequeue()).Count());
                 Assert.Equal(0, pageQueue.Count);
             }
 
@@ -93,7 +93,7 @@ namespace Spark.Infrastructure.Tests.EventStore
 
                 pageQueue.Enqueue(Enumerable.Repeat(1, 1));
 
-                Assert.Equal(1, ((IEnumerable)new PagedResult<Int32>(10, page => pageQueue.Dequeue())).Cast<Object>().Count());
+                Assert.Equal(1, new PagedResult<Int32>(10, (lastResult, page) => pageQueue.Dequeue()).Cast<Object>().Count());
                 Assert.Equal(0, pageQueue.Count);
             }
         }

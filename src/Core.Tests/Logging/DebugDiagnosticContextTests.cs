@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using Spark.Infrastructure.Logging;
-using Spark.Infrastructure.Resources;
+using Spark.Logging;
+using Spark.Resources;
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -19,7 +19,7 @@ using Xunit;
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure.Tests.Logging
+namespace Test.Spark.Logging
 {
     public static class DebugDiagnosticContextTests
     {
@@ -121,7 +121,7 @@ namespace Spark.Infrastructure.Tests.Logging
                 var data = Guid.NewGuid();
 
                 using (new DebugDiagnosticContext(traceSource, traceSource.Name, data, activityId))
-                    Assert.Equal(String.Format("{{ {0}, {1} }}", traceSource.Name, data), Trace.CorrelationManager.LogicalOperationStack.Peek());
+                    Assert.Equal(String.Format("{{ {0} = {1} }}", traceSource.Name, data), Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
             [Fact]
@@ -132,7 +132,7 @@ namespace Spark.Infrastructure.Tests.Logging
                 var activityId = Guid.NewGuid();
 
                 using (new DebugDiagnosticContext(traceSource, traceSource.Name, data, activityId))
-                    Assert.Equal(String.Format("{{ {0}, {1}, {2} }}", traceSource.Name, data[0], data[1]), Trace.CorrelationManager.LogicalOperationStack.Peek());
+                    Assert.Equal(String.Format("{{ {0} = [{1}, {2}] }}", traceSource.Name, data[0], data[1]), Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
         }
 

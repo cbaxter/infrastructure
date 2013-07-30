@@ -1,6 +1,6 @@
 ﻿using System;
 
-/* Copyright (c) 2012 Spark Software Ltd.
+/* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,23 +13,49 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Infrastructure
+namespace Spark
 {
     /// <summary>
-    /// Gets the current UTC system time.
+    /// Represents an instance in time, typically expressed as a date and time of day.
     /// </summary>
     /// <remarks>Can override usage of <see cref="DateTime.UtcNow"/> by calling <see cref="OverrideWith"/>.</remarks>
     public static class SystemTime
     {
-        private static Func<DateTime> now;
+        private static readonly Object TimeLock = new Object();
+        private static Func<DateTime> utcNowOverride;
+        private static DateTime previous;
+        private static Int64 sequence;
 
         /// <summary>
         /// Get the current system time (UTC).
         /// </summary>
-        public static DateTime Now { get { return now == null ? DateTime.UtcNow : now(); } }
+        public static DateTime Now { get { return utcNowOverride == null ? DateTime.UtcNow : utcNowOverride(); } }
 
         /// <summary>
-        /// Override the use of <see cref="DateTime.UtcNow"/> with a custom time function.
+        /// Get a unique system timestamp (UTC) within the current <see cref="AppDomain"/>.
+        /// </summary>
+        public static DateTime GetTimestamp()
+        {
+            var timestamp = utcNowOverride == null ? DateTime.UtcNow : utcNowOverride();
+
+            lock (TimeLock)
+            {
+                if (timestamp == previous)
+                {
+                    timestamp = previous.AddTicks(++sequence);
+                }
+                else
+                {
+                    previous = timestamp;
+                    sequence = 0L;
+                }
+            }
+
+            return timestamp;
+        }
+        
+        /// <summary>
+        /// Override the use of <see cref="DateTime.UtcNow"/> with a custom UTC time function.
         /// </summary>
         /// <param name="timeRetriever">The replacement function to use when retrieving the UTC system time.</param>
         public static void OverrideWith(Func<DateTime> timeRetriever)
@@ -37,7 +63,7 @@ namespace Spark.Infrastructure
             Verify.NotNull(timeRetriever, "timeRetriever");
             Verify.Equal(DateTimeKind.Utc, timeRetriever().Kind, "timeRetriever");
 
-            now = timeRetriever;
+            utcNowOverride = timeRetriever;
         }
 
         /// <summary>
@@ -45,7 +71,7 @@ namespace Spark.Infrastructure
         /// </summary>
         public static void ClearOverride()
         {
-            now = null;
+            utcNowOverride = null;
         }
     }
 }

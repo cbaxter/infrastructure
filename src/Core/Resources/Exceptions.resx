@@ -120,6 +120,37 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="AggregateAmbiguousApplyMethodStrategy" xml:space="preserve">
+    <value>Aggregate must have a single explicit ApplyByStrategyAttribute defined.
+Aggregate Type: {0}</value>
+  </data>
+  <data name="AggregateApplyMethodInvalidParameters" xml:space="preserve">
+    <value>A method marked with ApplyMethodAttribute must have a single input parameter that derives from {0}.
+Reflected Type: {1}
+Method Name: {2}</value>
+  </data>
+  <data name="AggregateApplyMethodMustHaveVoidReturn" xml:space="preserve">
+    <value>A method marked with ApplyMethodAttribute must return void.
+Reflected Type: {0}
+Method Name: {1}</value>
+  </data>
+  <data name="AggregateApplyMethodNotFound" xml:space="preserve">
+    <value>Aggregate apply method not found for event type.
+Aggregate Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="AggregateDefaultConstructorRequired" xml:space="preserve">
+    <value>Aggregate must have a single public default constructor.
+Aggregate Type: {0}</value>
+  </data>
+  <data name="AggregateHandleByStrategyAmbiguous" xml:space="preserve">
+    <value>Ambiguous command handler mapping strategy,
+Aggregate Type: {0}</value>
+  </data>
+  <data name="AggregateTypeUndiscovered" xml:space="preserve">
+    <value>Aggregate type was not discovered by type locator.
+Aggregate Type: {0}</value>
+  </data>
   <data name="ArgumentEqualToValue" xml:space="preserve">
     <value>Value must not equal {0}.</value>
   </data>
@@ -132,10 +163,31 @@
   <data name="ArgumentNotGreaterThanValue" xml:space="preserve">
     <value>Value must be greater than {0}.</value>
   </data>
-  <data name="ConcurrencyException" xml:space="preserve">
-    <value>Concurrency Exception.
+  <data name="ArgumentNotLessThanOrEqualToValue" xml:space="preserve">
+    <value>Value must be less than or equal to {0}.</value>
+  </data>
+  <data name="ArgumentNotLessThanValue" xml:space="preserve">
+    <value>Value must be less than {0}.</value>
+  </data>
+  <data name="CommandContextInterleaved" xml:space="preserve">
+    <value>This CommandContext is being disposed on a different thread than it was created.</value>
+  </data>
+  <data name="CommandContextInvalidThread" xml:space="preserve">
+    <value>This CommandContext is being disposed out of order.</value>
+  </data>
+  <data name="CommandHandlerNotFound" xml:space="preserve">
+    <value>Command not handled by any known aggregate type.
+Command Type: {0}</value>
+  </data>
+  <data name="CommitConcurrencyConflict" xml:space="preserve">
+    <value>Concurrency conflict.
 Stream Id: {0}
 Version: {1}</value>
+  </data>
+  <data name="CommitTimeout" xml:space="preserve">
+    <value>The commit operation has timed out.
+Commit Id: {0}
+Stream Id: {1}</value>
   </data>
   <data name="ConnectionNotFound" xml:space="preserve">
     <value>Connection string not found.
@@ -145,24 +197,155 @@ Name: {0}</value>
     <value>Connection string provider not specified.
 Name: {0}</value>
   </data>
-  <data name="DuplicateCommitException" xml:space="preserve">
+  <data name="DuplicateCommit" xml:space="preserve">
     <value>Duplicate commit.
 Commit Id: {0}</value>
+  </data>
+  <data name="EventContextInterleaved" xml:space="preserve">
+    <value>This EventContext is being disposed on a different thread than it was created.</value>
+  </data>
+  <data name="EventContextInvalidThread" xml:space="preserve">
+    <value>This EventContext is being disposed out of order.</value>
+  </data>
+  <data name="EventHandlerHandleByStrategyAmbiguous" xml:space="preserve">
+    <value>Ambiguous event handler mapping strategy,
+Handler Type: {0}</value>
+  </data>
+  <data name="EventTypeAlreadyConfigured" xml:space="preserve">
+    <value>An event may be configured only once.
+Saga Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="EventTypeNotConfigured" xml:space="preserve">
+    <value>Event handling not configured.
+Saga Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="EventTypeNotHandledBySaga" xml:space="preserve">
+    <value>Event not handled by saga.
+Saga Type: {0}
+Event Type: {1}</value>
+  </data>
+  <data name="HandleMethodInvalidParameters" xml:space="preserve">
+    <value>A method marked with HandleMethodAttribute must have the first input parameter derive from {0}.
+Reflected Type: {1}
+Method Name: {2}</value>
+  </data>
+  <data name="HandleMethodMustBeAssociatedWithSingleAggregate" xml:space="preserve">
+    <value>A command may only be handled by a single aggregate type.
+Aggregate Type: {0}
+Command Type: {1}</value>
+  </data>
+  <data name="HandleMethodMustHaveVoidReturn" xml:space="preserve">
+    <value>A method marked with HandleMethodAttribute must return void.
+Reflected Type: {0}
+Method Name: {1}</value>
+  </data>
+  <data name="HandleMethodOverloaded" xml:space="preserve">
+    <value>Overloaded method not allowed.
+Reflected Type: {0}
+Method: {1}</value>
+  </data>
+  <data name="HttpContextNotAvailable" xml:space="preserve">
+    <value>The current HTTP context is not available on this thread.</value>
+  </data>
+  <data name="MissingAggregateCommits" xml:space="preserve">
+    <value>Missing one or more aggregate commits; unable to apply commit to aggregate.
+Expected Version: {0}
+Actual Version: {1}</value>
   </data>
   <data name="MustContainOneNonWhitespaceCharacter" xml:space="preserve">
     <value>Value must contain at least one non-whitespace character.</value>
   </data>
+  <data name="NoCommandContext" xml:space="preserve">
+    <value>The current command context is null.</value>
+  </data>
+  <data name="NoEventContext" xml:space="preserve">
+    <value>The current event context is null.</value>
+  </data>
+  <data name="NoSagaContext" xml:space="preserve">
+    <value>The current saga context is null.</value>
+  </data>
   <data name="OperationIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.LogicalOperationStack is not the OperationId value set by this NestedDiagnosticContext.</value>
+  </data>
+  <data name="OperationTimeout" xml:space="preserve">
+    <value>The operation has timed out.</value>
   </data>
   <data name="PageSizeExceeded" xml:space="preserve">
     <value>Maximum page size of {0} has been exceeded.</value>
   </data>
+  <data name="ParameterSourceColumnNotSet" xml:space="preserve">
+    <value>Parameter source column not specified.
+Parameter Name: {0}</value>
+  </data>
+  <data name="ReservedHeaderName" xml:space="preserve">
+    <value>Reserved system header.
+Name: {0}</value>
+  </data>
+  <data name="SagaConcurrencyConflict" xml:space="preserve">
+    <value>Concurrency conflict.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaContextInterleaved" xml:space="preserve">
+    <value>This SagaContext is being disposed on a different thread than it was created.</value>
+  </data>
+  <data name="SagaContextInvalidThread" xml:space="preserve">
+    <value>This SagaContext is being disposed out of order.</value>
+  </data>
+  <data name="SagaDefaultConstructorRequired" xml:space="preserve">
+    <value>Saga must have a single public default constructor.
+Saga Type: {0}</value>
+  </data>
+  <data name="SagaLockAlreadyHeld" xml:space="preserve">
+    <value>Cannot aquire an additional lock until the current lock has been released.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaLockNotHeld" xml:space="preserve">
+    <value>Cannot release a lock that has not been aquired.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaMustHaveAtLeastOneInitiatingEvent" xml:space="preserve">
+    <value>Saga must have at least one initiating event.
+Saga Type: {0}</value>
+  </data>
+  <data name="SagaSaveTimeout" xml:space="preserve">
+    <value>The saga save operation has timed out.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaTimeoutAlreadyScheduled" xml:space="preserve">
+    <value>A saga timeout has already been scheduled; clear or reschedule existing timeout.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="SagaTimeoutNotScheduled" xml:space="preserve">
+    <value>No saga timeout has not been scheduled; unable to clear saga timeout.
+Saga Type: {0}
+Saga Id: {1}</value>
+  </data>
+  <data name="StateAccessException" xml:space="preserve">
+    <value>State may only be changed via an event apply method when saving an aggregate.
+Aggregate Id: {0}</value>
+  </data>
   <data name="TypeArgumentMustNotBeAnInterface" xml:space="preserve">
     <value>Type cannot be an interface.</value>
+  </data>
+  <data name="TypeDoesNotDeriveFromBase" xml:space="preserve">
+    <value>Type does not derive from {0}.
+Type: {1}</value>
   </data>
   <data name="UnknownDialect" xml:space="preserve">
     <value>Unknown database dialect.
 Provider Name: {0}</value>
+  </data>
+  <data name="UnknownSaga" xml:space="preserve">
+    <value>Unknown saga type {0}.</value>
+  </data>
+  <data name="UnresolvedConcurrencyConflict" xml:space="preserve">
+    <value>Unresolved concurrency conflict: {0}</value>
   </data>
 </root>

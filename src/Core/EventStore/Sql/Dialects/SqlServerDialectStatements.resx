@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DeleteStream" xml:space="preserve">
+    <value>DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;</value>
+  </data>
+  <data name="EnsureCommitTableExists" xml:space="preserve">
+    <value>IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = 'Commit')
+BEGIN
+    CREATE TABLE [Commit] (
+        [Id]            BIGINT           NOT NULL IDENTITY(1,1),
+        [Timestamp]     DATETIME2        NOT NULL,
+        [CorrelationId] UNIQUEIDENTIFIER NOT NULL,
+        [StreamId]      UNIQUEIDENTIFIER NOT NULL,
+        [Version]       INT              NOT NULL,
+        [Dispatched]    BIT              NOT NULL,
+        [Data]          VARBINARY(MAX)   NOT NULL,
+
+        CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED ([Id]),
+        CONSTRAINT [UQ_Commit_StreamVersion] UNIQUE ([StreamId],[Version])
+    );
+
+    CREATE NONCLUSTERED INDEX [IX_Commit_NotDispatched] ON [Commit]([Dispatched],[Id]) WHERE [Dispatched] = 0;
+END;</value>
+  </data>
+  <data name="EnsureDuplicateCommitsDetected" xml:space="preserve">
+    <value>IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID('Commit') AND name = 'UQ_Commit_CorrelationId')
+BEGIN
+    CREATE UNIQUE INDEX [UQ_Commit_CorrelationId] ON [Commit]([CorrelationId]);
+END;</value>
+  </data>
+  <data name="EnsureDuplicateCommitsSuppressed" xml:space="preserve">
+    <value>IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID('Commit') AND name = 'UQ_Commit_CorrelationId')
+BEGIN
+    DROP INDEX [UQ_Commit_CorrelationId] ON [Commit];
+END;</value>
+  </data>
+  <data name="EnsureSnapshotTableExists" xml:space="preserve">
+    <value>IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = 'Snapshot' )
+BEGIN
+    CREATE TABLE [Snapshot] (
+        [StreamId]  UNIQUEIDENTIFIER NOT NULL,
+        [Version]   INT              NOT NULL,
+        [State]     VARBINARY(MAX)   NOT NULL,
+     
+        CONSTRAINT [PK_Snapshot] PRIMARY KEY CLUSTERED ([StreamId],[Version]) WITH (IGNORE_DUP_KEY = ON)
+    );
+END;</value>
+  </data>
+  <data name="GetRange" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];</value>
+  </data>
+  <data name="GetSnapshot" xml:space="preserve">
+    <value>SELECT TOP(1) [StreamId],[Version],[State] FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;</value>
+  </data>
+  <data name="GetStream" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];</value>
+  </data>
+  <data name="GetStreams" xml:space="preserve">
+    <value>SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
+  </data>
+  <data name="GetUndispatched" xml:space="preserve">
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];</value>
+  </data>
+  <data name="InsertCommit" xml:space="preserve">
+    <value>INSERT INTO [dbo].[Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);</value>
+  </data>
+  <data name="InsertSnapshot" xml:space="preserve">
+    <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>
+  </data>
+  <data name="MarkDispatched" xml:space="preserve">
+    <value>UPDATE [Commit] SET [Dispatched] = 1 WHERE [Id] = @id;</value>
+  </data>
+  <data name="PurgeCommits" xml:space="preserve">
+    <value>TRUNCATE TABLE [dbo].[Commit];</value>
+  </data>
+  <data name="PurgeSnapshots" xml:space="preserve">
+    <value>TRUNCATE TABLE [dbo].[Snapshot];</value>
+  </data>
+  <data name="ReplaceSnapshot" xml:space="preserve">
+    <value>UPDATE TOP(1) [dbo].[Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
+IF @@ROWCOUNT = 0
+BEGIN
+    INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
+END;</value>
+  </data>
+  <data name="UpdateCommit" xml:space="preserve">
+    <value>UPDATE [dbo].[Commit] SET [Data] = @data WHERE [Id] = @id;</value>
+  </data>
+</root>
