@@ -121,7 +121,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
 
         public class WhenCreatingSaga : UsingInitializedSagaStore
         {
-            [Fact]
+            [SqlServerFact]
             public void ThrowKeyNotFoundIfSagaTypeUnknown()
             {
                 var sagaStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object);
@@ -129,7 +129,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 Assert.Throws<KeyNotFoundException>(() => sagaStore.CreateSaga(typeof(FakeSaga), GuidStrategy.NewGuid()));
             }
 
-            [Fact]
+            [SqlServerFact]
             public void TypeIdIsMD5HashOfSagaTypeFullName()
             {
                 var saga = SagaStore.CreateSaga(typeof(FakeSaga), GuidStrategy.NewGuid());
@@ -137,7 +137,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 Assert.Equal(Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), saga.TypeId);
             }
 
-            [Fact]
+            [SqlServerFact]
             public void CorrelationIdIsSagaId()
             {
                 var sagaId = GuidStrategy.NewGuid();
@@ -146,7 +146,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 Assert.Equal(sagaId, saga.CorrelationId);
             }
 
-            [Fact]
+            [SqlServerFact]
             public void VersionAssignedZeroValue()
             {
                 var saga = SagaStore.CreateSaga(typeof(FakeSaga), GuidStrategy.NewGuid());
@@ -183,7 +183,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 Assert.Equal(saga.Timeout, sagaTimeout.Timeout);
             }
 
-            [Fact]
+            [SqlServerFact]
             public void ThrowKeyNotFoundIfSagaTypeUnknown()
             {
                 var timeout = DateTime.Now.AddMinutes(20);
@@ -197,7 +197,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
 
         public class WhenSavingNewCompletedSaga : UsingInitializedSagaStore
         {
-            [Fact]
+            [SqlServerFact]
             public void DoNotInsertNewSagaIfCompleted()
             {
                 var saga = new FakeSaga { Version = 0, Completed = true };
