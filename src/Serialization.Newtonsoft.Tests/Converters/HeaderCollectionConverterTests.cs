@@ -84,7 +84,7 @@ namespace Test.Spark.Serialization.Converters
                 var headers = new ServiceMessageFactory().Create(null, new Object()).Headers;
                 var bson = WriteBson(new HeaderCollectionConverter(), headers);
 
-                Validate("﻿YgAAAAJfbwAMAAAAV29ya3N0YXRpb24AAl90AB0AAAAyMDEzLTA2LTAxVDEyOjMwOjQ1LjAwMDAwMDBaAAJfcgAcAAAAZmU4MDo6NGNhMDpmNzQ6Mzg3YTphNDViJTE3AAA=", bson);
+                Validate("YgAAAAJfbwAMAAAAV29ya3N0YXRpb24AAl90AB0AAAAyMDEzLTA2LTAxVDEyOjMwOjQ1LjAwMDAwMDBaAAJfcgAcAAAAZmU4MDo6MzViOTpiNzVlOmM4MDpjNTc5JTExAAA=", bson);
             }
         }
 
