@@ -4,9 +4,9 @@ using Spark.Example.Domain.Events;
 namespace Spark.Example.Denormalizers
 {
     [EventHandler]
-    public sealed class ClientDenormalizer
+    public sealed class AccountDenormalizer
     {
-        public void Handle(ClientRegistered e)
+        public void Handle(AccountOpened e)
         { }
     }
 }

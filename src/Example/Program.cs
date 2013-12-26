@@ -1,40 +1,64 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Threading;
 using Autofac;
-using Spark;
 using Spark.Cqrs.Commanding;
-using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
+using Spark.Example.Domain;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
 using Spark.Messaging;
-using PipelineHook = Spark.Cqrs.Domain.PipelineHook;
 
-namespace Example
+namespace Spark.Example
 {
-    class Program
+    /// <summary>
+    /// Basic test program used to evaluate infrastructure performance.
+    /// </summary>
+    internal static class Program
     {
-        static void Main()
-        {
-            GuidStrategy.Initialize(SqlSequentialGuid.NewGuid);
+        private const Int32 NumberOfCommandsToPublish = 5000;
 
-            var count = 50000;
+        /// <summary>
+        /// The main entry point for the test program.
+        /// </summary>
+        internal static void Main()
+        {
+            var container = Initialize();
+
+            Purge(container);
+            PublishCommands(container);
+
+            WaitForCompletion(container);
+        }
+
+        /// <summary>
+        /// Initialize the underlying IoC container.
+        /// </summary>
+        private static IContainer Initialize()
+        {
             var builder = new ContainerBuilder();
-            var benchmarkHook = new BenchmarkHook(count);
+
+            GuidStrategy.Initialize(SqlSequentialGuid.NewGuid);
 
             builder.RegisterModule<CommonModule>();
             builder.RegisterModule<CommandingModule>();
             builder.RegisterModule<EventingModule>();
-            builder.RegisterInstance(benchmarkHook).As<PipelineHook>();
+            builder.RegisterModule<ExampleModule>();
 
-            var container = builder.Build();
-            var commandPublisher = container.Resolve<IPublishCommands>();
+            return builder.Build();
+        }
+
+        /// <summary>
+        /// Purge all existing data to ensure a clean slate prior to running the test program.
+        /// </summary>
+        /// <param name="container">The test IoC container.</param>
+        private static void Purge(IComponentContext container)
+        {
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
             var sagaStore = container.Resolve<IStoreSagas>();
@@ -50,70 +74,92 @@ namespace Example
 
             Console.WriteLine("Starting performance test...");
             Console.WriteLine();
-
-            for (var i = 1; i <= count; i++)
-                commandPublisher.Publish(GuidStrategy.NewGuid(), new RegisterClient("User #" + i.ToString("{0:00000}")));
-
-            benchmarkHook.WaitForCommandDrain();
-
-            ((SqlSnapshotStore)container.Resolve<IStoreSnapshots>()).Dispose();
-            ((SqlEventStore)container.Resolve<IStoreEvents>()).Dispose();
-            (container.Resolve<IStoreSagas>()).Dispose();
-
-            ((IDisposable)container.Resolve<IReceiveMessages<EventEnvelope>>()).Dispose();
-            container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
         }
 
-        public class BenchmarkHook : PipelineHook
+        /// <summary>
+        /// Publish a set of pre-defined test commands to evaluate infrastructure performance.
+        /// </summary>
+        /// <param name="container">The test IoC container.</param>
+        private static void PublishCommands(IComponentContext container)
         {
-            private readonly ManualResetEvent manualResetEvent = new ManualResetEvent(false);
-            private readonly Int32 expectedCommands;
-            private readonly Timer timer;
-            private Int64 savedCommands;
-            private DateTime startTime;
-            private Boolean started;
+            var commandPublisher = container.Resolve<IPublishCommands>();
+            var accounts = new List<Guid>();
+            var randomizer = new Random();
 
-            public BenchmarkHook(Int32 expectedCommands)
+            // Ensure at least 10 accounts opened prior to randomized data generation.
+            for (var i = 0; i < 10; i++)
             {
-                this.expectedCommands = expectedCommands;
-                this.timer = new Timer(WriteThroughput, null, 0, 500);
+                accounts.Add(GuidStrategy.NewGuid());
+                commandPublisher.Publish(accounts[i], new OpenAccount((AccountType)randomizer.Next(1, 3)));
             }
 
-            private void WriteThroughput(Object state)
+            // Generate a random set of commands to exercise the underlying infrastructure.
+            for (var i = 10; i < (NumberOfCommandsToPublish - 10); i++)
             {
-                var current = Interlocked.Read(ref savedCommands);
-                if (current > 0 && current < expectedCommands)
+                switch (randomizer.Next(0, 11))
                 {
-                    var elapsedTime = DateTime.Now.Subtract(startTime);
+                    case 0:
+                        var account = GuidStrategy.NewGuid();
+                        commandPublisher.Publish(account, new OpenAccount((AccountType)randomizer.Next(1, 3)));
+                        accounts.Add(account);
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        commandPublisher.Publish(accounts[randomizer.Next(0, accounts.Count)], new DepositMoney((Decimal)(randomizer.Next(1, 1000000) / 100.0)));
+                        break;
+                    case 5:
+                    case 6:
+                    case 7:
+                        commandPublisher.Publish(accounts[randomizer.Next(0, accounts.Count)], new DepositMoney((Decimal)(randomizer.Next(1, 500000) / 100.0)));
+                        break;
+                    case 8:
+                    case 9:
+                        var account1 = accounts[randomizer.Next(0, accounts.Count)];
+                        var account2 = accounts[randomizer.Next(0, accounts.Count)];
 
-                    using (var process = Process.GetCurrentProcess())
-                        Console.Write("\r{0}: {1:0000000} @ {2:F2}/sec ({3})", elapsedTime, current, Math.Round(current / elapsedTime.TotalSeconds, 2), process.Threads.Count);
+                        while (account1 == account2)
+                            account2 = accounts[randomizer.Next(0, accounts.Count)];
+
+                        commandPublisher.Publish(account1, new SendMoneyTransfer(GuidStrategy.NewGuid(), account2, (Decimal)(randomizer.Next(1, 500000) / 100.0)));
+                        break;
+                    case 10:
+                        commandPublisher.Publish(accounts[randomizer.Next(0, accounts.Count)], new CloseAccount());
+                        break;
                 }
             }
+        }
 
-            public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
-            {
-                if (!started)
-                {
-                    startTime = DateTime.Now;
-                    started = true;
-                }
+        /// <summary>
+        /// Wait for all commands/events to be processed before allowing process to exit.
+        /// </summary>
+        /// <param name="container">The test IoC container.</param>
+        private static void WaitForCompletion(ILifetimeScope container)
+        {
+            var commandBus = container.Resolve<BlockingCollectionMessageBus<CommandEnvelope>>();
+            var eventBus = container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>();
 
-                if (Interlocked.Increment(ref savedCommands) == expectedCommands)
-                {
-                    var elapsedTime = DateTime.Now.Subtract(startTime);
+            while (commandBus.Count > 0 || eventBus.Count > 0)
+                Thread.Sleep(100);
 
-                    Console.Write("\r{0}: {1:0000000} @ {2:F2}/sec", elapsedTime, expectedCommands, Math.Round(expectedCommands / elapsedTime.TotalSeconds, 2));
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    manualResetEvent.Set();
-                }
-            }
+            // Wait for command bus drain and shut-down.
+            commandBus.WaitForDrain();
+            container.Resolve<MessageReceiver<CommandEnvelope>>().Dispose();
+            container.Resolve<BlockingCollectionMessageBus<CommandEnvelope>>().Dispose();
 
-            public void WaitForCommandDrain()
-            {
-                manualResetEvent.WaitOne();
-            }
+            // Wait for event bus drain and shut-down.
+            eventBus.WaitForDrain();
+            container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
+            container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>().Dispose();
+
+            // Wait for all stores to complete any background processing.
+            container.Resolve<SqlSnapshotStore>().Dispose();
+            container.Resolve<SqlEventStore>().Dispose();
+            container.Resolve<SqlSagaStore>().Dispose();
+
+            // Dispose underlying IoC container.
+            container.Dispose();
         }
     }
 }

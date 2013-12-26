@@ -228,7 +228,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Update the saga context to reflect that the saga timeout has changed.
         /// </summary>
-        private void FlagTimeoutChangedOnSagaContext()
+        private static void FlagTimeoutChangedOnSagaContext()
         {
             var context = SagaContext.Current;
             if (context == null)
