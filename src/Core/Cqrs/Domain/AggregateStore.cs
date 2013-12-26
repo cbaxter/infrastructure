@@ -32,7 +32,6 @@ namespace Spark.Cqrs.Domain
         private readonly IStoreSnapshots snapshotStore;
         private readonly IStoreEvents eventStore;
         private readonly Int32 snapshotInterval;
-        private readonly TimeSpan retryTimeout;
 
         /// <summary>
         /// Initializes a new instance of <see cref="AggregateStore"/>.
@@ -52,7 +51,6 @@ namespace Spark.Cqrs.Domain
             Verify.NotNull(aggregateUpdater, "aggregateUpdater");
 
             this.snapshotInterval = settings.SnapshotInterval;
-            this.retryTimeout = settings.SaveRetryTimeout;
             this.aggregateUpdater = aggregateUpdater;
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;

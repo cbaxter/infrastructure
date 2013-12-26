@@ -37,9 +37,8 @@ namespace Spark.Messaging
     /// </summary>
     public class BlockingCollectionMessageBus<T> : BlockingCollectionMessageBus, ISendMessages<T>, IReceiveMessages<T>, IDisposable
     {
-        private readonly BlockingCollection<Message<T>> messageQueue = new BlockingCollection<Message<T>>();
-        private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
-        private readonly ManualResetEvent drained = new ManualResetEvent(false);
+        private readonly BlockingCollection<Message<T>> messageQueue;
+        private readonly CancellationTokenSource tokenSource;
         private Boolean disposed;
 
         /// <summary>
@@ -59,7 +58,6 @@ namespace Spark.Messaging
         {
             messageQueue = new BlockingCollection<Message<T>>();
             tokenSource = new CancellationTokenSource();
-            drained = new ManualResetEvent(false);
         }
 
         /// <summary>
@@ -72,7 +70,22 @@ namespace Spark.Messaging
 
             messageQueue = new BlockingCollection<Message<T>>(boundedCapacity);
             tokenSource = new CancellationTokenSource();
-            drained = new ManualResetEvent(false);
+        }
+
+        /// <summary>
+        /// Wait for all messages to be received (removed) from the underlying message queue.
+        /// </summary>
+        public void WaitForDrain()
+        {
+            Verify.NotDisposed(this, disposed);
+
+            Log.TraceFormat("Waiting for message drain");
+            messageQueue.CompleteAdding();
+            while (!messageQueue.IsCompleted)
+                Thread.Sleep(10);
+
+            Log.TraceFormat("Cancel all blocked receive operations");
+            tokenSource.Cancel();
         }
 
         /// <summary>
@@ -85,20 +98,9 @@ namespace Spark.Messaging
 
             Log.TraceFormat("Disposing");
 
-            messageQueue.CompleteAdding();
-
-            if (messageQueue.IsCompleted)
-                drained.Set();
-
-            Log.TraceFormat("Waiting for message queue drain");
-            drained.WaitOne();
-
-            tokenSource.Cancel();
+            WaitForDrain();
             tokenSource.Dispose();
             messageQueue.Dispose();
-            drained.Dispose();
-
-            Log.TraceFormat("Disposing");
             disposed = true;
 
             Log.TraceFormat("Disposed");
@@ -124,17 +126,20 @@ namespace Spark.Messaging
         /// <returns>The message received or null.</returns>
         public Message<T> Receive()
         {
-            Message<T> message;
+            Message<T> message = null;
 
-            if (disposed)
-                return null;
-
-            if (messageQueue.IsCompleted)
-                drained.Set();
-
-            Log.TraceFormat("Waiting for message");
-            if (messageQueue.TryTake(out message, Timeout.Infinite, tokenSource.Token) && message != null)
-                Log.TraceFormat("Received message {0}", message.Id);
+            if (!(disposed || messageQueue.IsCompleted))
+            {
+                try
+                {
+                    Log.TraceFormat("Waiting for message");
+                    message = messageQueue.Take(tokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Log.Warn("Operation cancelled");
+                }
+            }
 
             return message;
         }

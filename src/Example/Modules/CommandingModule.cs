@@ -6,6 +6,7 @@ using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
 using Spark.EventStore.Sql.Dialects;
+using Spark.Example.Benchmarks;
 using Spark.Messaging;
 using Module = Autofac.Module;
 
@@ -15,30 +16,30 @@ namespace Spark.Example.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            base.Load(builder);
-
-            // Register Common Types (i.e., Sending or Receiving).
-            builder.RegisterType<BlockingCollectionMessageBus<CommandEnvelope>>().As<ISendMessages<CommandEnvelope>>().As<IReceiveMessages<CommandEnvelope>>().SingleInstance();
-
-            builder.RegisterType<CommandPublisher>().As<IPublishCommands>().SingleInstance();
-
-            
-            builder.RegisterType<SqlEventStoreDialect>().As<IEventStoreDialect>().SingleInstance();
-            builder.RegisterType<SqlEventStore>().As<IStoreEvents>().SingleInstance();
-
-            builder.RegisterType<SqlSnapshotStoreDialect>().As<ISnapshotStoreDialect>().SingleInstance();
-            builder.RegisterType<SqlSnapshotStore>().As<IStoreSnapshots>().SingleInstance();
-
-            builder.RegisterType<AggregateUpdater>().As<IApplyEvents>().SingleInstance();
-            builder.RegisterType<AggregateStore>().Named<IStoreAggregates>("AggregateStore").SingleInstance();
-
+            // Register underlying commanding infrastructure.
+            builder.RegisterType<BlockingCollectionMessageBus<CommandEnvelope>>().AsSelf().As<ISendMessages<CommandEnvelope>>().As<IReceiveMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<MessageReceiver<CommandEnvelope>>().AsSelf().SingleInstance().AutoActivate();
             builder.RegisterType<CommandProcessor>().As<IProcessMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
+            builder.RegisterType<CommandPublisher>().As<IPublishCommands>().SingleInstance();
 
-            builder.RegisterType<EventDispatcher>().As<PipelineHook>().SingleInstance();
+            // Register data store infrastructure.
+            builder.RegisterType<SqlEventStoreDialect>().AsSelf().As<IEventStoreDialect>().SingleInstance();
+            builder.RegisterType<SqlEventStore>().AsSelf().Named<IStoreEvents>("EventStore").SingleInstance();
+
+            builder.RegisterType<SqlSnapshotStoreDialect>().AsSelf().As<ISnapshotStoreDialect>().SingleInstance();
+            builder.RegisterType<SqlSnapshotStore>().AsSelf().Named<IStoreSnapshots>("SnapshotStore").SingleInstance();
+
+            builder.RegisterType<AggregateUpdater>().AsSelf().As<IApplyEvents>().SingleInstance();
+            builder.RegisterType<AggregateStore>().AsSelf().Named<IStoreAggregates>("AggregateStore").SingleInstance();
+
+            // Register decorators.
+            builder.RegisterType<CommandHook>().AsSelf().As<PipelineHook>().SingleInstance();
+            builder.RegisterType<EventDispatcher>().AsSelf().As<PipelineHook>().SingleInstance();
             builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new CachedAggregateStore(aggregateStore), "AggregateStore").Named<IStoreAggregates>("CachedAggregateStore").SingleInstance();
             builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedAggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
+            builder.RegisterDecorator<IStoreSnapshots>((context, snapshotStore) => new BenchmarkedSnapshotStore(snapshotStore, context.Resolve<Statistics>()), "SnapshotStore").As<IStoreSnapshots>().SingleInstance();
+            builder.RegisterDecorator<IStoreEvents>((context, eventStore) => new BenchmarkedEventStore(eventStore, context.Resolve<Statistics>()), "EventStore").As<IStoreEvents>().SingleInstance();
         }
     }
 }

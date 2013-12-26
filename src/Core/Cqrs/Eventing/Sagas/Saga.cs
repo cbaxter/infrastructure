@@ -54,7 +54,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// The saga version used to detect multi-node concurrency conflicts.
         /// </summary>
         [IgnoreDataMember]
-        internal Int32 Version { get; set; }
+        public Int32 Version { get; internal set; }
 
         /// <summary>
         /// The saga type identifier (MD5 hash of saga <see cref="Type.FullName"/>).
@@ -228,7 +228,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Update the saga context to reflect that the saga timeout has changed.
         /// </summary>
-        private void FlagTimeoutChangedOnSagaContext()
+        private static void FlagTimeoutChangedOnSagaContext()
         {
             var context = SagaContext.Current;
             if (context == null)
