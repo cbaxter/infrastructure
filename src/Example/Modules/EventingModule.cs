@@ -7,6 +7,7 @@ using Spark.Cqrs.Eventing.Mappings;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
+using Spark.Example.Benchmarks;
 using Spark.Messaging;
 using Module = Autofac.Module;
 
@@ -34,7 +35,8 @@ namespace Spark.Example.Modules
 
             // Register decorators.
             builder.Register(container => new TimeoutDispatcher(container.ResolveNamed<IStoreSagas>("SagaStore"), container.Resolve<IPublishEvents>())).As<PipelineHook>().SingleInstance();
-            builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "SagaStore").Named<IStoreSagas>("CachedSagaStore").SingleInstance();
+            builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new BenchmarkedSagaStore(sagaStore, context.Resolve<Statistics>()), "SagaStore").Named<IStoreSagas>("BenchmarkedSagaStore").SingleInstance();
+            builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "BenchmarkedSagaStore").Named<IStoreSagas>("CachedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new HookableSagaStore(sagaStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedSagaStore").As<IStoreSagas>().SingleInstance();
         }
     }

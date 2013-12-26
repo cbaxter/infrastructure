@@ -54,6 +54,11 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Benchmarks\BenchmarkedSagaStore.cs" />
+    <Compile Include="Benchmarks\BenchmarkedSnapshotStore.cs" />
+    <Compile Include="Benchmarks\BenchmarkedEventStore.cs" />
+    <Compile Include="Benchmarks\CommandHook.cs" />
+    <Compile Include="Benchmarks\Statistics.cs" />
     <Compile Include="Denormalizers\AccountDenormalizer.cs" />
     <Compile Include="Domain\Account.cs" />
     <Compile Include="Domain\AccountStatus.cs" />

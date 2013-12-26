@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Autofac;
 using Spark.Cqrs.Commanding;
@@ -9,6 +10,7 @@ using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Data.SqlClient;
 using Spark.EventStore;
 using Spark.EventStore.Sql;
+using Spark.Example.Benchmarks;
 using Spark.Example.Domain;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
@@ -21,7 +23,7 @@ namespace Spark.Example
     /// </summary>
     internal static class Program
     {
-        private const Int32 NumberOfCommandsToPublish = 5000;
+        private const Int32 NumberOfCommandsToPublish = 100000;
 
         /// <summary>
         /// The main entry point for the test program.
@@ -34,6 +36,12 @@ namespace Spark.Example
             PublishCommands(container);
 
             WaitForCompletion(container);
+
+            if (Debugger.IsAttached)
+            {
+                Console.Write("Press any key to continue . . . ");
+                Console.Read();
+            }   
         }
 
         /// <summary>
@@ -62,6 +70,7 @@ namespace Spark.Example
             var snapshotStore = container.Resolve<IStoreSnapshots>();
             var eventStore = container.Resolve<IStoreEvents>();
             var sagaStore = container.Resolve<IStoreSagas>();
+            var statistics = container.Resolve<Statistics>();
 
             Console.WriteLine("Purging event store...");
             eventStore.Purge();
@@ -74,6 +83,8 @@ namespace Spark.Example
 
             Console.WriteLine("Starting performance test...");
             Console.WriteLine();
+
+            statistics.StartCapture();
         }
 
         /// <summary>
@@ -139,6 +150,7 @@ namespace Spark.Example
         {
             var commandBus = container.Resolve<BlockingCollectionMessageBus<CommandEnvelope>>();
             var eventBus = container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>();
+            var statistics = container.Resolve<Statistics>();
 
             while (commandBus.Count > 0 || eventBus.Count > 0)
                 Thread.Sleep(100);
@@ -152,6 +164,9 @@ namespace Spark.Example
             eventBus.WaitForDrain();
             container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
             container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>().Dispose();
+
+            // Stop statistics collection.
+            statistics.StopCapture();
 
             // Wait for all stores to complete any background processing.
             container.Resolve<SqlSnapshotStore>().Dispose();

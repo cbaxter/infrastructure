@@ -8,5 +8,14 @@ namespace Spark.Example.Denormalizers
     {
         public void Handle(AccountOpened e)
         { }
+
+        public void Handle(MoneyDeposited e)
+        { }
+
+        public void Handle(MoneyWithdrawn e)
+        { }
+
+        public void Handle(AccountClosed e)
+        { }
     }
 }
