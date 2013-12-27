@@ -9,16 +9,17 @@ namespace Spark.Example.Benchmarks
     /// </summary>
     internal class Statistics
     {
-        private Int64 commands, queries, inserts, updates, deletes, totalCommands, totalQueries, totalInserts, totalUpdates, totalDelets;
-        private readonly Object syncLock = new Object();
         private readonly Timer timer;
+        private readonly Object syncLock = new Object();
+        private Int64 commands, queries, inserts, updates, deletes, totalCommands, totalQueries, totalInserts, totalUpdates, totalDeletes;
+        private Boolean disabled = true;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Statistics"/>.
         /// </summary>
         public Statistics()
         {
-            timer = new Timer(Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+            timer = new Timer(_ => WriteStatisticsLine(), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         /// <summary>
@@ -31,7 +32,9 @@ namespace Spark.Example.Benchmarks
             Console.WriteLine("      Commands       Queries       Inserts       Updates       Deletes");
             Console.WriteLine("----------------------------------------------------------------------");
 
+            commands = queries = inserts = updates = deletes = totalCommands = totalQueries = totalInserts = totalUpdates = totalDeletes = 0;
             timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            disabled = false;
         }
 
         /// <summary>
@@ -41,16 +44,17 @@ namespace Spark.Example.Benchmarks
         {
             var line = String.Empty;
 
+            disabled = true;
             timer.Change(Timeout.Infinite, Timeout.Infinite);
-
-            Console.WriteLine("----------------------------------------------------------------------");
+            WriteStatisticsLine();
 
             // Build Line
+            Console.WriteLine("----------------------------------------------------------------------");
             line += totalCommands.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalQueries.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalInserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalUpdates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalDelets.ToString(CultureInfo.InvariantCulture).PadLeft(14);
+            line += totalDeletes.ToString(CultureInfo.InvariantCulture).PadLeft(14);
 
             Console.WriteLine(line);
             Console.WriteLine();
@@ -63,6 +67,7 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void IncrementCommandCount()
         {
+            if (disabled) return;
             lock (syncLock)
             {
                 commands++;
@@ -75,6 +80,7 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void IncrementQueryCount()
         {
+            if (disabled) return;
             lock (syncLock)
             {
                 queries++;
@@ -87,6 +93,7 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void IncrementInsertCount()
         {
+            if (disabled) return;
             lock (syncLock)
             {
                 inserts++;
@@ -99,6 +106,7 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void IncrementUpdateCount()
         {
+            if (disabled) return;
             lock (syncLock)
             {
                 updates++;
@@ -111,18 +119,18 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void IncrementDeleteCount()
         {
+            if (disabled) return;
             lock (syncLock)
             {
                 deletes++;
-                totalDelets++;
+                totalDeletes++;
             }
         }
 
         /// <summary>
         /// Report statistics captured since the last interval.
         /// </summary>
-        /// <param name="state">The state.</param>
-        private void Elapsed(Object state)
+        private void WriteStatisticsLine()
         {
             var line = String.Empty;
 
