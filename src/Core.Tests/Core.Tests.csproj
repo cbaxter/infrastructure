@@ -158,6 +158,8 @@
       <SubType>
       </SubType>
     </Compile>
+    <Compile Include="Serialization\DeflateSerializerTests.cs" />
+    <Compile Include="Serialization\GZipSerializerTests.cs" />
     <Compile Include="StringExtensionTests.cs" />
     <Compile Include="SystemTimeTests.cs" />
     <Compile Include="Threading\BlockingThreadPoolTaskSchedulerTests.cs" />

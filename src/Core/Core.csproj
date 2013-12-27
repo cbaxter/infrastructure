@@ -247,6 +247,8 @@
     </Compile>
     <Compile Include="GuidStrategy.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
+    <Compile Include="Serialization\DeflateSerializer.cs" />
+    <Compile Include="Serialization\GzipSerializer.cs" />
     <Compile Include="Serialization\ISerializeObjects.cs" />
     <Compile Include="StateObject.cs" />
     <Compile Include="StreamExtensions.cs" />
