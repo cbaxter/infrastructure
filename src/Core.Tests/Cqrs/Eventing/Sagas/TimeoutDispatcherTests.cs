@@ -30,7 +30,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void CanSafelyDisposeMoreThanOnce()
             {
-                var dispatcher = new TimeoutDispatcher(new Mock<IStoreSagas>().Object, new Lazy<IPublishEvents>(() => new Mock<IPublishEvents>().Object));
+                var dispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => new Mock<IStoreSagas>().Object), new Lazy<IPublishEvents>(() => new Mock<IPublishEvents>().Object));
 
                 dispatcher.Dispose();
 
@@ -52,7 +52,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 now = DateTime.UtcNow;
                 sagaStore = new Mock<IStoreSagas>();
                 eventPublisher = new Mock<IPublishEvents>();
-                timeoutDispatcher = new TimeoutDispatcher(sagaStore.Object, new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
+                timeoutDispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
                 sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(5));
 
                 SystemTime.OverrideWith(() => now);
@@ -109,7 +109,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void ClearTimeoutIfSagaCompleted()
             {
                 var saga = new FakeSaga { CorrelationId = sagaTimeout.SagaId, Timeout = sagaTimeout.Timeout, Completed = true };
-                var cachedItems = timeoutDispatcher.Cache.Count - 1;
+                var cachedItems = timeoutDispatcher.TimeoutCache.Count - 1;
 
                 using (var context = new SagaContext(sagaTimeout.SagaType, sagaTimeout.SagaId, new FakeEvent()))
                 {
@@ -117,7 +117,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                     timeoutDispatcher.PostSave(saga, context, null);
                 }
 
-                Assert.Equal(cachedItems, timeoutDispatcher.Cache.Count);
+                Assert.Equal(cachedItems, timeoutDispatcher.TimeoutCache.Count);
             }
 
             [Fact]
@@ -152,7 +152,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void ClearTimeoutIfTimeoutChangedAndHasNoValue()
             {
                 var saga = new FakeSaga { CorrelationId = sagaTimeout.SagaId, Timeout = null };
-                var cachedItems = timeoutDispatcher.Cache.Count - 1;
+                var cachedItems = timeoutDispatcher.TimeoutCache.Count - 1;
 
                 using (var context = new SagaContext(sagaTimeout.SagaType, sagaTimeout.SagaId, new FakeEvent()))
                 {
@@ -160,14 +160,14 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                     timeoutDispatcher.PostSave(saga, context, null);
                 }
 
-                Assert.Equal(cachedItems, timeoutDispatcher.Cache.Count);
+                Assert.Equal(cachedItems, timeoutDispatcher.TimeoutCache.Count);
             }
 
             [Fact]
             public void ScheduleTimeoutIfTimeoutHasValueAndSagaNotCompleted()
             {
                 var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), Timeout = SystemTime.Now.AddMinutes(1) };
-                var cachedItems = timeoutDispatcher.Cache.Count + 1;
+                var cachedItems = timeoutDispatcher.TimeoutCache.Count + 1;
 
                 using (var context = new SagaContext(saga.GetType(), saga.CorrelationId, new FakeEvent()))
                 {
@@ -175,7 +175,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                     timeoutDispatcher.PostSave(saga, context, null);
                 }
 
-                Assert.Equal(cachedItems, timeoutDispatcher.Cache.Count);
+                Assert.Equal(cachedItems, timeoutDispatcher.TimeoutCache.Count);
             }
 
             [Fact]
@@ -223,7 +223,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(-5));
 
                 SystemTime.OverrideWith(() => now);
-                Assert.DoesNotThrow(() => new TimeoutDispatcher(sagaStore.Object, new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback)));
+                Assert.DoesNotThrow(() => new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback)));
 
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
             }
