@@ -41,7 +41,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="typeLocator">The type locator used to retrieve all known <see cref="Event"/> types.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
-        public EventHandlerRegistry(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
+        public EventHandlerRegistry(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
         {
             Verify.NotNull(sagaStore, "sagaStore");
             Verify.NotNull(typeLocator, "typeLocator");
@@ -63,7 +63,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="typeLocator">The type locator use to retrieve all known classes marked with <see cref="EventHandlerAttribute"/>.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
-        private static Dictionary<Type, EventHandler[]> DiscoverEventHandlers(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
+        private static Dictionary<Type, EventHandler[]> DiscoverEventHandlers(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
         {
             var knownEvents = typeLocator.GetTypes(type => !type.IsAbstract && type.IsClass && type.DerivesFrom(typeof(Event)));
             var knownHandlers = DiscoverHandleMethods(typeLocator, serviceProvider, sagaStore, commandPublisher);
@@ -105,7 +105,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="typeLocator">The type locator use to retrieve all known classes marked with <see cref="EventHandlerAttribute"/>.</param>
         /// <param name="serviceProvider">The service locator used to retrieve singleton event handler dependencies.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
-        private static Dictionary<Type, List<EventHandler>> DiscoverHandleMethods(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, IPublishCommands commandPublisher)
+        private static Dictionary<Type, List<EventHandler>> DiscoverHandleMethods(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
         {
             var handlerTypes = typeLocator.GetTypes(type => !type.IsAbstract && type.IsClass && type.GetCustomAttribute<EventHandlerAttribute>() != null);
             var knownEventHandlers = new Dictionary<Type, List<EventHandler>>();

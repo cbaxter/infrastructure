@@ -34,7 +34,7 @@ namespace Spark.Example.Modules
             builder.RegisterType<SqlSagaStore>().AsSelf().Named<IStoreSagas>("SagaStore").SingleInstance();
 
             // Register decorators.
-            builder.Register(container => new TimeoutDispatcher(container.ResolveNamed<IStoreSagas>("SagaStore"), container.Resolve<IPublishEvents>())).As<PipelineHook>().SingleInstance();
+            builder.Register(container => new TimeoutDispatcher(container.ResolveNamed<IStoreSagas>("SagaStore"), container.Resolve<Lazy<IPublishEvents>>())).As<PipelineHook>().SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new BenchmarkedSagaStore(sagaStore, context.Resolve<Statistics>()), "SagaStore").Named<IStoreSagas>("BenchmarkedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "BenchmarkedSagaStore").Named<IStoreSagas>("CachedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new HookableSagaStore(sagaStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedSagaStore").As<IStoreSagas>().SingleInstance();

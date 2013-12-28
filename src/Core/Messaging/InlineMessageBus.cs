@@ -41,11 +41,11 @@ namespace Spark.Messaging
         {
             try
             {
-                messageProcessor.ProcessAsync(message).Wait();
+                messageProcessor.Process(message);
             }
             catch (AggregateException ex)
             {
-                throw ex.Flatten().InnerException; 
+                throw ex.Flatten().InnerException;
             }
         }
     }

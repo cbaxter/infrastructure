@@ -82,6 +82,11 @@ namespace Test.Spark.Messaging
         {
             private readonly ManualResetEvent commandProcessed = new ManualResetEvent(false);
 
+            public void Process(Message<Object> message)
+            {
+                commandProcessed.Set();
+            }
+
             public Task ProcessAsync(Message<Object> message)
             {
                 commandProcessed.Set();

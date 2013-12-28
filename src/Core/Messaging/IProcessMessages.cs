@@ -21,35 +21,17 @@ namespace Spark.Messaging
     /// </summary>
     public interface IProcessMessages<T>
     {
+
+        /// <summary>
+        /// Processes the specified message instance synchornously.
+        /// </summary>
+        /// <param name="message">The message to process.</param>
+        void Process(Message<T> message);
+
         /// <summary>
         /// Processes the specified message instance asynchornously.
         /// </summary>
         /// <param name="message">The message to process.</param>
         Task ProcessAsync(Message<T> message);
-    }
-
-    /// <summary>
-    /// Extension methods of <see cref="IProcessMessages{T}"/>
-    /// </summary>
-    public static class MessageProcessorExtensions
-    {
-        /// <summary>
-        /// Processes the specified message instance synchornously.
-        /// </summary>
-        /// <param name="messageProcessor">The message processor.</param>
-        /// <param name="message">The message to process.</param>
-        public static void Process<T>(this IProcessMessages<T> messageProcessor, Message<T> message)
-        {
-            Verify.NotNull(messageProcessor, "messageProcessor");
-
-            try
-            {
-                messageProcessor.ProcessAsync(message).Wait();
-            }
-            catch (AggregateException ex)
-            {
-                throw ex.Flatten().InnerException;
-            }
-        }
     }
 }

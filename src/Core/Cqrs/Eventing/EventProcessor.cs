@@ -81,7 +81,7 @@ namespace Spark.Cqrs.Eventing
         /// Process the received <see cref="Event"/> message instance synchronously.
         /// </summary>
         /// <param name="message">The <see cref="Event"/> message.</param>
-        private void Process(Message<EventEnvelope> message)
+        public void Process(Message<EventEnvelope> message)
         {
             var envelope = message.Payload;
 

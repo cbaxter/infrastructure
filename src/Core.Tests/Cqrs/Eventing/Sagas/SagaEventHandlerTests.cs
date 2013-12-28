@@ -6,9 +6,7 @@ using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
 using Spark.Cqrs.Eventing.Sagas;
-using Spark.Data;
 using Spark.Messaging;
-using Test.Spark.Configuration;
 using Xunit;
 using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
@@ -52,7 +50,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 EventContext = new EventContext(AggregateId, HeaderCollection.Empty, Event);
                 EventHandler = new EventHandler(typeof(FakeSaga), typeof(FakeEvent), executor, () => { throw new NotSupportedException(); });
                 SagaMetadata = Saga.GetMetadata(typeof(FakeSaga), new HandleMethodCollection(new Dictionary<Type, Action<Object, Event>> { { typeof(FakeEvent), executor } }));
-                SagaEventHandler = new SagaEventHandler(EventHandler, SagaMetadata, SagaStore.Object, CommandPublisher.Object);
+                SagaEventHandler = new SagaEventHandler(EventHandler, SagaMetadata, SagaStore.Object, new Lazy<IPublishCommands>(() => CommandPublisher.Object));
             }
 
             public void Dispose()

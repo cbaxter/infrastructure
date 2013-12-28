@@ -1,4 +1,5 @@
-﻿using Spark.Configuration;
+﻿using System;
+using Spark.Configuration;
 using Spark.Cqrs.Commanding;
 using Spark.Logging;
 
@@ -23,7 +24,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     public sealed class SagaEventHandler : EventHandler
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        private readonly IPublishCommands commandPublisher;
+        private readonly Lazy<IPublishCommands> lazyCommandPublisher;
         private readonly SagaMetadata sagaMetadata;
         private readonly IStoreSagas sagaStore;
 
@@ -34,7 +35,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaMetadata">The saga metadata associated with this saga event handler.</param>
         /// <param name="sagaStore">The saga store used to load/save saga state.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
-        public SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IPublishCommands commandPublisher)
+        public SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
             : this(eventHandler, sagaMetadata, sagaStore, commandPublisher, Settings.SagaStore)
         { }
 
@@ -46,7 +47,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaStore">The saga store used to load/save saga state.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
         /// <param name="settings">The event processor settings.</param>
-        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, IPublishCommands commandPublisher, IStoreSagaSettings settings)
+        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher, IStoreSagaSettings settings)
             : base(eventHandler)
         {
             Verify.NotNull(sagaStore, "sagaStore");
@@ -56,7 +57,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             this.sagaStore = sagaStore;
             this.sagaMetadata = sagaMetadata;
-            this.commandPublisher = commandPublisher;
+            this.lazyCommandPublisher = commandPublisher;
         }
 
         /// <summary>
@@ -71,6 +72,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 UpdateSaga(sagaContext);
 
+                var commandPublisher = lazyCommandPublisher.Value;
                 foreach (var sagaCommand in sagaContext.GetPublishedCommands())
                     commandPublisher.Publish(sagaCommand.AggregateId, sagaCommand.Command, sagaCommand.Headers);
             }
