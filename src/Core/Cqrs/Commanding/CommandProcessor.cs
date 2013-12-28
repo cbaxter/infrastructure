@@ -82,7 +82,7 @@ namespace Spark.Cqrs.Commanding
         /// Process the received <see cref="Command"/> message instance synchronously.
         /// </summary>
         /// <param name="message">The <see cref="Command"/> message.</param>
-        private void Process(Message<CommandEnvelope> message)
+        public void Process(Message<CommandEnvelope> message)
         {
             using (Log.PushContext("Message", message))
             {

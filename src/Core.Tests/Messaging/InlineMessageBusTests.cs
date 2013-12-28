@@ -44,7 +44,7 @@ namespace Test.Spark.Messaging
                 var messageBus = new InlineMessageBus<Object>(messageProcessor.Object);
                 var message = new Message<Object>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new Object());
 
-                messageProcessor.Setup(mock => mock.ProcessAsync(message)).Throws(new AggregateException(new InvalidOperationException()));
+                messageProcessor.Setup(mock => mock.Process(message)).Throws(new AggregateException(new InvalidOperationException()));
 
                 Assert.Throws<InvalidOperationException>(() => messageBus.Send(message));
             }
@@ -58,6 +58,12 @@ namespace Test.Spark.Messaging
                 public void Dispose()
                 {
                     processed.Dispose();
+                }
+
+                public void Process(Message<Object> message)
+                {
+                    Processed = true;
+                    processed.Set();
                 }
 
                 public Task ProcessAsync(Message<Object> message)

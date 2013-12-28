@@ -28,8 +28,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         private readonly ITimer timer;
-        private readonly IPublishEvents eventPublisher;
-        private readonly SagaTimeoutCache sagaTimeoutCache;
+        private readonly Lazy<SagaTimeoutCache> sagaTimeoutCache;
+        private readonly Lazy<IPublishEvents> lazyEventPublisher;
         private readonly Object syncLock = new Object();
         private DateTime scheduledTimeout;
         private Boolean disposed;
@@ -37,20 +37,20 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// The underlying saga timeout cache instance.
         /// </summary>
-        internal SagaTimeoutCache Cache { get { return sagaTimeoutCache; } }
+        internal SagaTimeoutCache TimeoutCache { get { return sagaTimeoutCache.Value; } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="TimeoutDispatcher"/>.
         /// </summary>
         /// <param name="sagaStore">The saga store.</param>
         /// <param name="eventPublisher">The event publisher.</param>
-        public TimeoutDispatcher(IStoreSagas sagaStore, IPublishEvents eventPublisher)
+        public TimeoutDispatcher(Lazy<IStoreSagas> sagaStore, Lazy<IPublishEvents> eventPublisher)
         {
             Verify.NotNull(sagaStore, "sagaStore");
             Verify.NotNull(eventPublisher, "eventPublisher");
 
-            this.eventPublisher = eventPublisher;
-            this.sagaTimeoutCache = new SagaTimeoutCache(sagaStore, Settings.SagaStore.TimeoutCacheDuration);
+            this.lazyEventPublisher = eventPublisher;
+            this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
             this.timer = new TimerWrapper(_ => OnTimerElapsed(), null, TimeSpan.Zero, System.Threading.Timeout.InfiniteTimeSpan);
         }
 
@@ -60,14 +60,14 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaStore">The saga store.</param>
         /// <param name="eventPublisher">The event publisher.</param>
         /// <param name="timer">The timer factory.</param>
-        internal TimeoutDispatcher(IStoreSagas sagaStore, IPublishEvents eventPublisher, Func<Action, ITimer> timer)
+        internal TimeoutDispatcher(Lazy<IStoreSagas> sagaStore, Lazy<IPublishEvents> eventPublisher, Func<Action, ITimer> timer)
         {
             Verify.NotNull(timer, "timer");
             Verify.NotNull(sagaStore, "sagaStore");
             Verify.NotNull(eventPublisher, "eventPublisher");
 
-            this.eventPublisher = eventPublisher;
-            this.sagaTimeoutCache = new SagaTimeoutCache(sagaStore, Settings.SagaStore.TimeoutCacheDuration);
+            this.lazyEventPublisher = eventPublisher;
+            this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
             this.timer = timer(OnTimerElapsed);
         }
 
@@ -101,14 +101,14 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (saga.Timeout.HasValue && !saga.Completed)
             {
-                sagaTimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, saga.Timeout.Value));
+                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, saga.Timeout.Value));
             }
             else
             {
-                sagaTimeoutCache.ClearTimeout(new SagaReference(saga.GetType(), saga.CorrelationId));
+                TimeoutCache.ClearTimeout(new SagaReference(saga.GetType(), saga.CorrelationId));
             }
 
-            RescheduleTimer(sagaTimeoutCache.GetNextScheduledTimeout());
+            RescheduleTimer(TimeoutCache.GetNextScheduledTimeout());
         }
 
         /// <summary>
@@ -118,10 +118,10 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             try
             {
-                var sagaTimeouts = sagaTimeoutCache.GetElapsedTimeouts();
+                var sagaTimeouts = TimeoutCache.GetElapsedTimeouts();
 
                 DispatchSagaTimeouts(sagaTimeouts);
-                RescheduleTimer(sagaTimeoutCache.GetNextScheduledTimeout());
+                RescheduleTimer(TimeoutCache.GetNextScheduledTimeout());
             }
             catch (Exception ex)
             {
@@ -160,6 +160,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             Log.Trace("Dispatching saga timeouts");
 
+            var eventPublisher = lazyEventPublisher.Value;
             foreach (var sagaTimeout in sagaTimeouts)
             {
                 var eventVersion = new EventVersion(sagaTimeout.Version, 1, 1);
