@@ -19,13 +19,11 @@ namespace Test.Spark.Configuration
     public sealed class AggregateStoreSettings : IStoreAggregateSettings
     {
         public TimeSpan CacheSlidingExpiration { get; set; }
-        public TimeSpan SaveRetryTimeout { get; set; }
         public Int32 SnapshotInterval { get; set; }
 
         public AggregateStoreSettings()
         {
             CacheSlidingExpiration = TimeSpan.FromMinutes(1);
-            SaveRetryTimeout = TimeSpan.FromMilliseconds(100);
             SnapshotInterval = 5;
         }
     }

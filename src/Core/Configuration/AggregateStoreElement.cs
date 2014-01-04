@@ -28,11 +28,6 @@ namespace Spark.Configuration
         TimeSpan CacheSlidingExpiration { get; }
 
         /// <summary>
-        /// The maximum amount of time to spend trying to save a commit (default = <value>00:00:10</value>).
-        /// </summary>
-        TimeSpan SaveRetryTimeout { get; }
-
-        /// <summary>
         /// The number of aggregate versions between snapshots (default = <value>100</value>).
         /// </summary>
         Int32 SnapshotInterval { get; }
@@ -42,9 +37,6 @@ namespace Spark.Configuration
     {
         [ConfigurationProperty("cacheSlidingExpiration", IsRequired = false, DefaultValue = "00:10:00")]
         public TimeSpan CacheSlidingExpiration { get { return (TimeSpan)base["cacheSlidingExpiration"]; } }
-
-        [ConfigurationProperty("saveRetryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
-        public TimeSpan SaveRetryTimeout { get { return (TimeSpan)base["saveRetryTimeout"]; } }
 
         [ConfigurationProperty("snapshotInterval", IsRequired = false, DefaultValue = "100")]
         public Int32 SnapshotInterval { get { return (Int32)base["snapshotInterval"]; } }
