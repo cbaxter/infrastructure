@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Spark.Logging;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -24,6 +25,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     internal sealed class SagaLock : IDisposable
     {
         private static readonly IDictionary<SagaReference, HashSet<SagaLock>> SagaLocks = new Dictionary<SagaReference, HashSet<SagaLock>>();
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private static readonly Object GlobalLock = new Object();
         private readonly SagaReference sagaReference;
         private HashSet<SagaLock> lockReference;
@@ -53,7 +55,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void Aquire()
         {
-            if(lockReference != null)
+            Log.TraceFormat("Aquiring saga lock {0}", sagaReference);
+
+            if (lockReference != null)
                 throw new InvalidOperationException(Exceptions.SagaLockAlreadyHeld.FormatWith(SagaType, SagaId));
 
             lock (GlobalLock)
@@ -65,6 +69,8 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
 
             Monitor.Enter(lockReference);
+
+            Log.TraceFormat("Saga lock {0} aquired", sagaReference);
         }
 
         /// <summary>
@@ -72,6 +78,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void Release()
         {
+            Log.TraceFormat("Releasing saga lock {0}", sagaReference);
+
             if (lockReference == null)
                 throw new InvalidOperationException(Exceptions.SagaLockNotHeld.FormatWith(SagaType, SagaId));
 
@@ -86,8 +94,10 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
 
             lockReference = null;
+
+            Log.TraceFormat("Saga lock {0} released", sagaReference);
         }
-        
+
         /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="SagaContext"/> class.
         /// </summary>

@@ -34,7 +34,7 @@ namespace Spark.Configuration
         Int32 MaximumConcurrencyLevel { get; }
 
         /// <summary>
-        /// The maximum amount of time to spend trying to execute an event handler (default = <value>00:00:10</value>).
+        /// The maximum amount of time to spend trying to execute an event handler (default = <value>00:01:00</value>).
         /// </summary>
         TimeSpan RetryTimeout { get; }
     }
@@ -47,7 +47,7 @@ namespace Spark.Configuration
         [ConfigurationProperty("maximumConcurrencyLevel", IsRequired = false, DefaultValue = 47)]
         public Int32 MaximumConcurrencyLevel { get { return (Int32)base["maximumConcurrencyLevel"]; } }
 
-        [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:00:10")]
+        [ConfigurationProperty("retryTimeout", IsRequired = false, DefaultValue = "00:01:00")]
         public TimeSpan RetryTimeout { get { return (TimeSpan)base["retryTimeout"]; } }
     }
 }

@@ -88,13 +88,12 @@ namespace Spark.Cqrs.Eventing.Sagas
             var sagaId = context.SagaId;
             var e = context.Event;
 
-            using (Saga.AquireLock(sagaType, sagaId))
             using (Log.PushContext("Saga", new SagaReference(sagaType, sagaId)))
+            using (var sagaLock = new SagaLock(sagaType, sagaId))
             {
-                Saga saga;
-                if (!sagaStore.TryGetSaga(sagaType, sagaId, out saga) && sagaMetadata.CanStartWith(e.GetType()))
-                    saga = sagaStore.CreateSaga(sagaType, sagaId);
+                sagaLock.Aquire();
 
+                var saga = GetOrCreateSaga(sagaType, sagaId, e);
                 if (saga != null)
                 {
                     Log.DebugFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
@@ -112,6 +111,22 @@ namespace Spark.Cqrs.Eventing.Sagas
                     Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
                 }
             }
+        }
+
+        /// <summary>
+        /// Get or create the target saga instance.
+        /// </summary>
+        /// <param name="sagaType">The saga type.</param>
+        /// <param name="sagaId">The saga correlation id.</param>
+        /// <param name="e">The event instance to handle.</param>
+        private Saga GetOrCreateSaga(Type sagaType, Guid sagaId, Event e)
+        {
+            Saga saga;
+
+            if (!sagaStore.TryGetSaga(sagaType, sagaId, out saga) && sagaMetadata.CanStartWith(e.GetType()))
+                saga = sagaStore.CreateSaga(sagaType, sagaId);
+
+            return saga;
         }
     }
 }

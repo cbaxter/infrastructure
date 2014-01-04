@@ -64,15 +64,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        public class WhenLockingSaga
-        {
-            [Fact]
-            public void CanExplicitylyReleaseLock()
-            {
-                Saga.ReleaseLock(Saga.AquireLock(typeof(Saga), GuidStrategy.NewGuid()));
-            }
-        }
-
         public class WhenCompletingSagas
         {
             [Fact]

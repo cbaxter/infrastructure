@@ -124,39 +124,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Aquires a lock on the specified saga instance identified by <paramref name="sagaType"/> and <paramref name="sagaId"/>.
-        /// </summary>
-        /// <param name="sagaType">The saga type on which a lock is to be aquired.</param>
-        /// <param name="sagaId">The saga correlation ID on which a lock is to be aquired.</param>
-        internal static SagaLock AquireLock(Type sagaType, Guid sagaId)
-        {
-            var sagaLock = new SagaLock(sagaType, sagaId);
-
-            Log.TraceFormat("Aquiring saga lock {0} - {1}", sagaType, sagaId);
-
-            sagaLock.Aquire();
-
-            Log.TraceFormat("Saga lock {0} - {1} aquired", sagaType, sagaId);
-
-            return sagaLock;
-        }
-
-        /// <summary>
-        /// Releases a held lock identified by the specified saga lock <paramref name="token"/>.
-        /// </summary>
-        /// <param name="token">The saga lock token issued when <see cref="AquireLock"/> was called.</param>
-        internal static void ReleaseLock(SagaLock token)
-        {
-            Verify.NotNull(token, "token");
-
-            Log.TraceFormat("Releasing saga lock {0} - {1}", token.SagaType, token.SagaId);
-
-            token.Release();
-
-            Log.TraceFormat("Saga lock {0} - {1} released", token.SagaType, token.SagaId);
-        }
-
-        /// <summary>
         /// Mark this saga instance as completed.
         /// </summary>
         protected void MarkCompleted()
