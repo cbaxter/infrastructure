@@ -89,10 +89,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             var e = context.Event;
 
             using (Log.PushContext("Saga", new SagaReference(sagaType, sagaId)))
-            using (var sagaLock = new SagaLock(sagaType, sagaId))
             {
-                sagaLock.Aquire();
-
                 var saga = GetOrCreateSaga(sagaType, sagaId, e);
                 if (saga != null)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using Spark.Cqrs.Domain;
+using Spark.Data;
 using Spark.EventStore;
 
 namespace Spark.Example.Benchmarks
@@ -31,6 +32,9 @@ namespace Spark.Example.Benchmarks
             base.PostSave(aggregate, commit, error);
 
             statistics.IncrementCommandCount();
+
+            if (error is ConcurrencyException)
+                statistics.IncrementConflictCount();
         }
     }
 }

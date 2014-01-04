@@ -135,10 +135,6 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
             catch (ConcurrencyException)
             {
-                // NOTE: Under a single node configuration, this should not happen as events against a specific
-                //       saga are serialized. If a concurrency exception is thrown, then the conflict is likely 
-                //       at the persistence level and thus any cached instance of the saga should be purged and
-                //       re-cached on subsequent `TryGetSaga` call.
                 memoryCache.Remove(key);
                 throw;
             }

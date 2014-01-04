@@ -11,7 +11,7 @@ namespace Spark.Example.Benchmarks
     {
         private readonly Timer timer;
         private readonly Object syncLock = new Object();
-        private Int64 commands, queries, inserts, updates, deletes, totalCommands, totalQueries, totalInserts, totalUpdates, totalDeletes;
+        private Int64 commands, queries, inserts, updates, deletes, conflicts, totalCommands, totalQueries, totalInserts, totalUpdates, totalDeletes, totalConflicts;
         private Boolean disabled = true;
 
         /// <summary>
@@ -29,10 +29,10 @@ namespace Spark.Example.Benchmarks
         {
             Console.WriteLine("Started @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", SystemTime.Now);
             Console.WriteLine();
-            Console.WriteLine("      Commands       Queries       Inserts       Updates       Deletes");
-            Console.WriteLine("----------------------------------------------------------------------");
+            Console.WriteLine("      Commands       Queries       Inserts       Updates       Deletes     Conflicts");
+            Console.WriteLine("------------------------------------------------------------------------------------");
 
-            commands = queries = inserts = updates = deletes = totalCommands = totalQueries = totalInserts = totalUpdates = totalDeletes = 0;
+            commands = queries = inserts = updates = deletes = conflicts = totalCommands = totalQueries = totalInserts = totalUpdates = totalDeletes = totalConflicts = 0;
             timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
             disabled = false;
         }
@@ -55,6 +55,7 @@ namespace Spark.Example.Benchmarks
             line += totalInserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalUpdates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalDeletes.ToString(CultureInfo.InvariantCulture).PadLeft(14);
+            line += totalConflicts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
 
             Console.WriteLine(line);
             Console.WriteLine();
@@ -128,6 +129,19 @@ namespace Spark.Example.Benchmarks
         }
 
         /// <summary>
+        /// Increment delete count.
+        /// </summary>
+        public void IncrementConflictCount()
+        {
+            if (disabled) return;
+            lock (syncLock)
+            {
+                conflicts++;
+                totalConflicts++;
+            }
+        }
+
+        /// <summary>
         /// Report statistics captured since the last interval.
         /// </summary>
         private void WriteStatisticsLine()
@@ -142,6 +156,7 @@ namespace Spark.Example.Benchmarks
                 line += inserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
                 line += updates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
                 line += deletes.ToString(CultureInfo.InvariantCulture).PadLeft(14);
+                line += conflicts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
 
                 // Reset Counters
                 commands = 0;
@@ -149,6 +164,7 @@ namespace Spark.Example.Benchmarks
                 inserts = 0;
                 updates = 0;
                 deletes = 0;
+                conflicts = 0;
             }
 
             Console.WriteLine(line);

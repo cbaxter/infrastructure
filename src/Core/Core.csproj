@@ -145,7 +145,6 @@
     <Compile Include="Cqrs\Eventing\Sagas\SagaConfiguration.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaContext.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandler.cs" />
-    <Compile Include="Cqrs\Eventing\Sagas\SagaLock.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaReference.cs" />
     <Compile Include="EventStore\CommitData.cs" />
     <Compile Include="EventStore\EventStoreExtensions.cs" />
