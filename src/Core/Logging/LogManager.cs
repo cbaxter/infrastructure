@@ -26,9 +26,18 @@ namespace Spark.Logging
     /// </summary>
     public sealed class LogManager
     {
-        private static readonly LogManager Instance = new LogManager(ConfigurationManager.GetSection("system.diagnostics") as ConfigurationSection);
-        private readonly IReadOnlyDictionary<String, SourceLevels> configuredSwitches;
+        private static readonly LogManager Instance = new LogManager();
+        private readonly IDictionary<String, Logger> cachedLoggers = new Dictionary<String, Logger>();
+        private readonly IReadOnlyDictionary<String, SourceSwitch> configuredSwitches;
+        private readonly IReadOnlyDictionary<String, TraceSource> configuredSources;
         private readonly SourceLevels defaultLevel;
+
+        /// <summary>
+        /// Initializes the configured switches for <see cref="LogManager"/>.
+        /// </summary>
+        public LogManager()
+            : this(ConfigurationManager.GetSection("system.diagnostics") as ConfigurationSection)
+        { }
 
         /// <summary>
         /// Initializes the configured switches for <see cref="LogManager"/>.
@@ -36,38 +45,43 @@ namespace Spark.Logging
         /// <param name="diagnosticsSection">The system.diagnostics configuration section.</param>
         internal LogManager(ConfigurationSection diagnosticsSection)
         {
-            var switchSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["switches"] : null;
-            var switches = switchSection != null && switchSection.Value is IEnumerable ? (IEnumerable)switchSection.Value : Enumerable.Empty<ConfigurationElement>();
+            SourceSwitch defaultSwitch;
 
-            configuredSwitches = GetConfiguredSwitches(switches.OfType<ConfigurationElement>());
-            if (!configuredSwitches.TryGetValue("default", out defaultLevel))
-                defaultLevel = SourceLevels.Warning;
+            configuredSources = GetConfiguredSources(diagnosticsSection);
+            configuredSwitches = GetConfiguredSwitches(diagnosticsSection);
+            defaultLevel = configuredSwitches.TryGetValue("default", out defaultSwitch) ? defaultSwitch.Level : SourceLevels.Warning;
         }
 
         /// <summary>
         /// Get the configured trace switches from the application configuration file.
         /// </summary>
-        /// <param name="switchElements">The collection of <see cref="ConfigurationElement"/> instances to attempt to parse the <see cref="SourceLevels"/> value.</param>
-        private static IReadOnlyDictionary<String, SourceLevels> GetConfiguredSwitches(IEnumerable<ConfigurationElement> switchElements)
+        /// <param name="diagnosticsSection">The system.diagnostics configuration section.</param>
+        private static IReadOnlyDictionary<String, SourceSwitch> GetConfiguredSwitches(ConfigurationSection diagnosticsSection)
         {
-            var configuredSwitches = new Dictionary<String, SourceLevels>(StringComparer.InvariantCultureIgnoreCase);
+            var switchSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["switches"] : null;
+            var switches = switchSection != null && switchSection.Value is IEnumerable ? (IEnumerable)switchSection.Value : Enumerable.Empty<ConfigurationElement>();
+            var configuredSwitches = new Dictionary<String, SourceSwitch>(StringComparer.InvariantCultureIgnoreCase);
 
-            foreach (var element in switchElements)
-            {
-                var level = default(SourceLevels);
-                var name = GetPropertyValue(element, "name");
-                var value = GetPropertyValue(element, "value");
+            foreach (var name in switches.OfType<ConfigurationElement>().Select(element => GetPropertyValue(element, "name")).Where(name => name.IsNotNullOrWhiteSpace()))
+                configuredSwitches[name] = new SourceSwitch(name);
 
-                if (String.IsNullOrWhiteSpace(name))
-                    continue;
+            return new ReadOnlyDictionary<String, SourceSwitch>(configuredSwitches);
+        }
 
-                if (!Enum.TryParse(value, true, out level))
-                    continue;
+        /// <summary>
+        /// Get the configured trace sources from the application configuration file.
+        /// </summary>
+        /// <param name="diagnosticsSection">The system.diagnostics configuration section.</param>
+        private static IReadOnlyDictionary<String, TraceSource> GetConfiguredSources(ConfigurationSection diagnosticsSection)
+        {
+            var sourceSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["sources"] : null;
+            var sources = sourceSection != null && sourceSection.Value is IEnumerable ? (IEnumerable)sourceSection.Value : Enumerable.Empty<ConfigurationElement>();
+            var configuredSources = new Dictionary<String, TraceSource>(StringComparer.InvariantCultureIgnoreCase);
 
-                configuredSwitches[name] = level;
-            }
+            foreach (var name in sources.OfType<ConfigurationElement>().Select(element => GetPropertyValue(element, "name")).Where(name => name.IsNotNullOrWhiteSpace()))
+                configuredSources[name] = new TraceSource(name);
 
-            return new ReadOnlyDictionary<String, SourceLevels>(configuredSwitches);
+            return new ReadOnlyDictionary<String, TraceSource>(configuredSources);
         }
 
         /// <summary>
@@ -88,19 +102,57 @@ namespace Spark.Logging
         /// <param name="name">The name of the logger.</param>
         internal ILog CreateLogger(String name)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
+            Logger logger;
 
-            var switchName = name;
+            lock (cachedLoggers)
+            {
+                if (!cachedLoggers.TryGetValue(name, out logger))
+                    cachedLoggers[name] = logger = new Logger(name, GetLevel(name), GetListeners(name));
+            }
+
+            return logger;
+        }
+
+        /// <summary>
+        /// Get the source level associated with the specified logger <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the logger.</param>
+        private SourceLevels GetLevel(String name)
+        {
+            SourceSwitch sourceSwitch;
+
             do
             {
-                if (configuredSwitches.ContainsKey(switchName))
-                    return new Logger(name, configuredSwitches[switchName]);
+                // Use the configured source switch level if exists.
+                if (configuredSwitches.TryGetValue(name, out sourceSwitch))
+                    return sourceSwitch.Level;
 
                 // Use `.` as a hierarchical separator and travel up the name looking for a match.
-                switchName = switchName.Substring(0, Math.Max(0, switchName.LastIndexOf('.')));
-            } while (!String.IsNullOrWhiteSpace(switchName));
+                name = name.Substring(0, Math.Max(0, name.LastIndexOf('.')));
+            } while (name.IsNotNullOrWhiteSpace());
 
-            return new Logger(name, defaultLevel);
+            return defaultLevel;
+        }
+
+        /// <summary>
+        /// Get the trace listener(s) associated with the specified logger <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the logger.</param>
+        private TraceListenerCollection GetListeners(String name)
+        {
+            TraceSource traceSource;
+
+            do
+            {
+                // Use the configured source switch level if exists.
+                if (configuredSources.TryGetValue(name, out traceSource))
+                    return traceSource.Listeners;
+
+                // Use `.` as a hierarchical separator and travel up the name looking for a match.
+                name = name.Substring(0, Math.Max(0, name.LastIndexOf('.')));
+            } while (name.IsNotNullOrWhiteSpace());
+
+            return Trace.Listeners;
         }
 
         /// <summary>
@@ -109,6 +161,8 @@ namespace Spark.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
+            Verify.NotNullOrWhiteSpace(name, "name");
+
             return Instance.CreateLogger(name);
         }
 

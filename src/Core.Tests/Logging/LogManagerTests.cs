@@ -1,4 +1,5 @@
-﻿using Spark;
+﻿using System.Diagnostics;
+using Spark;
 using Spark.Logging;
 using System;
 using System.Configuration;
@@ -25,90 +26,68 @@ namespace Test.Spark.Logging
         public class WhenCreatingLogger
         {
             [Fact]
-            public void DefaultToWarningIfConfigurationSectionMissing()
+            public void DefaultToWarningIfSwitchNameUnknown()
             {
-                var logManager = new LogManager(null);
-                var logger = logManager.CreateLogger("MyTestLogger");
+                var logManager = new LogManager();
+                var logger = logManager.CreateLogger("LogManager.UnknownSource");
 
                 Assert.True(logger.IsWarnEnabled);
                 Assert.False(logger.IsInfoEnabled);
             }
 
             [Fact]
-            public void DefaultToWarningIfSwitchNameIsNull()
+            public void DefaultToStandardListenersIfSwitchNameUnknown()
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement(null, "All"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("MyTestLogger");
+                var logManager = new LogManager();
+                var logger = (Logger)logManager.CreateLogger("LogManager.UnknownSource");
 
-                Assert.True(logger.IsWarnEnabled);
-                Assert.False(logger.IsInfoEnabled);
+                Assert.Equal(Trace.Listeners.Count,  logger.TraceSource.Listeners.Count);
             }
 
             [Fact]
-            public void DefaultToWarningIfSwitchValueIsNull()
+            public void OverrideDefaultLevelIfSwitchConfigured()
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement("default", null));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("MyTestLogger");
+                var logManager = new LogManager();
+                var logger = logManager.CreateLogger("LogManager.Test");
 
-                Assert.True(logger.IsWarnEnabled);
-                Assert.False(logger.IsInfoEnabled);
+                Assert.True(logger.IsDebugEnabled);
             }
 
             [Fact]
-            public void DefaultToWarningIfSwitchValueIsUnknown()
+            public void OverrideListenersIfSourceConfigured()
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement("default", "DoesNotExist"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("MyTestLogger");
+                var logManager = new LogManager();
+                var logger = (Logger)logManager.CreateLogger("LogManager.Test");
 
-                Assert.True(logger.IsWarnEnabled);
-                Assert.False(logger.IsInfoEnabled);
-            }
-
-            [Fact]
-            public void OverrideDefaultIfSwitchValueIsKnown()
-            {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement("MyTestLogger", "Information"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("MyTestLogger");
-
-                Assert.True(logger.IsInfoEnabled);
-                Assert.False(logger.IsDebugEnabled);
+                Assert.Equal(0, logger.TraceSource.Listeners.Count);
             }
 
             [Fact]
             public void TreatPeriodAsNamespaceMarker()
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement("My", "All"), new FakeSwitchElement("My.Test", "Verbose"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("My.Test.Logger");
+                var logManager = new LogManager();
+                var logger = (Logger)logManager.CreateLogger("LogManager.Test.Namespace");
 
                 Assert.True(logger.IsDebugEnabled);
-                Assert.False(logger.IsTraceEnabled);
+                Assert.Equal(0, logger.TraceSource.Listeners.Count);
             }
 
             [Theory, InlineData("My..Test"), InlineData("My.Test."), InlineData(".Test.Logger")]
             public void CanTolerateBadLoggerName(String name)
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement("default", "Warning"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger(name);
+                var logManager = new LogManager();
 
-                Assert.True(logger.IsWarnEnabled);
-                Assert.False(logger.IsInfoEnabled);
+                Assert.DoesNotThrow(() => logManager.CreateLogger(name));
             }
 
-            [Theory, InlineData("MyTest"), InlineData("myTest"), InlineData("MYTEST")]
+            [Theory, InlineData("LogManager.TEST"), InlineData("LogManager.Test"), InlineData("LogManager.test")]
             public void SwitchNameIsCaseInsensitive(String name)
             {
-                var diagnosticSection = new FakeDiagnosticSectionConfiguration(new FakeSwitchElement(name, "Verbose"));
-                var logManager = new LogManager(diagnosticSection);
-                var logger = logManager.CreateLogger("MyTest");
+                var logManager = new LogManager();
+                var logger = (Logger)logManager.CreateLogger(name);
 
                 Assert.True(logger.IsDebugEnabled);
-                Assert.False(logger.IsTraceEnabled);
+                Assert.Equal(0, logger.TraceSource.Listeners.Count);
             }
         }
 
@@ -140,62 +119,9 @@ namespace Test.Spark.Logging
             }
         }
 
-        public sealed class FakeDiagnosticSectionConfiguration : ConfigurationSection
-        {
-            public FakeDiagnosticSectionConfiguration(params FakeSwitchElement[] configuredSwitches)
-            {
-                base["switches"] = new FakeSwitchElementCollection(configuredSwitches);
-            }
-
-            [ConfigurationProperty("switches")]
-            public FakeSwitchElementCollection Switches { get { return (FakeSwitchElementCollection)base["switches"]; } }
-        }
-
-        [ConfigurationCollection(typeof(FakeSwitchElement), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
-        public sealed class FakeSwitchElementCollection : ConfigurationElementCollection
-        {
-            public FakeSwitchElementCollection()
-                : this(null)
-            { }
-
-            public FakeSwitchElementCollection(params FakeSwitchElement[] configuredSwitches)
-            {
-                foreach (var configuredSwitch in configuredSwitches.EmptyIfNull())
-                    BaseAdd(configuredSwitch);
-            }
-
-            protected override ConfigurationElement CreateNewElement()
-            {
-                return new FakeSwitchElement();
-            }
-
-            protected override Object GetElementKey(ConfigurationElement element)
-            {
-                return element.GetHashCode();
-            }
-        }
-
         public sealed class LoggerClass
         {
             public static readonly ILog Log = LogManager.GetCurrentClassLogger();
-        }
-
-        public sealed class FakeSwitchElement : ConfigurationElement
-        {
-            public FakeSwitchElement()
-            { }
-
-            public FakeSwitchElement(String key, String value)
-            {
-                base["name"] = key;
-                base["value"] = value;
-            }
-
-            [ConfigurationProperty("name")]
-            public String Name { get { return base["name"] as String; } }
-
-            [ConfigurationProperty("value")]
-            public String Value { get { return base["value"] as String; } }
         }
     }
 }

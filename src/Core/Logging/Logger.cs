@@ -84,10 +84,27 @@ namespace Spark.Logging
         /// <param name="name">The name of the logger.</param>
         /// <param name="level">The log level of the logger.</param>
         public Logger(String name, SourceLevels level)
+            : this(name, level, System.Diagnostics.Trace.Listeners)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <see cref="level"/>.
+        /// </summary>
+        /// <param name="name">The name of the logger.</param>
+        /// <param name="level">The log level of the logger.</param>
+        /// <param name="listeners">The underlying set of trace listeners.</param>
+        public Logger(String name, SourceLevels level, TraceListenerCollection listeners)
         {
             Verify.NotNullOrWhiteSpace(name, "name");
 
+            // Create the trace source.
             traceSource = new TraceSource(name, level);
+
+            // Configure trace source listeners.
+            traceSource.Listeners.Clear();
+            traceSource.Listeners.AddRange(listeners);
+
+            // Determine supported log operations.
             fatalEnabled = (level & SourceLevels.Critical) == SourceLevels.Critical;
             errorEnabled = (level & SourceLevels.Error) == SourceLevels.Error;
             warnEnabled = (level & SourceLevels.Warning) == SourceLevels.Warning;

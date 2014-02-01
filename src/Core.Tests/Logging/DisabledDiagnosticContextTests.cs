@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using Spark.Logging;
+﻿using Spark.Logging;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
