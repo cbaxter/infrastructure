@@ -113,14 +113,30 @@ namespace Spark.Logging
         }
 
         /// <summary>
+        /// Gets the <see cref="ILog"/> instance associated with the specified <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The type associated with the logger.</param>
+        public static ILog GetLogger(Type type)
+        {
+            Verify.NotNull(type, "type");
+
+            return Instance.CreateLogger(type.FullName);
+        }
+
+        /// <summary>
         /// Gets a <see cref="ILog"/> instance named after the caller's declaring or reflected type.
         /// </summary>
         public static ILog GetCurrentClassLogger()
         {
             var caller = new StackFrame(1, false).GetMethod();
-            var name = (caller.DeclaringType ?? caller.ReflectedType).FullName;
+            var name = (caller.DeclaringType ?? caller.ReflectedType ?? typeof(UnknownLogger)).FullName;
 
             return Instance.CreateLogger(name);
         }
+
+        /// <summary>
+        /// An unknown logger class.
+        /// </summary>
+        private sealed class UnknownLogger { }
     }
 }

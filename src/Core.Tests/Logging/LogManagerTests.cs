@@ -130,6 +130,14 @@ namespace Test.Spark.Logging
 
                 Assert.Equal("MyCustomName", logger.Name);
             }
+
+            [Fact]
+            public void LoggerIsNamedAsFullTypeName()
+            {
+                var logger = LogManager.GetLogger(typeof(WhenGettingNamedLogger));
+
+                Assert.Equal("Test.Spark.Logging.UsingLogManager+WhenGettingNamedLogger", logger.Name);
+            }
         }
 
         public sealed class FakeDiagnosticSectionConfiguration : ConfigurationSection
