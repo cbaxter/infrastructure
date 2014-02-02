@@ -68,7 +68,7 @@ namespace Spark.Cqrs.Commanding
         {
             var aggregate = aggregateStore.Get(AggregateType, context.AggregateId);
 
-            Log.DebugFormat("Executing {0} command on aggregate {1}", context.Command, aggregate);
+            Log.TraceFormat("Executing {0} command on aggregate {1}", context.Command, aggregate);
 
             executor(aggregate, context.Command);
 

@@ -70,6 +70,7 @@ namespace Spark.Cqrs.Eventing
             var result = new Dictionary<Type, EventHandler[]>();
             var logMessage = new StringBuilder();
 
+            logMessage.AppendLine("Discovered event handlers:");
             foreach (var eventType in knownEvents.OrderBy(type => type.FullName))
             {
                 var eventHandlers = eventType.GetTypeHierarchy().Reverse()

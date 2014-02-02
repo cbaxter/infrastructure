@@ -79,7 +79,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
             var knownSagas = typeLocator.GetTypes(type => type.IsClass && !type.IsAbstract && type.DerivesFrom(typeof(Saga))).ToDictionary(type => type, HashType);
             var logMessage = new StringBuilder();
 
-            logMessage.Append("Discovered sagas:");
+            logMessage.AppendLine("Discovered sagas:");
             foreach (var saga in knownSagas)
             {
                 logMessage.Append("    ");

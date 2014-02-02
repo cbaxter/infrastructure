@@ -57,7 +57,7 @@ namespace Spark.Cqrs.Commanding
             var result = new Dictionary<Type, CommandHandler>();
             var logMessage = new StringBuilder();
 
-            logMessage.Append("Discovered command handler methods:");
+            logMessage.AppendLine("Discovered command handlers:");
             foreach (var aggregateMapping in knownHandleMethods.OrderBy(kvp => kvp.Key.FullName))
             {
                 logMessage.Append("    ");

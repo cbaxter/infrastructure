@@ -93,7 +93,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                 var saga = GetOrCreateSaga(sagaType, sagaId, e);
                 if (saga != null)
                 {
-                    Log.DebugFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
+                    Log.TraceFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
 
                     Executor(saga, e);
 
