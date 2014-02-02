@@ -33,9 +33,7 @@ namespace Spark.Threading
         /// <param name="period">The time interval between invocations of <paramref name="callback"/>, in milliseconds. Specify <see cref="Timeout.Infinite"/> to disable periodic signaling. </param>
         public TimerWrapper(TimerCallback callback, Object state, TimeSpan dueTime, TimeSpan period)
             : this(callback, state, dueTime.Ticks / TimeSpan.TicksPerMillisecond, period.Ticks / TimeSpan.TicksPerMillisecond)
-        {
-            timer = new Timer(callback, state, dueTime, period);
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of the Timer class, using 64 bit unsigned integer values to measure time intervals.
