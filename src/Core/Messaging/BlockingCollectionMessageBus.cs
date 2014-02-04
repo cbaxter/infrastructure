@@ -118,6 +118,8 @@ namespace Spark.Messaging
             Log.TraceFormat("Sending message {0}", message.Id);
 
             messageQueue.Add(message);
+
+            Log.TraceFormat("Message {0} sent", message.Id);
         }
 
         /// <summary>

@@ -84,29 +84,26 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="context">The current saga context.</param>
         private void UpdateSaga(SagaContext context)
         {
-            var sagaType = context.SagaType;
-            var sagaId = context.SagaId;
             var e = context.Event;
+            var sagaId = context.SagaId;
+            var sagaType = context.SagaType;
+            var saga = GetOrCreateSaga(sagaType, sagaId, e);
 
-            using (Log.PushContext("Saga", new SagaReference(sagaType, sagaId)))
+            if (saga != null)
             {
-                var saga = GetOrCreateSaga(sagaType, sagaId, e);
-                if (saga != null)
-                {
-                    Log.TraceFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
+                Log.TraceFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
 
-                    Executor(saga, e);
+                Executor(saga, e);
 
-                    Log.Trace("Saving saga state");
+                Log.Trace("Saving saga state");
 
-                    sagaStore.Save(saga, context);
+                sagaStore.Save(saga, context);
 
-                    Log.Trace("Saga state saved");
-                }
-                else
-                {
-                    Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
-                }
+                Log.Trace("Saga state saved");
+            }
+            else
+            {
+                Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
             }
         }
 

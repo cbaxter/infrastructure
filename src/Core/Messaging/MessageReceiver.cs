@@ -77,7 +77,7 @@ namespace Spark.Messaging
             Message<T> message;
             while ((message = messageReceiver.Receive()) != null)
             {
-                Log.TraceFormat("Message received: {0}", message);
+                Log.TraceFormat("Message {0} received", message.Id);
 
                 ProcessMessage(message);
             }

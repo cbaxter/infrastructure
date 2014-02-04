@@ -49,7 +49,7 @@ namespace Spark.Cqrs.Eventing
         {
             Verify.NotNull(payload, "payload");
 
-            Log.TraceFormat("Publishing {0} to {1}", payload.Event, payload.AggregateId);
+            Log.TraceFormat("Publishing {0} from {1}", payload.Event, payload.AggregateId);
 
             messageSender.Send(messageFactory.Create(headers, payload));
         }
