@@ -97,24 +97,17 @@ namespace Spark.Threading
         /// <param name="task">The <see cref="Task"/> to be queued.</param>
         protected override void QueueTask(Task task)
         {
-            using (Log.PushContext("Task", task.Id))
+            WaitIfRequired(task);
+
+            if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
             {
-                WaitIfRequired(task);
+                var longRunningThread = new Thread(state => TryExecuteTaskInline((Task)state, true)) { IsBackground = true };
 
-                if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
-                {
-                    var longRunningThread = new Thread(state => TryExecuteTaskInline((Task)state, true)) { IsBackground = true };
-
-                    Log.Trace("Scheduling task executor on long running thread");
-
-                    longRunningThread.Start(task);
-                }
-                else
-                {
-                    Log.Trace("Scheduling task executor on thread pool");
-
-                    threadPool.UnsafeQueueUserWorkItem(state => TryExecuteTaskInline(state, true), task);
-                }
+                longRunningThread.Start(task);
+            }
+            else
+            {
+                threadPool.UnsafeQueueUserWorkItem(state => TryExecuteTaskInline(state, true), task);
             }
         }
 
@@ -123,21 +116,12 @@ namespace Spark.Threading
         /// </summary>
         private void WaitIfRequired(Task task)
         {
-            Log.Trace("Acquiring lock");
             lock (queuedTasks)
             {
-                Log.Trace("Lock acquired");
-
                 while (queuedTasks.Count >= boundedCapacity)
-                {
-                    Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
                     monitor.Wait(queuedTasks);
-                }
 
-                Log.Trace("Adding task to queue");
                 queuedTasks.Add(task.Id, task);
-
-                Log.Trace("Releasing lock");
             }
         }
 
@@ -148,18 +132,13 @@ namespace Spark.Threading
         /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
         protected override Boolean TryExecuteTaskInline(Task task, Boolean taskWasPreviouslyQueued)
         {
-            using (Log.PushContext("Task", task.Id))
+            try
             {
-                Log.Trace("Executing task");
-
-                try
-                {
-                    return TryExecuteTask(task);
-                }
-                finally
-                {
-                    PulseIfRequired(task, taskWasPreviouslyQueued);
-                }
+                return TryExecuteTask(task);
+            }
+            finally
+            {
+                PulseIfRequired(task, taskWasPreviouslyQueued);
             }
         }
 
@@ -170,23 +149,10 @@ namespace Spark.Threading
         /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
         private void PulseIfRequired(Task task, Boolean taskWasPreviouslyQueued)
         {
-            Log.Trace("Acquiring lock");
             lock (queuedTasks)
             {
-                Log.Trace("Lock acquired");
-
                 if (queuedTasks.Remove(task.Id))
-                {
-                    Log.Trace("Removed task from queue");
-                    Log.Trace("Pusling");
                     monitor.Pulse(queuedTasks);
-                }
-                else
-                {
-                    Log.Trace(taskWasPreviouslyQueued ? "Task already removed from queue" : "Task not previously queued");
-                }
-
-                Log.Trace("Releasing lock");
             }
         }
 
@@ -197,14 +163,9 @@ namespace Spark.Threading
         {
             Task[] tasks;
 
-            Log.Trace("Acquiring lock");
             lock (queuedTasks)
             {
-                Log.Trace("Lock acquired");
-
                 tasks = queuedTasks.Values.ToArray();
-
-                Log.Trace("Releasing lock");
             }
 
             return tasks;

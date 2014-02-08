@@ -24,8 +24,6 @@ namespace Spark.Threading
     /// </summary>
     public sealed class InlineTaskScheduler : TaskScheduler
     {
-        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Default instance of <see cref="InlineTaskScheduler"/>.
         /// </summary>
@@ -47,8 +45,7 @@ namespace Spark.Threading
         /// <param name="task">The <see cref="Task"/> to be executed.</param>
         protected override void QueueTask(Task task)
         {
-            using (Log.PushContext("Task", task.Id))
-                TryExecuteTask(task);
+            TryExecuteTask(task);
         }
 
         /// <summary>
@@ -58,8 +55,7 @@ namespace Spark.Threading
         /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
         protected override Boolean TryExecuteTaskInline(Task task, Boolean taskWasPreviouslyQueued)
         {
-            using (Log.PushContext("Task", task.Id))
-                return TryExecuteTask(task);
+            return TryExecuteTask(task);
         }
 
         /// <summary>

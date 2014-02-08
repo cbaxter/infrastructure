@@ -153,31 +153,21 @@ namespace Spark.Threading
         /// <param name="task">The <see cref="Task"/> to be queued.</param>
         protected override void QueueTask(Task task)
         {
-            using (Log.PushContext("Task", task.Id))
+            WaitIfRequired();
+
+            var partition = GetOrCreatePartition(task);
+            if (partition.Enqueue(task) != 1)
+                return;
+
+            if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
             {
-                WaitIfRequired();
+                var longRunningThread = new Thread(state => ExecutePartitionedTasks((Partition)state)) { IsBackground = true };
 
-                var partition = GetOrCreatePartition(task);
-                if (partition.Enqueue(task) != 1)
-                {
-                    Log.Trace("Task executor already scheduled");
-                    return;
-                }
-
-                if ((task.CreationOptions & TaskCreationOptions.LongRunning) == TaskCreationOptions.LongRunning)
-                {
-                    var longRunningThread = new Thread(state => ExecutePartitionedTasks((Partition)state)) { IsBackground = true };
-
-                    Log.Trace("Scheduling task executor on long running thread");
-
-                    longRunningThread.Start(partition);
-                }
-                else
-                {
-                    Log.Trace("Scheduling task executor on thread pool");
-
-                    threadPool.UnsafeQueueUserWorkItem(ExecutePartitionedTasks, partition);
-                }
+                longRunningThread.Start(partition);
+            }
+            else
+            {
+                threadPool.UnsafeQueueUserWorkItem(ExecutePartitionedTasks, partition);
             }
         }
 
@@ -190,27 +180,14 @@ namespace Spark.Threading
             var partitionId = partitionHash(task);
             var partition = default(Partition);
 
-            Log.TraceFormat("Getting partition {0}", partitionId);
-
             if (!partitions.TryGetValue(partitionId, out partition))
             {
-                Log.Trace("Acquiring lock: partitions");
                 lock (partitions)
                 {
-                    Log.Trace("Lock acquired: partitions");
-
                     if (!partitions.TryGetValue(partitionId, out partition))
-                    {
-                        Log.TraceFormat("Creating partition {0}", partitionId);
-
                         partitions.Add(partitionId, partition = new Partition(partitionId));
-                    }
-
-                    Log.Trace("Releasing lock: partitions");
                 }
             }
-
-            Log.TraceFormat("Task {0} mapped to partition {1}", task.Id, partitionId);
 
             return partition;
         }
@@ -223,22 +200,14 @@ namespace Spark.Threading
         {
             while (true)
             {
-                Log.TraceFormat("Acquiring lock: partition {0}", partition.Id);
                 lock (partition)
                 {
                     Task task;
 
-                    Log.TraceFormat("Lock acquired: partition {0}", partition.Id);
-
                     if (!partition.TryDequeue(out task))
-                    {
-                        Log.Trace("All queued tasks executed");
                         break;
-                    }
 
                     ExecuteTask(task);
-
-                    Log.TraceFormat("Releasing lock:  partition {0}", partition.Id);
                 }
 
                 Pulse(1);
@@ -250,21 +219,12 @@ namespace Spark.Threading
         /// </summary>
         private void WaitIfRequired()
         {
-            Log.Trace("Acquiring lock: partitions");
             lock (partitions)
             {
-                Log.Trace("Lock acquired: partitions");
-
                 while (queuedTasks >= boundedCapacity)
-                {
-                    Log.Trace("Maximum number of queued tasks reached; waiting for pulse");
                     monitor.Wait(partitions);
-                }
 
-                Log.Trace("Adding task to queue");
                 queuedTasks++;
-
-                Log.Trace("Releasing lock: partitions");
             }
         }
 
@@ -274,21 +234,13 @@ namespace Spark.Threading
         /// <param name="count">The number of threads to notify.</param>
         private void Pulse(Int32 count)
         {
-            Log.Trace("Acquiring lock: partitions");
             lock (partitions)
             {
-                Log.Trace("Lock acquired: partitions");
-
                 for (var i = 0; i < count; i++)
                 {
                     queuedTasks--;
-
-                    Log.Trace("Pulsing");
-
                     monitor.Pulse(partitions);
                 }
-
-                Log.Trace("Releasing lock: partitions");
             }
         }
 
@@ -304,11 +256,8 @@ namespace Spark.Threading
 
             var partition = GetOrCreatePartition(task);
 
-            Log.TraceFormat("Acquiring lock: partition {0}", partition.Id);
             lock (partition)
             {
-                Log.TraceFormat("Lock acquired: partition {0}", partition.Id);
-
                 Task queuedTask;
                 while (partition.TryDequeue(out queuedTask) && !taskExecuted)
                 {
@@ -319,8 +268,6 @@ namespace Spark.Threading
 
                 if (!taskExecuted)
                     taskExecuted = ExecuteTask(task);
-
-                Log.TraceFormat("Releasing lock: partition {0}", partition.Id);
             }
 
             Pulse(queuedTasksExecuted);
@@ -334,12 +281,7 @@ namespace Spark.Threading
         /// <param name="task">The <see cref="Task"/> to be executed.</param>
         private Boolean ExecuteTask(Task task)
         {
-            using (Log.PushContext("Task", task.Id))
-            {
-                Log.Trace("Executing task");
-
-                return TryExecuteTask(task);
-            }
+            return TryExecuteTask(task);
         }
 
         /// <summary>
@@ -349,14 +291,9 @@ namespace Spark.Threading
         {
             Task[] result;
 
-            Log.Trace("Acquiring lock: partitions");
             lock (partitions)
             {
-                Log.Trace("Lock acquired: partitions");
-
                 result = partitions.ToArray().SelectMany(kvp => kvp.Value.Tasks).ToArray();
-
-                Log.Trace("Releasing lock: partitions");
             }
 
             return result;
@@ -370,11 +307,6 @@ namespace Spark.Threading
         {
             private readonly LinkedList<Task> tasks = new LinkedList<Task>();
             private readonly Int32 id;
-
-            /// <summary>
-            /// The unique identifier for this <see cref="Partition"/> instance.
-            /// </summary>
-            public Int32 Id { get { return id; } }
 
             /// <summary>
             /// For debugger support only, generates an enumerable of <see cref="Task"/> instances currently queued to the scheduler waiting to be executed.
@@ -430,6 +362,14 @@ namespace Spark.Threading
 
                     return taskDequeued;
                 }
+            }
+
+            /// <summary>
+            /// Returns the <see cref="Partition"/> description for this instance.
+            /// </summary>
+            public override String ToString()
+            {
+                return String.Format("Partition #{0}", id);
             }
         }
     }
