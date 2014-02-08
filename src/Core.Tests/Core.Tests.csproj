@@ -133,6 +133,8 @@
     <Compile Include="EventStore\Dialects\SqlServerSnapshotStoreTests.cs" />
     <Compile Include="EventStore\Dialects\SqlServerEventStoreTests.cs" />
     <Compile Include="Cqrs\Eventing\EventCollectionTests.cs" />
+    <Compile Include="Logging\LogicalOperationScopeTests.cs" />
+    <Compile Include="Logging\ActivityScopeTests.cs" />
     <Compile Include="Messaging\InlineMessageBusTests.cs" />
     <Compile Include="Messaging\MessageReceiverTests.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />
@@ -140,9 +142,6 @@
     <Compile Include="EventStore\PagedResultTests.cs" />
     <Compile Include="EventStore\PageTests.cs" />
     <Compile Include="EventStore\SnapshotTests.cs" />
-    <Compile Include="Logging\DebugDiagnosticContextTests.cs" />
-    <Compile Include="Logging\DefaultDiagnosticContextTests.cs" />
-    <Compile Include="Logging\DisabledDiagnosticContextTests.cs" />
     <Compile Include="Logging\FakeTraceListener.cs" />
     <Compile Include="Logging\LoggerTests.cs" />
     <Compile Include="Logging\LogManagerTests.cs" />

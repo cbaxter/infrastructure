@@ -161,6 +161,9 @@
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Logging\ActivityScope.cs" />
+    <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="Logging\LogicalOperationScope.cs" />
     <Compile Include="Messaging\InlineMessageBus.cs" />
     <Compile Include="Messaging\IProcessMessages.cs" />
     <Compile Include="Messaging\IMessage.cs" />
@@ -214,10 +217,7 @@
     <Compile Include="EventStore\Snapshot.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logging\DebugDiagnosticContext.cs" />
     <Compile Include="Logging\ILog.cs" />
-    <Compile Include="Logging\DefaultDiagnosticContext.cs" />
-    <Compile Include="Logging\DisabledDiagnosticContext.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Messaging\Header.cs" />

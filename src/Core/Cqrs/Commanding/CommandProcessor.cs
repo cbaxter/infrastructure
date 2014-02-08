@@ -84,7 +84,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="message">The <see cref="Command"/> message.</param>
         public void Process(Message<CommandEnvelope> message)
         {
-            using (Log.PushContext("Message", message))
+            using (Log.PushContext("{0} ({1})", message.Payload.Command.GetType(), message.Id))
             {
                 var commandHandler = commandHandlerRegistry.GetHandlerFor(message.Payload.Command);
 

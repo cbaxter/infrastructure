@@ -74,53 +74,6 @@ namespace Test.Spark.Logging
 
                 Assert.True(logger.IsTraceEnabled);
             }
-
-            [Theory, InlineData(SourceLevels.Critical), InlineData(SourceLevels.Error), InlineData(SourceLevels.Warning), InlineData(SourceLevels.Information)]
-            public void DisableDiagnosticContextIfSourceLevels(SourceLevels level)
-            {
-                var logger = new Logger("MyTestLogger", level);
-
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
-                using (logger.PushContext(Guid.NewGuid(), MethodBase.GetCurrentMethod().Name))
-                    Assert.Equal(Guid.Empty, Trace.CorrelationManager.ActivityId);
-            }
-
-            [Theory, InlineData(SourceLevels.Verbose), InlineData(SourceLevels.All), InlineData(SourceLevels.ActivityTracing)]
-            public void EnableDiagnosticContextIfSourceLevels(SourceLevels level)
-            {
-                var logger = new Logger("MyTestLogger", level);
-                var activityId = Guid.NewGuid();
-
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
-                using (logger.PushContext(activityId, MethodBase.GetCurrentMethod().Name))
-                    Assert.Equal(activityId, Trace.CorrelationManager.ActivityId);
-            }
-
-            [Theory, InlineData(SourceLevels.Critical), InlineData(SourceLevels.Error), InlineData(SourceLevels.Warning), InlineData(SourceLevels.Information), InlineData(SourceLevels.Verbose), InlineData(SourceLevels.All), InlineData(SourceLevels.ActivityTracing)]
-            public void DoNotTraceDiagnosticContextIfSourceLevels(SourceLevels level)
-            {
-                var logger = new Logger("MyTestLogger", level);
-                var listener = new FakeTraceListener();
-                var activityId = Guid.NewGuid();
-
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
-                using (logger.PushContext(activityId, MethodBase.GetCurrentMethod().Name))
-                    Assert.Equal(0, listener.Messages.Count());
-            }
-
-            [Theory, InlineData(SourceLevels.All)]
-            public void TraceDiagnosticContextIfSourceLevels(SourceLevels level)
-            {
-                var logger = new Logger("MyTestLogger", level);
-                var listener = new FakeTraceListener();
-                var activityId = Guid.NewGuid();
-
-                logger.TraceSource.Listeners.Add(listener);
-
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
-                using (logger.PushContext(activityId, MethodBase.GetCurrentMethod().Name))
-                    Assert.Equal(1, listener.Messages.Count(m => m.StartsWith(String.Format("Transfer from {0} to {1}", Guid.Empty, activityId))));
-            }
         }
 
         public class WhenLoggingFatal
@@ -439,64 +392,70 @@ namespace Test.Spark.Logging
             }
         }
 
-        public class WhenPushingDiagnosticContext
+        public class WhenTransfering
         {
-            private static Expression<Func<ILog, IDisposable>> CreateExpressionFor(Expression<Func<ILog, IDisposable>> expression)
+            [Fact]
+            public void AlwaysReturnActivityScope()
             {
-                return expression;
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
+
+                Assert.IsType(typeof(ActivityScope), logger.Transfer(Guid.NewGuid()));
+            }
+        }
+
+        public class WhenPushingContext
+        {
+            [Fact]
+            public void AlwaysReturnLogicalOperationScope()
+            {
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
+
+                Assert.IsType(typeof(LogicalOperationScope), logger.PushContext());
             }
 
-            private static Expression<Func<ILog, Guid, IDisposable>> CreateExpressionFor(Expression<Func<ILog, Guid, IDisposable>> expression)
+            [Fact]
+            public void CanPushContextWithFixedName()
             {
-                return expression;
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
+
+                using (logger.PushContext("Name"))
+                    Assert.Equal("Name", Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
-            public static IEnumerable<Object[]> PushContextWithNoCorrelationId
+            [Fact]
+            public void CanPushContextWithSingleNameParameter()
             {
-                get
-                {
-                    yield return new Object[] { CreateExpressionFor(log => log.PushContext("Name")) };
-                    yield return new Object[] { CreateExpressionFor(log => log.PushContext("Name", 1)) };
-                    yield return new Object[] { CreateExpressionFor(log => log.PushContext("Name", 1, 2)) };
-                }
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
+
+                using (logger.PushContext("Name {0}", 1))
+                    Assert.Equal("Name 1", Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
-            public static IEnumerable<Object[]> PushContextWitCorrelationId
+            [Fact]
+            public void CanPushContextWithTwoNameParameters()
             {
-                get
-                {
-                    yield return new Object[] { CreateExpressionFor((log, activityId) => log.PushContext(activityId, "Name")) };
-                    yield return new Object[] { CreateExpressionFor((log, activityId) => log.PushContext(activityId, "Name", 1)) };
-                    yield return new Object[] { CreateExpressionFor((log, activityId) => log.PushContext(activityId, "Name", 1, 2)) };
-                }
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
+
+                using (logger.PushContext("Name {0} {1}", 1, 2))
+                    Assert.Equal("Name 1 2", Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
-            [Theory, PropertyData("PushContextWithNoCorrelationId")]
-            public void DoNotChangeActivityIdIfNoCorrelationIdSpecified(Expression<Func<ILog, IDisposable>> expression)
+            [Fact]
+            public void CanPushContextWithThreeNameParametes()
             {
-                var logger = new Logger("MyTestLogger", SourceLevels.All);
-                var pushContext = expression.Compile();
-                var activityId = Guid.NewGuid();
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
 
-                Trace.CorrelationManager.ActivityId = activityId;
-                
-                using (pushContext(logger))
-                    Assert.Equal(activityId, Trace.CorrelationManager.ActivityId);
-
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
+                using (logger.PushContext("Name {0} {1} {2}", 1, 2, 3))
+                    Assert.Equal("Name 1 2 3", Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
 
-            [Theory, PropertyData("PushContextWitCorrelationId")]
-            public void ChangeActivityIdIfCorrelationIdSpecified(Expression<Func<ILog, Guid, IDisposable>> expression)
+            [Fact]
+            public void CanPushContextWithManyNameParameters()
             {
-                var logger = new Logger("MyTestLogger", SourceLevels.All);
-                var pushContext = expression.Compile();
-                var activityId = Guid.NewGuid();
+                var logger = new Logger("MyTestLogger", SourceLevels.Off);
 
-                Trace.CorrelationManager.ActivityId = Guid.Empty;
-
-                using (pushContext(logger, activityId))
-                    Assert.Equal(activityId, Trace.CorrelationManager.ActivityId);
+                using (logger.PushContext("Name {0} {1} {2} {3} {4}", 1, 2, 3, 4, 5))
+                    Assert.Equal("Name 1 2 3 4 5", Trace.CorrelationManager.LogicalOperationStack.Peek());
             }
         }
     }

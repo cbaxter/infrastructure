@@ -392,40 +392,9 @@ namespace Spark.Logging
         IDisposable PushContext(String name);
 
         /// <summary>
-        /// Start a new named logical operation.
+        /// Start a new activity scope.
         /// </summary>
-        /// <param name="name">The logical operation name.</param>
-        /// <param name="data">The logical operation context.</param>
-        IDisposable PushContext(String name, Object data);
-
-        /// <summary>
-        /// Start a new named logical operation.
-        /// </summary>
-        /// <param name="name">The logical operation name.</param>
-        /// <param name="data">The logical operation context.</param>
-        IDisposable PushContext(String name, params Object[] data);
-
-        /// <summary>
-        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
-        /// </summary>
-        /// <param name="correlationId">The logical operation correlation id.</param>
-        /// <param name="name">The logical operation name.</param>
-        IDisposable PushContext(Guid correlationId, String name);
-
-        /// <summary>
-        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
-        /// </summary>
-        /// <param name="correlationId">The logical operation correlation id.</param>
-        /// <param name="name">The logical operation name.</param>
-        /// <param name="data">The logical operation context.</param>
-        IDisposable PushContext(Guid correlationId, String name, Object data);
-
-        /// <summary>
-        /// Start a new named logical operation associated with the specified <paramref name="correlationId"/>.
-        /// </summary>
-        /// <param name="correlationId">The logical operation correlation id.</param>
-        /// <param name="name">The logical operation name.</param>
-        /// <param name="data">The logical operation context.</param>
-        IDisposable PushContext(Guid correlationId, String name, params Object[] data);
+        /// <param name="activityId">The activity identifier.</param>
+        IDisposable Transfer(Guid activityId);
     }
 }

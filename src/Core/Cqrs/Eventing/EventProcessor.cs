@@ -85,7 +85,7 @@ namespace Spark.Cqrs.Eventing
         {
             var envelope = message.Payload;
 
-            using (Log.PushContext("Message", message))
+            using (Log.PushContext("{0} ({1})", message.Payload.Event.GetType(), message.Id))
             using (var context = new EventContext(envelope.AggregateId, message.Headers, envelope.Event))
             {
                 var eventHandlers = eventHandlerRegistry.GetHandlersFor(envelope.Event);

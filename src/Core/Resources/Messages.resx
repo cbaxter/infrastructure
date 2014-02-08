@@ -121,7 +121,7 @@
     <value>Logical operation {0} started</value>
   </data>
   <data name="LogicalOperationStopped" xml:space="preserve">
-    <value>Logical operation {0} stopped after {1}</value>
+    <value>Logical operation {0} stopped</value>
   </data>
   <data name="LogicalOperationTransfered" xml:space="preserve">
     <value>Transfer from {0} to {1}</value>
