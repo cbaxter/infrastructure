@@ -75,6 +75,38 @@ namespace Test.Spark
                 Assert.Same(value, result[0]);
             }
         }
+
+        public class WhenConvertingToLowerString
+        {
+            [Fact]
+            public void ReturnEmptyStringIfNull()
+            {
+                Assert.Equal(String.Empty, default(Object).ToLowerString());
+            }
+
+            [Fact]
+            public void ReturnLowerCaseStringIfNotNull()
+            {
+
+                Assert.Equal("mypascalcasestring", "MyPascalCaseString".ToLowerString());
+            }
+        }
+
+        public class WhenConvertingToUpperString
+        {
+            [Fact]
+            public void ReturnEmptyStringIfNull()
+            {
+                Assert.Equal(String.Empty, default(Object).ToUpperString());
+            }
+
+            [Fact]
+            public void ReturnLowerCaseStringIfNotNull()
+            {
+
+                Assert.Equal("MYPASCALCASESTRING", "MyPascalCaseString".ToUpperString());
+            }
+        }
     }
 }
 #pragma warning restore 1720

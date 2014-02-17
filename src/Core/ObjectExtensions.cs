@@ -40,7 +40,7 @@ namespace Spark
         {
             return value != null;
         }
-        
+
         /// <summary>
         /// Creates a new <see cref="Array"/> containing <paramref name="item"/>.
         /// </summary>
@@ -59,6 +59,26 @@ namespace Spark
         public static List<T> AsList<T>(this T item)
         {
             return new List<T> { item };
+        }
+
+        /// <summary>
+        /// Returns a lowercase <see cref="String"/> which represents the object instance using invariant culture casing rules.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
+        /// <param name="item">The object to convert to a lowercase invariant string.</param>
+        public static String ToLowerString<T>(this T item)
+        {
+            return ReferenceEquals(item, null) ? String.Empty : item.ToString().ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Returns a uppercase <see cref="String"/> which represents the object instance using invariant culture casing rules.
+        /// </summary>
+        /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
+        /// <param name="item">The object to convert to a uppercase invariant string.</param>
+        public static String ToUpperString<T>(this T item)
+        {
+            return ReferenceEquals(item, null) ? String.Empty : item.ToString().ToUpperInvariant();
         }
     }
 }
