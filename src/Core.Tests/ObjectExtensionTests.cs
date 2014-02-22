@@ -79,32 +79,32 @@ namespace Test.Spark
         public class WhenConvertingToLowerString
         {
             [Fact]
-            public void ReturnEmptyStringIfNull()
+            public void ReturnNullIfStringNull()
             {
-                Assert.Equal(String.Empty, default(Object).ToLowerString());
+                Assert.Null(default(Object).ToLowerInvariant());
             }
 
             [Fact]
             public void ReturnLowerCaseStringIfNotNull()
             {
-
-                Assert.Equal("mypascalcasestring", "MyPascalCaseString".ToLowerString());
+                Object value = "MyPascalCaseString";
+                Assert.Equal("mypascalcasestring", value.ToLowerInvariant());
             }
         }
 
         public class WhenConvertingToUpperString
         {
             [Fact]
-            public void ReturnEmptyStringIfNull()
+            public void ReturnNullIfStringNull()
             {
-                Assert.Equal(String.Empty, default(Object).ToUpperString());
+                Assert.Null(default(Object).ToUpperInvariant());
             }
 
             [Fact]
             public void ReturnLowerCaseStringIfNotNull()
             {
-
-                Assert.Equal("MYPASCALCASESTRING", "MyPascalCaseString".ToUpperString());
+                Object value = "MyPascalCaseString";
+                Assert.Equal("MYPASCALCASESTRING", value.ToUpperInvariant());
             }
         }
     }

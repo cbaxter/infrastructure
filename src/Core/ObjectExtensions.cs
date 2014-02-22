@@ -66,9 +66,10 @@ namespace Spark
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
         /// <param name="item">The object to convert to a lowercase invariant string.</param>
-        public static String ToLowerString<T>(this T item)
+        public static String ToLowerInvariant<T>(this T item)
+            where T : class
         {
-            return ReferenceEquals(item, null) ? String.Empty : item.ToString().ToLowerInvariant();
+            return ReferenceEquals(item, null) ? null : item.ToString().ToLowerInvariant();
         }
 
         /// <summary>
@@ -76,9 +77,10 @@ namespace Spark
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
         /// <param name="item">The object to convert to a uppercase invariant string.</param>
-        public static String ToUpperString<T>(this T item)
+        public static String ToUpperInvariant<T>(this T item)
+            where T : class
         {
-            return ReferenceEquals(item, null) ? String.Empty : item.ToString().ToUpperInvariant();
+            return ReferenceEquals(item, null) ? null : item.ToString().ToUpperInvariant();
         }
     }
 }
