@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using Spark.Cqrs.Commanding;
-using Spark.Cqrs.Eventing;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
