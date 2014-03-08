@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Spark.Configuration;
@@ -30,6 +31,7 @@ namespace Spark.Cqrs.Commanding
         private static readonly TaskCreationOptions TaskCreationOptions = TaskCreationOptions.AttachedToParent | TaskCreationOptions.HideScheduler;
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly IRetrieveCommandHandlers commandHandlerRegistry;
+        private readonly IDetectTransientErrors transientErrorRegistry;
         private readonly TaskScheduler taskScheduler;
         private readonly TimeSpan retryTimeout;
 
@@ -37,21 +39,24 @@ namespace Spark.Cqrs.Commanding
         /// Creates a new instance of the <see cref="CommandProcessor"/> using the specified <see cref="IRetrieveCommandHandlers"/> and <see cref="IStoreAggregates"/> instances.
         /// </summary>
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
-        public CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry)
-            : this(commandHandlerRegistry, Settings.CommandProcessor)
+        /// <param name="transientErrorRegistries">The set of <see cref="IDetectTransientErrors"/> instances used to detect transient errors.</param>
+        public CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IEnumerable<IDetectTransientErrors> transientErrorRegistries)
+            : this(commandHandlerRegistry, new TransientErrorRegistry(transientErrorRegistries), Settings.CommandProcessor)
         { }
 
         /// <summary>
         /// Creates a new instance of the <see cref="CommandProcessor"/> using the specified <see cref="IRetrieveCommandHandlers"/> and <see cref="IStoreAggregates"/> instances.
         /// </summary>
         /// <param name="commandHandlerRegistry">The <see cref="CommandHandler"/> registry.</param>
+        /// <param name="transientErrorRegistry">The <see cref="IDetectTransientErrors"/> instance used to detect transient errors.</param>
         /// <param name="settings">The command processor configuration settings.</param>
-        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IProcessCommandSettings settings)
+        internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IDetectTransientErrors transientErrorRegistry, IProcessCommandSettings settings)
         {
             Verify.NotNull(commandHandlerRegistry, "commandHandlerRegistry");
             Verify.NotNull(settings, "settings");
 
             this.retryTimeout = settings.RetryTimeout;
+            this.transientErrorRegistry = transientErrorRegistry;
             this.taskScheduler = new PartitionedTaskScheduler(GetAggregateId, settings.MaximumConcurrencyLevel, settings.BoundedCapacity);
             this.commandHandlerRegistry = commandHandlerRegistry;
         }
@@ -113,6 +118,9 @@ namespace Spark.Cqrs.Commanding
                 }
                 catch (Exception ex)
                 {
+                    if (!transientErrorRegistry.IsTransient(ex))
+                        throw;
+
                     backoffContext = backoffContext ?? new ExponentialBackoff(retryTimeout);
                     backoffContext.WaitOrTimeout(ex);
                     Log.WarnFormat(ex.Message);

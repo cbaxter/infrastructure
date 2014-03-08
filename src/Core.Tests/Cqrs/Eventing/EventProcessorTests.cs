@@ -4,6 +4,7 @@ using Moq;
 using Spark;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
+using Spark.Data;
 using Spark.Messaging;
 using Test.Spark.Configuration;
 using Xunit;
@@ -28,13 +29,15 @@ namespace Test.Spark.Cqrs.Eventing
     {
         public abstract class UsingEventProcessorBase
         {
+            internal readonly Mock<IDetectTransientErrors> TransientErrorRegistry = new Mock<IDetectTransientErrors>();
             internal readonly Mock<IRetrieveEventHandlers> HandlerRegistry = new Mock<IRetrieveEventHandlers>();
             internal readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
             internal readonly EventProcessor Processor;
 
             protected UsingEventProcessorBase()
             {
-                Processor = new EventProcessor(HandlerRegistry.Object, new EventProcessorSettings());
+                TransientErrorRegistry.Setup(mock => mock.IsTransient(It.IsAny<ConcurrencyException>())).Returns(true);
+                Processor = new EventProcessor(HandlerRegistry.Object, TransientErrorRegistry.Object, new EventProcessorSettings());
             }
         }
 
@@ -43,7 +46,7 @@ namespace Test.Spark.Cqrs.Eventing
             [Fact]
             public void EventHandlerRegistryCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new EventProcessor(null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new EventProcessor(null, new IDetectTransientErrors[0]));
 
                 Assert.Equal("eventHandlerRegistry", ex.ParamName);
             }
@@ -73,7 +76,7 @@ namespace Test.Spark.Cqrs.Eventing
             {
                 var execution = 0;
                 var e = new FakeEvent();
-                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { if (++execution == 1) { throw new InvalidOperationException(); } }, () => new Object());
+                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { if (++execution == 1) { throw new ConcurrencyException(); } }, () => new Object());
                 var envelope = new EventEnvelope(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), new EventVersion(1, 1, 1), e);
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
 
@@ -86,14 +89,14 @@ namespace Test.Spark.Cqrs.Eventing
             public void WillTimeoutEventuallyIfCannotExecuteHandler()
             {
                 var e = new FakeEvent();
-                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { throw new InvalidOperationException(); }, () => new Object());
+                var eventHandler = new FakeEventHandler(typeof(Object), typeof(FakeEvent), (a, b) => { throw new ConcurrencyException(); }, () => new Object());
                 var envelope = new EventEnvelope(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), new EventVersion(1, 1, 1), e);
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
 
                 SystemTime.ClearOverride();
 
                 HandlerRegistry.Setup(mock => mock.GetHandlersFor(e)).Returns(new EventHandler[] { eventHandler });
-                
+
                 Assert.Throws<TimeoutException>(() => Processor.Process(message));
             }
         }

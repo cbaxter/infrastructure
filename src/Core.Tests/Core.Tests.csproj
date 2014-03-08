@@ -114,6 +114,8 @@
     <Compile Include="Cqrs\Eventing\Sagas\SagaTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCacheTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\TimeoutDispatcherTests.cs" />
+    <Compile Include="Data\SqlClient\SqlSequentialGuidTests.cs" />
+    <Compile Include="Data\SqlClient\SqlTransientErrorRegistryTests.cs" />
     <Compile Include="Data\SqlServerFactAttribute.cs" />
     <Compile Include="EnumerableExtensionTests.cs" />
     <Compile Include="Cqrs\Eventing\EventHandlerRegistryTests.cs" />

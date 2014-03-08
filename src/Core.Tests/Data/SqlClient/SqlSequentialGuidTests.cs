@@ -1,6 +1,8 @@
 ﻿using System;
+using Spark.Data.SqlClient;
+using Xunit;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2014 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -13,15 +15,17 @@
  * IN THE SOFTWARE. 
  */
 
-namespace Spark.Data.SqlClient
+namespace Test.Spark.Data.SqlClient
 {
-    /// <summary>
-    /// Sql Server error code constants.
-    /// </summary>
-    public static class SqlErrorCode
+    public static class UsingSqlSequentialGuid
     {
-        public const Int32 UniqueConstraintViolation = 2627;
-        public const Int32 UniqueIndexViolation = 2601;
-        public const Int32 Deadlock = 1205;
+        public class WhenCreatingNewGuid
+        {
+            [Fact]
+            public void AlwaysReturnNonEmptyGuid()
+            {
+                Assert.NotEqual(Guid.Empty, SqlSequentialGuid.NewGuid());
+            }
+        }
     }
 }

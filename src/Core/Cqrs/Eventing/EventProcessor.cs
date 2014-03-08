@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Spark.Configuration;
@@ -28,6 +29,7 @@ namespace Spark.Cqrs.Eventing
     {
         private static readonly TaskCreationOptions TaskCreationOptions = TaskCreationOptions.AttachedToParent | TaskCreationOptions.HideScheduler;
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private readonly IDetectTransientErrors transientErrorRegistry;
         private readonly IRetrieveEventHandlers eventHandlerRegistry;
         private readonly TaskScheduler taskScheduler;
         private readonly TimeSpan retryTimeout;
@@ -36,22 +38,25 @@ namespace Spark.Cqrs.Eventing
         /// Creates a new instance of the <see cref="EventProcessor"/> using the specified <see cref="IRetrieveEventHandlers"/> instance.
         /// </summary>
         /// <param name="eventHandlerRegistry">The <see cref="EventHandler"/> registry.</param>
-        public EventProcessor(IRetrieveEventHandlers eventHandlerRegistry)
-            : this(eventHandlerRegistry, Settings.EventProcessor)
+        /// <param name="transientErrorRegistries">The set of <see cref="IDetectTransientErrors"/> instances used to detect transient errors.</param>
+        public EventProcessor(IRetrieveEventHandlers eventHandlerRegistry, IEnumerable<IDetectTransientErrors> transientErrorRegistries)
+            : this(eventHandlerRegistry, new TransientErrorRegistry(transientErrorRegistries), Settings.EventProcessor)
         { }
 
         /// <summary>
         /// Creates a new instance of the <see cref="EventProcessor"/> using the specified <see cref="IRetrieveEventHandlers"/> instance.
         /// </summary>
         /// <param name="eventHandlerRegistry">The <see cref="EventHandler"/> registry.</param>
+        /// <param name="transientErrorRegistry">The <see cref="IDetectTransientErrors"/> instance used to detect transient errors.</param>
         /// <param name="settings">The event processor configuration settings.</param>
-        internal EventProcessor(IRetrieveEventHandlers eventHandlerRegistry, IProcessEventSettings settings)
+        internal EventProcessor(IRetrieveEventHandlers eventHandlerRegistry, IDetectTransientErrors transientErrorRegistry, IProcessEventSettings settings)
         {
             Verify.NotNull(eventHandlerRegistry, "eventHandlerRegistry");
             Verify.NotNull(settings, "settings");
 
             this.retryTimeout = settings.RetryTimeout;
             this.eventHandlerRegistry = eventHandlerRegistry;
+            this.transientErrorRegistry = transientErrorRegistry;
             this.taskScheduler = new PartitionedTaskScheduler(GetAggregateId, settings.MaximumConcurrencyLevel, settings.BoundedCapacity);
         }
 
@@ -115,6 +120,9 @@ namespace Spark.Cqrs.Eventing
                 }
                 catch (Exception ex)
                 {
+                    if (!transientErrorRegistry.IsTransient(ex))
+                        throw;
+
                     backoffContext = backoffContext ?? new ExponentialBackoff(retryTimeout);
                     backoffContext.WaitOrTimeout(ex);
                     Log.WarnFormat(ex.Message);

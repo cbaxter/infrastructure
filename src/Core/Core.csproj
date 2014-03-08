@@ -97,6 +97,8 @@
     <Compile Include="Data\SqlClient\SqlDialect.cs" />
     <Compile Include="Data\SqlClient\SqlErrorCode.cs" />
     <Compile Include="Data\SqlClient\SqlSequentialGuid.cs" />
+    <Compile Include="Data\SqlClient\SqlTransientErrorRegistry.cs" />
+    <Compile Include="Data\DbTransientErrorRegistry.cs" />
     <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
     <Compile Include="Cqrs\Domain\Entity.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="TransientErrorRegistry.cs" />
     <Compile Include="Logging\ActivityScope.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LogicalOperationScope.cs" />

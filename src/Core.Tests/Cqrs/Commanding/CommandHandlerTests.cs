@@ -4,7 +4,7 @@ using Moq;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
-using Spark.EventStore;
+using Spark.Cqrs.Eventing;
 using Spark.Messaging;
 using Xunit;
 
@@ -83,7 +83,22 @@ namespace Test.Spark.Cqrs.Commanding
             protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
 
             [Fact]
-            public void SaveAggregateOnSuccess()
+            public void SaveAggregateOnSuccessIfEventsRaised()
+            {
+                var aggregate = new FakeAggregate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregate)a).Handle((FakeCommand)c));
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    commandHandler.Handle(context);
+
+                AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Once());
+            }
+
+            [Fact]
+            public void DoNotSaveAggregateOnSuccessIfNoEventsRaised()
             {
                 var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
@@ -94,7 +109,7 @@ namespace Test.Spark.Cqrs.Commanding
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
                     commandHandler.Handle(context);
 
-                AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Once());
+                AggregateStore.Verify(mock => mock.Save(aggregate, It.IsAny<CommandContext>()), Times.Never);
             }
         }
         // ReSharper restore AccessToDisposedClosure
@@ -111,10 +126,18 @@ namespace Test.Spark.Cqrs.Commanding
         }
 
         private class FakeAggregate : Aggregate
+        {
+            [UsedImplicitly]
+            public void Handle(FakeCommand command)
+            {
+                Raise(new FakeEvent());
+            }
+        }
+
+        private class FakeCommand : Command
         { }
 
-        [UsedImplicitly]
-        private class FakeCommand : Command
+        private class FakeEvent : Event
         { }
     }
 }

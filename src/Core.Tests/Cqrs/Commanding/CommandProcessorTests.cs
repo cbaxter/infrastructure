@@ -4,6 +4,7 @@ using Moq;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
+using Spark.Cqrs.Eventing;
 using Spark.Data;
 using Spark.Messaging;
 using Test.Spark.Configuration;
@@ -28,13 +29,15 @@ namespace Test.Spark.Cqrs.Commanding
     {
         public abstract class UsingCommandProcessorBase
         {
+            internal readonly Mock<IDetectTransientErrors> TransientErrorRegistry = new Mock<IDetectTransientErrors>();
             protected readonly Mock<IRetrieveCommandHandlers> HandlerRegistry = new Mock<IRetrieveCommandHandlers>();
             protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
             protected readonly CommandProcessor Processor;
 
             protected UsingCommandProcessorBase()
             {
-                Processor = new CommandProcessor(HandlerRegistry.Object, new CommandProcessorSettings());
+                TransientErrorRegistry.Setup(mock => mock.IsTransient(It.IsAny<ConcurrencyException>())).Returns(true);
+                Processor = new CommandProcessor(HandlerRegistry.Object, TransientErrorRegistry.Object, new CommandProcessorSettings());
             }
         }
 
@@ -43,7 +46,7 @@ namespace Test.Spark.Cqrs.Commanding
             [Fact]
             public void CommandHandlerRegistryCannotBeNull()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new CommandProcessor(null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new CommandProcessor(null, new IDetectTransientErrors[0]));
 
                 Assert.Equal("commandHandlerRegistry", ex.ParamName);
             }
@@ -75,7 +78,7 @@ namespace Test.Spark.Cqrs.Commanding
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
                 var ex = new ConcurrencyException();
 
-                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { }));
+                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregate)a).Handle((FakeCommand)c)));
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
                 AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() =>
                 {
@@ -95,13 +98,13 @@ namespace Test.Spark.Cqrs.Commanding
                 var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
-                var processor = new CommandProcessor(HandlerRegistry.Object, new CommandProcessorSettings { RetryTimeout =TimeSpan.FromMilliseconds(20) });
+                var processor = new CommandProcessor(HandlerRegistry.Object, TransientErrorRegistry.Object, new CommandProcessorSettings { RetryTimeout = TimeSpan.FromMilliseconds(20) });
 
                 SystemTime.ClearOverride();
 
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
                 AggregateStore.Setup(mock => mock.Save(aggregate, It.IsAny<CommandContext>())).Callback(() => { throw new ConcurrencyException(); });
-                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { }));
+                HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregate)a).Handle((FakeCommand)c)));
 
                 Assert.Throws<TimeoutException>(() => processor.Process(message));
             }
@@ -111,10 +114,15 @@ namespace Test.Spark.Cqrs.Commanding
         {
             [UsedImplicitly]
             public void Handle(FakeCommand command)
-            { }
+            {
+                Raise(new FakeEvent());
+            }
         }
 
         private class FakeCommand : Command
+        { }
+
+        private class FakeEvent : Event
         { }
     }
 }
