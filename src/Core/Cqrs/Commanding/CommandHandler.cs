@@ -72,11 +72,18 @@ namespace Spark.Cqrs.Commanding
 
             executor(aggregate, context.Command);
 
-            Log.Trace("Saving aggregate state");
+            if (context.HasRaisedEvents)
+            {
+                Log.Trace("Saving aggregate state");
 
-            aggregateStore.Save(aggregate, context);
+                aggregateStore.Save(aggregate, context);
 
-            Log.Trace("Aggregate state saved");
+                Log.Trace("Aggregate state saved");
+            }
+            else
+            {
+                Log.WarnFormat("Executing {0} command on aggregate {1} raised no events", context.Command, aggregate);
+            }
         }
 
         /// <summary>

@@ -62,6 +62,11 @@ namespace Spark.Cqrs.Commanding
         public Command Command { get { return envelope.Command; } }
 
         /// <summary>
+        /// Return <value>True</value> if one or more events were raised when handling the underlying <see cref="Command"/>; otherwise <value>False</value>.
+        /// </summary>
+        internal Boolean HasRaisedEvents { get { return raisedEvents.Count > 0; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="CommandContext"/> with the specified <paramref name="commandId"/> and <paramref name="headers"/>.
         /// </summary>
         /// <param name="commandId">The unique <see cref="Command"/> identifier.</param>
