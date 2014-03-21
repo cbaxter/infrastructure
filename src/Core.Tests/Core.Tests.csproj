@@ -172,6 +172,7 @@
     <Compile Include="Threading\MonitorWrapperTests.cs" />
     <Compile Include="Threading\ThreadPoolWrapperTests.cs" />
     <Compile Include="TypeExtensionTests.cs" />
+    <Compile Include="ValueObjectTests.cs" />
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>

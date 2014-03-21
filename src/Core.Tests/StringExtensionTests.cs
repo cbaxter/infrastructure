@@ -220,6 +220,25 @@ namespace Test.Spark
                 Assert.True("MyTestString".IsNotNullOrWhiteSpace());
             }
         }
+
+        public class WhenConvertingStringToMd5Hash
+        {
+            [Fact]
+            public void CaseSensitiveByDefault()
+            {
+                var value = "My Cast Sensitive String";
+
+                Assert.NotEqual(value.ToGuid(), value.ToLowerInvariant().ToGuid());
+            }
+            
+            [Fact]
+            public void CanBeCaseInsensitiveIfDesired()
+            {
+                var value = "My Cast Sensitive String";
+
+                Assert.Equal(value.ToGuid(ignoreCase: true), value.ToLowerInvariant().ToGuid(ignoreCase: true));
+            }
+        }
     }
 }
 #pragma warning restore 1720

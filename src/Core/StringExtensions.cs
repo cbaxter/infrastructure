@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -142,6 +144,35 @@ namespace Spark
         public static Boolean IsNotNullOrWhiteSpace(this String value)
         {
             return !String.IsNullOrWhiteSpace(value);
+        }
+
+        /// <summary>
+        /// Computes the case-sensitive MD5 hash for the string <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The string for which to compute the MD5 hash.</param>
+        public static Guid ToGuid(this String value)
+        {
+            return value.ToGuid(ignoreCase: false);
+        }
+
+        /// <summary>
+        /// Computes the MD5 hash for the string <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The string for which to compute the MD5 hash.</param>
+        /// <param name="ignoreCase">Specify <value>true</value> to first convert the string value to its lower invariant value; otherwise <value>false</value>.</param>
+        public static Guid ToGuid(this String value, Boolean ignoreCase)
+        {
+            value = (value ?? String.Empty).Trim();
+
+            if (ignoreCase)
+                value = value.ToLowerInvariant();
+
+            using (var hash = new MD5CryptoServiceProvider())
+            {
+                var bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(value));
+
+                return new Guid(bytes);
+            }
         }
     }
 }

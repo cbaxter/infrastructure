@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Spark.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -269,6 +270,7 @@
     <Compile Include="Threading\TimerWrapper.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLocator.cs" />
+    <Compile Include="ValueObject.cs" />
     <Compile Include="Verify.cs" />
   </ItemGroup>
   <ItemGroup>

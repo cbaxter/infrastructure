@@ -88,7 +88,7 @@ namespace Spark.Logging
         /// <summary>
         /// Returns a string that represents the current diagnostic context.
         /// </summary>
-        public override string ToString()
+        public override String ToString()
         {
             return currentActivityId.ToString();
         }

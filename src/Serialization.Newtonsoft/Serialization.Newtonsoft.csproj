@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Spark.Serialization.Newtonsoft.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -54,6 +55,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Converters\CommitDataConverter.cs" />
+    <Compile Include="Converters\ValueObjectConverter.cs" />
     <Compile Include="Converters\StateObjectConverter.cs" />
     <Compile Include="JsonReaderExtensions.cs" />
     <Compile Include="NewtonsoftBsonSerializer.cs" />
