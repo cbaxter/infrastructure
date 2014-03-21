@@ -24,6 +24,9 @@ namespace Spark.Cqrs.Domain.Mappings
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class ApplyByStrategyAttribute : Attribute
     {
+        /// <summary>
+        /// Represents the default <see cref="ApplyByStrategyAttribute"/> instance. This field is read-only.
+        /// </summary>
         public static readonly ApplyByStrategyAttribute Default = new ApplyByConventionAttribute();
 
         /// <summary>

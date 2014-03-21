@@ -36,9 +36,9 @@ namespace Spark
         }
 
         /// <summary>
-        /// Return the type definition if <paramref name="type"/> derives from <see cref="baseType"/>; otherwise <value>null</value>.
+        /// Return the type definition if <paramref name="type"/> derives from <paramref name="baseType"/>; otherwise <value>null</value>.
         /// </summary>
-        /// <param name="type">The type on which to locate <see cref="baseType"/>.</param>
+        /// <param name="type">The type on which to locate <paramref name="baseType"/>.</param>
         /// <param name="baseType">The target type to find in the type inheritance hierarchy (can be generic type definition).</param>
         public static Type FindBaseType(this Type type, Type baseType)
         {

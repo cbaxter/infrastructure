@@ -22,16 +22,16 @@ namespace Spark.Messaging
     /// </summary>
     public struct Header : IEquatable<Header>
     {
-        public const String Aggregate = "_a";
-        public const String Origin = "_o";
-        public const String Timestamp = "_t";
-        public const String RemoteAddress = "_r";
-        public const String UserAddress = "_c";
-        public const String UserName = "_i";
-
         private static readonly HashSet<String> ReservedNames = new HashSet<String> { Origin, Timestamp, RemoteAddress, UserAddress, UserName };
         private readonly String value;
         private readonly String name;
+
+        internal const String Aggregate = "_a";
+        internal const String Origin = "_o";
+        internal const String Timestamp = "_t";
+        internal const String RemoteAddress = "_r";
+        internal const String UserAddress = "_c";
+        internal const String UserName = "_i";
 
         /// <summary>
         /// The name of the header value.

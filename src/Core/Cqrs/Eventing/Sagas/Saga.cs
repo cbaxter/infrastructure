@@ -165,7 +165,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (timeout.Kind != DateTimeKind.Utc)
                 timeout = timeout.ToUniversalTime();
-            
+
             Timeout = timeout;
             FlagTimeoutChangedOnSagaContext();
             Log.TraceFormat("Timeout scheduled for {0}", timeout);
@@ -304,6 +304,10 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
         }
 
+        /// <summary>
+        /// When overriden, handles a saga timeout event.
+        /// </summary>
+        /// <param name="e">The saga timeout event.</param>
         protected virtual void OnTimeout(Timeout e)
         { }
 

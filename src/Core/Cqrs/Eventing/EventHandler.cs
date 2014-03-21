@@ -76,7 +76,7 @@ namespace Spark.Cqrs.Eventing
         }
 
         /// <summary>
-        /// Invokes the underlying <see cref="Object"/> event handler method using the specified <see cref="context"/>.
+        /// Invokes the underlying <see cref="Object"/> event handler method using the specified <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The current event context.</param>
         public virtual void Handle(EventContext context)

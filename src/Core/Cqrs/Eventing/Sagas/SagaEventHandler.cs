@@ -61,7 +61,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Invokes the underlying <see cref="Saga"/> event handler method using the specified <see cref="context"/>.
+        /// Invokes the underlying <see cref="Saga"/> event handler method using the specified <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The current event context.</param>
         public override void Handle(EventContext context)
@@ -79,7 +79,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Invokes the underlying <see cref="Saga"/> event handler method using the current saga <see cref="context"/>.
+        /// Invokes the underlying <see cref="Saga"/> event handler method using the current saga <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The current saga context.</param>
         private void UpdateSaga(SagaContext context)

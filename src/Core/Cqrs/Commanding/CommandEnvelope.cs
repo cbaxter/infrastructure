@@ -23,10 +23,13 @@ namespace Spark.Cqrs.Commanding
     public sealed class CommandEnvelope
     {
         private class NullCommand : Command { }
-
-        public static readonly CommandEnvelope Empty = new CommandEnvelope(Guid.Empty, new NullCommand());
         private readonly Guid aggregateId;
         private readonly Command command;
+
+        /// <summary>
+        /// Represents an empty <see cref="CommandEnvelope"/>. This field is read-only.
+        /// </summary>
+        public static readonly CommandEnvelope Empty = new CommandEnvelope(Guid.Empty, new NullCommand());
 
         /// <summary>
         /// The unique <see cref="Aggregate"/> identifier that is the target of the associated <see cref="Command"/>.

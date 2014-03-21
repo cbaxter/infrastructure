@@ -25,8 +25,12 @@ namespace Spark.Serialization
     /// </summary>
     public sealed class NewtonsoftJsonSerializer : ISerializeObjects
     {
-        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(Enumerable.Empty<JsonConverter>());
         private readonly JsonSerializer serializer;
+
+        /// <summary>
+        /// The default Newtonsoft JSON Serializer instance.
+        /// </summary>
+        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(Enumerable.Empty<JsonConverter>());
 
         /// <summary>
         /// The <see cref="JsonSerializer"/> used by this <see cref="NewtonsoftJsonSerializer"/> instance.

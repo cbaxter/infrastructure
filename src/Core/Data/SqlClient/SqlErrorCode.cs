@@ -20,8 +20,19 @@ namespace Spark.Data.SqlClient
     /// </summary>
     public static class SqlErrorCode
     {
+        /// <summary>
+        /// Unique constraint violation error code.
+        /// </summary>
         public const Int32 UniqueConstraintViolation = 2627;
+
+        /// <summary>
+        /// Unique index violation error code.
+        /// </summary>
         public const Int32 UniqueIndexViolation = 2601;
+
+        /// <summary>
+        /// Deadlock error code.
+        /// </summary>
         public const Int32 Deadlock = 1205;
     }
 }

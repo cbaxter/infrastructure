@@ -21,10 +21,14 @@ namespace Spark.Cqrs.Eventing
     /// </summary>
     public struct EventVersion : IEquatable<EventVersion>
     {
-        public static readonly EventVersion Empty = new EventVersion();
         private readonly Int32 version;
         private readonly Int32 count;
         private readonly Int32 item;
+
+        /// <summary>
+        /// Represents an empty <see cref="EventVersion"/>. This field is read-only.
+        /// </summary>
+        public static readonly EventVersion Empty = new EventVersion();
 
         /// <summary>
         /// The <see cref="Aggregate"/> version.

@@ -24,7 +24,7 @@ namespace Spark.Cqrs.Domain
     /// </summary>
     public abstract class Entity : StateObject
     {
-        protected static class Property
+        internal static class Property
         {
             public const String Id = "id";
         }

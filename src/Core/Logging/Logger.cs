@@ -79,7 +79,7 @@ namespace Spark.Logging
         internal TraceSource TraceSource { get { return traceSource; } }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <see cref="level"/>.
+        /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <paramref name="level"/>.
         /// </summary>
         /// <param name="name">The name of the logger.</param>
         /// <param name="level">The log level of the logger.</param>
@@ -88,7 +88,7 @@ namespace Spark.Logging
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <see cref="level"/>.
+        /// Initializes a new instance of the <see cref="Logger"/> class with the specified <paramref name="name"/> and logging <paramref name="level"/>.
         /// </summary>
         /// <param name="name">The name of the logger.</param>
         /// <param name="level">The log level of the logger.</param>

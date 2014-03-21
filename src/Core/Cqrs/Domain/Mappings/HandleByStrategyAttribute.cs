@@ -27,6 +27,10 @@ namespace Spark.Cqrs.Domain.Mappings
     public abstract class HandleByStrategyAttribute : Attribute
     {
         private static readonly MethodInfo GetServiceMethod = typeof(IServiceProvider).GetMethod("GetService", new[] { typeof(Type) });
+
+        /// <summary>
+        /// Represents the default <see cref="HandleByStrategyAttribute"/> instance. This field is read-only.
+        /// </summary>
         public static readonly HandleByStrategyAttribute Default = new HandleByConventionAttribute();
 
         /// <summary>

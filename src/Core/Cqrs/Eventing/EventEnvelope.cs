@@ -23,12 +23,15 @@ namespace Spark.Cqrs.Eventing
     public sealed class EventEnvelope
     {
         private class NullEvent : Event { }
-
-        public static readonly EventEnvelope Empty = new EventEnvelope(Guid.Empty, Guid.Empty, EventVersion.Empty, new NullEvent());
         private readonly EventVersion version;
         private readonly Guid correlationId;
         private readonly Guid aggregateId;
         private readonly Event e;
+
+        /// <summary>
+        /// Represents an empty <see cref="EventEnvelope"/>. This field is read-only.
+        /// </summary>
+        public static readonly EventEnvelope Empty = new EventEnvelope(Guid.Empty, Guid.Empty, EventVersion.Empty, new NullEvent());
 
         /// <summary>
         /// The message correlation identifier that is assocaited with this <see cref="EventEnvelope"/>.

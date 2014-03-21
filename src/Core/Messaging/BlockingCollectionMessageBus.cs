@@ -23,6 +23,9 @@ namespace Spark.Messaging
     /// </summary>
     public abstract class BlockingCollectionMessageBus
     {
+        /// <summary>
+        /// The <see cref="BlockingCollectionMessageBus"/> log instance.
+        /// </summary>
         protected static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
@@ -89,7 +92,7 @@ namespace Spark.Messaging
         }
 
         /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="DefaultDiagnosticContext"/> class.
+        /// Releases all managed resources used by the current instance of the <see cref="BlockingCollectionMessageBus"/> class.
         /// </summary>
         public void Dispose()
         {

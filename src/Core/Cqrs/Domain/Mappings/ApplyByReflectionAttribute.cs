@@ -19,6 +19,9 @@ using Spark.Cqrs.Eventing;
 
 namespace Spark.Cqrs.Domain.Mappings
 {
+    /// <summary>
+    /// Base attribute for indicating apply methods mapped by reflection.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public abstract class ApplyByReflectionAttribute : ApplyByStrategyAttribute
     {
@@ -55,7 +58,7 @@ namespace Spark.Cqrs.Domain.Mappings
 
             return new ApplyMethodCollection(ApplyOptional, mappings);
         }
-        
+
         /// <summary>
         /// Gets the reflection binding flags to be used when locating apply methods.
         /// </summary>
@@ -69,7 +72,7 @@ namespace Spark.Cqrs.Domain.Mappings
 
             return bindingFlags;
         }
-        
+
         /// <summary>
         /// Determine if the specified <paramref name="method"/> conforms to the configured apply method specification.
         /// </summary>

@@ -26,8 +26,12 @@ namespace Spark.Data.SqlClient
     /// </summary>
     public abstract class SqlDialect : IDbDialect
     {
-        protected const Int32 Max = -1;
         private readonly String connectionString;
+
+        /// <summary>
+        /// The <see cref="DbParameter"/> size to use when using (MAX) for VARBINARY or VARCHAR fields.
+        /// </summary>
+        protected const Int32 Max = -1;
 
         /// <summary>
         /// The Sql-Server databse provider factory.

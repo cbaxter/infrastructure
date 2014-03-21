@@ -19,7 +19,7 @@ namespace Spark.Serialization
     internal static class JsonReaderExtensions
     {
         /// <summary>
-        /// Returns true if the specified <see cref="reader"/> is ready to read a JSON object.
+        /// Returns true if the specified <paramref name="reader"/> is ready to read a JSON object.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> instance.</param>
         public static Boolean CanReadObject(this JsonReader reader)
@@ -28,7 +28,7 @@ namespace Spark.Serialization
         }
 
         /// <summary>
-        /// Returns true if the specified <see cref="reader"/> is ready to read a JSON array.
+        /// Returns true if the specified <paramref name="reader"/> is ready to read a JSON array.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> instance.</param>
         public static Boolean CanReadArray(this JsonReader reader)
@@ -37,7 +37,7 @@ namespace Spark.Serialization
         }
         
         /// <summary>
-        /// Returns true if the <see cref="reader"/> was advanced to the next JSON object property; otherwise false.
+        /// Returns true if the <paramref name="reader"/> was advanced to the next JSON object property; otherwise false.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> instance.</param>
         /// <param name="propertyName">The property name associated with the current <paramref name="reader"/> value.</param>

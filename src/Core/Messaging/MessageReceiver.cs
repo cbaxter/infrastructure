@@ -22,6 +22,9 @@ namespace Spark.Messaging
     /// </summary>
     public abstract class MessageReceiver
     {
+        /// <summary>
+        /// The <see cref="MessageReceiver"/> log instance.
+        /// </summary>
         protected static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
