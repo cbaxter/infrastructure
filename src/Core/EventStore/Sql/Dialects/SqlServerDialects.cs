@@ -19,6 +19,7 @@ using Spark.Resources;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1591
 namespace Spark.EventStore.Sql.Dialects
 {
     /// <summary>
@@ -92,3 +93,4 @@ namespace Spark.EventStore.Sql.Dialects
         public IDataParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
     }
 }
+#pragma warning restore 1591

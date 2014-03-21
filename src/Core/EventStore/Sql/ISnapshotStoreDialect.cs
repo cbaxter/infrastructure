@@ -15,6 +15,7 @@ using Spark.Data;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1591
 namespace Spark.EventStore.Sql
 {
     /// <summary>
@@ -34,3 +35,4 @@ namespace Spark.EventStore.Sql
         IDataParameter CreateStateParameter(Byte[] state);
     }
 }
+#pragma warning restore 1591

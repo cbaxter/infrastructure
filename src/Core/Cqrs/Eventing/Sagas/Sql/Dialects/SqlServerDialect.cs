@@ -16,6 +16,7 @@ using Spark.Data.SqlClient;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1591
 namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects
 {
     public sealed class SqlSagaStoreDialect : SqlDialect, ISagaStoreDialect
@@ -40,3 +41,4 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql.Dialects
         public IDataParameter CreateStateParameter(Byte[] state) { return new SqlParameter("@state", SqlDbType.VarBinary, Max) { SourceColumn = "state", Value = state }; }
     }
 }
+#pragma warning restore 1591

@@ -15,6 +15,7 @@ using Spark.Data;
  * IN THE SOFTWARE. 
  */
 
+#pragma warning disable 1591
 namespace Spark.Cqrs.Eventing.Sagas.Sql
 {
     public interface ISagaStoreDialect : IDbDialect
@@ -35,3 +36,4 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         IDataParameter CreateStateParameter(Byte[] state);
     }
 }
+#pragma warning restore 1591
