@@ -6,6 +6,7 @@ using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
+using Spark.Resources;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -83,6 +84,49 @@ namespace Test.Spark.Cqrs.Commanding
             protected readonly Mock<IStoreAggregates> AggregateStore = new Mock<IStoreAggregates>();
 
             [Fact]
+            public void VerifyInitializedIfExplictCreateRequired()
+            {
+                var aggregate = new FakeAggregate(explicitCreateRequired: true, version: 0);
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregate)a).Handle((FakeCommand)c));
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                {
+                    var ex = Assert.Throws<InvalidOperationException>(() => commandHandler.Handle(context));
+
+                    Assert.Equal(Exceptions.AggregateNotInitialized.FormatWith(typeof(FakeAggregate), Guid.Empty), ex.Message);
+                }
+            }
+
+            [Fact]
+            public void VerifyInitializedIfExplictCreateRequiredAndCommandExceptionNotDefined()
+            {
+                var aggregate = new FakeAggregateWithExplicitCreate();
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregateWithExplicitCreate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregateWithExplicitCreate)a).Handle((FakeCommand)c));
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregateWithExplicitCreate), envelope.AggregateId)).Returns(aggregate);
+
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    Assert.DoesNotThrow(() => commandHandler.Handle(context));
+            }
+
+            [Fact]
+            public void DoNotVerifyInitializedIfImplicitCreateAllowed()
+            {
+                var aggregate = new FakeAggregate(explicitCreateRequired: false, version: 0);
+                var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), new FakeCommand());
+                var commandHandler = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => ((FakeAggregate)a).Handle((FakeCommand)c));
+
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
+
+                using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
+                    Assert.DoesNotThrow(() => commandHandler.Handle(context));
+            }
+
+            [Fact]
             public void SaveAggregateOnSuccessIfEventsRaised()
             {
                 var aggregate = new FakeAggregate();
@@ -127,6 +171,34 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class FakeAggregate : Aggregate
         {
+            private readonly Boolean explicitCreateRequired;
+
+            protected override bool RequiresExplicitCreate { get { return explicitCreateRequired; } }
+
+            public FakeAggregate()
+                : this(false, 0)
+            { }
+
+            public FakeAggregate(Boolean explicitCreateRequired, Int32 version)
+            {
+                this.explicitCreateRequired = explicitCreateRequired;
+                Version = version;
+            }
+
+            [UsedImplicitly]
+            public void Handle(FakeCommand command)
+            {
+                Raise(new FakeEvent());
+            }
+        }
+
+        private class FakeAggregateWithExplicitCreate : Aggregate
+        {
+            protected override bool CanCreateAggregate(Type commandType)
+            {
+                return commandType == typeof(FakeCommand);
+            }
+
             [UsedImplicitly]
             public void Handle(FakeCommand command)
             {

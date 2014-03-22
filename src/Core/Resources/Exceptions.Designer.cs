@@ -144,6 +144,29 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Aggregate version must be equal to zero.
+        ///Aggregate Type: {0}
+        ///Aggregate Id: {1}
+        ///Version: {2}.
+        /// </summary>
+        internal static string AggregateInitialized {
+            get {
+                return ResourceManager.GetString("AggregateInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate version must be greater than zero.
+        ///Aggregate Type: {0}
+        ///Aggregate Id: {1}.
+        /// </summary>
+        internal static string AggregateNotInitialized {
+            get {
+                return ResourceManager.GetString("AggregateNotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aggregate type was not discovered by type locator.
         ///Aggregate Type: {0}.
         /// </summary>

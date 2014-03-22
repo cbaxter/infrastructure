@@ -152,6 +152,17 @@ Aggregate Type: {0}</value>
     <value>Ambiguous command handler mapping strategy,
 Aggregate Type: {0}</value>
   </data>
+  <data name="AggregateInitialized" xml:space="preserve">
+    <value>Aggregate version must be equal to zero.
+Aggregate Type: {0}
+Aggregate Id: {1}
+Version: {2}</value>
+  </data>
+  <data name="AggregateNotInitialized" xml:space="preserve">
+    <value>Aggregate version must be greater than zero.
+Aggregate Type: {0}
+Aggregate Id: {1}</value>
+  </data>
   <data name="AggregateTypeUndiscovered" xml:space="preserve">
     <value>Aggregate type was not discovered by type locator.
 Aggregate Type: {0}</value>

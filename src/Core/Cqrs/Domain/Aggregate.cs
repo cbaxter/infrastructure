@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
+using Spark.Cqrs.Commanding;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -35,7 +36,14 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         [IgnoreDataMember]
         public Int32 Version { get { return version; } internal set { version = value; } }
-        
+
+        /// <summary>
+        /// Return <value>true</value> if this aggregate must be explicitly created by another <see cref="Aggregate"/> instance or an exception 
+        /// has been made via <see cref="CanCreateAggregate"/>; otherwise return <value>false</value> (default = <value>true</value>).
+        /// </summary>
+        [IgnoreDataMember]
+        protected virtual Boolean RequiresExplicitCreate { get { return true; } }
+
         /// <summary>
         /// Creates a deep-copy of the current aggregate object graph by traversing all public and non-public fields.
         /// </summary>
@@ -58,8 +66,8 @@ namespace Spark.Cqrs.Domain
         }
 
         /// <summary>
-        /// Validates the <see cref="Aggregate"/> state against the current checksum (state hash). If <see cref="UpdateHash"/> has not been previously called
-        /// the aggregate state is assumed to be valid and the checksum is set for future reference.
+        /// Validates the <see cref="Aggregate"/> state against the current checksum (state hash). If <see cref="UpdateHash"/> has not been
+        /// previously called the aggregate state is assumed to be valid and the checksum is set for future reference.
         /// </summary>
         /// <remarks>
         /// Fields marked with <see cref="IgnoreDataMemberAttribute"/>, <see cref="NonSerializedAttribute"/> and/or <see cref="XmlIgnoreAttribute"/> will not
@@ -76,6 +84,42 @@ namespace Spark.Cqrs.Domain
                 if (checksum != ObjectHasher.Hash(this))
                     throw new MemberAccessException(Exceptions.StateAccessException.FormatWith(Id));
             }
+        }
+
+        /// <summary>
+        /// Verify that the specified command can be handled by this aggregate instance.
+        /// </summary>
+        /// <param name="command">The command to be handled.</param>
+        internal void VerifyCanHandleCommand(Command command)
+        {
+            if (Version == 0 && RequiresExplicitCreate && !CanCreateAggregate(command.GetType()))
+                throw new InvalidOperationException(Exceptions.AggregateNotInitialized.FormatWith(GetType(), Id));
+        }
+
+        /// <summary>
+        /// Return <value>true</value> if a <see cref="Command"/> instance of <paramref name="commandType"/> can create a 
+        /// new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
+        /// </summary>
+        /// <param name="commandType">The command type attempting to create this aggregate instance.</param>
+        protected virtual Boolean CanCreateAggregate(Type commandType)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the aggregate <see cref="Version"/> is equal to zero (i.e., the aggregate did not previously exist).
+        /// </summary>
+        protected void VerifyInitialized()
+        {
+            if (version == 0) throw new InvalidOperationException(Exceptions.AggregateNotInitialized.FormatWith(GetType(), Id));
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the aggregate <see cref="Version"/> is greater than zero (i.e., the aggregate already exists).
+        /// </summary>
+        protected void VerifyUninitialized()
+        {
+            if (version > 0) throw new InvalidOperationException(Exceptions.AggregateInitialized.FormatWith(GetType(), Id, Version));
         }
 
         /// <summary>

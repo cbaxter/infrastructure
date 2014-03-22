@@ -83,6 +83,7 @@
     <Compile Include="Cqrs\Commanding\CommandTests.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidatorTests.cs" />
     <Compile Include="Cqrs\Domain\AggregateStoreTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateTests.cs" />
     <Compile Include="Cqrs\Domain\AggregateUpdaterTests.cs" />
     <Compile Include="Cqrs\Domain\CachedAggregateStoreTests.cs" />
     <Compile Include="Cqrs\Domain\HookableAggregateStoreTests.cs" />

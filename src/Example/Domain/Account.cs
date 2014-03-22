@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Domain.Events;
@@ -33,6 +34,22 @@ namespace Spark.Example.Domain
         /// </summary>
         [DataMember(Name = "s")]
         public AccountStatus Status { get; private set; }
+
+        /// <summary>
+        /// Return <value>true</value> if this aggregate must be explicitly created by another <see cref="Aggregate"/> instance (default); otherwise return <value>false</value>.
+        /// </summary>
+        [IgnoreDataMember]
+        protected override Boolean RequiresExplicitCreate { get { return false; } }
+
+        /// <summary>
+        /// Return <value>true</value> if a <see cref="Command"/> instance of <paramref name="commandType"/> can create a 
+        /// new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
+        /// </summary>
+        /// <param name="commandType">The command type attempting to create this aggregate instance.</param>
+        protected override bool CanCreateAggregate(Type commandType)
+        {
+            return commandType == typeof(OpenAccount);
+        }
 
         /// <summary>
         /// Handle open account request.

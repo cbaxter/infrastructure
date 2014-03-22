@@ -154,6 +154,8 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class ImplicitStrategyAggregate : Aggregate
         {
+            protected override bool RequiresExplicitCreate { get { return false; } }
+
             [UsedImplicitly]
             public void Handle(FakeCommand command)
             { }
@@ -161,6 +163,8 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class AlternateImplicitStrategyAggregate : Aggregate
         {
+            protected override bool RequiresExplicitCreate { get { return false; } }
+
             [UsedImplicitly]
             public void Handle(AlternateFakeCommand command)
             { }
@@ -168,6 +172,8 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class ServicedAggregate : Aggregate
         {
+            protected override bool RequiresExplicitCreate { get { return false; } }
+
             [UsedImplicitly]
             public void Handle(FakeCommand command, FakeService service)
             { }
@@ -176,6 +182,8 @@ namespace Test.Spark.Cqrs.Commanding
         [HandleByAttribute]
         private class ExplicitStrategyAggregate : Aggregate
         {
+            protected override bool RequiresExplicitCreate { get { return false; } }
+
             [UsedImplicitly, HandleMethod]
             public void Invoke(FakeCommand command)
             { }

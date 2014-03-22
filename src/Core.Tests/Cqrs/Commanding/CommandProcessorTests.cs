@@ -58,10 +58,12 @@ namespace Test.Spark.Cqrs.Commanding
             public void RetrieveCommandHandlerBasedOnCommandType()
             {
                 var command = new FakeCommand();
+                var aggregate = new FakeAggregate();
                 var envelope = new CommandEnvelope(GuidStrategy.NewGuid(), command);
                 var message = Message.Create(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope);
 
                 HandlerRegistry.Setup(mock => mock.GetHandlerFor(command)).Returns(new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), AggregateStore.Object, (a, c) => { }));
+                AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
 
                 Processor.Process(message);
 
@@ -112,6 +114,8 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class FakeAggregate : Aggregate
         {
+            protected override bool RequiresExplicitCreate { get { return false; } }
+
             [UsedImplicitly]
             public void Handle(FakeCommand command)
             {
