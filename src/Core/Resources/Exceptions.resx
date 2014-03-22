@@ -120,6 +120,11 @@
   <data name="ActivityIdModifiedInsideScope" xml:space="preserve">
     <value>The value of Trace.CorrelationManager.ActivityId is not the ActivityId value set by this NestedDiagnosticContext.</value>
   </data>
+  <data name="AggregateAlreadyExists" xml:space="preserve">
+    <value>Cannot create aggregate; aggregate already exists.
+Aggregate Type: {0}
+Aggregate Id: {1}</value>
+  </data>
   <data name="AggregateAmbiguousApplyMethodStrategy" xml:space="preserve">
     <value>Aggregate must have a single explicit ApplyByStrategyAttribute defined.
 Aggregate Type: {0}</value>

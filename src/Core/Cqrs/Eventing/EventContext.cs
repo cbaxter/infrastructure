@@ -82,7 +82,7 @@ namespace Spark.Cqrs.Eventing
             if (disposed)
                 return;
 
-            if (this.thread != Thread.CurrentThread)
+            if (thread != Thread.CurrentThread)
                 throw new InvalidOperationException(Exceptions.EventContextInterleaved);
 
             if (this != Current)

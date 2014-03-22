@@ -2,7 +2,6 @@
 using System.Runtime.Serialization;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Eventing;
-using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -43,11 +42,7 @@ namespace Spark.Cqrs.Domain
         {
             Verify.NotNull(e, "e");
 
-            var context = CommandContext.Current;
-            if (context == null)
-                throw new InvalidOperationException(Exceptions.NoCommandContext);
-
-            context.Raise(e);
+            CommandContext.GetCurrent().Raise(e);
         }
     }
 }

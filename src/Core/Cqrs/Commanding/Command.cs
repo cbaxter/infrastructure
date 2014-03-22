@@ -3,7 +3,6 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Principal;
 using Spark.Messaging;
-using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -29,17 +28,7 @@ namespace Spark.Cqrs.Commanding
         /// The message header collection associated with this command instance.
         /// </summary>
         [IgnoreDataMember]
-        public HeaderCollection Headers
-        {
-            get
-            {
-                var context = CommandContext.Current;
-                if(context == null)
-                    throw new InvalidOperationException(Exceptions.NoCommandContext);
-
-                return context.Headers;
-            }
-        }
+        public HeaderCollection Headers { get { return CommandContext.GetCurrent().Headers; } }
 
         /// <summary>
         /// Returns the origin server name that published the command or an empty string if not set.
@@ -73,7 +62,7 @@ namespace Spark.Cqrs.Commanding
         {
             return Headers.GetUserAddress();
         }
-        
+
         /// <summary>
         /// Returns the <see cref="IIdentity.Name"/> of the user principal that published this command, or <see cref="String.Empty"/> if not set.
         /// </summary>

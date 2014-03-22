@@ -1,5 +1,6 @@
 ﻿using System;
 using Spark.Cqrs.Commanding;
+using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -27,5 +28,70 @@ namespace Spark.Cqrs.Domain
         /// <param name="aggregate">The current aggregate version for which the context applies.</param>
         /// <param name="context">The command context containing the aggregate changes to be applied.</param>
         SaveResult Save(Aggregate aggregate, CommandContext context);
+    }
+
+    /// <summary>
+    /// Extension methods of <see cref="IStoreAggregates"/>.
+    /// </summary>
+    public static class StoreAggregateExtensions
+    {
+        /// <summary>
+        /// Creates an aggregate of type <typeparamref name="TAggregate"/> identified by <paramref name="id"/> if does not already exist; otherwise throws an <see cref="InvalidOperationException"/>.
+        /// </summary>
+        /// <typeparam name="TAggregate">The type of aggregate to retrieve.</typeparam>
+        /// <param name="aggregateStore">The aggregate repository from which the aggregate is to be retrieved.</param>
+        /// <param name="id">The unique aggregate id.</param>
+        /// <param name="initializer">The aggregate initializer.</param>
+        public static TAggregate Create<TAggregate>(this IStoreAggregates aggregateStore, Guid id, Action<TAggregate> initializer)
+            where TAggregate : Aggregate
+        {
+            Verify.NotNull(aggregateStore, "aggregateStore");
+            Verify.NotNull(initializer, "initializer");
+
+            var aggregate = aggregateStore.Get<TAggregate>(id);
+            if (aggregate.Version > 0)
+                throw new InvalidOperationException(Exceptions.AggregateAlreadyExists.FormatWith(typeof(TAggregate), id));
+
+            return aggregateStore.Create(aggregate, initializer);
+        }
+
+        /// <summary>
+        /// Gets or creates an aggregate of type <typeparamref name="TAggregate"/> identified by <paramref name="id"/>.
+        /// </summary>
+        /// <typeparam name="TAggregate">The type of aggregate to retrieve or create.</typeparam>
+        /// <param name="aggregateStore">The aggregate store to extend.</param>
+        /// <param name="id">The unique aggregate id.</param>
+        /// <param name="initializer">The aggregate initializer.</param>
+        public static TAggregate GetOrCreate<TAggregate>(this IStoreAggregates aggregateStore, Guid id, Action<TAggregate> initializer)
+            where TAggregate : Aggregate
+        {
+            Verify.NotNull(aggregateStore, "aggregateStore");
+            Verify.NotNull(initializer, "initializer");
+
+            var aggregate = aggregateStore.Get<TAggregate>(id);
+            if (aggregate.Version > 0)
+                return aggregate;
+
+            return aggregateStore.Create(aggregate, initializer);
+        }
+
+        /// <summary>
+        /// Initializes a newly created aggregate instance.
+        /// </summary>
+        /// <typeparam name="TAggregate">The type of aggregate to initialize.</typeparam>
+        /// <param name="aggregateStore">The aggregate repository to which the aggregate is to be saved.</param>
+        /// <param name="aggregate">The newly created aggregate.</param>
+        /// <param name="initializer">The aggregate initializer.</param>
+        private static TAggregate Create<TAggregate>(this IStoreAggregates aggregateStore, TAggregate aggregate, Action<TAggregate> initializer)
+            where TAggregate : Aggregate
+        {
+            var context = CommandContext.GetCurrent();
+            using (var createContext = new CommandContext(aggregate.Id, context.Headers, new CommandEnvelope(aggregate.Id, context.Command)))
+            {
+                initializer.Invoke(aggregate);
+
+                return (TAggregate)aggregateStore.Save(aggregate, createContext).Aggregate;
+            }
+        }
     }
 }

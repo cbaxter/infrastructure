@@ -94,8 +94,8 @@ namespace Spark.Cqrs.Commanding
         {
             if (disposed)
                 return;
-           
-            if (this.thread != Thread.CurrentThread)
+
+            if (thread != Thread.CurrentThread)
                 throw new InvalidOperationException(Exceptions.CommandContextInterleaved);
 
             if (this != Current)
@@ -106,12 +106,24 @@ namespace Spark.Cqrs.Commanding
         }
 
         /// <summary>
+        /// Gets the current <see cref="CommandContext"/> if exists or throws an <see cref="InvalidOperationException"/>.
+        /// </summary>
+        public static CommandContext GetCurrent()
+        {
+            if (currentContext == null)
+                throw new InvalidOperationException(Exceptions.NoCommandContext);
+
+            return currentContext;
+        }
+
+        /// <summary>
         /// Add the specified <see cref="Event"/> <paramref name="e"/> to the current <see cref="CommandContext"/>.
         /// </summary>
         /// <param name="e">The <see cref="Event"/> to be raise.</param>
         internal void Raise(Event e)
         {
             Verify.NotNull(e, "e");
+            Verify.NotDisposed(this, disposed);
 
             raisedEvents.Add(e);
         }
@@ -122,9 +134,11 @@ namespace Spark.Cqrs.Commanding
         /// <returns></returns>
         internal EventCollection GetRaisedEvents()
         {
+            Verify.NotDisposed(this, disposed);
+
             return new EventCollection(raisedEvents);
         }
-        
+
         /// <summary>
         /// Returns the <see cref="CommandContext"/> description for this instance.
         /// </summary>

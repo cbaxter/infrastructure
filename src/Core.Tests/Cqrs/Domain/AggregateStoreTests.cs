@@ -6,7 +6,6 @@ using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
 using Spark.Cqrs.Eventing;
-using Spark.Data;
 using Spark.EventStore;
 using Spark.Messaging;
 using Spark.Resources;
@@ -48,7 +47,7 @@ namespace Test.Spark.Cqrs.Domain
             private readonly Mock<IStoreSnapshots> snapshotStore = new Mock<IStoreSnapshots>();
             private readonly Mock<IApplyEvents> aggregateUpdater = new Mock<IApplyEvents>();
             private readonly Mock<IStoreEvents> eventStore = new Mock<IStoreEvents>();
-            
+
             [Fact]
             public void CreateNewAggregateIfNoExistingEventStream()
             {
@@ -96,7 +95,7 @@ namespace Test.Spark.Cqrs.Domain
             {
                 var id = GuidStrategy.NewGuid();
                 var commits = new List<Commit>();
-                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings()) ;
+                var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings());
 
                 for (var i = 0; i < 10; i++)
                     commits.Add(new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 11 + i, HeaderCollection.Empty, EventCollection.Empty));
@@ -218,6 +217,98 @@ namespace Test.Spark.Cqrs.Domain
             }
 
             [UsedImplicitly]
+            private class FakeEvent : Event
+            { }
+        }
+
+        public class WhenCreatingAggregate
+        {
+            private readonly Mock<IStoreAggregates> aggregateStore = new Mock<IStoreAggregates>();
+
+            [Fact]
+            public void CreateWillThrowInvalidOperationExceptionIfAggregateAlreadyExists()
+            {
+                var aggregateId = GuidStrategy.NewGuid();
+                var command = new FakeCommand();
+
+                aggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), aggregateId)).Returns(new FakeAggregate(aggregateId, 1));
+
+                using (new CommandContext(aggregateId, HeaderCollection.Empty, new CommandEnvelope(aggregateId, command)))
+                {
+                    var ex = Assert.Throws<InvalidOperationException>(() => aggregateStore.Object.Create(aggregateId, (FakeAggregate aggregate) => aggregate.InitializeWith(command)));
+
+                    Assert.Equal(Exceptions.AggregateAlreadyExists.FormatWith(typeof(FakeAggregate), aggregateId), ex.Message);
+                }
+            }
+
+            [Fact]
+            public void CreateWillReturnNewAggregateIfAggregateDoesNotAlreadyExist()
+            {
+                var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
+                var newAggregate = new FakeAggregate(aggregateId, 0);
+
+                aggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), aggregateId)).Returns(newAggregate);
+
+                using (new CommandContext(aggregateId, HeaderCollection.Empty, new CommandEnvelope(aggregateId, command)))
+                {
+                    aggregateStore.Setup(mock => mock.Save(newAggregate, It.IsAny<CommandContext>())).Returns(new SaveResult(new FakeAggregate(aggregateId, 1), new Commit(GuidStrategy.NewGuid(), aggregateId, 1, HeaderCollection.Empty, EventCollection.Empty)));
+
+                    var savedAggregate = aggregateStore.Object.Create(aggregateId, (FakeAggregate aggregate) => aggregate.InitializeWith(command));
+
+                    Assert.Equal(1, savedAggregate.Version);
+                }
+            }
+
+            [Fact]
+            public void GetOrCreateWillReturnExistingAggregateIfAlreadyExists()
+            {
+                var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
+                var existingAggregate = new FakeAggregate(aggregateId, 1);
+
+                aggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), aggregateId)).Returns(existingAggregate);
+
+                using (new CommandContext(aggregateId, HeaderCollection.Empty, new CommandEnvelope(aggregateId, command)))
+                    Assert.Same(existingAggregate, aggregateStore.Object.GetOrCreate(aggregateId, (FakeAggregate aggregate) => aggregate.InitializeWith(command)));
+            }
+
+            [Fact]
+            public void GetOrCreateWillReturnNewAggregateIfAggregateDoesNotAlreadyExist()
+            {
+                var command = new FakeCommand();
+                var aggregateId = GuidStrategy.NewGuid();
+                var newAggregate = new FakeAggregate(aggregateId, 0);
+
+                aggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), aggregateId)).Returns(newAggregate);
+
+                using (new CommandContext(aggregateId, HeaderCollection.Empty, new CommandEnvelope(aggregateId, command)))
+                {
+                    aggregateStore.Setup(mock => mock.Save(newAggregate, It.IsAny<CommandContext>())).Returns(new SaveResult(new FakeAggregate(aggregateId, 1), new Commit(GuidStrategy.NewGuid(), aggregateId, 1, HeaderCollection.Empty, EventCollection.Empty)));
+
+                    var savedAggregate = aggregateStore.Object.GetOrCreate(aggregateId, (FakeAggregate aggregate) => aggregate.InitializeWith(command));
+
+                    Assert.Equal(1, savedAggregate.Version);
+                }
+            }
+
+            private class FakeAggregate : Aggregate
+            {
+                public FakeAggregate(Guid id, Int32 version)
+                {
+                    Id = id;
+                    Version = version;
+                }
+
+                public void InitializeWith(FakeCommand command)
+                {
+                    Raise(new FakeEvent());
+                }
+            }
+
+            private class FakeCommand : Command
+            { }
+
             private class FakeEvent : Event
             { }
         }
