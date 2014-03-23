@@ -92,7 +92,7 @@ namespace Spark.Serialization.Converters
                 foreach (var item in state)
                 {
                     writer.WritePropertyName(item.Key);
-                    serializer.Serialize(writer, item.Value);
+                    serializer.Serialize(writer, item.Value, entity.GetFieldType(item.Key));
                 }
 
                 writer.WriteEndObject();

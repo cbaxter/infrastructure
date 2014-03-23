@@ -53,7 +53,7 @@ namespace Spark.Serialization.Converters
                 writer.WriteStartArray();
 
                 foreach (var e in events)
-                    serializer.Serialize(writer, e);
+                    serializer.Serialize(writer, e, typeof(Event));
 
                 writer.WriteEndArray();
             }

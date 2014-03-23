@@ -50,7 +50,7 @@ namespace Spark.Serialization
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,
                     NullValueHandling = NullValueHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.Auto
                 };
         }
 
@@ -63,7 +63,7 @@ namespace Spark.Serialization
         public void Serialize(Stream stream, Object graph, Type type)
         {
             using (var bsonWriter = new BsonWriter(stream))
-                serializer.Serialize(bsonWriter, graph);
+                serializer.Serialize(bsonWriter, graph, type);
         }
         
         /// <summary>
@@ -74,7 +74,7 @@ namespace Spark.Serialization
         public Object Deserialize(Stream stream, Type type)
         {
             using (var bsonWriter = new BsonReader(stream))
-                return serializer.Deserialize(bsonWriter);
+                return serializer.Deserialize(bsonWriter, type);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Spark.Serialization.Converters
                 writer.WriteValue(envelope.AggregateId);
 
                 writer.WritePropertyName("c");
-                serializer.Serialize(writer, envelope.Command);
+                serializer.Serialize(writer, envelope.Command, typeof(Command));
 
                 writer.WriteEndObject();
             }

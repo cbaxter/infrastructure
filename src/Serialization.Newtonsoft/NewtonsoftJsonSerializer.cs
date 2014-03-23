@@ -50,7 +50,7 @@ namespace Spark.Serialization
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,
                     NullValueHandling = NullValueHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.Auto
                 };
         }
 
