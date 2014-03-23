@@ -35,6 +35,21 @@ namespace Spark.Cqrs.Domain
         public Guid Id { get; internal set; }
 
         /// <summary>
+        /// Initializes a new instance of <see cref="Entity"/>.
+        /// </summary>
+        protected Entity()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Entity"/> with the specified <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The unique entity identifier.</param>
+        protected Entity(Guid id)
+        {
+            Id = id;
+        }
+
+        /// <summary>
         /// Raises the specified event.
         /// </summary>
         /// <param name="e">The <see cref="Event"/> to be raised.</param>
