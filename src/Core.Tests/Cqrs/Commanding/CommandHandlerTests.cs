@@ -194,9 +194,9 @@ namespace Test.Spark.Cqrs.Commanding
 
         private class FakeAggregateWithExplicitCreate : Aggregate
         {
-            protected override bool CanCreateAggregate(Type commandType)
+            protected override bool CanCreateAggregate(Command command)
             {
-                return commandType == typeof(FakeCommand);
+                return command is FakeCommand;
             }
 
             [UsedImplicitly]

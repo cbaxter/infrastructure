@@ -42,13 +42,12 @@ namespace Spark.Example.Domain
         protected override Boolean RequiresExplicitCreate { get { return false; } }
 
         /// <summary>
-        /// Return <value>true</value> if a <see cref="Command"/> instance of <paramref name="commandType"/> can create a 
-        /// new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
+        /// Return <value>true</value> if the <paramref name="command"/> can create a new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
         /// </summary>
-        /// <param name="commandType">The command type attempting to create this aggregate instance.</param>
-        protected override bool CanCreateAggregate(Type commandType)
+        /// <param name="command">The command attempting to create this aggregate instance.</param>
+        protected override bool CanCreateAggregate(Command command)
         {
-            return commandType == typeof(OpenAccount);
+            return command is OpenAccount;
         }
 
         /// <summary>

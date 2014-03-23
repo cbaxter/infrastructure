@@ -92,16 +92,15 @@ namespace Spark.Cqrs.Domain
         /// <param name="command">The command to be handled.</param>
         internal void VerifyCanHandleCommand(Command command)
         {
-            if (Version == 0 && RequiresExplicitCreate && !CanCreateAggregate(command.GetType()))
+            if (Version == 0 && RequiresExplicitCreate && !CanCreateAggregate(command))
                 throw new InvalidOperationException(Exceptions.AggregateNotInitialized.FormatWith(GetType(), Id));
         }
 
         /// <summary>
-        /// Return <value>true</value> if a <see cref="Command"/> instance of <paramref name="commandType"/> can create a 
-        /// new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
+        /// Return <value>true</value> if the <paramref name="command"/> can create a new aggregateinstance; otherwise return <value>false</value> (default = <value>false</value>).
         /// </summary>
-        /// <param name="commandType">The command type attempting to create this aggregate instance.</param>
-        protected virtual Boolean CanCreateAggregate(Type commandType)
+        /// <param name="command">The command attempting to create this aggregate instance.</param>
+        protected virtual Boolean CanCreateAggregate(Command command)
         {
             return false;
         }
