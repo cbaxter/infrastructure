@@ -71,6 +71,7 @@
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Cqrs\Domain\EntityId.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
