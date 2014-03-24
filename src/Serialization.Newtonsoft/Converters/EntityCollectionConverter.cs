@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Domain;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -18,11 +18,16 @@ using Spark.Cqrs.Commanding;
 namespace Spark.Serialization.Converters
 {
     /// <summary>
-    /// Converts a <see cref="CommandEnvelope"/> to and from JSON.
+    /// Converts a <see cref="EntityCollection{TEntity}"/> to and from JSON.
     /// </summary>
-    public sealed class CommandEnvelopeConverter : JsonConverter
+    public sealed class EntityCollectionConverter : JsonConverter
     {
-        private static readonly Type CommandEnvelopeType = typeof(CommandEnvelope);
+        private static readonly Type EntityCollectionType = typeof(EntityCollection);
+
+        /// <summary>
+        /// The default <see cref="StateObjectConverter"/> instance.
+        /// </summary>
+        public static readonly EntityCollectionConverter Default = new EntityCollectionConverter();
 
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
@@ -30,32 +35,36 @@ namespace Spark.Serialization.Converters
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == CommandEnvelopeType;
+            return EntityCollectionType.IsAssignableFrom(objectType);
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="CommandEnvelope"/> instance.
+        /// Writes the JSON representation of an <see cref="EntityCollection{T}"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var envelope = (CommandEnvelope)value;
+            if (value == null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                var collection = (EntityCollection)value;
 
-            writer.WriteStartObject();
+                writer.WriteStartArray();
 
-            writer.WritePropertyName("a");
-            writer.WriteValue(envelope.AggregateId);
+                foreach (var entity in collection)
+                    StateObjectConverter.Default.WriteJson(writer, collection.EntityType, entity, serializer);
 
-            writer.WritePropertyName("c");
-            serializer.Serialize(writer, envelope.Command, typeof(Command));
-
-            writer.WriteEndObject();
+                writer.WriteEndArray();
+            }
         }
 
         /// <summary>
-        /// Reads the JSON representation of an <see cref="CommandEnvelope"/> instance.
+        /// Reads the JSON representation of an <see cref="EntityCollection{T}"/> instance.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
         /// <param name="objectType">The type of object.</param>
@@ -63,29 +72,15 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            if (!reader.CanReadObject())
-                return null;
+            var collection = (EntityCollection)Activator.CreateInstance(objectType);
 
-            var aggregateId = Guid.Empty;
-            var command = default(Command);
-            while (reader.Read() && reader.TokenType != JsonToken.EndObject)
+            if (reader.CanReadArray())
             {
-                String propertyName;
-                if (!reader.TryGetProperty(out propertyName))
-                    continue;
-
-                switch (propertyName)
-                {
-                    case "a":
-                        aggregateId = serializer.Deserialize<Guid>(reader);
-                        break;
-                    case "c":
-                        command = serializer.Deserialize<Command>(reader);
-                        break;
-                }
+                while (reader.Read() && reader.TokenType != JsonToken.EndArray)
+                    collection.Add((Entity)StateObjectConverter.Default.ReadJson(reader, collection.EntityType, null, serializer));
             }
 
-            return new CommandEnvelope(aggregateId, command);
+            return collection;
         }
     }
 }

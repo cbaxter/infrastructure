@@ -1,7 +1,6 @@
 ﻿using System;
 using Spark.Cqrs.Commanding;
 using Spark.Messaging;
-using Spark.Serialization.Converters;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -26,7 +25,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new CommandEnvelopeConverter(), default(CommandEnvelope));
+                var json = WriteJson(default(CommandEnvelope));
 
                 Validate("null", json);
             }
@@ -34,14 +33,18 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeToJson()
             {
-                var aggregateId = Guid.NewGuid();
+                var aggregateId = Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb");
                 var envelope = new CommandEnvelope(aggregateId, new FakeCommand("My Command"));
-                var json = WriteJson(new CommandEnvelopeConverter(), envelope);
+                var json = WriteJson(envelope);
 
-                Validate(
-                    String.Format("{{\"a\":\"{0}\",\"c\":{{\"$type\":\"Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}}}", aggregateId), 
-                    json
-                );
+                Validate2(json, @"
+{
+  ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
+  ""c"": {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Command""
+  }
+}");
             }
         }
 
@@ -50,33 +53,48 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Null(ReadJson<Message<CommandEnvelope>>(new CommandEnvelopeConverter(), "null"));
+                Assert.Null(ReadJson<Message<CommandEnvelope>>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"}}";
-                var envelope = ReadJson<CommandEnvelope>(new CommandEnvelopeConverter(), json);
-
+                var envelope = ReadJson<CommandEnvelope>(@"
+{
+  ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
+  ""c"": {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Command""
+  }
+}");
                 Assert.Equal(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"), envelope.AggregateId);
             }
 
             [Fact]
             public void PropertyOrderIrrelevant()
             {
-                var json = "﻿{\"c\":{\"$type\":\"Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"},\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\"}";
-                var envelope = ReadJson<CommandEnvelope>(new CommandEnvelopeConverter(), json);
-
+                var envelope = ReadJson<CommandEnvelope>(@"
+{
+  ""c"": {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Command""
+  },
+  ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb""
+}");
                 Assert.Equal(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"), envelope.AggregateId);
             }
 
             [Fact]
             public void CanTolerateMalformedJson()
             {
-                var json = "﻿{\"a\":\"a6c45a28-c572-4d5b-ac18-7b0ec2d723fb\",\"c\":{\"$type\":\"Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Command\"},\"x\":null,}";
-                var envelope = ReadJson<CommandEnvelope>(new CommandEnvelopeConverter(), json);
-
+                var envelope = ReadJson<CommandEnvelope>(@"
+{
+  ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
+  ""c"": {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Command""
+  },
+}");
                 Assert.Equal(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"), envelope.AggregateId);
             }
         }
@@ -88,7 +106,7 @@ namespace Test.Spark.Serialization.Converters
             {
                 var aggregateId = Guid.Parse("61296B2F-F040-472D-95DF-B1C3A32A7C7E");
                 var envelope = new CommandEnvelope(aggregateId, new FakeCommand("My Command"));
-                var json = WriteBson(new CommandEnvelopeConverter(), envelope);
+                var json = WriteBson(envelope);
 
                 Validate("vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA", json);
             }
@@ -100,7 +118,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanDeserializeValidBson()
             {
                 var bson = "vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA";
-                var envelope = ReadBson<CommandEnvelope>(new CommandEnvelopeConverter(), bson);
+                var envelope = ReadBson<CommandEnvelope>(bson);
 
                 Assert.Equal(Guid.Parse("61296B2F-F040-472D-95DF-B1C3A32A7C7E"), envelope.AggregateId);
             }

@@ -1,8 +1,6 @@
-﻿using System;
-using Spark.Cqrs.Eventing;
+﻿using Spark.Cqrs.Eventing;
 using Spark.EventStore;
 using Spark.Messaging;
-using Spark.Serialization.Converters;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -27,18 +25,26 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new CommitDataConverter(), default(CommitData));
+                var json = WriteJson(default(CommitData));
 
-                Validate("{\"h\":{},\"e\":[]}", json);
+                Validate2(json, @"
+{
+  ""h"": {},
+  ""e"": []
+}");
             }
 
             [Fact]
             public void CanSerializeToJson()
             {
                 var data = new CommitData(HeaderCollection.Empty, EventCollection.Empty);
-                var json = WriteJson(new CommitDataConverter(), data);
+                var json = WriteJson(data);
 
-                Validate("{\"h\":{},\"e\":[]}", json);
+                Validate2(json, @"
+{
+  ""h"": {},
+  ""e"": []
+}");
             }
         }
 
@@ -47,33 +53,39 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Equal(CommitData.Empty, ReadJson<CommitData>(new CommitDataConverter(), "null"));
+                Assert.Equal(CommitData.Empty, ReadJson<CommitData>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿{\"h\":{},\"e\":[]}";
-                var data = ReadJson<CommitData>(new CommitDataConverter(), json);
-
+                var data = ReadJson<CommitData>(@"
+{
+  ""h"": {},
+  ""e"": []
+}");
                 Assert.Equal(HeaderCollection.Empty, data.Headers);
             }
 
             [Fact]
             public void PropertyOrderIrrelevant()
             {
-                var json = "{\"e\":[],\"h\":{}}";
-                var data = ReadJson<CommitData>(new CommitDataConverter(), json);
-
+                var data = ReadJson<CommitData>(@"
+{
+  ""e"": [],
+  ""h"": {}
+}");
                 Assert.Equal(HeaderCollection.Empty, data.Headers);
             }
 
             [Fact]
             public void CanTolerateMalformedJson()
             {
-                var json = "{\"e\":[],\"h\":{},}";
-                var data = ReadJson<CommitData>(new CommitDataConverter(), json);
-
+                var data = ReadJson<CommitData>(@"
+{
+  ""h"": {},
+  ""e"": [],
+}");
                 Assert.Equal(HeaderCollection.Empty, data.Headers);
             }
         }
@@ -84,7 +96,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeToBson()
             {
                 var data = new CommitData(HeaderCollection.Empty, EventCollection.Empty);
-                var json = WriteBson(new CommitDataConverter(), data);
+                var json = WriteBson(data);
 
                 Validate("﻿FQAAAANoAAUAAAAABGUABQAAAAAA", json);
             }
@@ -96,7 +108,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanDeserializeValidBson()
             {
                 var bson = "FQAAAANoAAUAAAAABGUABQAAAAAA";
-                var data = ReadBson<CommitData>(new CommitDataConverter(), bson);
+                var data = ReadBson<CommitData>(bson);
 
                 Assert.Equal(HeaderCollection.Empty, data.Headers);
             }

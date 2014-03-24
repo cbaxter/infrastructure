@@ -171,7 +171,6 @@
     <Compile Include="Logging\LogicalOperationScope.cs" />
     <Compile Include="Messaging\InlineMessageBus.cs" />
     <Compile Include="Messaging\IProcessMessages.cs" />
-    <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\MessageReceiver.cs" />
     <Compile Include="ObjectHasher.cs" />
     <Compile Include="Cqrs\Domain\AggregateStore.cs" />

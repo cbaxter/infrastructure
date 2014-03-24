@@ -31,7 +31,7 @@ namespace Spark.Serialization.Converters
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == EventCollectionType;
+            return EventCollectionType.IsAssignableFrom(objectType);
         }
 
         /// <summary>
@@ -42,21 +42,14 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var events = value as EventCollection;
+            var events = (EventCollection)value;
 
-            if (events == null)
-            {
-                writer.WriteNull();
-            }
-            else
-            {
-                writer.WriteStartArray();
+            writer.WriteStartArray();
 
-                foreach (var e in events)
-                    serializer.Serialize(writer, e, typeof(Event));
+            foreach (var e in events)
+                serializer.Serialize(writer, e, typeof(Event));
 
-                writer.WriteEndArray();
-            }
+            writer.WriteEndArray();
         }
 
         /// <summary>
@@ -68,12 +61,7 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            if (!reader.CanReadArray())
-                return null;
-            
-            var events = serializer.Deserialize<List<Event>>(reader);
-
-            return new EventCollection(events);
+            return reader.CanReadArray() ? new EventCollection(serializer.Deserialize<List<Event>>(reader)) : null;
         }
     }
 }

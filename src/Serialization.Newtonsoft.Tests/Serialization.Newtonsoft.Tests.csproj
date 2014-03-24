@@ -60,6 +60,7 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Converters\EventEnvelopeConverterTests.cs" />
     <Compile Include="Converters\CommandEnvelopeConverterTests.cs" />
     <Compile Include="Converters\CommitDataConverterTests.cs" />
     <Compile Include="Converters\ValueObjectConverterTests.cs" />

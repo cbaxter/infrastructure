@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
 using Spark.Resources;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -23,8 +24,8 @@ namespace Spark
     /// </summary>
     public static class TypeExtensions
     {
-        private static readonly IDictionary<Type, String> AssemblyTypeNameCache = new ConcurrentDictionary<Type, String>();
-        
+        private static readonly IDictionary<Type, String> TypeSimpleAssemblyQualifiedName = new ConcurrentDictionary<Type, String>();
+
         /// <summary>
         /// Returns <value>true</value> if <paramref name="type"/> derives from <paramref name="baseType"/>; otherwise <value>false</value>.
         /// </summary>
@@ -45,7 +46,7 @@ namespace Spark
             Verify.NotNull(type, "type");
             Verify.NotNull(baseType, "baseType");
             Verify.False(baseType.IsInterface, "baseType", Exceptions.TypeArgumentMustNotBeAnInterface);
-            
+
             var subType = type.BaseType;
             while (subType != null && !Equal(subType, baseType))
                 subType = subType.BaseType;
@@ -61,19 +62,6 @@ namespace Spark
         private static Boolean Equal(Type type, Type targetType)
         {
             return targetType.IsGenericTypeDefinition ? type.IsGenericType && type.GetGenericTypeDefinition() == targetType : type == targetType;
-        }
-
-        /// <summary>
-        /// Gets the full name with assembly name for the specified <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="Type"/> for which the full name and assembly name are to be retrieved.</param>
-        public static String GetFullNameWithAssembly(this Type type)
-        {
-            String result;
-            if (!AssemblyTypeNameCache.TryGetValue(type, out result))
-                AssemblyTypeNameCache[type] = result = String.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name);
-
-            return result;
         }
 
         /// <summary>
@@ -93,6 +81,58 @@ namespace Spark
 
                 baseType = baseType.BaseType;
             }
+        }
+
+        /// <summary>
+        /// Get the simple assembly qualified type name (i.e., "System.String, mscorlib" rather than "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> for which the short assembly qualified name is to be retrieved.</param>
+        public static String GetFullNameWithAssembly(this Type type)
+        {
+            String result;
+
+            if (!TypeSimpleAssemblyQualifiedName.TryGetValue(type, out result))
+                TypeSimpleAssemblyQualifiedName[type] = result = CreateSimpleAssemblyQualifiedName(type.AssemblyQualifiedName);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the simple assembly qualified type name (i.e., "System.String, mscorlib" rather than "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089") for a given <paramref name="assemblyQualifiedName"/>.
+        /// </summary>
+        /// <param name="assemblyQualifiedName">The assembly qualified name from which to strip out version, culture and public key information.</param>
+        private static String CreateSimpleAssemblyQualifiedName(String assemblyQualifiedName)
+        {
+            var typeNameBuilder = new StringBuilder();
+            var skippingAssemblyDetails = false;
+            var writingAssemblyName = false;
+            var current = '\0';
+
+            for (var i = 0; i < assemblyQualifiedName.Length; i++)
+            {
+                var previous = current;
+                switch (current = assemblyQualifiedName[i])
+                {
+                    case '[': case ']':
+                        skippingAssemblyDetails = false;
+                        writingAssemblyName = false;
+                        break;
+                    case ',':
+                        if (previous != '[' && previous != ',')
+                        {
+                            if (!writingAssemblyName)
+                                writingAssemblyName = true;
+                            else
+                                skippingAssemblyDetails = true;
+                        }
+                        break;
+                }
+
+                if (!skippingAssemblyDetails)
+                    typeNameBuilder.Append(current);
+            }
+
+            return typeNameBuilder.ToString();
         }
     }
 }

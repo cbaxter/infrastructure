@@ -26,7 +26,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new ValueObjectConverter(), default(ValueObject));
+                var json = WriteJson(default(ValueObject));
 
                 Validate("null", json);
             }
@@ -35,7 +35,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeStringValueObjectToJson()
             {
                 var value = new EmailAddress("CBaxter@sparksoftware.net");
-                var json = WriteJson(new ValueObjectConverter(), value);
+                var json = WriteJson(value);
 
                 Validate("\"cbaxter@sparksoftware.net\"", json);
             }
@@ -44,7 +44,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializePrimitiveValueObjectToJson()
             {
                 var value = new TestId(123);
-                var json = WriteJson(new ValueObjectConverter(), value);
+                var json = WriteJson(value);
 
                 Validate("123", json);
             }
@@ -55,14 +55,14 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Null(ReadJson<EmailAddress>(new ValueObjectConverter(), "null"));
+                Assert.Null(ReadJson<EmailAddress>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidStringValueObjectJson()
             {
                 var json = "\"CBaxter@sparksoftware.net\"";
-                var value = ReadJson<EmailAddress>(new ValueObjectConverter(), json);
+                var value = ReadJson<EmailAddress>(json);
 
                 Assert.Equal(new EmailAddress("CBaxter@sparksoftware.net"), value);
             }
@@ -71,7 +71,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanDeserializeValidPrimitiveValueObjectJson()
             {
                 var json = "123";
-                var value = ReadJson<TestId>(new ValueObjectConverter(), json);
+                var value = ReadJson<TestId>(json);
 
                 Assert.Equal(new TestId(123), value);
             }
@@ -79,13 +79,13 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanThrowFormatExceptionIfValueInvalid()
             {
-                Assert.Throws<FormatException>(() => ReadJson<EmailAddress>(new ValueObjectConverter { Strict = true }, "\"cbaxter\""));
+                Assert.Throws<FormatException>(() => ReadJson<EmailAddress>("\"cbaxter\"", new ValueObjectConverter { Strict = true }));
             }
 
             [Fact]
             public void CanReturnNullIfValueInvalid()
             {
-                Assert.Null(ReadJson<EmailAddress>(new ValueObjectConverter { Strict = false }, "\"cbaxter\""));
+                Assert.Null(ReadJson<EmailAddress>("\"cbaxter\"", new ValueObjectConverter { Strict = false }));
             }
         }
 

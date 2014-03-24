@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 using Spark.Serialization;
 using Xunit;
 
@@ -30,6 +31,7 @@ namespace Test.Spark.Serialization
                 String json;
                 using (var memoryStream = new MemoryStream())
                 {
+                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
                     NewtonsoftJsonSerializer.Default.Serialize(memoryStream, new Dictionary<String, Object> { { "key", "value" } }, typeof(Object));
 
                     json = Encoding.UTF8.GetString(memoryStream.ToArray());
@@ -48,7 +50,11 @@ namespace Test.Spark.Serialization
                 IDictionary<String, Object> graph;
 
                 using (var memoryStream = new MemoryStream(json, writable: false))
-                    graph = (IDictionary<String,Object>) NewtonsoftJsonSerializer.Default.Deserialize(memoryStream, typeof(Object));
+                {
+                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
+
+                    graph = (IDictionary<String, Object>) NewtonsoftJsonSerializer.Default.Deserialize(memoryStream, typeof (Object));
+                }
 
                 Assert.Equal("value", graph["key"]);
             }

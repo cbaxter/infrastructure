@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -20,8 +18,44 @@ namespace Spark.Messaging
     /// <summary>
     /// A message envelope containing a unique identifier, message headers and associated payload.
     /// </summary>
-    public static class Message
+    public abstract class Message
     {
+        private readonly Guid id;
+        private readonly HeaderCollection headers;
+
+        /// <summary>
+        /// The unique message identifier.
+        /// </summary>
+        public Guid Id { get { return id; } }
+
+        /// <summary>
+        /// The set of message headers for this message.
+        /// </summary>
+        public HeaderCollection Headers { get { return headers; } }
+
+        /// <summary>
+        /// Get the underlying payload <see cref="Type"/>.
+        /// </summary>
+        public abstract Type PayloadType { get; }
+
+        /// <summary>
+        /// Initalizes a new instance of <see cref="Message"/>.
+        /// </summary>
+        internal Message(Guid id, HeaderCollection headers)
+        {
+            Verify.NotEqual(Guid.Empty, id, "id");
+            Verify.NotNull(headers, "headers");
+
+            this.id = id;
+            this.headers = headers;
+        }
+
+        /// <summary>
+        /// Get the message payload.
+        /// </summary>
+        /// <returns></returns>
+        protected internal abstract Object GetPayload();
+
         /// <summary>
         /// Creates a new instance of <see cref="Message{TPayload}"/>.
         /// </summary>
@@ -38,27 +72,19 @@ namespace Spark.Messaging
     /// A message envelope containing a unique identifier, message headers and associated payload.
     /// </summary>
     [Serializable]
-    public sealed class Message<TPayload> : IMessage
+    public sealed class Message<TPayload> : Message
     {
-        private readonly Guid id;
-        private readonly HeaderCollection headers;
         private readonly TPayload payload;
-
-        /// <summary>
-        /// The unique message identifier.
-        /// </summary>
-        public Guid Id { get { return id; } }
-
-        /// <summary>
-        /// The set of message headers for this message.
-        /// </summary>
-        public HeaderCollection Headers { get { return headers; } }
 
         /// <summary>
         /// The message payload.
         /// </summary>
         public TPayload Payload { get { return payload; } }
-        Object IMessage.Payload { get { return payload; } }
+
+        /// <summary>
+        /// The payload type carried by this <see cref="Message"/>.
+        /// </summary>
+        public override Type PayloadType { get { return typeof(TPayload); } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Message{TPayload}"/>.
@@ -67,14 +93,20 @@ namespace Spark.Messaging
         /// <param name="headers">The set of headers associated with this message.</param>
         /// <param name="payload">The message payload.</param>
         public Message(Guid id, HeaderCollection headers, TPayload payload)
+            : base(id, headers)
         {
-            Verify.NotEqual(Guid.Empty, id, "id");
-            Verify.NotNull(headers, "headers");
             Verify.NotNull((Object)payload, "payload");
 
-            this.id = id;
-            this.headers = headers;
             this.payload = payload;
+        }
+
+        /// <summary>
+        /// Get the message payload.
+        /// </summary>
+        /// <returns></returns>
+        protected internal override Object GetPayload()
+        {
+            return Payload;
         }
 
         /// <summary>

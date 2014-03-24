@@ -1,5 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -12,7 +14,6 @@ using Newtonsoft.Json;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
-using Newtonsoft.Json.Linq;
 
 namespace Spark.Serialization.Converters
 {
@@ -53,12 +54,9 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var entity = value as ValueObject;
+            var valueObject = (ValueObject)value;
 
-            if (entity == null)
-                writer.WriteNull();
-            else
-                writer.WriteValue(entity.BoxedValue);
+            writer.WriteValue(valueObject.BoxedValue);
         }
 
         /// <summary>
@@ -71,7 +69,6 @@ namespace Spark.Serialization.Converters
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
             var value = JToken.Load(reader).ToString();
-
             if (value.IsNullOrWhiteSpace())
                 return null;
 

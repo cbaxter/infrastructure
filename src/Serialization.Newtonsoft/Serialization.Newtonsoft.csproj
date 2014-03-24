@@ -54,6 +54,9 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Converters\EntityCollectionConverter.cs" />
+    <Compile Include="Converters\EventVersionConverter.cs" />
+    <Compile Include="Converters\EventEnvelopeConverter.cs" />
     <Compile Include="Converters\CommitDataConverter.cs" />
     <Compile Include="Converters\ValueObjectConverter.cs" />
     <Compile Include="Converters\StateObjectConverter.cs" />

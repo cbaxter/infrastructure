@@ -1,8 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Spark.Cqrs.Commanding;
+using Spark.Cqrs.Eventing;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2014 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
  * See: http://www.gnu.org/copyleft/lesser.html
@@ -18,11 +18,11 @@ using Spark.Cqrs.Commanding;
 namespace Spark.Serialization.Converters
 {
     /// <summary>
-    /// Converts a <see cref="CommandEnvelope"/> to and from JSON.
+    /// Converts a <see cref="EventEnvelope"/> to and from JSON.
     /// </summary>
-    public sealed class CommandEnvelopeConverter : JsonConverter
+    public sealed class EventEnvelopeConverter : JsonConverter
     {
-        private static readonly Type CommandEnvelopeType = typeof(CommandEnvelope);
+        private static readonly Type EventEnvelopeType = typeof(EventEnvelope);
 
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
@@ -30,32 +30,38 @@ namespace Spark.Serialization.Converters
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return objectType == CommandEnvelopeType;
+            return objectType == EventEnvelopeType;
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="CommandEnvelope"/> instance.
+        /// Writes the JSON representation of an <see cref="EventEnvelope"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var envelope = (CommandEnvelope)value;
+            var envelope = (EventEnvelope)value;
 
             writer.WriteStartObject();
 
             writer.WritePropertyName("a");
             writer.WriteValue(envelope.AggregateId);
 
+            writer.WritePropertyName("v");
+            serializer.Serialize(writer, envelope.Version, typeof(EventVersion));
+
+            writer.WritePropertyName("e");
+            serializer.Serialize(writer, envelope.Event, typeof(Event));
+
             writer.WritePropertyName("c");
-            serializer.Serialize(writer, envelope.Command, typeof(Command));
+            writer.WriteValue(envelope.CorrelationId);
 
             writer.WriteEndObject();
         }
 
         /// <summary>
-        /// Reads the JSON representation of an <see cref="CommandEnvelope"/> instance.
+        /// Reads the JSON representation of an <see cref="EventEnvelope"/> instance.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
         /// <param name="objectType">The type of object.</param>
@@ -66,8 +72,10 @@ namespace Spark.Serialization.Converters
             if (!reader.CanReadObject())
                 return null;
 
+            var e = default(Event);
             var aggregateId = Guid.Empty;
-            var command = default(Command);
+            var correlationId = Guid.Empty;
+            var version = EventVersion.Empty;
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
                 String propertyName;
@@ -79,13 +87,19 @@ namespace Spark.Serialization.Converters
                     case "a":
                         aggregateId = serializer.Deserialize<Guid>(reader);
                         break;
+                    case "v":
+                        version = serializer.Deserialize<EventVersion>(reader);
+                        break;
+                    case "e":
+                        e = serializer.Deserialize<Event>(reader);
+                        break;
                     case "c":
-                        command = serializer.Deserialize<Command>(reader);
+                        correlationId = serializer.Deserialize<Guid>(reader);
                         break;
                 }
             }
 
-            return new CommandEnvelope(aggregateId, command);
+            return new EventEnvelope(correlationId, aggregateId, version, e);
         }
     }
 }

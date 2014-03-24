@@ -19,7 +19,7 @@ namespace Spark.Cqrs.Eventing
     /// <summary>
     /// Identifies a specific aggregate event instance.
     /// </summary>
-    public struct EventVersion : IEquatable<EventVersion>
+    public struct EventVersion : IComparable<EventVersion>, IEquatable<EventVersion>
     {
         private readonly Int32 version;
         private readonly Int32 count;
@@ -61,6 +61,15 @@ namespace Spark.Cqrs.Eventing
             this.version = version;
             this.count = count;
             this.item = item;
+        }
+        
+        /// <summary>
+        /// Compares this instance to a specified <see cref="EventVersion"/> and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An <see cref="EventVersion"/> to compare.</param>
+        public Int32 CompareTo(EventVersion value)
+        {
+            return version == value.version ? item.CompareTo(value.item) : version.CompareTo(value.version);
         }
 
         /// <summary>

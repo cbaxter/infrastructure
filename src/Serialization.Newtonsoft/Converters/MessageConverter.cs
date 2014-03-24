@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
-using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
 
@@ -24,7 +26,8 @@ namespace Spark.Serialization.Converters
     /// </summary>
     internal sealed class MessageConverter : JsonConverter
     {
-        private static readonly Type MessageType = typeof(IMessage);
+        private static readonly Type MessageType = typeof(Message<>);
+        private static readonly IDictionary<Type, Type> KnownPayloadTypes = new ConcurrentDictionary<Type, Type>();
 
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
@@ -32,7 +35,14 @@ namespace Spark.Serialization.Converters
         /// <param name="objectType">The type of object.</param>
         public override Boolean CanConvert(Type objectType)
         {
-            return MessageType.IsAssignableFrom(objectType);
+            Type payloadType;
+            if (KnownPayloadTypes.TryGetValue(objectType, out payloadType))
+                return true;
+
+            if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == MessageType)
+                KnownPayloadTypes[objectType] = payloadType = objectType.GetGenericArguments().Single();
+
+            return payloadType != null;
         }
 
         /// <summary>
@@ -43,27 +53,20 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var message = value as IMessage;
+            var message = (Message)value;
 
-            if (message == null)
-            {
-                writer.WriteNull();
-            }
-            else
-            {
-                writer.WriteStartObject();
+            writer.WriteStartObject();
 
-                writer.WritePropertyName("id");
-                writer.WriteValue(message.Id);
+            writer.WritePropertyName("id");
+            writer.WriteValue(message.Id);
 
-                writer.WritePropertyName("h");
-                serializer.Serialize(writer, message.Headers);
+            writer.WritePropertyName("h");
+            serializer.Serialize(writer, message.Headers);
 
-                writer.WritePropertyName("p");
-                serializer.Serialize(writer, message.Payload);
+            writer.WritePropertyName("p");
+            serializer.Serialize(writer, message.GetPayload(), message.PayloadType);
 
-                writer.WriteEndObject();
-            }
+            writer.WriteEndObject();
         }
 
         /// <summary>
@@ -75,13 +78,13 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            var id = Guid.Empty;
-            var headers = HeaderCollection.Empty;
-            var envelope = CommandEnvelope.Empty;
-
             if (!reader.CanReadObject())
                 return null;
 
+            var id = Guid.Empty;
+            var payload = default(Object);
+            var headers = HeaderCollection.Empty;
+            var payloadType = KnownPayloadTypes[objectType];
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
                 String propertyName;
@@ -97,12 +100,12 @@ namespace Spark.Serialization.Converters
                         headers = serializer.Deserialize<HeaderCollection>(reader);
                         break;
                     case "p":
-                        envelope = serializer.Deserialize<CommandEnvelope>(reader);
+                        payload = serializer.Deserialize(reader, payloadType);
                         break;
                 }
             }
 
-            return Activator.CreateInstance(objectType, id, headers, envelope);
+            return Activator.CreateInstance(objectType, id, headers, payload);
         }
     }
 }

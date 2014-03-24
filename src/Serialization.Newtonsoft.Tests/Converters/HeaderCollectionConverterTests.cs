@@ -2,7 +2,6 @@
 using System.Net;
 using Spark;
 using Spark.Messaging;
-using Spark.Serialization.Converters;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -27,7 +26,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new HeaderCollectionConverter(), default(HeaderCollection));
+                var json = WriteJson(default(HeaderCollection));
 
                 Validate("null", json);
             }
@@ -36,12 +35,14 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeToJson()
             {
                 var headers = new ServiceMessageFactory().Create(null, new Object()).Headers;
-                var json = WriteJson(new HeaderCollectionConverter(), headers);
+                var json = WriteJson(headers);
 
-                Validate(
-                    String.Format("{{\"_o\":\"{0}\",\"_t\":\"{1}\",\"_r\":\"{2}\"}}", headers.GetOrigin(), headers.GetTimestamp().ToString(DateTimeFormat.RoundTrip), headers.GetRemoteAddress()),
-                    json
-                );
+                Validate2(json, @"
+{
+  ""_o"": """ + headers.GetOrigin() + @""",
+  ""_t"": """ + headers.GetTimestamp().ToString(DateTimeFormat.RoundTrip) + @""",
+  ""_r"": """ + headers.GetRemoteAddress() + @"""
+}");
             }
         }
 
@@ -50,23 +51,30 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Null(ReadJson<HeaderCollection>(new HeaderCollectionConverter(), "null"));
+                Assert.Null(ReadJson<HeaderCollection>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿{\"_o\":\"Workstation\",\"_t\":\"2013-06-02T18:23:59.7237080Z\",\"_r\":\"fe80::54c:c8d:e628:6ad6%12\"}";
-                var headers = ReadJson<HeaderCollection>(new HeaderCollectionConverter(), json);
-
+                var headers = ReadJson<HeaderCollection>(@"
+{
+  ""_o"": ""Workstation"",
+  ""_t"": ""2013-06-02T18:23:59.7237080Z"",
+  ""_r"": ""fe80::54c:c8d:e628:6ad6%12""
+}");
                 Assert.Equal("Workstation", headers.GetOrigin());
             }
 
             [Fact]
             public void WillIgnoreNullHeaderValues()
             {
-                var json = "﻿{\"_o\":\"Workstation\",\"_t\":\"2013-06-02T18:23:59.7237080Z\",\"_r\":null}";
-                var headers = ReadJson<HeaderCollection>(new HeaderCollectionConverter(), json);
+                var headers = ReadJson<HeaderCollection>(@"
+{
+  ""_o"": ""Workstation"",
+  ""_t"": ""2013-06-02T18:23:59.7237080Z"",
+  ""_r"": null
+}");
 
                 Assert.Equal(IPAddress.None, headers.GetRemoteAddress());
             }
@@ -82,7 +90,7 @@ namespace Test.Spark.Serialization.Converters
                 SystemTime.OverrideWith(() => now);
 
                 var headers = new ServiceMessageFactory().Create(null, new Object()).Headers;
-                var bson = WriteBson(new HeaderCollectionConverter(), headers);
+                var bson = WriteBson(headers);
 
                 Validate("YgAAAAJfbwAMAAAAV29ya3N0YXRpb24AAl90AB0AAAAyMDEzLTA2LTAxVDEyOjMwOjQ1LjAwMDAwMDBaAAJfcgAcAAAAZmU4MDo6MzViOTpiNzVlOmM4MDpjNTc5JTExAAA=", bson);
             }
@@ -95,7 +103,7 @@ namespace Test.Spark.Serialization.Converters
             {
                 var now = new DateTime(2013, 6, 1, 12, 30, 45, DateTimeKind.Utc);
                 var bson = "﻿YQAAAAJfbwAMAAAAV29ya3N0YXRpb24AAl90AB0AAAAyMDEzLTA2LTAxVDEyOjMwOjQ1LjAwMDAwMDBaAAJfcgAbAAAAZmU4MDo6NTRjOmM4ZDplNjI4OjZhZDYlMTIAAA==";
-                var headers = ReadBson<HeaderCollection>(new HeaderCollectionConverter(), bson);
+                var headers = ReadBson<HeaderCollection>(bson);
 
                 Assert.Equal(now, headers.GetTimestamp());
             }

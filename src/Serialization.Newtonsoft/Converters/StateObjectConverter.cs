@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
-
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -16,6 +14,7 @@ using Newtonsoft.Json;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
+using Spark.Cqrs.Domain;
 
 namespace Spark.Serialization.Converters
 {
@@ -25,37 +24,13 @@ namespace Spark.Serialization.Converters
     public sealed class StateObjectConverter : JsonConverter
     {
         private const String TypePropertyName = "$type";
+        private const String ValuesPropertyName = "$values";
         private static readonly Type StateObjectType = typeof(StateObject);
-        private static readonly IDictionary<Type, String> TypeShortAssemblyQualifiedName = new ConcurrentDictionary<Type, String>();
 
-        // NOTE: Serialization Guide: http://james.newtonking.com/projects/json/help/index.html?topic=html/SerializationGuide.htm
-        private static readonly HashSet<Type> ImplicitTypes = new HashSet<Type>
-            {
-                //String
-                typeof(String),
-
-                // Integer
-                typeof(Byte),
-                typeof(SByte), 
-                typeof(UInt16), 
-                typeof(Int16), 
-                typeof(UInt32), 
-                typeof(Int32), 
-                typeof(UInt64),
-                typeof(Int64), 
-
-                // Float
-                typeof(Single),
-                typeof(Double), 
-                typeof(Decimal), 
-
-                // Other
-                typeof(Byte[]), 
-                typeof(DateTime), 
-                typeof(Guid), 
-                typeof(Type),
-                typeof(TypeConverter)
-            };
+        /// <summary>
+        /// The default <see cref="StateObjectConverter"/> instance.
+        /// </summary>
+        public static readonly StateObjectConverter Default = new StateObjectConverter();
 
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
@@ -67,33 +42,93 @@ namespace Spark.Serialization.Converters
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="StateObject"/> instance.
+        /// Writes the JSON representation of a <see cref="StateObject"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var entity = value as StateObject;
+            WriteJson(writer, null, (StateObject)value, serializer);
+        }
 
-            if (entity == null)
+        /// <summary>
+        /// Writes the JSON representation of a <see cref="StateObject"/> instance.
+        /// </summary>
+        /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="value">The value to serialize.</param>
+        /// <param name="serializer">The calling serializer.</param>
+        public void WriteJson(JsonWriter writer, Type objectType, StateObject value, JsonSerializer serializer)
+        {
+            var state = value.GetState();
+            var instanceType = value.GetType();
+
+            writer.WriteStartObject();
+
+            // Determine if we must write out the state object type (i.e., $type property) or if we can simply infer the type from the objectType provided.
+            if (objectType != instanceType)
             {
-                writer.WriteNull();
+                writer.WritePropertyName(TypePropertyName);
+                serializer.Serialize(writer, instanceType.GetFullNameWithAssembly());
+            }
+
+            // Write out each state object property value.
+            foreach (var item in state)
+            {
+                writer.WritePropertyName(item.Key);
+
+                if (item.Value == null)
+                {
+                    writer.WriteNull();
+                }
+                else
+                {
+                    WriteProperty(writer, value.GetFieldType(item.Key), item.Value, serializer);
+                }
+            }
+
+            writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Writes the JSON representation of a <see cref="StateObject"/> property value.
+        /// </summary>
+        /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
+        /// <param name="propertyType">The property type.</param>
+        /// <param name="propertyValue">The property value to serialize.</param>
+        /// <param name="serializer">The calling serializer.</param>
+        private void WriteProperty(JsonWriter writer, Type propertyType, Object propertyValue, JsonSerializer serializer)
+        {
+            var stateObject = propertyValue as StateObject;
+            if (stateObject == null)
+            {
+                serializer.Serialize(writer, propertyValue, propertyType);
             }
             else
             {
-                var state = entity.GetState();
-                var assemblyName = GetShortAssemblyQualifiedName(value.GetType());
+                WriteJson(writer, propertyType, stateObject, serializer);
+            }
+        }
 
+        private void WriteEntityCollection(JsonWriter writer, Type propertyType, IEnumerable<Entity> propertyValue, JsonSerializer serializer)
+        {
+            var instanceType = propertyValue.GetType();
+
+            if (instanceType == propertyType)
+            {
+                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
+            }
+            else
+            {
                 writer.WriteStartObject();
-                writer.WritePropertyName(TypePropertyName);
-                serializer.Serialize(writer, assemblyName);
 
-                foreach (var item in state)
-                {
-                    writer.WritePropertyName(item.Key);
-                    serializer.Serialize(writer, item.Value, entity.GetFieldType(item.Key));
-                }
+                writer.WritePropertyName(TypePropertyName);
+                serializer.Serialize(writer, instanceType.GetFullNameWithAssembly());
+
+                writer.WritePropertyName(ValuesPropertyName);
+
+                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
 
                 writer.WriteEndObject();
             }
@@ -108,41 +143,33 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            var state = new Dictionary<String, Object>();
-
             if (!reader.CanReadObject())
                 return null;
 
-            var propertyName = String.Empty;
-            while (reader.Read() && reader.TokenType != JsonToken.EndObject && !reader.TryGetProperty(out propertyName))
-                continue; //NOTE: Given that JSON.NET expects `$type` to be the first property, we can make the same assumption to keep life simple.
-
-            var type = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
-            var stateObject = (StateObject)Activator.CreateInstance(type);
+            var stateObject = default(StateObject);
+            var state = new Dictionary<String, Object>();
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
+                var propertyName = String.Empty;
                 if (!reader.TryGetProperty(out propertyName))
                     continue;
 
-                var fieldType = stateObject.GetFieldType(propertyName);
-                state.Add(propertyName, serializer.Deserialize(reader, fieldType.IsEnum || ImplicitTypes.Contains(fieldType) ? fieldType : typeof(Object)));
+                if (propertyName == TypePropertyName)
+                {
+                    objectType = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
+                    stateObject = (StateObject)Activator.CreateInstance(objectType);
+                }
+                else
+                {
+                    stateObject = stateObject ?? (StateObject)Activator.CreateInstance(objectType);
+                    state.Add(propertyName, serializer.Deserialize(reader, stateObject.GetFieldType(propertyName)));
+                }
             }
 
+            if (stateObject != null)
+                stateObject.SetState(state);
+
             return stateObject;
-        }
-
-        /// <summary>
-        /// Get the short assembly qualified type name (i.e., Namespace.Type, Assembly)
-        /// </summary>
-        /// <param name="type">The <see cref="Type"/> for which the short assembly qualified name is to be retrieved.</param>
-        private static String GetShortAssemblyQualifiedName(Type type)
-        {
-            String result;
-
-            if (!TypeShortAssemblyQualifiedName.TryGetValue(type, out result))
-                TypeShortAssemblyQualifiedName[type] = result = String.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name);
-
-            return result;
         }
     }
 }

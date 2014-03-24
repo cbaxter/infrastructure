@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Spark.Cqrs.Eventing;
 using Spark.Serialization;
-using Spark.Serialization.Converters;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -29,7 +28,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(new EventCollectionConverter(), default(EventCollection));
+                var json = WriteJson(default(EventCollection));
 
                 Validate("null", json);
             }
@@ -38,9 +37,15 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeToJson()
             {
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
-                var json = WriteJson(new EventCollectionConverter(), events);
+                var json = WriteJson(events);
 
-                Validate("[{\"$type\":\"Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]", json);
+                Validate2(json, @"
+[
+  {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Property""
+  }
+]");
             }
         }
 
@@ -49,15 +54,19 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Null(ReadJson<EventCollection>(new EventCollectionConverter(), "null"));
+                Assert.Null(ReadJson<EventCollection>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var json = "﻿[{\"$type\":\"Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests\",\"Property\":\"My Property\"}]";
-                var events = ReadJson<EventCollection>(new EventCollectionConverter(), json);
-
+                var events = ReadJson<EventCollection>(@"
+[
+  {
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""Property"": ""My Property""
+  }
+]");
                 Assert.Equal("My Property", events.OfType<FakeEvent>().Single().Property);
             }
         }
@@ -68,7 +77,7 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeToBson()
             {
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
-                var bson = WriteBson(new EventCollectionConverter(), events);
+                var bson = WriteBson(events);
 
                 Validate("pAAAAAMwAJwAAAACJHR5cGUAcgAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nRXZlbnRDb2xsZWN0aW9uQ29udmVydGVyK0Zha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAMAAAATXkgUHJvcGVydHkAAAA=", bson);
             }

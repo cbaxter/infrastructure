@@ -42,24 +42,17 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
         {
-            var headers = value as HeaderCollection;
+            var headers = (HeaderCollection)value;
 
-            if (headers == null)
+            writer.WriteStartObject();
+
+            foreach (var header in headers)
             {
-                writer.WriteNull();
+                writer.WritePropertyName(header.Key);
+                serializer.Serialize(writer, header.Value);
             }
-            else
-            {
-                writer.WriteStartObject();
 
-                foreach (var header in headers)
-                {
-                    writer.WritePropertyName(header.Key);
-                    serializer.Serialize(writer, header.Value);
-                }
-
-                writer.WriteEndObject();
-            }
+            writer.WriteEndObject();
         }
 
         /// <summary>
@@ -71,11 +64,10 @@ namespace Spark.Serialization.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
         {
-            var dictionary = new Dictionary<String, String>();
-
             if (!reader.CanReadObject())
                 return null;
-            
+
+            var dictionary = new Dictionary<String, String>();
             while (reader.Read() && reader.TokenType != JsonToken.EndObject)
             {
                 String propertyName;
@@ -84,7 +76,7 @@ namespace Spark.Serialization.Converters
 
                 dictionary.Add(propertyName, serializer.Deserialize<String>(reader));
             }
-            
+
             return new HeaderCollection(dictionary);
         }
     }

@@ -54,6 +54,45 @@ namespace Test.Spark.Cqrs.Eventing
             }
         }
 
+        public class WhenComparingVersions
+        {
+            [Fact]
+            public void LowerVersionBeforeHigherVersion()
+            {
+                var version1 = new EventVersion(1, 2, 2);
+                var version2 = new EventVersion(2, 1, 1);
+
+                Assert.Equal(-1, version1.CompareTo(version2));
+            }
+
+            [Fact]
+            public void HigherVersionAfterLowerVersion()
+            {
+                var version1 = new EventVersion(1, 2, 2);
+                var version2 = new EventVersion(2, 1, 1);
+
+                Assert.Equal(1, version2.CompareTo(version1));
+            }
+
+            [Fact]
+            public void LowerItemBeforeHigherItemInSameVersion()
+            {
+                var version1 = new EventVersion(1, 2, 1);
+                var version2 = new EventVersion(1, 2, 2);
+
+                Assert.Equal(-1, version1.CompareTo(version2));
+            }
+
+            [Fact]
+            public void HigherItemAfterLowerItemInSameVersion()
+            {
+                var version1 = new EventVersion(1, 2, 1);
+                var version2 = new EventVersion(1, 2, 2);
+
+                Assert.Equal(1, version2.CompareTo(version1));
+            }
+        }
+
         public class WhenTestingEquality
         {
             [Fact]

@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using Spark;
+﻿using System;
+using System.Diagnostics;
 using Spark.Logging;
-using System;
-using System.Configuration;
 using Xunit;
 using Xunit.Extensions;
 

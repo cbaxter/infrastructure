@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Spark;
 using Xunit;
-
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -16,6 +16,7 @@ using Xunit;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
+using Xunit.Extensions;
 
 namespace Test.Spark
 {
@@ -85,6 +86,74 @@ namespace Test.Spark
 
             private class CustomList : List<Object>
             { }
+        }
+
+        public class WhenGettingShortAssemblyQualifiedName
+        {
+            [
+                Theory,
+                InlineData(typeof(String), "System.String, mscorlib"),
+                InlineData(typeof(String[]), "System.String[], mscorlib"),
+                InlineData(typeof(String[,]), "System.String[,], mscorlib"),
+                InlineData(typeof(String[][]), "System.String[][], mscorlib"),
+                InlineData(typeof(IList<String>), "System.Collections.Generic.IList`1[[System.String, mscorlib]], mscorlib"),
+                InlineData(typeof(IList<String>[]), "System.Collections.Generic.IList`1[[System.String, mscorlib]][], mscorlib"),
+                InlineData(typeof(IList<String>[,]), "System.Collections.Generic.IList`1[[System.String, mscorlib]][,], mscorlib"),
+                InlineData(typeof(IList<String>[, ,]), "System.Collections.Generic.IList`1[[System.String, mscorlib]][,,], mscorlib"),
+                InlineData(typeof(IList<String>[][]), "System.Collections.Generic.IList`1[[System.String, mscorlib]][][], mscorlib"),
+                InlineData(typeof(IList<IList<String>>), "System.Collections.Generic.IList`1[[System.Collections.Generic.IList`1[[System.String, mscorlib]], mscorlib]], mscorlib"),
+                InlineData(typeof(IList<IList<String>[][]>[][]), "System.Collections.Generic.IList`1[[System.Collections.Generic.IList`1[[System.String, mscorlib]][][], mscorlib]][][], mscorlib"),
+                InlineData(typeof(IDictionary<String, String>), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]], mscorlib"),
+                InlineData(typeof(IDictionary<String, IDictionary<String, String>>), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]], mscorlib]], mscorlib"),
+                InlineData(typeof(IDictionary<String, IDictionary<String, IList<String>>>), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.Collections.Generic.IList`1[[System.String, mscorlib]], mscorlib]], mscorlib]], mscorlib"),
+                InlineData(typeof(IDictionary<String, String>[][]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][][], mscorlib"),
+                InlineData(typeof(IDictionary<String, String>[, ,]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][,,], mscorlib"),
+                InlineData(typeof(IDictionary<String, String>[,]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][,], mscorlib"),
+                InlineData(typeof(IDictionary<String, String>[]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][], mscorlib"),
+                InlineData(typeof(ParentType<Int32>.ChildType<String>.GrantChildType<Boolean>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1+GrantChildType`1[[System.Int32, mscorlib],[System.String, mscorlib],[System.Boolean, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType<Int32>.ChildType<String>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1[[System.Int32, mscorlib],[System.String, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType<Int32>.ChildType), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType[[System.Int32, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType.ChildType<String>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType+ChildType`1[[System.String, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType.ChildType), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType+ChildType, Spark.Core.Tests"),
+            ]
+            public void ReturnTypeNameWithNoCultureVersionOrPublicKeys(Type type, String expectedTypeName)
+            {
+                var simpleAssemblyQualifiedName = type.GetFullNameWithAssembly();
+
+                Assert.Equal(expectedTypeName, simpleAssemblyQualifiedName);
+                Assert.DoesNotThrow(() => Type.GetType(simpleAssemblyQualifiedName, throwOnError: true));
+            }
+
+            // ReSharper disable UnusedTypeParameter
+            internal class ParentType
+            {
+                internal class ChildType
+                {
+
+                }
+
+                internal class ChildType<T>
+                {
+
+                }
+            }
+
+            internal class ParentType<TParent>
+            {
+                internal class ChildType
+                {
+
+                }
+
+                internal class ChildType<TChild>
+                {
+                    internal class GrantChildType<TGrandChild>
+                    {
+
+                    }
+                }
+            }
+            // ReSharper restore UnusedTypeParameter
         }
     }
 }
