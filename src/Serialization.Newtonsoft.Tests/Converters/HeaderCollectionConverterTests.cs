@@ -37,7 +37,7 @@ namespace Test.Spark.Serialization.Converters
                 var headers = new ServiceMessageFactory().Create(null, new Object()).Headers;
                 var json = WriteJson(headers);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""_o"": """ + headers.GetOrigin() + @""",
   ""_t"": """ + headers.GetTimestamp().ToString(DateTimeFormat.RoundTrip) + @""",

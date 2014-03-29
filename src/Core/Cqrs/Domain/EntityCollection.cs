@@ -139,6 +139,12 @@ namespace Spark.Cqrs.Domain
         /// Gets the number of entities contained in the <see cref="EntityCollection"/>.
         /// </summary>
         public override Int32 Count { get { return dictionary.Count; } }
+        
+        /// <summary>
+        /// Gets the <see cref="Entity"/> identified by the specified <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The unique entity identifier.</param>
+        public TEntity this[Guid id] { get { return dictionary[id]; } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="EntityCollection"/>.
@@ -299,15 +305,6 @@ namespace Spark.Cqrs.Domain
         IEnumerable<TEntity> IReadOnlyDictionary<Guid, TEntity>.Values
         {
             get { return dictionary.Values; }
-        }
-
-        /// <summary>
-        /// Gets the element that has the specified key in the read-only dictionary.
-        /// </summary>
-        /// <param name="key">The key to locate.</param>
-        TEntity IReadOnlyDictionary<Guid, TEntity>.this[Guid key]
-        {
-            get { return dictionary[key]; }
         }
 
         /// <summary>

@@ -116,12 +116,7 @@ namespace Test.Spark.Serialization.Converters
                 return (T)converter.ReadJson(jsonReader, typeof(T), null, NewtonsoftBsonSerializer.Default.Serializer);
         }
 
-        protected void Validate(String expected, String actual)
-        {
-            Assert.Equal(RemovePreamble(expected ?? String.Empty).Trim(), RemovePreamble(actual ?? String.Empty).Trim());
-        }
-
-        protected void Validate2(String actual, String expected)
+        protected void Validate(String actual, String expected)
         {
             actual =  RemovePreamble(actual).Trim().Replace("\r\n", "\n");
             expected = RemovePreamble(expected).Trim().Replace("\r\n", "\n");

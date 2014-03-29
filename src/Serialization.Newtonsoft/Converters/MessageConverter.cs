@@ -46,7 +46,7 @@ namespace Spark.Serialization.Converters
         }
 
         /// <summary>
-        /// Writes the JSON representation of an <see cref="EventCollection"/> instance.
+        /// Writes the JSON representation of a <see cref="EventCollection"/> instance.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
         /// <param name="value">The value to serialize.</param>
@@ -70,7 +70,7 @@ namespace Spark.Serialization.Converters
         }
 
         /// <summary>
-        /// Reads the JSON representation of an <see cref="EventCollection"/> instance.
+        /// Reads the JSON representation of a <see cref="EventCollection"/> instance.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
         /// <param name="objectType">The type of object.</param>

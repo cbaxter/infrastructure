@@ -40,7 +40,7 @@ namespace Test.Spark.Serialization.Converters
                 var envelope = new EventEnvelope(correlationId, aggregateId, version, new FakeEvent("My Event"));
                 var json = WriteJson(envelope);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""a"": ""512fe943-c9bd-49c3-8116-20c186c755af"",
   ""v"": {

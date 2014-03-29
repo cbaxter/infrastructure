@@ -65,6 +65,7 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="BinaryTests.cs" />
     <Compile Include="Configuration\AggregateStoreSettings.cs" />
     <Compile Include="Configuration\CommandProcessorSettings.cs" />
     <Compile Include="Configuration\SagaStoreSettings.cs" />

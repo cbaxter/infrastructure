@@ -54,6 +54,7 @@
     <Compile Include="..\.shared\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Converters\BinaryConverter.cs" />
     <Compile Include="Converters\EntityCollectionConverter.cs" />
     <Compile Include="Converters\EventVersionConverter.cs" />
     <Compile Include="Converters\EventEnvelopeConverter.cs" />

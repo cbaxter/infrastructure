@@ -56,6 +56,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Binary.cs" />
     <Compile Include="Configuration\SagaStoreElement.cs" />
     <Compile Include="Cqrs\Commanding\CommandContext.cs" />
     <Compile Include="Cqrs\Commanding\CommandEnvelope.cs" />

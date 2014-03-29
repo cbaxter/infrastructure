@@ -38,7 +38,7 @@ namespace Test.Spark.Serialization.Converters
                 var message = new Message<CommandEnvelope>(id, HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand("My Command")));
                 var json = WriteJson(message);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""id"": ""cf72612c-8e46-4311-b40f-6c9279bce591"",
   ""h"": {},

@@ -114,7 +114,6 @@ namespace Test.Spark
             }
         }
 
-
         public class WhenAttemptingParseValue
         {
             [Fact]

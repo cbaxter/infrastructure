@@ -39,7 +39,7 @@ namespace Test.Spark.Serialization.Converters
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
                 var json = WriteJson(events);
 
-                Validate2(json, @"
+                Validate(json, @"
 [
   {
     ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",

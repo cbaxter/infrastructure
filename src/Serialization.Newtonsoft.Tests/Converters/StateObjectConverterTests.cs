@@ -38,7 +38,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = new TestAggregate();
                 var json = WriteJson(entity);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
@@ -63,7 +63,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = new TestAggregateWithEntityParent(new TestEntity());
                 var json = WriteJson(entity);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
@@ -80,7 +80,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = new TestAggregateWithTestEntityParent(new TestEntity());
                 var json = WriteJson(entity);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
@@ -96,7 +96,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = new TestAggregateWithEntityChildren();
                 var json = WriteJson(entity);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
@@ -121,7 +121,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = new TestAggregateWithTestEntityChildren();
                 var json = WriteJson(entity);
 
-                Validate2(json, @"
+                Validate(json, @"
 {
   ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [

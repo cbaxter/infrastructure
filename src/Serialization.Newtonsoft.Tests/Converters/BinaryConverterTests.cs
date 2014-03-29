@@ -1,6 +1,7 @@
-﻿using Spark.Cqrs.Eventing;
-using Spark.EventStore;
-using Spark.Messaging;
+﻿using System;
+using System.Collections.Generic;
+using Spark;
+using Spark.Cqrs.Commanding;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -18,33 +19,25 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingCommitDataConverter
+    public static class UsingBinaryConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
             [Fact]
             public void CanSerializeNullValue()
             {
-                var json = WriteJson(default(CommitData));
+                var json = WriteJson(default(Binary));
 
-                Validate(json, @"
-{
-  ""h"": {},
-  ""e"": []
-}");
+                Validate("null", json);
             }
 
             [Fact]
             public void CanSerializeToJson()
             {
-                var data = new CommitData(HeaderCollection.Empty, EventCollection.Empty);
-                var json = WriteJson(data);
+                var binary = new Binary(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb").ToByteArray());
+                var json = WriteJson(binary);
 
-                Validate(json, @"
-{
-  ""h"": {},
-  ""e"": []
-}");
+                Validate(json, "\"KFrEpnLFW02sGHsOwtcj+w==\"");
             }
         }
 
@@ -53,40 +46,16 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeNull()
             {
-                Assert.Equal(CommitData.Empty, ReadJson<CommitData>("null"));
+                Assert.Null(ReadJson<Binary>("null"));
             }
 
             [Fact]
             public void CanDeserializeValidJson()
             {
-                var data = ReadJson<CommitData>(@"
-{
-  ""h"": {},
-  ""e"": []
-}");
-                Assert.Equal(HeaderCollection.Empty, data.Headers);
-            }
+                var expected = new Binary(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb").ToByteArray());
+                var actual = ReadJson<Binary>("\"KFrEpnLFW02sGHsOwtcj+w==\"");
 
-            [Fact]
-            public void PropertyOrderIrrelevant()
-            {
-                var data = ReadJson<CommitData>(@"
-{
-  ""e"": [],
-  ""h"": {}
-}");
-                Assert.Equal(HeaderCollection.Empty, data.Headers);
-            }
-
-            [Fact]
-            public void CanTolerateMalformedJson()
-            {
-                var data = ReadJson<CommitData>(@"
-{
-  ""h"": {},
-  ""e"": [],
-}");
-                Assert.Equal(HeaderCollection.Empty, data.Headers);
+                Assert.Equal(expected, actual);
             }
         }
 
@@ -95,10 +64,10 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeToBson()
             {
-                var data = new CommitData(HeaderCollection.Empty, EventCollection.Empty);
-                var json = WriteBson(data);
+                var binary = new Binary(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb").ToByteArray());
+                var bson = WriteBson(new BinaryContainer { Value = binary });
 
-                Validate("﻿FQAAAANoAAUAAAAABGUABQAAAAAA", json);
+                Validate(bson, "IQAAAAVWYWx1ZQAQAAAAAChaxKZyxVtNrBh7DsLXI/sA");
             }
         }
 
@@ -107,11 +76,17 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "FQAAAANoAAUAAAAABGUABQAAAAAA";
-                var data = ReadBson<CommitData>(bson);
+                var expected = new Binary(Guid.Parse("a6c45a28-c572-4d5b-ac18-7b0ec2d723fb").ToByteArray());
+                var bson = "IQAAAAV2YWx1ZQAQAAAAAChaxKZyxVtNrBh7DsLXI/sA";
+                var actual = ReadBson<BinaryContainer>(bson);
 
-                Assert.Equal(HeaderCollection.Empty, data.Headers);
+                Assert.Equal(expected, actual.Value);
             }
+        }
+
+        public class BinaryContainer
+        {
+            public Binary Value { get; set; }
         }
     }
 }
