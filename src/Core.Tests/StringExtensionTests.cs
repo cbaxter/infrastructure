@@ -239,6 +239,56 @@ namespace Test.Spark
                 Assert.Equal(value.ToGuid(ignoreCase: true), value.ToLowerInvariant().ToGuid(ignoreCase: true));
             }
         }
+
+        public class WhenTruncatingStringFromLeft
+        {
+            [Fact]
+            public void ReturnNullIfValueNull()
+            {
+                Assert.Null(default(String).Left(1));
+            }
+
+            [Fact]
+            public void ReturnValueIfValueLessThanMaxLength()
+            {
+                var value = "My Short String";
+
+                Assert.Equal(value, value.Left(value.Length));
+            }
+
+            [Fact]
+            public void ReturnTruncatedValueIfValueGreaterThanMaxLength()
+            {
+                var value = "My Short String";
+
+                Assert.Equal("My Short", value.Left(8));
+            }
+        }
+
+        public class WhenTruncatingStringFromRight
+        {
+            [Fact]
+            public void ReturnNullIfValueNull()
+            {
+                Assert.Null(default(String).Right(1));
+            }
+
+            [Fact]
+            public void ReturnValueIfValueLessThanMaxLength()
+            {
+                var value = "My Short String";
+
+                Assert.Equal(value, value.Right(value.Length));
+            }
+
+            [Fact]
+            public void ReturnTruncatedValueIfValueGreaterThanMaxLength()
+            {
+                var value = "My Short String";
+
+                Assert.Equal("Short String", value.Right(12));
+            }
+        }
     }
 }
 #pragma warning restore 1720

@@ -174,5 +174,29 @@ namespace Spark
                 return new Guid(bytes);
             }
         }
+
+        /// <summary>
+        /// Returns <paramref name="value"/> if <value>null</value> or less than the maximum desired length; otherwise truncates the string from the left returning the first <paramref name="maxLength"/> characters .
+        /// </summary>
+        /// <param name="value">The string to truncate if required.</param>
+        /// <param name="maxLength">The maximum string length allowed.</param>
+        public static String Left(this String value, Int32 maxLength)
+        {
+            Verify.GreaterThan(0, maxLength, "maxLength");
+
+            return value == null || value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        /// <summary>
+        /// Returns <paramref name="value"/> if <value>null</value> or less than the maximum desired length; otherwise truncates the string from the right returning the last <paramref name="maxLength"/> characters .
+        /// </summary>
+        /// <param name="value">The string to truncate if required.</param>
+        /// <param name="maxLength">The maximum string length allowed.</param>
+        public static String Right(this String value, Int32 maxLength)
+        {
+            Verify.GreaterThan(0, maxLength, "maxLength");
+
+            return value == null || value.Length <= maxLength ? value : value.Substring(value.Length - maxLength);
+        }
     }
 }
