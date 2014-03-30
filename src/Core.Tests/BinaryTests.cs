@@ -187,6 +187,46 @@ namespace Test.Spark
             }
         }
 
+        public class WhenParsingString
+        {
+            [Fact]
+            public void HexStringMustNotBeNull()
+            {
+                Assert.Throws<FormatException>(() => Binary.Parse(null));
+            }
+
+            [Fact]
+            public void HexStringMustHaveAnEvenLength()
+            {
+                Assert.Throws<FormatException>(() => Binary.Parse("01020304F"));
+            }
+
+            [Fact]
+            public void HexStringCannotContainNonHexCharacters()
+            {
+                Assert.Throws<FormatException>(() => Binary.Parse("01020304FX"));
+            }
+
+
+            [Fact]
+            public void HexPreambleOptional()
+            {
+                var expected = new Binary(new Byte[] { 1, 2, 3, 4, 255 });
+                var actual = Binary.Parse("01020304FF");
+
+                Assert.Equal(expected, actual);
+            }
+
+            [Fact]
+            public void WillIgnoreHexPreamble()
+            {
+                var expected = new Binary(new Byte[] { 1, 2, 3, 4, 255 });
+                var actual = Binary.Parse("0x01020304FF");
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
         public class WhenEnumeratingBytes
         {
             [Fact]

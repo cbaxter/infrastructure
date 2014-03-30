@@ -24,6 +24,7 @@ namespace Spark
     /// </summary>
     public class Binary : IComparable, IComparable<Binary>, IComparable<Byte[]>, IEquatable<Binary>, IEquatable<Byte[]>, IEnumerable<Byte>
     {
+        private static readonly IReadOnlyDictionary<Char, Byte> HexMap = new Dictionary<Char, Byte> { { '0', 0 }, { '1', 1 }, { '2', 2 }, { '3', 3 }, { '4', 4 }, { '5', 5 }, { '6', 6 }, { '7', 7 }, { '8', 8 }, { '9', 9 }, { 'A', 10 }, { 'B', 11 }, { 'C', 12 }, { 'D', 13 }, { 'E', 14 }, { 'F', 15 } };
         private readonly Byte[] data;
 
         /// <summary>
@@ -143,6 +144,55 @@ namespace Spark
 
                 return hash;
             }
+        }
+
+        /// <summary>
+        /// Parse the HEX <see cref="String"/> <paramref name="value"/> in to its <see cref="Binary"/> equivalent.
+        /// </summary>
+        /// <param name="value">The value to parse.</param>
+        public static Binary Parse(String value)
+        {
+            Binary result;
+            if (TryParse(value, out result))
+                return result;
+
+            throw new FormatException();
+        }
+
+        /// <summary>
+        /// Attempt to parse the HEX <see cref="String"/> <paramref name="value"/> in to its <see cref="Binary"/> equivalent.
+        /// </summary>
+        /// <param name="value">The value to parse.</param>
+        /// <param name="result">The parsed HEX string <see cref="Binary"/> equivalent if successful; otherwise <value>null</value>.</param>
+        public static Boolean TryParse(String value, out Binary result)
+        {
+            result = null;
+
+            if (value.IsNullOrWhiteSpace())
+                return false;
+
+            if (value.Length % 2 != 0)
+                return false;
+
+            Int32 byteIndex = 0, stringIndex = 0, numberOfBytes = (value.Length / 2);
+            if (value.StartsWith("0x"))
+            {
+                stringIndex = 2;
+                numberOfBytes -= 1;
+            }
+
+            var bytes = new Byte[numberOfBytes];
+            while (stringIndex < value.Length)
+            {
+                Byte upperNibble, lowerNibble;
+                if (HexMap.TryGetValue(value[stringIndex++], out upperNibble) && HexMap.TryGetValue(value[stringIndex++], out lowerNibble))
+                    bytes[byteIndex++] = (Byte)(upperNibble << 4 | lowerNibble);
+                else
+                    return false;
+            }
+
+            result = new Binary(bytes);
+            return true;
         }
 
         /// <summary>
