@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using JetBrains.Annotations;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Domain;
@@ -29,41 +30,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 {
     public static class UsingSaga
     {
-        public class WhenGettingSagaMetadata
-        {
-            [Fact]
-            public void AllHandledEventsMustBeConfigured()
-            {
-                var knownHandleMethods = new HandleMethodCollection(new Dictionary<Type, Action<Object, Event>> { { typeof(FakeEvent), (handler, e) => { } } });
-                var ex = Assert.Throws<MappingException>(() => Saga.GetMetadata(typeof(SagaWithEventTypesNotConfigured), knownHandleMethods));
-
-                Assert.Equal(Exceptions.EventTypeNotConfigured.FormatWith(typeof(SagaWithEventTypesNotConfigured), typeof(FakeEvent)), ex.Message);
-            }
-
-            [Fact]
-            public void MustHaveAtLeastOneInitiatingEvent()
-            {
-                var knownHandleMethods = new HandleMethodCollection(new Dictionary<Type, Action<Object, Event>> { { typeof(FakeEvent), (handler, e) => { } } });
-                var ex = Assert.Throws<MappingException>(() => Saga.GetMetadata(typeof(SagaWithInitiatingEventNotConfigured), knownHandleMethods));
-
-                Assert.Equal(Exceptions.SagaMustHaveAtLeastOneInitiatingEvent.FormatWith(typeof(SagaWithInitiatingEventNotConfigured)), ex.Message);
-            }
-
-            private class SagaWithEventTypesNotConfigured : Saga
-            {
-                protected override void Configure(SagaConfiguration saga)
-                { }
-            }
-
-            private class SagaWithInitiatingEventNotConfigured : Saga
-            {
-                protected override void Configure(SagaConfiguration saga)
-                {
-                    saga.CanHandle((FakeEvent e) => e.Id);
-                }
-            }
-        }
-
         public class WhenCompletingSagas
         {
             [Fact]
@@ -132,6 +98,21 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
 
             [Fact]
+            public void CannotScheduleTimeoutIfTimeoutNotHandled()
+            {
+                var saga = new FakeSagaWithoutTimeout() { CorrelationId = GuidStrategy.NewGuid() };
+                var e = new FakeEvent();
+
+                using (var context = new SagaContext(saga.GetType(), GuidStrategy.NewGuid(), e))
+                {
+                    var ex = Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
+
+                    Assert.Equal(Exceptions.SagaTimeoutNotHandled.FormatWith(saga.GetType()), ex.Message);
+                    Assert.False(context.TimeoutChanged);
+                }
+            }
+
+            [Fact]
             public void CannotScheduleTimeoutIfAlreadyScheduled()
             {
                 var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), Timeout = SystemTime.Now };
@@ -151,8 +132,29 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 protected override void Configure(SagaConfiguration saga)
                 {
                     saga.CanStartWith((FakeEvent e) => e.Id);
+                    saga.CanHandle((Timeout e) => e.CorrelationId);
                 }
 
+                public void Handle(FakeEvent e)
+                {
+                    ScheduleTimeout(TimeSpan.FromMinutes(30));
+                }
+
+                [UsedImplicitly]
+                public void Handle(Timeout e)
+                {
+                    RescheduleTimeout(TimeSpan.FromMinutes(30));
+                }
+            }
+
+            private class FakeSagaWithoutTimeout : Saga
+            {
+                protected override void Configure(SagaConfiguration saga)
+                {
+                    saga.CanStartWith((FakeEvent e) => e.Id);
+                }
+                
+                [UsedImplicitly]
                 public void Handle(FakeEvent e)
                 {
                     ScheduleTimeout(TimeSpan.FromMinutes(30));
@@ -191,11 +193,18 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 protected override void Configure(SagaConfiguration saga)
                 {
                     saga.CanStartWith((FakeEvent e) => e.Id);
+                    saga.CanHandle((Timeout e) => e.CorrelationId);
                 }
 
                 public void Handle(FakeEvent e)
                 {
                     ScheduleTimeout(DateTime.Now);
+                }
+
+                [UsedImplicitly]
+                public void Handle(Timeout e)
+                {
+                    RescheduleTimeout(TimeSpan.FromMinutes(30));
                 }
             }
         }
@@ -282,9 +291,16 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 protected override void Configure(SagaConfiguration saga)
                 {
                     saga.CanStartWith((FakeEvent e) => e.Id);
+                    saga.CanHandle((Timeout e) => e.CorrelationId);
                 }
 
                 public void Handle(FakeEvent e)
+                {
+                    RescheduleTimeout(TimeSpan.FromMinutes(30));
+                }
+
+                [UsedImplicitly]
+                public void Handle(Timeout e)
                 {
                     RescheduleTimeout(TimeSpan.FromMinutes(30));
                 }

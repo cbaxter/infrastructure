@@ -36,10 +36,10 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
             protected UsingSagaEventHandlerBase()
             {
+                var sagaMetadata = new FakeSaga().GetMetadata();
                 var commandPublisher = new Mock<IPublishCommands>();
                 var executor = new Action<Object, Event>((handler, e) => { ((FakeSaga)handler).Handle((Timeout)e); Handled = true; });
                 var eventHandler = new EventHandler(typeof(FakeSaga), typeof(Timeout), executor, () => { throw new NotSupportedException(); });
-                var sagaMetadata = Saga.GetMetadata(typeof(FakeSaga), new HandleMethodCollection(new Dictionary<Type, Action<Object, Event>> { { typeof(FakeEvent), executor } }));
                 
                 SystemTime.ClearOverride();
                 SagaEventHandler = new SagaTimeoutHandler(eventHandler, sagaMetadata, SagaStore.Object, new Lazy<IPublishCommands>(() => commandPublisher.Object));
@@ -121,7 +121,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             protected override void Configure(SagaConfiguration saga)
             {
                 saga.CanStartWith((FakeEvent e) => e.Id);
-                saga.CanHandle((Timeout e) => e.SagaId);
+                saga.CanHandle((Timeout e) => e.CorrelationId);
             }
 
             [UsedImplicitly]

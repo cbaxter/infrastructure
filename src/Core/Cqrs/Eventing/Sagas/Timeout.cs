@@ -23,7 +23,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// The saga correlation identifier associated with this saga timeout event.
         /// </summary>
-        public Guid SagaId { get { return AggregateId; } }
+        public Guid CorrelationId { get { return AggregateId; } }
 
         /// <summary>
         /// The saga type associated with this saga timeout event.

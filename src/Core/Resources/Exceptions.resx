@@ -338,6 +338,10 @@ Saga Id: {1}</value>
 Saga Type: {0}
 Saga Id: {1}</value>
   </data>
+  <data name="SagaTimeoutNotHandled" xml:space="preserve">
+    <value>A saga timeout cannot be scheduled because the saga does not handle the Timeout event.
+Saga Type: {0}</value>
+  </data>
   <data name="SagaTimeoutNotScheduled" xml:space="preserve">
     <value>No saga timeout has not been scheduled; unable to clear saga timeout.
 Saga Type: {0}

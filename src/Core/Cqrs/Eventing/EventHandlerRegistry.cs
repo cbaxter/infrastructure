@@ -114,7 +114,7 @@ namespace Spark.Cqrs.Eventing
             foreach (var handlerType in handlerTypes)
             {
                 var handleMethods = GetHandleMethods(handlerType, serviceProvider);
-                var sagaMetadata = typeof(Saga).IsAssignableFrom(handlerType) ? Saga.GetMetadata(handlerType, handleMethods) : null;
+                var sagaMetadata = typeof(Saga).IsAssignableFrom(handlerType) ? GetSagaMetadata(handlerType, handleMethods) : null;
 
                 foreach (var handleMethod in handleMethods)
                 {
@@ -132,6 +132,33 @@ namespace Spark.Cqrs.Eventing
             }
 
             return knownEventHandlers;
+        }
+
+        /// <summary>
+        /// Gets the saga metadata for the specified <paramref name="sagaType"/> validating against the known <paramref name="handleMethods"/>.
+        /// </summary>
+        /// <remarks>Called once during saga discovery.</remarks>
+        private static SagaMetadata GetSagaMetadata(Type sagaType, HandleMethodCollection handleMethods)
+        {
+            var saga = (Saga)Activator.CreateInstance(sagaType);
+            var metadata = saga.GetMetadata();
+            var initiatingEvents = 0;
+
+            foreach (var handleMethod in handleMethods)
+            {
+                if (metadata.CanStartWith(handleMethod.Key))
+                    initiatingEvents++;
+
+                if (metadata.CanHandle(handleMethod.Key))
+                    continue;
+
+                throw new MappingException(Exceptions.EventTypeNotConfigured.FormatWith(sagaType, handleMethod.Key));
+            }
+
+            if (initiatingEvents == 0)
+                throw new MappingException(Exceptions.SagaMustHaveAtLeastOneInitiatingEvent.FormatWith(sagaType));
+
+            return metadata;
         }
 
         /// <summary>

@@ -47,9 +47,9 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 SagaId = GuidStrategy.NewGuid();
                 AggregateId = GuidStrategy.NewGuid();
                 Event = new FakeEvent { Id = SagaId };
+                SagaMetadata = new FakeSaga().GetMetadata();
                 EventContext = new EventContext(AggregateId, HeaderCollection.Empty, Event);
                 EventHandler = new EventHandler(typeof(FakeSaga), typeof(FakeEvent), executor, () => { throw new NotSupportedException(); });
-                SagaMetadata = Saga.GetMetadata(typeof(FakeSaga), new HandleMethodCollection(new Dictionary<Type, Action<Object, Event>> { { typeof(FakeEvent), executor } }));
                 SagaEventHandler = new SagaEventHandler(EventHandler, SagaMetadata, SagaStore.Object, new Lazy<IPublishCommands>(() => CommandPublisher.Object));
             }
 

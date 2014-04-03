@@ -33,7 +33,7 @@ namespace Spark.Example.Sagas
             saga.CanStartWith((MoneyTransferReceived e) => e.TransferId);
             saga.CanHandle((MoneyTransferRefunded e) => e.TransferId);
             saga.CanHandle((MoneyTransferFailed e) => e.TransferId);
-            saga.CanHandle((Timeout e) => e.SagaId);
+            saga.CanHandle((Timeout e) => e.CorrelationId);
         }
 
         public void Handle(MoneyTransferSent e)

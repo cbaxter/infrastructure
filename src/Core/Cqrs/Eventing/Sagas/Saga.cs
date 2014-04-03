@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -30,8 +31,15 @@ namespace Spark.Cqrs.Eventing.Sagas
     [Serializable, EventHandler(IsReusable = false)]
     public abstract class Saga : StateObject
     {
+        private static readonly IDictionary<Type, SagaMetadata> SagaMetadataCache = new ConcurrentDictionary<Type, SagaMetadata>();
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Returns <value>true</value> if the saga handles the <see cref="Timeout"/> event; otherwise <value>false</value>.
+        /// </summary>
+        [IgnoreDataMember]
+        private Boolean CanScheduleTimeout { get; set; }
+        
         /// <summary>
         /// The saga correlation identifier associated with this saga instance.
         /// </summary>
@@ -63,47 +71,31 @@ namespace Spark.Cqrs.Eventing.Sagas
         internal Guid TypeId { get; set; }
 
         /// <summary>
-        /// Gets the saga metadata for the specified <paramref name="sagaType"/> validating against the known <paramref name="handleMethods"/>.
+        /// Initializes a new instance of <see cref="Saga"/>.
         /// </summary>
-        /// <remarks>Called once during saga discovery.</remarks>
-        internal static SagaMetadata GetMetadata(Type sagaType, HandleMethodCollection handleMethods)
+        protected Saga()
         {
-            Verify.NotNull(sagaType, "sagaType");
-            Verify.NotNull(handleMethods, "handleMethods");
-            Verify.TypeDerivesFrom(typeof(Saga), sagaType, "sagaType");
-
-            var saga = (Saga)Activator.CreateInstance(sagaType);
-            var metadata = saga.GetMetadata();
-            var initiatingEvents = 0;
-
-            foreach (var handleMethod in handleMethods)
-            {
-                if (metadata.CanStartWith(handleMethod.Key))
-                    initiatingEvents++;
-
-                if (metadata.CanHandle(handleMethod.Key))
-                    continue;
-
-                throw new MappingException(Exceptions.EventTypeNotConfigured.FormatWith(sagaType, handleMethod.Key));
-            }
-
-            if (initiatingEvents == 0)
-                throw new MappingException(Exceptions.SagaMustHaveAtLeastOneInitiatingEvent.FormatWith(sagaType));
-
-            return metadata;
+            CanScheduleTimeout = GetMetadata().CanHandle(typeof(Timeout));
         }
 
         /// <summary>
         /// Gets the saga metadata for this saga instance.
         /// </summary>
         /// <remarks>Called once during saga discovery.</remarks>
-        private SagaMetadata GetMetadata()
+        internal SagaMetadata GetMetadata()
         {
-            var configuration = new SagaConfiguration(GetType());
+            Type sagaType = GetType();
+            SagaMetadata sagaMetadata;
 
-            Configure(configuration);
+            if (!SagaMetadataCache.TryGetValue(sagaType, out sagaMetadata))
+            {
+                var configuration = new SagaConfiguration(GetType());
 
-            return configuration.GetMetadata();
+                Configure(configuration);
+                SagaMetadataCache[sagaType] = sagaMetadata = configuration.GetMetadata();
+            }
+
+            return sagaMetadata;
         }
 
         /// <summary>
@@ -158,6 +150,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time when a timeout should occur.</param>
         protected internal void ScheduleTimeout(DateTime timeout)
         {
+            if (!CanScheduleTimeout)
+                throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
+
             if (Timeout.HasValue)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutAlreadyScheduled.FormatWith(GetType(), CorrelationId));
 

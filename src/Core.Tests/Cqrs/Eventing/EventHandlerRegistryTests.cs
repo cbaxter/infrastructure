@@ -62,6 +62,24 @@ namespace Test.Spark.Cqrs.Eventing
             }
 
             [Fact]
+            public void ThrowMappingExceptionIfNotAllHandleMethodsConfigured()
+            {
+                var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(FakeSagaWithMissingConfiguration));
+                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object, sagaStore.Object, new Lazy<IPublishCommands>(() => commandPublisher.Object)));
+
+                Assert.Equal(Exceptions.EventTypeNotConfigured.FormatWith(typeof(FakeSagaWithMissingConfiguration), typeof(FakeEvent)), ex.Message);
+            }
+
+            [Fact]
+            public void ThrowMappingExceptionIfSagaDoesNotHaveAtLeastOneInitiatingEvent()
+            {
+                var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(FakeSagaWithNoStartingEvent));
+                var ex = Assert.Throws<MappingException>(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object, sagaStore.Object, new Lazy<IPublishCommands>(() => commandPublisher.Object)));
+
+                Assert.Equal(Exceptions.SagaMustHaveAtLeastOneInitiatingEvent.FormatWith(typeof(FakeSagaWithNoStartingEvent)), ex.Message);
+            }
+
+            [Fact]
             public void DefaultMappingStrategyUsedWhenNoExplicitStrategyDefined()
             {
                 var typeLocator = new FakeTypeLocator(typeof(FakeEvent), typeof(ImplicitStrategyAggregate));
@@ -110,8 +128,32 @@ namespace Test.Spark.Cqrs.Eventing
                 { }
             }
 
+            private sealed class FakeSagaWithNoStartingEvent : Saga
+            {
+                protected override void Configure(SagaConfiguration saga)
+                {
+                    saga.CanHandle((FakeEvent e) => e.Id);
+                }
+
+                [UsedImplicitly]
+                public void Handle(FakeEvent e)
+                { }
+            }
+
+            private sealed class FakeSagaWithMissingConfiguration : Saga
+            {
+                protected override void Configure(SagaConfiguration saga)
+                { }
+
+                [UsedImplicitly]
+                public void Handle(FakeEvent e)
+                { }
+            }
+
             public sealed class FakeEvent : Event
-            { }
+            {
+                public Guid Id { get; set; }
+            }
         }
 
         public class WhenGettingHandlers

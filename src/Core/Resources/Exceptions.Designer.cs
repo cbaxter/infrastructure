@@ -612,6 +612,16 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A saga timeout cannot be scheduled because the saga does not handle the Timeout event.
+        ///Saga Type: {0}.
+        /// </summary>
+        internal static string SagaTimeoutNotHandled {
+            get {
+                return ResourceManager.GetString("SagaTimeoutNotHandled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No saga timeout has not been scheduled; unable to clear saga timeout.
         ///Saga Type: {0}
         ///Saga Id: {1}.
