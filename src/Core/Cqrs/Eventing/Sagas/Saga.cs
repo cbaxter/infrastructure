@@ -186,9 +186,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time when a timeout should occur.</param>
         protected void RescheduleTimeout(DateTime timeout)
         {
-            if (Timeout.HasValue)
-                ClearTimeout();
-
+            ClearTimeout();
             ScheduleTimeout(timeout);
         }
 

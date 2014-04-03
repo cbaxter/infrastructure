@@ -268,18 +268,13 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
 
             [Fact]
-            public void CanRescheduleIfTimeoutNotAlreadyScheduled()
+            public void CannotRescheduleIfTimeoutNotAlreadyScheduled()
             {
                 var e = new FakeEvent();
                 var saga = new FakeSaga { Timeout = null };
 
-                using (var context = new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
-                {
-                    saga.Handle(e);
-
-                    Assert.NotNull(saga.Timeout);
-                    Assert.True(context.TimeoutChanged);
-                }
+                using (new SagaContext(typeof(Saga), GuidStrategy.NewGuid(), e))
+                    Assert.Throws<InvalidOperationException>(() => saga.Handle(e));
             }
 
             private class FakeSaga : Saga
