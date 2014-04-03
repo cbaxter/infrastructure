@@ -21,7 +21,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     /// <summary>
     /// Represents an <see cref="Event"/> handler method executor associated with a given <see cref="Saga"/>.
     /// </summary>
-    public sealed class SagaEventHandler : EventHandler
+    public class SagaEventHandler : EventHandler
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly Lazy<IPublishCommands> lazyCommandPublisher;
@@ -35,7 +35,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaMetadata">The saga metadata associated with this saga event handler.</param>
         /// <param name="sagaStore">The saga store used to load/save saga state.</param>
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
-        public SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
+        internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
             : this(eventHandler, sagaMetadata, sagaStore, commandPublisher, Settings.SagaStore)
         { }
 
@@ -61,16 +61,17 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Invokes the underlying <see cref="Saga"/> event handler method using the specified <paramref name="context"/>.
+        /// Invokes the underlying <see cref="Saga"/> event handler method using the specified event <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The current event context.</param>
         public override void Handle(EventContext context)
         {
-            var sagaId = sagaMetadata.GetCorrelationId(context.Event);
+            Verify.NotNull(context, "context");
 
+            var sagaId = sagaMetadata.GetCorrelationId(context.Event);
             using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
             {
-                UpdateSaga(sagaContext);
+                Handle(sagaContext);
 
                 var commandPublisher = lazyCommandPublisher.Value;
                 foreach (var sagaCommand in sagaContext.GetPublishedCommands())
@@ -82,7 +83,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Invokes the underlying <see cref="Saga"/> event handler method using the current saga <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The current saga context.</param>
-        private void UpdateSaga(SagaContext context)
+        private void Handle(SagaContext context)
         {
             var e = context.Event;
             var sagaId = context.SagaId;
@@ -93,7 +94,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 Log.TraceFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
 
-                Executor(saga, e);
+                HandleSagaEvent(saga, e);
 
                 Log.Trace("Saving saga state");
 
@@ -105,6 +106,16 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
             }
+        }
+
+        /// <summary>
+        /// Handles the <paramref name="saga"/> event.
+        /// </summary>
+        /// <param name="saga">The saga instance handling the event.</param>
+        /// <param name="e">The event to be handled.</param>
+        protected virtual void HandleSagaEvent(Saga saga, Event e)
+        {
+            Executor(saga, e);
         }
 
         /// <summary>

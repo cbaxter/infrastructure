@@ -110,6 +110,7 @@
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHookTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaConfigurationTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandlerTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandlerTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadataTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaRefereneTets.cs" />

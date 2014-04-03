@@ -33,6 +33,7 @@ namespace Spark.Example.Sagas
             saga.CanStartWith((MoneyTransferReceived e) => e.TransferId);
             saga.CanHandle((MoneyTransferRefunded e) => e.TransferId);
             saga.CanHandle((MoneyTransferFailed e) => e.TransferId);
+            saga.CanHandle((Timeout e) => e.SagaId);
         }
 
         public void Handle(MoneyTransferSent e)
@@ -80,7 +81,7 @@ namespace Spark.Example.Sagas
             }
         }
 
-        protected override void OnTimeout(Timeout e)
+        public void Handle(Timeout e)
         {
             if (MoneySent && !MoneyReceived && !MoneyRefunded)
             {

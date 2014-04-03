@@ -63,11 +63,11 @@ namespace Test.Spark.Cqrs.Eventing
         public class WhenHandlingEventContext
         {
             [Fact]
-            public void ContextCanBeNull()
+            public void ContextCannotBeNull()
             {
                 var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (h, e) => { }, () => new Object());
 
-                Assert.DoesNotThrow(() => eventHandler.Handle(null));
+                Assert.Throws<ArgumentNullException>(() => eventHandler.Handle(null));
             }
 
             [Fact]

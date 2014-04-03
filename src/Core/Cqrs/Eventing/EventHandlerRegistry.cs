@@ -119,11 +119,15 @@ namespace Spark.Cqrs.Eventing
                 foreach (var handleMethod in handleMethods)
                 {
                     List<EventHandler> eventHandlers;
-                    if (!knownEventHandlers.TryGetValue(handleMethod.Key, out eventHandlers))
-                        knownEventHandlers.Add(handleMethod.Key, eventHandlers = new List<EventHandler>());
+                    Type eventType = handleMethod.Key;
+                    if (!knownEventHandlers.TryGetValue(eventType, out eventHandlers))
+                        knownEventHandlers.Add(eventType, eventHandlers = new List<EventHandler>());
 
-                    var eventHandler = new EventHandler(handlerType, handleMethod.Key, handleMethod.Value, GetHandlerFactory(handlerType, serviceProvider));
-                    eventHandlers.Add(typeof(Saga).IsAssignableFrom(handlerType) ? new SagaEventHandler(eventHandler, sagaMetadata, sagaStore, commandPublisher) : eventHandler);
+                    var eventHandler = new EventHandler(handlerType, eventType, handleMethod.Value, GetHandlerFactory(handlerType, serviceProvider));
+                    if (sagaMetadata != null)
+                        eventHandler = eventType == typeof(Timeout) ? new SagaTimeoutHandler(eventHandler, sagaMetadata, sagaStore, commandPublisher) : new SagaEventHandler(eventHandler, sagaMetadata, sagaStore, commandPublisher);
+
+                    eventHandlers.Add(eventHandler);
                 }
             }
 

@@ -101,8 +101,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             var configuration = new SagaConfiguration(GetType());
 
-            configuration.CanHandle((Timeout e) => e.SagaId);
-
             Configure(configuration);
 
             return configuration.GetMetadata();
@@ -126,7 +124,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Mark this saga instance as completed.
         /// </summary>
-        protected void MarkCompleted()
+        protected internal void MarkCompleted()
         {
             Completed = true;
             Log.Trace("Saga completed");
@@ -135,7 +133,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Clear an existing scheduled timeout.
         /// </summary>
-        protected void ClearTimeout()
+        protected internal void ClearTimeout()
         {
             if (!Timeout.HasValue)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
@@ -149,7 +147,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        protected void ScheduleTimeout(TimeSpan timeout)
+        protected internal void ScheduleTimeout(TimeSpan timeout)
         {
             ScheduleTimeout(SystemTime.Now.Add(timeout));
         }
@@ -158,7 +156,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        protected void ScheduleTimeout(DateTime timeout)
+        protected internal void ScheduleTimeout(DateTime timeout)
         {
             if (Timeout.HasValue)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutAlreadyScheduled.FormatWith(GetType(), CorrelationId));
@@ -175,7 +173,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        protected void RescheduleTimeout(TimeSpan timeout)
+        protected internal void RescheduleTimeout(TimeSpan timeout)
         {
             RescheduleTimeout(DateTime.UtcNow.Add(timeout));
         }
@@ -184,7 +182,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        protected void RescheduleTimeout(DateTime timeout)
+        protected internal void RescheduleTimeout(DateTime timeout)
         {
             ClearTimeout();
             ScheduleTimeout(timeout);
@@ -280,34 +278,6 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             return result;
         }
-
-        /// <summary>
-        /// Handle saga timeout.
-        /// </summary>
-        /// <param name="e">The saga timeout event.</param>
-        [HandleMethod]
-        public void Handle(Timeout e)
-        {
-            if (Timeout.HasValue && Timeout.Value == e.Scheduled)
-            {
-                ClearTimeout();
-                OnTimeout(e);
-            }
-            else
-            {
-                if (Timeout.HasValue)
-                    Log.WarnFormat("Unexpected timeout received for {0} when scheduled timeout is for {1}", e, Timeout.Value);
-                else
-                    Log.WarnFormat("Unexpected timeout received for {0} when no timeout is scheduled", e);
-            }
-        }
-
-        /// <summary>
-        /// When overriden, handles a saga timeout event.
-        /// </summary>
-        /// <param name="e">The saga timeout event.</param>
-        protected virtual void OnTimeout(Timeout e)
-        { }
 
         /// <summary>
         /// Returns the saga description for this instance.

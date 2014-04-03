@@ -11,7 +11,6 @@ using Spark.Cqrs.Eventing.Mappings;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Resources;
 using Xunit;
-//using EventHandler = Spark.Infrastructure.Eventing.Mappings.EventHandlerAttribute;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -195,7 +194,12 @@ namespace Test.Spark.Cqrs.Eventing
                     saga.CanStartWith((FakeEvent e) => Guid.Empty);
                     saga.CanStartWith((AlternateFakeEvent e) => Guid.Empty);
                     saga.CanStartWith((DerivedFakeEvent e) => Guid.Empty);
+                    saga.CanHandle((Timeout e) => Guid.Empty);
                 }
+
+                [UsedImplicitly]
+                public void Handle(Timeout e)
+                { }
 
                 [UsedImplicitly]
                 public void Handle(FakeEvent e)
@@ -217,7 +221,12 @@ namespace Test.Spark.Cqrs.Eventing
                     saga.CanStartWith((FakeEvent e) => Guid.Empty);
                     saga.CanStartWith((AlternateFakeEvent e) => Guid.Empty);
                     saga.CanStartWith((DerivedFakeEvent e) => Guid.Empty);
+                    saga.CanHandle((Timeout e) => Guid.Empty);
                 }
+
+                [UsedImplicitly]
+                public void Handle(Timeout e)
+                { }
 
                 [UsedImplicitly]
                 public void Handle(FakeEvent e)

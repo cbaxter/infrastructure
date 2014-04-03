@@ -77,6 +77,7 @@
     <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandler.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCache.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialect.cs" />

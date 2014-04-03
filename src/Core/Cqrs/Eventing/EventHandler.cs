@@ -47,7 +47,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="eventType">The event type.</param>
         /// <param name="executor">The event handler executor.</param>
         /// <param name="eventHandlerFactory">The event handler factory.</param>
-        public EventHandler(Type handlerType, Type eventType, Action<Object, Event> executor, Func<Object> eventHandlerFactory)
+        internal EventHandler(Type handlerType, Type eventType, Action<Object, Event> executor, Func<Object> eventHandlerFactory)
         {
             Verify.NotNull(executor, "executor");
             Verify.NotNull(eventType, "eventType");
@@ -81,8 +81,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="context">The current event context.</param>
         public virtual void Handle(EventContext context)
         {
-            if (context == null)
-                return;
+            Verify.NotNull(context, "context");
 
             Executor.Invoke(eventHandlerFactory(), context.Event);
         }
