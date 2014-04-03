@@ -180,13 +180,10 @@ namespace Spark.Threading
             var partitionId = partitionHash(task);
             var partition = default(Partition);
 
-            if (!partitions.TryGetValue(partitionId, out partition))
+            lock (partitions)
             {
-                lock (partitions)
-                {
-                    if (!partitions.TryGetValue(partitionId, out partition))
-                        partitions.Add(partitionId, partition = new Partition(partitionId));
-                }
+                if (!partitions.TryGetValue(partitionId, out partition))
+                    partitions.Add(partitionId, partition = new Partition(partitionId));
             }
 
             return partition;
