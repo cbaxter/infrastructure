@@ -1,4 +1,5 @@
 ﻿using System;
+using Spark.Logging;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -20,6 +21,7 @@ namespace Spark.Cqrs.Eventing
     /// </summary>
     public class EventHandler
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private readonly Func<Object> eventHandlerFactory;
         private readonly Action<Object, Event> executor;
         private readonly Type handlerType;
@@ -82,6 +84,8 @@ namespace Spark.Cqrs.Eventing
         public virtual void Handle(EventContext context)
         {
             Verify.NotNull(context, "context");
+
+            Log.TraceFormat("{0} handling event {0}", handlerType, context.Event);
 
             Executor.Invoke(eventHandlerFactory(), context.Event);
         }

@@ -92,7 +92,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (saga != null)
             {
-                Log.TraceFormat("Handling event {0} on saga {1}-{2}", context.Event, sagaType, sagaId);
+                Log.TraceFormat("{0} handling event {1}", saga, context.Event);
 
                 HandleSagaEvent(saga, e);
 
@@ -104,7 +104,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
             else
             {
-                Log.TraceFormat("Saga {0} is not initiated by event {1}", sagaType, context.Event);
+                Log.TraceFormat("{0} - {1} cannot be initiated by event {2}", sagaType, sagaId, context.Event);
             }
         }
 

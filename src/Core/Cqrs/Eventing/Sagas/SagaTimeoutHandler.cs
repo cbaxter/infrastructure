@@ -43,18 +43,23 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The event to be handled.</param>
         protected override void HandleSagaEvent(Saga saga, Event e)
         {
-            var timeout = saga.Timeout;
-            if (timeout.HasValue && timeout.Value == ((Timeout)e).Scheduled)
+            var timeout = ((Timeout)e).Scheduled;
+
+            if (saga.Timeout.HasValue)
             {
-                saga.ClearTimeout();
-                base.HandleSagaEvent(saga, e);
+                if (saga.Timeout.Value == timeout)
+                {
+                    saga.ClearTimeout();
+                    base.HandleSagaEvent(saga, e);
+                }
+                else
+                {
+                    Log.WarnFormat("{0} received unexpected timeout at {1} when scheduled timeout is for {2}", saga, timeout.ToString(DateTimeFormat.RoundTrip), saga.Timeout.Value.ToString(DateTimeFormat.RoundTrip));
+                }
             }
             else
             {
-                if (timeout.HasValue)
-                    Log.WarnFormat("Unexpected timeout received for {0} when scheduled timeout is for {1}", e, timeout.Value);
-                else
-                    Log.WarnFormat("Unexpected timeout received for {0} when no timeout is scheduled", e);
+                Log.WarnFormat("{0} received unexpected timeout at {1} when no timeout is scheduled", saga, timeout.ToString(DateTimeFormat.RoundTrip));
             }
         }
     }

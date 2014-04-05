@@ -39,7 +39,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         [IgnoreDataMember]
         private Boolean CanScheduleTimeout { get; set; }
-        
+
         /// <summary>
         /// The saga correlation identifier associated with this saga instance.
         /// </summary>
@@ -277,9 +277,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Returns the saga description for this instance.
         /// </summary>
-        public override string ToString()
+        public override String ToString()
         {
-            return String.Format("{0} - {1}", GetType(), CorrelationId);
+            return String.Concat(GetType(), " - ", CorrelationId);
         }
     }
 }
