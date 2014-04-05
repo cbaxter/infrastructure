@@ -116,7 +116,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Mark this saga instance as completed.
         /// </summary>
-        protected internal void MarkCompleted()
+        public void MarkCompleted()
         {
             Completed = true;
             Log.Trace("Saga completed");
@@ -125,7 +125,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Clear an existing scheduled timeout.
         /// </summary>
-        protected internal void ClearTimeout()
+        public void ClearTimeout()
         {
             if (!Timeout.HasValue)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
@@ -139,7 +139,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        protected internal void ScheduleTimeout(TimeSpan timeout)
+        public void ScheduleTimeout(TimeSpan timeout)
         {
             ScheduleTimeout(SystemTime.Now.Add(timeout));
         }
@@ -148,7 +148,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        protected internal void ScheduleTimeout(DateTime timeout)
+        public void ScheduleTimeout(DateTime timeout)
         {
             if (!CanScheduleTimeout)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
@@ -168,16 +168,16 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        protected internal void RescheduleTimeout(TimeSpan timeout)
+        public void RescheduleTimeout(TimeSpan timeout)
         {
-            RescheduleTimeout(DateTime.UtcNow.Add(timeout));
+            RescheduleTimeout(SystemTime.Now.Add(timeout));
         }
 
         /// <summary>
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        protected internal void RescheduleTimeout(DateTime timeout)
+        public void RescheduleTimeout(DateTime timeout)
         {
             ClearTimeout();
             ScheduleTimeout(timeout);

@@ -132,7 +132,7 @@ namespace Spark.Cqrs.Commanding
         /// Gets the set of <see cref="Event"/> instances raised within the current <see cref="CommandContext"/>.
         /// </summary>
         /// <returns></returns>
-        internal EventCollection GetRaisedEvents()
+        public EventCollection GetRaisedEvents()
         {
             Verify.NotDisposed(this, disposed);
 

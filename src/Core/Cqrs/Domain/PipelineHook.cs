@@ -80,6 +80,7 @@ namespace Spark.Cqrs.Domain
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     /// <summary>
     /// Represents a defered saga command to be published once saga state has been updated successfully.
     /// </summary>
-    internal sealed class SagaCommand
+    public sealed class SagaCommand
     {
         private readonly IEnumerable<Header> headers;
         private readonly Guid aggregateId;

@@ -78,6 +78,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

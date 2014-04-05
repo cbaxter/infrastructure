@@ -61,7 +61,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// The <see cref="Event"/> associated with this <see cref="SagaContext"/>.
         /// </summary>
         public Event Event { get { return @event; } }
-        
+
         /// <summary>
         /// Initalizes a new instance of <see cref="SagaContext"/> with the specified <paramref name="sagaType"/> and <paramref name="sagaId"/>.
         /// </summary>
@@ -119,7 +119,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Gets the set of <see cref="Message{CommandEnvelope}"/> instances published within the current <see cref="SagaContext"/>.
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<SagaCommand> GetPublishedCommands()
+        public IEnumerable<SagaCommand> GetPublishedCommands()
         {
             return publishedCommands ?? Enumerable.Empty<SagaCommand>();
         }
