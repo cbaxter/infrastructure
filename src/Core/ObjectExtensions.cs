@@ -42,45 +42,13 @@ namespace Spark
         }
 
         /// <summary>
-        /// Creates a new <see cref="Array"/> containing <paramref name="item"/>.
+        /// Wraps the specified <paramref name="item"/> in an <see cref="Array"/> for enumeration.
         /// </summary>
         /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
         /// <param name="item">The singleton element to be added to the <see cref="Array"/>.</param>
-        public static T[] AsArray<T>(this T item)
+        public static IEnumerable<T> ToEnumerable<T>(this T item)
         {
             return new[] { item };
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="List{T}"/> containing <paramref name="item"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
-        /// <param name="item">The singleton element to be added to the <see cref="List{T}"/>.</param>
-        public static List<T> AsList<T>(this T item)
-        {
-            return new List<T> { item };
-        }
-
-        /// <summary>
-        /// Returns a lowercase <see cref="String"/> which represents the object instance using invariant culture casing rules.
-        /// </summary>
-        /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
-        /// <param name="item">The object to convert to a lowercase invariant string.</param>
-        public static String ToLowerInvariant<T>(this T item)
-            where T : class
-        {
-            return ReferenceEquals(item, null) ? null : item.ToString().ToLowerInvariant();
-        }
-
-        /// <summary>
-        /// Returns a uppercase <see cref="String"/> which represents the object instance using invariant culture casing rules.
-        /// </summary>
-        /// <typeparam name="T">The type of <paramref name="item"/>.</typeparam>
-        /// <param name="item">The object to convert to a uppercase invariant string.</param>
-        public static String ToUpperInvariant<T>(this T item)
-            where T : class
-        {
-            return ReferenceEquals(item, null) ? null : item.ToString().ToUpperInvariant();
         }
     }
 }

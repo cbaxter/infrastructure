@@ -50,61 +50,15 @@ namespace Test.Spark
             }
         }
 
-        public class WhenConvertingToArray
+        public class WhenConvertingToEnumerable
         {
             [Fact]
             public void WrapObjectInArray()
             {
                 var value = new Object();
-                var result = value.AsArray();
+                var result = value.ToEnumerable();
 
-                Assert.Equal(1, result.Length);
-                Assert.Same(value, result[0]);
-            }
-        }
-
-        public class WhenConvertingToList
-        {
-            [Fact]
-            public void WrapObjectInList()
-            {
-                var value = new Object();
-                var result = value.AsList();
-
-                Assert.Equal(1, result.Count);
-                Assert.Same(value, result[0]);
-            }
-        }
-
-        public class WhenConvertingToLowerString
-        {
-            [Fact]
-            public void ReturnNullIfStringNull()
-            {
-                Assert.Null(default(Object).ToLowerInvariant());
-            }
-
-            [Fact]
-            public void ReturnLowerCaseStringIfNotNull()
-            {
-                Object value = "MyPascalCaseString";
-                Assert.Equal("mypascalcasestring", value.ToLowerInvariant());
-            }
-        }
-
-        public class WhenConvertingToUpperString
-        {
-            [Fact]
-            public void ReturnNullIfStringNull()
-            {
-                Assert.Null(default(Object).ToUpperInvariant());
-            }
-
-            [Fact]
-            public void ReturnLowerCaseStringIfNotNull()
-            {
-                Object value = "MyPascalCaseString";
-                Assert.Equal("MYPASCALCASESTRING", value.ToUpperInvariant());
+                Assert.IsType(typeof(Object[]), result);
             }
         }
     }

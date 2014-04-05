@@ -70,7 +70,7 @@ namespace Test.Spark.Messaging
             public void ReturnHeaderValueIfSpecified()
             {
                 var header = new Header(Header.Origin, "ServerName", checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal("ServerName", headers.GetOrigin());
             }
@@ -92,19 +92,19 @@ namespace Test.Spark.Messaging
             public void ReturnCurrentSystemTimeIfHeaderValueNull()
             {
                 var header = new Header(Header.Timestamp, null, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
                 Assert.Equal(now, headers.GetTimestamp());
             }
-            
+
             [Fact]
             public void ReturnParsedDateTimeIfValueIsNotDateTime()
             {
                 var now = new DateTime(2013, 2, 10, 15, 58, 12);
                 var header = new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(now, headers.GetTimestamp());
             }
@@ -113,7 +113,7 @@ namespace Test.Spark.Messaging
             public void ReturnCurrentSystemTimeIfHeaderValueCannotBeParsed()
             {
                 var header = new Header(Header.Timestamp, "ServerName", checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
@@ -135,16 +135,16 @@ namespace Test.Spark.Messaging
             public void ReturnNoneIfHeaderValueNull()
             {
                 var header = new Header(Header.RemoteAddress, null, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.None, headers.GetRemoteAddress());
             }
-            
+
             [Fact]
             public void ReturnParsedAddressIfValueIsNotAddress()
             {
                 var header = new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.Loopback, headers.GetRemoteAddress());
             }
@@ -153,7 +153,7 @@ namespace Test.Spark.Messaging
             public void ReturnNoneeIfHeaderValueCannotBeParsed()
             {
                 var header = new Header(Header.RemoteAddress, "ServerName", checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.None, headers.GetRemoteAddress());
             }
@@ -173,7 +173,7 @@ namespace Test.Spark.Messaging
             public void ReturnNoneIfHeaderValueNull()
             {
                 var header = new Header(Header.UserAddress, null, checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.None, headers.GetUserAddress());
             }
@@ -182,7 +182,7 @@ namespace Test.Spark.Messaging
             public void ReturnParsedAddressIfValueIsNotAddress()
             {
                 var header = new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.Loopback, headers.GetUserAddress());
             }
@@ -191,7 +191,7 @@ namespace Test.Spark.Messaging
             public void ReturnNoneeIfHeaderValueCannotBeParsed()
             {
                 var header = new Header(Header.UserAddress, "ServerName", checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.None, headers.GetUserAddress());
             }
@@ -200,7 +200,7 @@ namespace Test.Spark.Messaging
             public void ReturnRemoteAddressIfUserAddressNotSpecified()
             {
                 var header = new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal(IPAddress.Loopback, headers.GetUserAddress());
             }
@@ -220,7 +220,7 @@ namespace Test.Spark.Messaging
             public void ReturnHeaderValueIfSpecified()
             {
                 var header = new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false);
-                var headers = new HeaderCollection(header.AsArray());
+                var headers = new HeaderCollection(header.ToEnumerable());
 
                 Assert.Equal("nbawdy@sparksoftware.net", headers.GetUserName());
             }
