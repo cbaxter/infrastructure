@@ -38,7 +38,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Returns <value>true</value> if the saga handles the <see cref="Timeout"/> event; otherwise <value>false</value>.
         /// </summary>
         [IgnoreDataMember]
-        private Boolean CanScheduleTimeout { get; set; }
+        private Boolean HandlesTimeout { get; set; }
 
         /// <summary>
         /// The saga correlation identifier associated with this saga instance.
@@ -51,6 +51,12 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         [IgnoreDataMember]
         public DateTime? Timeout { get; internal set; }
+
+        /// <summary>
+        /// Returns <value>true</value> if a <see cref="Timeout"/> is current scheduled; otherwise <value>false</value>.
+        /// </summary>
+        [IgnoreDataMember]
+        public Boolean TimeoutScheduled { get { return Timeout.HasValue; } }
 
         /// <summary>
         /// Returns <value>true</value> if this saga  instance has completed; otherwise <value>false</value>.
@@ -75,7 +81,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         protected Saga()
         {
-            CanScheduleTimeout = GetMetadata().CanHandle(typeof(Timeout));
+            HandlesTimeout = GetMetadata().CanHandle(typeof(Timeout));
         }
 
         /// <summary>
@@ -127,7 +133,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void ClearTimeout()
         {
-            if (!Timeout.HasValue)
+            if (!TimeoutScheduled)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
 
             Timeout = null;
@@ -150,10 +156,10 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time when a timeout should occur.</param>
         public void ScheduleTimeout(DateTime timeout)
         {
-            if (!CanScheduleTimeout)
+            if (!HandlesTimeout)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
 
-            if (Timeout.HasValue)
+            if (TimeoutScheduled)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutAlreadyScheduled.FormatWith(GetType(), CorrelationId));
 
             if (timeout.Kind != DateTimeKind.Utc)

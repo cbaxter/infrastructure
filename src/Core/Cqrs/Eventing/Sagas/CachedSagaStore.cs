@@ -119,7 +119,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             Verify.NotNull(saga, "saga");
             Verify.NotNull(context, "context");
 
-            var key = String.Concat(saga.GetType().FullName, "-", saga.CorrelationId.ToString());
+            var key = String.Concat(saga.GetType().FullName, "-", saga.CorrelationId);
             var copy = saga.Copy();
 
             try
