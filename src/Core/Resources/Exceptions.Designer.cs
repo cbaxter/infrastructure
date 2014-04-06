@@ -558,28 +558,6 @@ namespace Spark.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot aquire an additional lock until the current lock has been released.
-        ///Saga Type: {0}
-        ///Saga Id: {1}.
-        /// </summary>
-        internal static string SagaLockAlreadyHeld {
-            get {
-                return ResourceManager.GetString("SagaLockAlreadyHeld", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot release a lock that has not been aquired.
-        ///Saga Type: {0}
-        ///Saga Id: {1}.
-        /// </summary>
-        internal static string SagaLockNotHeld {
-            get {
-                return ResourceManager.GetString("SagaLockNotHeld", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Saga must have at least one initiating event.
         ///Saga Type: {0}.
         /// </summary>

@@ -29,8 +29,8 @@ namespace Spark.Example.Benchmarks
         {
             Console.WriteLine("Started @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", SystemTime.Now);
             Console.WriteLine();
-            Console.WriteLine("      Commands       Queries       Inserts       Updates       Deletes     Conflicts");
-            Console.WriteLine("------------------------------------------------------------------------------------");
+            Console.WriteLine("      Commands    Operations       Queries       Inserts       Updates       Deletes     Conflicts");
+            Console.WriteLine("--------------------------------------------------------------------------------------------------");
 
             commands = queries = inserts = updates = deletes = conflicts = totalCommands = totalQueries = totalInserts = totalUpdates = totalDeletes = totalConflicts = 0;
             timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
@@ -49,8 +49,9 @@ namespace Spark.Example.Benchmarks
             WriteStatisticsLine();
 
             // Build Line
-            Console.WriteLine("----------------------------------------------------------------------");
+            Console.WriteLine("--------------------------------------------------------------------------------------------------");
             line += totalCommands.ToString(CultureInfo.InvariantCulture).PadLeft(14);
+            line += (totalQueries + totalInserts + totalUpdates + totalDeletes).ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalQueries.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalInserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
             line += totalUpdates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
@@ -152,6 +153,7 @@ namespace Spark.Example.Benchmarks
             {
                 // Build Line
                 line += commands.ToString(CultureInfo.InvariantCulture).PadLeft(14);
+                line += (queries + inserts + updates + deletes).ToString(CultureInfo.InvariantCulture).PadLeft(14);
                 line += queries.ToString(CultureInfo.InvariantCulture).PadLeft(14);
                 line += inserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
                 line += updates.ToString(CultureInfo.InvariantCulture).PadLeft(14);

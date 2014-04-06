@@ -314,16 +314,6 @@ Saga Id: {1}</value>
     <value>Saga must have a single public default constructor.
 Saga Type: {0}</value>
   </data>
-  <data name="SagaLockAlreadyHeld" xml:space="preserve">
-    <value>Cannot aquire an additional lock until the current lock has been released.
-Saga Type: {0}
-Saga Id: {1}</value>
-  </data>
-  <data name="SagaLockNotHeld" xml:space="preserve">
-    <value>Cannot release a lock that has not been aquired.
-Saga Type: {0}
-Saga Id: {1}</value>
-  </data>
   <data name="SagaMustHaveAtLeastOneInitiatingEvent" xml:space="preserve">
     <value>Saga must have at least one initiating event.
 Saga Type: {0}</value>

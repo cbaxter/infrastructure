@@ -92,15 +92,9 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (saga != null)
             {
-                Log.TraceFormat("{0} handling event {1}", saga, context.Event);
-
                 HandleSagaEvent(saga, e);
 
-                Log.Trace("Saving saga state");
-
                 sagaStore.Save(saga, context);
-
-                Log.Trace("Saga state saved");
             }
             else
             {
@@ -115,6 +109,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The event to be handled.</param>
         protected virtual void HandleSagaEvent(Saga saga, Event e)
         {
+            Log.TraceFormat("{0} handling event {1}", saga, e);
+
             Executor(saga, e);
         }
 
