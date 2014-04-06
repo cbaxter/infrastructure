@@ -156,6 +156,28 @@ namespace Spark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot aquire an additional lock until the current lock has been released.
+        ///Aggregate Type: {0}
+        ///Aggregate Id: {1}.
+        /// </summary>
+        internal static string AggregateLockAlreadyHeld {
+            get {
+                return ResourceManager.GetString("AggregateLockAlreadyHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot release a lock that has not been aquired.
+        ///Aggregate Type: {0}
+        ///Aggregate Id: {1}.
+        /// </summary>
+        internal static string AggregateLockNotHeld {
+            get {
+                return ResourceManager.GetString("AggregateLockNotHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aggregate version must be greater than zero.
         ///Aggregate Type: {0}
         ///Aggregate Id: {1}.
@@ -554,6 +576,28 @@ namespace Spark.Resources {
         internal static string SagaDefaultConstructorRequired {
             get {
                 return ResourceManager.GetString("SagaDefaultConstructorRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot aquire an additional lock until the current lock has been released.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaLockAlreadyHeld {
+            get {
+                return ResourceManager.GetString("SagaLockAlreadyHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot release a lock that has not been aquired.
+        ///Saga Type: {0}
+        ///Saga Id: {1}.
+        /// </summary>
+        internal static string SagaLockNotHeld {
+            get {
+                return ResourceManager.GetString("SagaLockNotHeld", resourceCulture);
             }
         }
         

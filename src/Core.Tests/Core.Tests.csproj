@@ -104,12 +104,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Cqrs\Domain\PipelineHookTests.cs" />
+    <Compile Include="Cqrs\Domain\AggregateLockTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStoreTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\Dialects\SqlSagaStoreTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStoreTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHookTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaConfigurationTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaContextTests.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLockTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandlerTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaEventHandlerTests.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadataTests.cs" />

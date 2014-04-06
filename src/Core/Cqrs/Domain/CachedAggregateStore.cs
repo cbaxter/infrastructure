@@ -73,27 +73,20 @@ namespace Spark.Cqrs.Domain
         {
             Verify.NotNull(aggregateType, "aggregateType");
 
-            var key = String.Concat(aggregateType.FullName, "-", id.ToString());
-            var lazyValue = new Lazy<Aggregate>(() => LoadAggregate(aggregateType, id));
-            var cachedValue = memoryCache.AddOrGetExisting(key, lazyValue, CreateCacheItemPolicy());
+            var key = String.Concat(aggregateType.GetFullNameWithAssembly(), "-", id);
+            using (var aggregateLock = new AggregateLock(aggregateType, id))
+            {
+                aggregateLock.Aquire();
 
-            return cachedValue as Aggregate ?? (cachedValue as Lazy<Aggregate> ?? lazyValue).Value;
-        }
+                //NOTE: We do not want to use AddOrGetExisting due to internal global cache lock while doing aggregate lookup.
+                var aggregate = (Aggregate)memoryCache.Get(key);
+                if (aggregate == null)
+                    memoryCache.Add(key, aggregate = aggregateStore.Get(aggregateType, id), CreateCacheItemPolicy());
 
-        /// <summary>
-        /// Load the aggregate of the specified <paramref name="aggregateType"/> and aggregate <paramref name="id"/>.
-        /// </summary>
-        /// <param name="aggregateType">The type of aggregate to retrieve.</param>
-        /// <param name="id">The unique aggregate id.</param>
-        private Aggregate LoadAggregate(Type aggregateType, Guid id)
-        {
-            Aggregate aggregate;
-
-            Log.TraceFormat("Aggregate {0}-{1} not found in cache.", aggregateType, id);
-
-            aggregate = aggregateStore.Get(aggregateType, id);
-
-            return aggregate;
+                //NOTE: Given that aggregate state is only applied during `Save`, we can return the cached instance.
+                //      This avoids making a copy of the aggregate when no state changes will be applied.
+                return aggregate;
+            }
         }
 
         /// <summary>
@@ -106,21 +99,26 @@ namespace Spark.Cqrs.Domain
             Verify.NotNull(aggregate, "aggregate");
             Verify.NotNull(context, "context");
 
-            var key = String.Concat(aggregate.GetType().FullName, "-", aggregate.Id.ToString());
             var copy = aggregate.Copy();
-
-            try
+            var aggregateType = aggregate.GetType();
+            var key = String.Concat(aggregateType.GetFullNameWithAssembly(), "-", aggregate.Id);
+            using (var aggregateLock = new AggregateLock(aggregateType, aggregate.Id))
             {
-                var result = aggregateStore.Save(copy, context);
+                aggregateLock.Aquire();
 
-                memoryCache.Set(key, copy, CreateCacheItemPolicy());
+                try
+                {
+                    var result = aggregateStore.Save(copy, context);
 
-                return result;
-            }
-            catch (ConcurrencyException)
-            {
-                memoryCache.Remove(key);
-                throw;
+                    memoryCache.Set(key, copy, CreateCacheItemPolicy());
+
+                    return result;
+                }
+                catch (ConcurrencyException)
+                {
+                    memoryCache.Remove(key);
+                    throw;
+                }
             }
         }
 

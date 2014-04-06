@@ -76,11 +76,7 @@ namespace Spark.Cqrs.Commanding
 
             if (context.HasRaisedEvents)
             {
-                Log.Trace("Saving aggregate state");
-
                 aggregateStore.Save(aggregate, context);
-
-                Log.Trace("Aggregate state saved");
             }
             else
             {

@@ -83,21 +83,20 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Boolean TryGetSaga(Type type, Guid id, out Saga saga)
         {
             Verify.NotNull(type, "type");
-            
-            // Since we do not want to cache NULL values, we will simply use Get to check if the desired
-            // saga has already been cached; if not then we will call down to our delegate saga store to
-            // retrieve the desired saga instance and cache if the requested saga is found.
-            var key = String.Concat(type.FullName, "-", id.ToString());
 
-            saga = memoryCache.Get(key) as Saga;
-            if (saga == null && sagaStore.TryGetSaga(type, id, out saga))
+            var key = String.Concat(type.GetFullNameWithAssembly(), "-", id);
+            using (var sagaLock = new SagaLock(type, id))
             {
-                Log.TraceFormat("Saga {0}-{1} not found in cache.", type, id);
+                sagaLock.Aquire();
 
-                memoryCache.Set(key, saga, CreateCacheItemPolicy());
+                //NOTE: We do not want to cache a NULL saga reference, thus explicitly check for existance and add to cache if instance found.
+                saga = (Saga)memoryCache.Get(key);
+                if (saga == null && sagaStore.TryGetSaga(type, id, out saga))
+                    memoryCache.Add(key, saga, CreateCacheItemPolicy());
             }
 
-            return saga != null;
+            //NOTE: Given that saga state is modified during `Handling`, we must always return a copy of the cached instance.
+            return (saga == null ? null : saga = saga.Copy()) != null;
         }
 
         /// <summary>
@@ -119,24 +118,28 @@ namespace Spark.Cqrs.Eventing.Sagas
             Verify.NotNull(saga, "saga");
             Verify.NotNull(context, "context");
 
-            var key = String.Concat(saga.GetType().FullName, "-", saga.CorrelationId);
-            var copy = saga.Copy();
-
-            try
+            var sagaType = saga.GetType();
+            var key = String.Concat(sagaType.GetFullNameWithAssembly(), "-", saga.CorrelationId);
+            using (var sagaLock = new SagaLock(sagaType, saga.CorrelationId))
             {
-                sagaStore.Save(copy, context);
+                sagaLock.Aquire();
 
-                if (saga.Completed)
+                try
+                {
+                    sagaStore.Save(saga, context);
+
+                    if (saga.Completed)
+                        memoryCache.Remove(key);
+                    else
+                        memoryCache.Set(key, saga, CreateCacheItemPolicy());
+
+                    return saga;
+                }
+                catch (ConcurrencyException)
+                {
                     memoryCache.Remove(key);
-                else
-                    memoryCache.Set(key, copy, CreateCacheItemPolicy());
-
-                return copy;
-            }
-            catch (ConcurrencyException)
-            {
-                memoryCache.Remove(key);
-                throw;
+                    throw;
+                }
             }
         }
 

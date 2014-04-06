@@ -56,32 +56,6 @@ namespace Test.Spark.Cqrs.Domain
 
                 decoratedAggregateStore.Verify(mock => mock.Get(typeof(FakeAggregate), aggregate.Id), Times.Once());
             }
-
-            [Fact]
-            public void CanUnwrapLazyCachedValue()
-            {
-                var aggregate = new FakeAggregate();
-                var decoratedAggregateStore = new Mock<IStoreAggregates>();
-                var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
-                var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object, TimeSpan.FromMinutes(1), memoryCache);
-
-                memoryCache.Add(aggregate.CacheKey, new Lazy<Aggregate>(() => aggregate), new CacheItemPolicy());
-
-                Assert.DoesNotThrow(() => cachedAggregateStore.Get(typeof(FakeAggregate), aggregate.Id));
-            }
-
-            [Fact]
-            public void CanUseRawCachedValue()
-            {
-                var aggregate = new FakeAggregate();
-                var decoratedAggregateStore = new Mock<IStoreAggregates>();
-                var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
-                var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object, TimeSpan.FromMinutes(1), memoryCache);
-
-                memoryCache.Add(aggregate.CacheKey, new FakeAggregate(), new CacheItemPolicy());
-
-                Assert.DoesNotThrow(() => cachedAggregateStore.Get(typeof(FakeAggregate), aggregate.Id));
-            }
         }
 
         public class WhenSavingAggregate
@@ -156,7 +130,7 @@ namespace Test.Spark.Cqrs.Domain
 
         private class FakeAggregate : Aggregate
         {
-            public String CacheKey { get { return String.Concat(GetType().FullName, "-", Id.ToString()); } }
+            public String CacheKey { get { return String.Concat(GetType().GetFullNameWithAssembly(), "-", Id); } }
             public FakeAggregate() { Id = GuidStrategy.NewGuid(); }
         }
     }

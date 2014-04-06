@@ -75,11 +75,13 @@
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Cqrs\Domain\AggregateActivator.cs" />
     <Compile Include="Cqrs\Domain\EntityId.cs" />
+    <Compile Include="Cqrs\Domain\AggregateLock.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaActivator.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaLock.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandler.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCache.cs" />

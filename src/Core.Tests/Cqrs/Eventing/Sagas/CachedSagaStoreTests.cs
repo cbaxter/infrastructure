@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Caching;
 using Moq;
 using Spark;
 using Spark.Cqrs.Eventing;
@@ -80,6 +81,24 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 }
             }
 
+            [Fact]
+            public void AlwaysReturnCopyOfCachedSaga()
+            {
+                var sagaStore = new Mock<IStoreSagas>();
+                var sagaId = GuidStrategy.NewGuid();
+
+                using (var cachedSagaStore = new CachedSagaStore(sagaStore.Object))
+                {
+                    Saga cachedSaga = new FakeSaga(), result1, result2;
+                    
+                    sagaStore.Setup(mock => mock.TryGetSaga(typeof(Saga), sagaId, out cachedSaga)).Returns(true);
+
+                    Assert.True(cachedSagaStore.TryGetSaga(typeof(Saga), sagaId, out result1));
+                    Assert.True(cachedSagaStore.TryGetSaga(typeof(Saga), sagaId, out result2));
+                    Assert.NotSame(result1, result2);
+                }
+            }
+
             private class FakeSaga : Saga
             {
                 protected override void Configure(SagaConfiguration saga)
@@ -108,38 +127,18 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
         public class WhenSavingSaga
         {
             [Fact]
-            public void SagaStateCopiedBeforeSaving()
-            {
-                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid() };
-                var sagaStore = new Mock<IStoreSagas>();
-
-                using (var sagaContext = new SagaContext(typeof(FakeSaga), saga.CorrelationId, new FakeEvent()))
-                using (var cachedSagaStore = new CachedSagaStore(sagaStore.Object))
-                {
-                    cachedSagaStore.Save(saga, sagaContext);
-
-                    sagaStore.Verify(mock => mock.Save(It.Is<Saga>(copy => !ReferenceEquals(saga, copy)), sagaContext), Times.Once());
-                }
-            }
-
-            [Fact]
             public void SagaUpdatedAfterSaveIfNotCompleted()
             {
                 var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid() };
+                var memoryCache = new MemoryCache(Guid.NewGuid().ToString());
                 var sagaStore = new Mock<IStoreSagas>();
-                var sagaCopy = default(FakeSaga);
-                var cachedSaga = default(Saga);
 
                 using (var sagaContext = new SagaContext(typeof(FakeSaga), saga.CorrelationId, new FakeEvent()))
-                using (var cachedSagaStore = new CachedSagaStore(sagaStore.Object))
+                using (var cachedSagaStore = new CachedSagaStore(sagaStore.Object, TimeSpan.FromMinutes(1), memoryCache))
                 {
-                    sagaStore.Setup(mock => mock.Save(It.IsAny<Saga>(), sagaContext)).Callback((Saga s, SagaContext c) => { sagaCopy = (FakeSaga)s; });
-
                     cachedSagaStore.Save(saga, sagaContext);
 
-
-                    Assert.True(cachedSagaStore.TryGetSaga(typeof(FakeSaga), saga.CorrelationId, out cachedSaga));
-                    Assert.Same(sagaCopy, cachedSaga);
+                    Assert.Same(saga, memoryCache.Get(typeof(FakeSaga).GetFullNameWithAssembly() + '-' + saga.CorrelationId));
                 }
             }
 
