@@ -54,7 +54,7 @@ namespace Spark.Cqrs.Domain
             this.aggregateStore = aggregateStore;
             this.slidingExpiration = slidingExpiration;
         }
-        
+
         /// <summary>
         /// Releases all managed resources used by the current instance of the <see cref="CachedAggregateStore"/> class.
         /// </summary>
@@ -119,10 +119,6 @@ namespace Spark.Cqrs.Domain
             }
             catch (ConcurrencyException)
             {
-                // NOTE: Under normal configuration, this should not happen as commands against a specific
-                //       aggregate are serialized. If a concurrency exception is thrown, then the conflict
-                //       is likely at the persistence level and thus any cached instance of the aggregate 
-                //       should be purged and re-cached on subsequent `Get` call.
                 memoryCache.Remove(key);
                 throw;
             }

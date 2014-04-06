@@ -151,13 +151,10 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="id">The correlation id of the saga to be retrieved.</param>
         public Saga CreateSaga(Type type, Guid id)
         {
-            var saga = (Saga)Activator.CreateInstance(type);
-
-            saga.TypeId = GetSagaTypeId(type);
-            saga.CorrelationId = id;
-            saga.Version = 0;
-
-            return saga;
+            if (!typeToGuidMap.ContainsKey(type))
+                throw new KeyNotFoundException(Exceptions.UnknownSaga.FormatWith(type));
+            
+            return SagaActivator.CreateInstance(type, id);
         }
 
         /// <summary>
@@ -234,12 +231,13 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         private void InsertSaga(Saga saga)
         {
             var state = serializer.Serialize(saga);
+            var typeId = GetSagaTypeId(saga.GetType());
 
             using (var command = dialect.CreateCommand(dialect.InsertSaga))
             {
                 Log.TraceFormat("Starting new saga {0}", saga);
 
-                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
                 command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
                 command.Parameters.Add(dialect.CreateStateParameter(state));
@@ -258,12 +256,13 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         private void UpdateSaga(Saga saga)
         {
             var state = serializer.Serialize(saga);
+            var typeId = GetSagaTypeId(saga.GetType());
 
             using (var command = dialect.CreateCommand(dialect.UpdateSaga))
             {
                 Log.TraceFormat("Updating existing saga {0}", saga);
 
-                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
                 command.Parameters.Add(dialect.CreateVersionParameter(saga.Version));
                 command.Parameters.Add(dialect.CreateTimeoutParameter(saga.Timeout));
@@ -282,11 +281,13 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="saga">The saga instance to delete.</param>
         private void DeleteSaga(Saga saga)
         {
+            var typeId = GetSagaTypeId(saga.GetType());
+
             using (var command = dialect.CreateCommand(dialect.DeleteSaga))
             {
                 Log.TraceFormat("Completing existing saga {0}", saga);
 
-                command.Parameters.Add(dialect.CreateTypeIdParameter(saga.TypeId));
+                command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
                 command.Parameters.Add(dialect.CreateVersionParameter(saga.Version));
 
@@ -315,13 +316,11 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         private Saga CreateSaga(IDataRecord record)
         {
             var id = record.GetGuid(Column.Id);
-            var typeId = record.GetGuid(Column.TypeId);
             var version = record.GetInt32(Column.Version);
             var timeout = record.GetNullableDateTime(Column.Timeout);
             var saga = serializer.Deserialize<Saga>(record.GetBytes(Column.State));
 
             saga.CorrelationId = id;
-            saga.TypeId = typeId;
             saga.Version = version;
             saga.Timeout = timeout;
 

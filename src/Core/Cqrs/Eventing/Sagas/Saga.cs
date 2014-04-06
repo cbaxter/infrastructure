@@ -65,16 +65,10 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Boolean Completed { get; internal set; }
 
         /// <summary>
-        /// The saga version used to detect multi-node concurrency conflicts.
+        /// The saga revision used to detect concurrency conflicts.
         /// </summary>
         [IgnoreDataMember]
         public Int32 Version { get; internal set; }
-
-        /// <summary>
-        /// The saga type identifier (MD5 hash of saga <see cref="Type.FullName"/>).
-        /// </summary>
-        [IgnoreDataMember]
-        internal Guid TypeId { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Saga"/>.
@@ -122,7 +116,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Mark this saga instance as completed.
         /// </summary>
-        public void MarkCompleted()
+        protected void MarkCompleted()
         {
             Completed = true;
             Log.Trace("Saga completed");
@@ -131,7 +125,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Clear an existing scheduled timeout.
         /// </summary>
-        public void ClearTimeout()
+        protected internal void ClearTimeout()
         {
             if (!TimeoutScheduled)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotScheduled.FormatWith(GetType(), CorrelationId));
@@ -145,7 +139,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        public void ScheduleTimeout(TimeSpan timeout)
+        protected void ScheduleTimeout(TimeSpan timeout)
         {
             ScheduleTimeout(SystemTime.Now.Add(timeout));
         }
@@ -154,7 +148,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Scheduled a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        public void ScheduleTimeout(DateTime timeout)
+        protected void ScheduleTimeout(DateTime timeout)
         {
             if (!HandlesTimeout)
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
@@ -174,7 +168,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The time from now when a timeout should occur.</param>
-        public void RescheduleTimeout(TimeSpan timeout)
+        protected void RescheduleTimeout(TimeSpan timeout)
         {
             RescheduleTimeout(SystemTime.Now.Add(timeout));
         }
@@ -183,7 +177,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// Clear existing timeout if scheduled and schedule a new <paramref name="timeout"/>.
         /// </summary>
         /// <param name="timeout">The date/time when a timeout should occur.</param>
-        public void RescheduleTimeout(DateTime timeout)
+        protected void RescheduleTimeout(DateTime timeout)
         {
             ClearTimeout();
             ScheduleTimeout(timeout);

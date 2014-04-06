@@ -101,7 +101,9 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             if (saga.Timeout.HasValue && !saga.Completed)
             {
-                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, saga.Timeout.Value));
+                var timeout = saga.Timeout.Value;
+
+                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, timeout));
             }
             else
             {

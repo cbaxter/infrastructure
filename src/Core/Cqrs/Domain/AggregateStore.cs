@@ -97,9 +97,7 @@ namespace Spark.Cqrs.Domain
 
             if (snapshot == null)
             {
-                aggregate = (Aggregate)Activator.CreateInstance(aggregateType);
-                aggregate.Version = 0;
-                aggregate.Id = id;
+                aggregate = AggregateActivator.CreateInstance(aggregateType, id, 0);
             }
             else
             {

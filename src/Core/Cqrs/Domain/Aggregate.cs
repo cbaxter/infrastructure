@@ -32,7 +32,7 @@ namespace Spark.Cqrs.Domain
         private Guid checksum;
 
         /// <summary>
-        /// The aggregate revision.
+        /// The aggregate revision used to detect concurrency conflicts.
         /// </summary>
         [IgnoreDataMember]
         public Int32 Version { get { return version; } internal set { version = value; } }

@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Moq;
 using Spark;
-using Spark.Configuration;
 using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
 using Spark.Data;
+using Spark.Resources;
 using Spark.Serialization;
-using Test.Spark.Configuration;
 using Test.Spark.Data;
 using Xunit;
 
@@ -36,7 +33,9 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
     {
         public abstract class UsingInitializedSagaStore : IDisposable
         {
+            protected readonly SqlSagaStoreDialect Dialect = new SqlSagaStoreDialect(SqlServerConnection.Name);
             protected readonly Mock<ILocateTypes> TypeLocator = new Mock<ILocateTypes>();
+            protected readonly ISerializeObjects Serializer = new BinarySerializer();
             protected readonly SagaContext SagaContext;
             protected readonly IStoreSagas SagaStore;
             protected readonly Guid SagaId;
@@ -46,7 +45,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 SagaId = GuidStrategy.NewGuid();
                 SagaContext = new SagaContext(typeof(FakeSaga), SagaId, new FakeEvent());
                 TypeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(FakeSaga) });
-                SagaStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), TypeLocator.Object);
+                SagaStore = new SqlSagaStore(Dialect, Serializer, TypeLocator.Object);
                 SagaStore.Purge();
             }
 
@@ -130,14 +129,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
 
             [SqlServerFact]
-            public void TypeIdIsMD5HashOfSagaTypeFullName()
-            {
-                var saga = SagaStore.CreateSaga(typeof(FakeSaga), GuidStrategy.NewGuid());
-
-                Assert.Equal(Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), saga.TypeId);
-            }
-
-            [SqlServerFact]
             public void CorrelationIdIsSagaId()
             {
                 var sagaId = GuidStrategy.NewGuid();
@@ -172,7 +163,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             public void TimeoutContainsAllNonStateData()
             {
                 var timeout = DateTime.Now.AddMinutes(20);
-                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), Version = 0, Timeout = timeout };
+                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), Version = 0, Timeout = timeout };
 
                 SagaStore.Save(saga, SagaContext);
 
@@ -187,9 +178,18 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             public void ThrowKeyNotFoundIfSagaTypeUnknown()
             {
                 var timeout = DateTime.Now.AddMinutes(20);
-                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), TypeId = Guid.Empty, Version = 0, Timeout = timeout };
+                var saga = new FakeSaga { CorrelationId = GuidStrategy.NewGuid(), Version = 0, Timeout = timeout };
+                var state = Serializer.Serialize(saga);
 
-                SagaStore.Save(saga, SagaContext);
+                using (var command = Dialect.CreateCommand(Dialect.InsertSaga))
+                {
+                    command.Parameters.Add(Dialect.CreateTypeIdParameter(Guid.NewGuid()));
+                    command.Parameters.Add(Dialect.CreateIdParameter(saga.CorrelationId));
+                    command.Parameters.Add(Dialect.CreateTimeoutParameter(timeout));
+                    command.Parameters.Add(Dialect.CreateStateParameter(state));
+
+                    Dialect.ExecuteNonQuery(command);
+                }
 
                 Assert.Throws<KeyNotFoundException>(() => SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)));
             }
@@ -213,7 +213,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void IncrementVersionIfSaveSuccessful()
             {
-                var saga = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
+                var saga = new FakeSaga { CorrelationId = SagaId, Version = 0 };
                 var savedSaga = default(Saga);
 
                 SagaStore.Save(saga, SagaContext);
@@ -225,8 +225,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void ThrowConcurrencyExceptionIfSagaAlreadyExists()
             {
-                var saga1 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
-                var saga2 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
+                var saga1 = new FakeSaga { CorrelationId = SagaId, Version = 0 };
+                var saga2 = new FakeSaga { CorrelationId = SagaId, Version = 0 };
 
                 SagaStore.Save(saga1, SagaContext);
 
@@ -239,7 +239,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void IncrementVersionIfSaveSuccessful()
             {
-                var saga = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
+                var saga = new FakeSaga { CorrelationId = SagaId, Version = 0 };
                 var savedSaga = default(Saga);
 
                 SagaStore.Save(saga, SagaContext);
@@ -252,8 +252,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void ThrowConcurrencyExceptionIfSagaVersionOutOfSync()
             {
-                var saga1 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
-                var saga2 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 2 };
+                var saga1 = new FakeSaga { CorrelationId = SagaId, Version = 0 };
+                var saga2 = new FakeSaga { CorrelationId = SagaId, Version = 2 };
 
                 SagaStore.Save(saga1, SagaContext);
 
@@ -266,7 +266,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void RemoveSagaIfCompleted()
             {
-                var saga = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
+                var saga = new FakeSaga { CorrelationId = SagaId, Version = 0 };
                 var savedSaga = default(Saga);
 
                 SagaStore.Save(saga, SagaContext);
@@ -281,8 +281,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             [SqlServerFact]
             public void ThrowConcurrencyExceptionIfSagaVersionOutOfSync()
             {
-                var saga1 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 0 };
-                var saga2 = new FakeSaga { TypeId = Guid.Parse("389d0f68-cb37-1632-d79f-799bb6ffeec8"), CorrelationId = SagaId, Version = 2 };
+                var saga1 = new FakeSaga { CorrelationId = SagaId, Version = 0 };
+                var saga2 = new FakeSaga { CorrelationId = SagaId, Version = 2 };
 
                 SagaStore.Save(saga1, SagaContext);
 

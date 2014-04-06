@@ -53,7 +53,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Type SagaType { get { return sagaType; } }
 
         /// <summary>
-        /// The underlying saga <see cref="Type"/> associated with this <see cref="SagaContext"/>.
+        /// Indicates if the <see cref="Saga.Timeout"/> associated with this <see cref="SagaContext"/> has changed.
         /// </summary>
         public Boolean TimeoutChanged { get; internal set; }
 
@@ -73,7 +73,6 @@ namespace Spark.Cqrs.Eventing.Sagas
             Verify.NotNull(sagaType, "sagaType");
             Verify.NotNull(e, "e");
 
-            //this.publishedCommands = new List<SagaCommand>();
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;
             this.sagaType = sagaType;

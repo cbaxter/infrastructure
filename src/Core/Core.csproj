@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Spark.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -72,10 +73,12 @@
     <Compile Include="Configuration\SnapshotStoreElement.cs" />
     <Compile Include="Configuration\EventStoreElement.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Cqrs\Domain\AggregateActivator.cs" />
     <Compile Include="Cqrs\Domain\EntityId.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\CachedSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\HookableSagaStore.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\PipelineHook.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaActivator.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandler.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
