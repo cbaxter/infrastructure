@@ -254,8 +254,43 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void DispatchElapsedSagatTimeouts()
             {
                 timer.InvokeCallback();
-                
+
                 eventPublisher.Verify(mock => mock.Publish(It.IsAny<IEnumerable<Header>>(), It.IsAny<EventEnvelope>()), Times.Once());
+            }
+        }
+
+        public class WhenEnsuringElapsedTimeoutsDispatched : IDisposable
+        {
+            private readonly Mock<IPublishEvents> eventPublisher;
+            private readonly Mock<IStoreSagas> sagaStore;
+            private readonly DateTime now;
+            private FakeTimer timer;
+
+            public WhenEnsuringElapsedTimeoutsDispatched()
+            {
+                now = DateTime.UtcNow;
+                SystemTime.OverrideWith(() => now);
+                sagaStore = new Mock<IStoreSagas>();
+                eventPublisher = new Mock<IPublishEvents>();
+            }
+
+            public void Dispose()
+            {
+                SystemTime.ClearOverride();
+            }
+
+            [Fact]
+            public void RescheduleTimer()
+            {
+                var dispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
+
+                sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new SagaTimeout[0]);
+                eventPublisher.Setup(mock => mock.Publish(It.IsAny<IEnumerable<Header>>(), It.IsAny<EventEnvelope>())).Throws(new InvalidOperationException());
+                dispatcher.EnsureElapsedTimeoutsDispatched();
+                timer.InvokeCallback();
+
+                Assert.True(timer.Changed);
+                sagaStore.Verify(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>()), Times.Once());
             }
         }
 

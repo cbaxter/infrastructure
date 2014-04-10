@@ -51,7 +51,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
-            this.timer = new TimerWrapper(_ => OnTimerElapsed(), null, TimeSpan.Zero, System.Threading.Timeout.InfiniteTimeSpan);
+            this.timer = new TimerWrapper(_ => DispatchElapsedTimeouts(), null, System.Threading.Timeout.InfiniteTimeSpan, System.Threading.Timeout.InfiniteTimeSpan);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
-            this.timer = timer(OnTimerElapsed);
+            this.timer = timer(DispatchElapsedTimeouts);
         }
 
         /// <summary>
@@ -86,6 +86,17 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 timer.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Ensure any un-dispatched timeouts are processed before handling new timeouts.
+        /// </summary>
+        /// <remarks>
+        /// The dispatcher must be started after the IoC container has been built to ensure that any <see cref="Lazy{T}"/> circular dependencies can be resolved.
+        /// </remarks>
+        public void EnsureElapsedTimeoutsDispatched()
+        {
+            DispatchElapsedTimeouts();
         }
 
         /// <summary>
@@ -116,7 +127,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Publish any pending saga timeouts.
         /// </summary>
-        private void OnTimerElapsed()
+        private void DispatchElapsedTimeouts()
         {
             try
             {

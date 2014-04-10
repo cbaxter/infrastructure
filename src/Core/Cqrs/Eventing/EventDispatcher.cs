@@ -52,16 +52,17 @@ namespace Spark.Cqrs.Eventing
             this.eventStore = eventStore;
             this.eventPublisher = eventPublisher;
             this.markDispatched = settings.MarkDispatched;
-
-            EnsurePersistedCommitsDispatched();
         }
 
         /// <summary>
         /// Ensure any un-dispatched commits are processed before handling new commits.
         /// </summary>
-        private void EnsurePersistedCommitsDispatched()
+        /// <remarks>
+        /// The dispatcher must be started after the IoC container has been built to ensure that any <see cref="Lazy{T}"/> circular dependencies can be resolved.
+        /// </remarks>
+        public void EnsurePersistedCommitsDispatched()
         {
-            if (!markDispatched) 
+            if (!markDispatched)
                 return;
 
             foreach (var commit in eventStore.GetUndispatched())
@@ -98,7 +99,7 @@ namespace Spark.Cqrs.Eventing
             {
                 var e = events[i];
                 var version = new EventVersion(commit.Version, events.Count, i + 1);
-                
+
                 eventPublisher.Publish(commit.Headers, new EventEnvelope(commit.CorrelationId, commit.StreamId, version, e));
             }
 
