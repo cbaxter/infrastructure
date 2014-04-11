@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Spark.Cqrs.Domain;
@@ -35,7 +34,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeToJson()
             {
-                var entity = new TestAggregate();
+                var entity = TestAggregate.Create();
                 var json = WriteJson(entity);
 
                 Validate(json, @"
@@ -91,17 +90,16 @@ namespace Test.Spark.Serialization.Converters
             }
 
             [Fact]
-            public void Unnamed1()
+            public void DoNotWriteOutEntityCollectionItemTypeIfInstanceType()
             {
-                var entity = new TestAggregateWithEntityChildren();
+                var entity = new TestAggregateWithTestEntityChildren();
                 var json = WriteJson(entity);
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     },
@@ -116,16 +114,17 @@ namespace Test.Spark.Serialization.Converters
             }
 
             [Fact]
-            public void Unnamed2()
+            public void WriteOutEntityCollectionItemTypeIfNotInstanceType()
             {
-                var entity = new TestAggregateWithTestEntityChildren();
+                var entity = new TestAggregateWithEntityChildren();
                 var json = WriteJson(entity);
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     },
@@ -161,19 +160,19 @@ namespace Test.Spark.Serialization.Converters
       ""n"": ""My Entity""
     }
   ],
-  ""d"": 8.9,
+  ""d"": 8.8,
   ""f"": 456.7,
   ""i"": 123,
   ""n"": ""My Aggregate"",
   ""s"": 1,
   ""t"": ""2013-07-01T00:00:00""
 }");
-
+                Assert.NotNull(entity);
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);
                 Assert.Equal("My Aggregate", entity.Name);
                 Assert.Equal(123, entity.Number);
                 Assert.Equal(456.7, entity.Double);
-                Assert.Equal(8.9M, entity.Decimal);
+                Assert.Equal(8.8M, entity.Decimal);
                 Assert.Equal(TestEnum.Serialized, entity.Status);
                 Assert.Equal(DateTime.Parse("2013-07-01"), entity.Timestamp);
             }
@@ -215,7 +214,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanSerializeToBson()
             {
-                var entity = new TestAggregate();
+                var entity = TestAggregate.Create();
                 var bson = WriteBson(entity);
 
                 Validate(
@@ -272,17 +271,20 @@ namespace Test.Spark.Serialization.Converters
             [DataMember(Name = "s")]
             public TestEnum Status { get; set; }
 
-            public TestAggregate()
+            public static TestAggregate Create()
             {
-                Version = 10;
-                Id = Guid.Parse("8D5A1320-8B4E-4890-BA4E-02A8CF5D4F81");
-                Children = new EntityCollection<Entity> { new TestEntity() };
-                Timestamp = DateTime.Parse("2013-07-01");
-                Status = TestEnum.Serialized;
-                Name = "My Aggregate";
-                Decimal = 8.9M;
-                Double = 456.7;
-                Number = 123;
+                return new TestAggregate
+                {
+                    Version = 10, 
+                    Id = Guid.Parse("8D5A1320-8B4E-4890-BA4E-02A8CF5D4F81"), 
+                    Children = new EntityCollection<Entity> { new TestEntity() }, 
+                    Timestamp = DateTime.Parse("2013-07-01"), 
+                    Status = TestEnum.Serialized, 
+                    Name = "My Aggregate",
+                    Decimal = 8.9M, 
+                    Double = 456.7, 
+                    Number = 123
+                };
             }
         }
 

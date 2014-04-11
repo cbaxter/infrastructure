@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
+
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -14,7 +14,6 @@ using Newtonsoft.Json;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
-using Spark.Cqrs.Domain;
 
 namespace Spark.Serialization.Converters
 {
@@ -24,7 +23,6 @@ namespace Spark.Serialization.Converters
     public sealed class StateObjectConverter : JsonConverter
     {
         private const String TypePropertyName = "$type";
-        private const String ValuesPropertyName = "$values";
         private static readonly Type StateObjectType = typeof(StateObject);
 
         /// <summary>
@@ -108,29 +106,6 @@ namespace Spark.Serialization.Converters
             else
             {
                 WriteJson(writer, propertyType, stateObject, serializer);
-            }
-        }
-
-        private void WriteEntityCollection(JsonWriter writer, Type propertyType, IEnumerable<Entity> propertyValue, JsonSerializer serializer)
-        {
-            var instanceType = propertyValue.GetType();
-
-            if (instanceType == propertyType)
-            {
-                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
-            }
-            else
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName(TypePropertyName);
-                serializer.Serialize(writer, instanceType.GetFullNameWithAssembly());
-
-                writer.WritePropertyName(ValuesPropertyName);
-
-                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
-
-                writer.WriteEndObject();
             }
         }
 
