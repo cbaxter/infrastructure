@@ -25,8 +25,7 @@ namespace Spark.Cqrs.Eventing.Sagas
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
         private static readonly TimeSpan MinimumCacheDuration = TimeSpan.FromMinutes(5);
-        private readonly SortedDictionary<DateTime, HashSet<SagaReference>> sortedSagaTimeouts = new SortedDictionary<DateTime, HashSet<SagaReference>>();
-        private readonly Dictionary<SagaReference, SagaTimeout> scheduledSagaTimeouts = new Dictionary<SagaReference, SagaTimeout>();
+        private readonly SagaTimeoutCollection sagaTimeouts = new SagaTimeoutCollection();
         private readonly Object syncLock = new Object();
         private readonly TimeSpan timeoutCacheDuration;
         private readonly IStoreSagas sagaStore;
@@ -35,7 +34,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Get the current number of saga timeouts cached in this <see cref="SagaTimeoutCache"/> instance.
         /// </summary>
-        public Int32 Count { get { lock (syncLock) { return scheduledSagaTimeouts.Count; } } }
+        public Int32 Count { get { lock (syncLock) { return sagaTimeouts.Count; } } }
 
         /// <summary>
         /// Initializes a new instance of <see cref="SagaTimeoutCache"/>.
@@ -58,7 +57,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             lock (syncLock)
             {
-                return scheduledSagaTimeouts.Count > 0 ? sortedSagaTimeouts.First().Key : maximumCachedTimeout;
+                return sagaTimeouts.Count > 0 ? sagaTimeouts.First().Timeout : maximumCachedTimeout;
             }
         }
 
@@ -93,7 +92,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             foreach (var sagaTimeout in sagaStore.GetScheduledTimeouts(maximumCachedTimeout))
                 ScheduleTimeoutInternal(sagaTimeout);
 
-            Log.TraceFormat("Loaded {0} saga timeouts", scheduledSagaTimeouts.Count);
+            Log.TraceFormat("Loaded {0} saga timeouts", sagaTimeouts.Count);
         }
 
         /// <summary>
@@ -101,27 +100,28 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         private IEnumerable<SagaTimeout> GetAndClearElapsedSagaTimeouts()
         {
-            if (sortedSagaTimeouts.Count == 0)
-                return Enumerable.Empty<SagaTimeout>();
+            if (sagaTimeouts.Count == 0) return Enumerable.Empty<SagaTimeout>();
 
+            var elapsedTimeouts = GetElapsedSagaTimeouts().ToList();
+            foreach (var elapsedTimeout in elapsedTimeouts)
+                ClearTimeoutInternal(elapsedTimeout);
+
+            return elapsedTimeouts;
+        }
+
+        /// <summary>
+        /// Get the set of elapsed saga timeouts.
+        /// </summary>
+        private IEnumerable<SagaTimeout> GetElapsedSagaTimeouts()
+        {
             var now = SystemTime.Now;
-            var sagaReferences = sortedSagaTimeouts.Where(item => item.Key <= now).SelectMany(item => item.Value).ToArray();
-            if (sagaReferences.Length == 0)
-                return Enumerable.Empty<SagaTimeout>();
-
-            var sagaTimeouts = new List<SagaTimeout>(sagaReferences.Length);
-            foreach (var sagaReference in sagaReferences)
+            foreach (var sagaTimeout in sagaTimeouts)
             {
-                SagaTimeout sagaTimeout;
-                if (!scheduledSagaTimeouts.TryGetValue(sagaReference, out sagaTimeout))
-                    continue;
-
-                sagaTimeouts.Add(sagaTimeout);
-
-                ClearTimeoutInternal(sagaReference);
+                if (sagaTimeout.Timeout <= now)
+                    yield return sagaTimeout;
+                else
+                    yield break;
             }
-
-            return sagaTimeouts;
         }
 
         /// <summary>
@@ -146,18 +146,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaTimeout">The saga timeout to schedule.</param>
         private void ScheduleTimeoutInternal(SagaTimeout sagaTimeout)
         {
-            var sagaReference = new SagaReference(sagaTimeout.SagaType, sagaTimeout.SagaId);
-            var timeout = sagaTimeout.Timeout;
-
-            if (timeout >= maximumCachedTimeout)
-                return;
-
-            HashSet<SagaReference> sagaReferences;
-            if (!sortedSagaTimeouts.TryGetValue(timeout, out sagaReferences))
-                sortedSagaTimeouts.Add(timeout, sagaReferences = new HashSet<SagaReference>());
-
-            sagaReferences.Add(sagaReference);
-            scheduledSagaTimeouts[sagaReference] = sagaTimeout;
+            if (sagaTimeout.Timeout < maximumCachedTimeout)
+                sagaTimeouts.Add(sagaTimeout);
         }
 
         /// <summary>
@@ -182,19 +172,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaReference">The saga reference to clear a scheduled timeout.</param>
         private void ClearTimeoutInternal(SagaReference sagaReference)
         {
-            SagaTimeout sagaTimeout;
-            if (!scheduledSagaTimeouts.TryGetValue(sagaReference, out sagaTimeout))
-                return;
-
-            scheduledSagaTimeouts.Remove(sagaReference);
-
-            HashSet<SagaReference> sagaReferences;
-            if (!sortedSagaTimeouts.TryGetValue(sagaTimeout.Timeout, out sagaReferences))
-                return;
-
-            sagaReferences.Remove(sagaReference);
-            if (sagaReferences.Count == 0)
-                sortedSagaTimeouts.Remove(sagaTimeout.Timeout);
+            sagaTimeouts.Remove(sagaReference);
         }
 
         /// <summary>
@@ -205,8 +183,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             lock (syncLock)
             {
                 maximumCachedTimeout = DateTime.MinValue;
-                scheduledSagaTimeouts.Clear();
-                sortedSagaTimeouts.Clear();
+                sagaTimeouts.Clear();
             }
         }
     }

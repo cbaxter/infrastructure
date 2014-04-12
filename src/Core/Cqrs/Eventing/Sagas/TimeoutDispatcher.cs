@@ -114,7 +114,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 var timeout = saga.Timeout.Value;
 
-                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, timeout));
+                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.GetType(), saga.CorrelationId, timeout));
             }
             else
             {
@@ -176,7 +176,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             var eventPublisher = lazyEventPublisher.Value;
             foreach (var sagaTimeout in sagaTimeouts)
             {
-                var eventVersion = new EventVersion(sagaTimeout.Version, 1, 1);
+                var eventVersion = new EventVersion(Int32.MaxValue, 1, 1);
                 var e = new Timeout(sagaTimeout.SagaType, sagaTimeout.Timeout);
 
                 eventPublisher.Publish(HeaderCollection.Empty, new EventEnvelope(GuidStrategy.NewGuid(), sagaTimeout.SagaId, eventVersion, e));

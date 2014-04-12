@@ -170,7 +170,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 var sagaTimeout = SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)).Single();
                 Assert.Equal(saga.CorrelationId, sagaTimeout.SagaId);
                 Assert.Equal(saga.GetType(), sagaTimeout.SagaType);
-                Assert.Equal(saga.Version, sagaTimeout.Version);
                 Assert.Equal(saga.Timeout, sagaTimeout.Timeout);
             }
 

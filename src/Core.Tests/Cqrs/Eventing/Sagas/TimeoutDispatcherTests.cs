@@ -53,7 +53,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 sagaStore = new Mock<IStoreSagas>();
                 eventPublisher = new Mock<IPublishEvents>();
                 timeoutDispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
-                sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(5));
+                sagaTimeout = new SagaTimeout(typeof(FakeSaga), GuidStrategy.NewGuid(), now.AddMinutes(5));
 
                 SystemTime.OverrideWith(() => now);
 
@@ -220,7 +220,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 now = DateTime.UtcNow;
                 sagaStore = new Mock<IStoreSagas>();
                 eventPublisher = new Mock<IPublishEvents>();
-                sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(-5));
+                sagaTimeout = new SagaTimeout(typeof(FakeSaga), GuidStrategy.NewGuid(), now.AddMinutes(-5));
 
                 SystemTime.OverrideWith(() => now);
                 Assert.DoesNotThrow(() => new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback)));

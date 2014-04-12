@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using Moq;
 using Spark;
 using Spark.Cqrs.Commanding;
 using Spark.Cqrs.Eventing;
-using Spark.Cqrs.Eventing.Mappings;
 using Spark.Cqrs.Eventing.Sagas;
 using Spark.Messaging;
 using Xunit;

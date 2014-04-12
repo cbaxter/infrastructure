@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using Moq;
 using Spark;
@@ -37,8 +38,10 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        public class WhenGettingNextScheduledTimeout
+        public class WhenGettingNextScheduledTimeout : IDisposable
         {
+            public void Dispose() { SystemTime.ClearOverride(); }
+
             [Fact]
             public void ReturnDateTimeMinValIfCacheEmpty()
             {
@@ -57,8 +60,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
                 SystemTime.OverrideWith(() => now);
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { 
-                    new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, nextTimeout), 
-                    new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, nextTimeout.AddMinutes(5))
+                    new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), nextTimeout), 
+                    new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), nextTimeout.AddMinutes(5))
                 });
 
                 //NOTE: Because we are using an overriden SystemTime; the get will not actually clear out the cached items.
@@ -67,8 +70,10 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        public class WhenGettingElapsedTimeouts
+        public class WhenGettingElapsedTimeouts : IDisposable
         {
+            public void Dispose() { SystemTime.ClearOverride(); }
+
             [Fact]
             public void ReturnEmptySetIfNoTimeoutsCached()
             {
@@ -111,9 +116,9 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
                 SystemTime.OverrideWith(() => futureTime);
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { 
-                    new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(1)), 
-                    new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(5)), 
-                    new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(10))
+                    new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(),  now.AddMinutes(1)), 
+                    new SagaTimeout( typeof(Saga), GuidStrategy.NewGuid(), now.AddMinutes(5)), 
+                    new SagaTimeout( typeof(Saga),GuidStrategy.NewGuid(),  now.AddMinutes(10))
                 });
 
                 var elapsedTimeouts = cache.GetElapsedTimeouts().ToArray();
@@ -129,7 +134,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var futureTime = now.AddMinutes(10);
                 var sagaStore = new Mock<IStoreSagas>();
                 var cache = new SagaTimeoutCache(sagaStore.Object, TimeSpan.FromMinutes(5));
-                var sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, futureTime);
+                var sagaTimeout = new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), futureTime);
 
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
 
@@ -143,18 +148,20 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        public class WhenSchedulingTimeout
+        public class WhenSchedulingTimeout : IDisposable
         {
+            public void Dispose() { SystemTime.ClearOverride(); }
+
             [Fact]
             public void CachePendingTimeouts()
             {
                 var now = DateTime.UtcNow;
                 var sagaStore = new Mock<IStoreSagas>();
                 var cache = new SagaTimeoutCache(sagaStore.Object, TimeSpan.FromMinutes(5));
-                var sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(1));
+                var sagaTimeout = new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), now.AddMinutes(1));
 
-                sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
-                
+                sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new SagaTimeout[0]);
+
                 SystemTime.OverrideWith(() => now);
 
                 cache.GetElapsedTimeouts();
@@ -169,7 +176,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var now = DateTime.UtcNow;
                 var sagaStore = new Mock<IStoreSagas>();
                 var cache = new SagaTimeoutCache(sagaStore.Object, TimeSpan.FromMinutes(5));
-                var sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(10));
+                var sagaTimeout = new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), now.AddMinutes(10));
 
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
 
@@ -199,7 +206,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var now = DateTime.UtcNow;
                 var sagaStore = new Mock<IStoreSagas>();
                 var cache = new SagaTimeoutCache(sagaStore.Object, TimeSpan.FromMinutes(5));
-                var sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(Saga), 1, now.AddMinutes(10));
+                var sagaTimeout = new SagaTimeout(typeof(Saga), GuidStrategy.NewGuid(), now.AddMinutes(10));
 
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
 

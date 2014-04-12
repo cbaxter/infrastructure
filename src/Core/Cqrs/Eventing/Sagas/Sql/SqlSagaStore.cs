@@ -153,7 +153,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         {
             if (!typeToGuidMap.ContainsKey(type))
                 throw new KeyNotFoundException(Exceptions.UnknownSaga.FormatWith(type));
-            
+
             return SagaActivator.CreateInstance(type, id);
         }
 
@@ -333,7 +333,11 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="record">The record from which to create the new <see cref="Saga"/>.</param>
         private SagaTimeout CreateSagaTimeout(IDataRecord record)
         {
-            return new SagaTimeout(record.GetGuid(Column.Id), GetSagaType(record.GetGuid(Column.TypeId)), record.GetInt32(Column.Version), record.GetDateTime(Column.Timeout));
+            var id = record.GetGuid(Column.Id);
+            var typeId = record.GetGuid(Column.TypeId);
+            var timeout = record.GetDateTime(Column.Timeout);
+
+            return new SagaTimeout(GetSagaType(typeId), id, timeout);
         }
     }
 }
