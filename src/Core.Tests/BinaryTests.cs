@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark
 {
-    public static class UsingBinary
+    namespace UsingBinary
     {
         public class WhenCreatingBinary
         {

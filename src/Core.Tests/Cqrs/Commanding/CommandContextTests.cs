@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandContext
+    namespace UsingCommandContext
     {
         public class WhenCreatingNewContext
         {

@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
 {
-    public static class UsingSagaStoreWithSqlServer
+    namespace UsingSagaStoreWithSqlServer
     {
         public abstract class UsingInitializedSagaStore : IDisposable
         {
@@ -305,13 +305,13 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
         }
 
         [Serializable]
-        private class FakeSaga : Saga
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             { }
         }
 
-        public class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

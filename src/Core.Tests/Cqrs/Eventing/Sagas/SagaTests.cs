@@ -28,7 +28,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSaga
+    namespace UsingSaga
     {
         public class WhenCompletingSagas
         {
@@ -641,12 +641,12 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         {
             public Guid Id { get; set; }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         {
             public Guid Id { get; set; }
         }

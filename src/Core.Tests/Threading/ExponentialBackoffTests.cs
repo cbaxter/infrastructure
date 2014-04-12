@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Threading
 {
-    public static class UsingExponentialBackoff
+    namespace UsingExponentialBackoff
     {
         public class WhenCheckingCanRetry
         {

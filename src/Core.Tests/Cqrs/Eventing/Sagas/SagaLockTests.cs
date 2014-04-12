@@ -23,7 +23,7 @@ using Xunit;
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
     // ReSharper disable AccessToDisposedClosure
-    public static class UsingSagaLock
+    namespace UsingSagaLock
     {
         public class WhenAquiringSagaLock
         {

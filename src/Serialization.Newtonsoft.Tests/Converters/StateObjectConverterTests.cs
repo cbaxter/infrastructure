@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingStateObjectConverter
+    namespace UsingStateObjectConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
@@ -39,10 +39,10 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregate, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     }
@@ -64,9 +64,9 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityParent, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestEntity, Spark.Serialization.Newtonsoft.Tests"",
     ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
     ""n"": ""My Entity""
   }
@@ -81,7 +81,7 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityParent, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithTestEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
     ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
     ""n"": ""My Entity""
@@ -97,14 +97,14 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithTestEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     },
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+DerrivedEntity, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.DerrivedEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""a"": null,
       ""id"": ""3bdf361d-f577-4e01-801e-375b949fd14a"",
       ""n"": ""My Entity""
@@ -121,15 +121,15 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithEntityChildren, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     },
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+DerrivedEntity, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.DerrivedEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""a"": null,
       ""id"": ""3bdf361d-f577-4e01-801e-375b949fd14a"",
       ""n"": ""My Entity""
@@ -152,10 +152,10 @@ namespace Test.Spark.Serialization.Converters
             {
                 var entity = (TestAggregate)ReadJson<Entity>(@"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregate, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregate, Spark.Serialization.Newtonsoft.Tests"",
   ""c"": [
     {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestEntity, Spark.Serialization.Newtonsoft.Tests"",
       ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
       ""n"": ""My Entity""
     }
@@ -182,9 +182,9 @@ namespace Test.Spark.Serialization.Converters
             {
                 var entity = ReadJson<TestAggregateWithEntityParent>(@"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithEntityParent, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestEntity, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestEntity, Spark.Serialization.Newtonsoft.Tests"",
     ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
     ""n"": ""My Entity""
   }
@@ -198,7 +198,7 @@ namespace Test.Spark.Serialization.Converters
             {
                 var entity = ReadJson<TestAggregateWithTestEntityParent>(@"
 {
-  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter+TestAggregateWithTestEntityParent, Spark.Serialization.Newtonsoft.Tests"",
+  ""$type"": ""Test.Spark.Serialization.Converters.UsingStateObjectConverter.TestAggregateWithTestEntityParent, Spark.Serialization.Newtonsoft.Tests"",
   ""p"": {
     ""id"": ""8cb5f171-5505-4313-b8a8-0345d70cfb46"",
     ""n"": ""My Entity""
@@ -217,10 +217,7 @@ namespace Test.Spark.Serialization.Converters
                 var entity = TestAggregate.Create();
                 var bson = WriteBson(entity);
 
-                Validate(
-                    "fQEAAAIkdHlwZQByAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdTdGF0ZU9iamVjdENvbnZlcnRlcitUZXN0QWdncmVnYXRlLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABGMAsQAAAAMwAKkAAAACJHR5cGUAbwAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA",
-                    bson
-                );
+                Validate(bson, "fQEAAAIkdHlwZQByAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdTdGF0ZU9iamVjdENvbnZlcnRlci5UZXN0QWdncmVnYXRlLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABGMAsQAAAAMwAKkAAAACJHR5cGUAbwAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIuVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA");
             }
         }
 
@@ -229,7 +226,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "fQEAAAIkdHlwZQByAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdTdGF0ZU9iamVjdENvbnZlcnRlcitUZXN0QWdncmVnYXRlLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABGMAsQAAAAMwAKkAAAACJHR5cGUAbwAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIrVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA";
+                var bson = "fQEAAAIkdHlwZQByAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdTdGF0ZU9iamVjdENvbnZlcnRlci5UZXN0QWdncmVnYXRlLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMABGMAsQAAAAMwAKkAAAACJHR5cGUAbwAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nU3RhdGVPYmplY3RDb252ZXJ0ZXIuVGVzdEVudGl0eSwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAVpZAAQAAAABHHxtYwFVRNDuKgDRdcM+0YCbgAKAAAATXkgRW50aXR5AAAAAWQAzczMzMzMIUABZgAzMzMzM4t8QBJpAHsAAAAAAAAAAm4ADQAAAE15IEFnZ3JlZ2F0ZQAQcwABAAAACXQAAPvQmD8BAAAA";
                 var entity = (TestAggregate)ReadBson<Entity>(bson);
 
                 Assert.Equal("My Entity", entity.Children.Cast<TestEntity>().Single().Name);
@@ -242,13 +239,13 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public enum TestEnum
+        internal enum TestEnum
         {
             Unknown = 0,
             Serialized = 1
         }
 
-        public sealed class TestAggregate : Aggregate
+        internal sealed class TestAggregate : Aggregate
         {
             [DataMember(Name = "c")]
             public EntityCollection<Entity> Children { get; set; }
@@ -288,7 +285,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public sealed class TestAggregateWithEntityParent : Aggregate
+        internal sealed class TestAggregateWithEntityParent : Aggregate
         {
             [DataMember(Name = "p")]
             public Entity Parent { get; set; }
@@ -303,7 +300,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public sealed class TestAggregateWithTestEntityParent : Aggregate
+        internal sealed class TestAggregateWithTestEntityParent : Aggregate
         {
             [DataMember(Name = "p")]
             public TestEntity Parent { get; set; }
@@ -318,7 +315,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public sealed class TestAggregateWithEntityChildren : Aggregate
+        internal sealed class TestAggregateWithEntityChildren : Aggregate
         {
             [DataMember(Name = "c")]
             public EntityCollection<Entity> Children { get; set; }
@@ -330,7 +327,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public sealed class TestAggregateWithTestEntityChildren : Aggregate
+        internal sealed class TestAggregateWithTestEntityChildren : Aggregate
         {
             [DataMember(Name = "c")]
             private EntityCollection<TestEntity> Children { get; set; }
@@ -342,7 +339,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public class TestEntity : Entity
+        internal class TestEntity : Entity
         {
             [DataMember(Name = "n")]
             public String Name { get; set; }
@@ -354,7 +351,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public class DerrivedEntity : TestEntity
+        internal class DerrivedEntity : TestEntity
         {
             [DataMember(Name = "a")]
             public String AnotherName { get; set; }

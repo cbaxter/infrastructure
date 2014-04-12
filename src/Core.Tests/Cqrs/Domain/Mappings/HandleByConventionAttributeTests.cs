@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class UsingHandleByConventionAttribute
+    namespace UsingHandleByConventionAttribute
     {
         public class WhenUsingDefaultHandleMethodMappingAttribute
         {

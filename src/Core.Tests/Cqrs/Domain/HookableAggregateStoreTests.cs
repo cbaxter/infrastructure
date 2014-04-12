@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingHookableAggregateStore
+    namespace UsingHookableAggregateStore
     {
         public class WhenCreatingAggregateStore
         {

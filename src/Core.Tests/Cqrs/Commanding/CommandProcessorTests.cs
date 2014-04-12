@@ -25,7 +25,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandProcessor
+    namespace UsingCommandProcessor
     {
         public abstract class UsingCommandProcessorBase
         {
@@ -112,7 +112,7 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeAggregate : Aggregate
+        internal class FakeAggregate : Aggregate
         {
             protected override bool RequiresExplicitCreate { get { return false; } }
 
@@ -123,10 +123,10 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

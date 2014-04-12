@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingMessage
+    namespace UsingMessage
     {
         public class WhenCreatingMessage
         {

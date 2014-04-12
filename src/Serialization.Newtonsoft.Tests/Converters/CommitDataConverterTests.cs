@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingCommitDataConverter
+    namespace UsingCommitDataConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {

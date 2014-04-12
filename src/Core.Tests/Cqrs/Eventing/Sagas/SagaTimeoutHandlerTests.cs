@@ -24,7 +24,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSagaTimeoutHandler
+    namespace UsingSagaTimeoutHandler
     {
         public abstract class UsingSagaEventHandlerBase
         {
@@ -114,7 +114,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private class FakeSaga : Saga
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             {
@@ -131,7 +131,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             { }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         {
             public Guid SourceId { get { return AggregateId; } }
             public Guid Id { get; set; }

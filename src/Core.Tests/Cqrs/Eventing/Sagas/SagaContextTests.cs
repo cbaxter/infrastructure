@@ -26,7 +26,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSagaContext
+    namespace UsingSagaContext
     {
         public class WhenCreatingNewContext
         {

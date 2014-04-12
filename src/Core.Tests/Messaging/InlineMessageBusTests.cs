@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingInlineMessageBus
+    namespace UsingInlineMessageBus
     {
         public class WhenSendingMessages
         {

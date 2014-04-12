@@ -21,7 +21,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class UsingApplyByRegistrationAttribute
+    namespace UsingApplyByRegistrationAttribute
     {
         public class WhenLocatingApplyMethods
         {

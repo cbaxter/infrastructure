@@ -27,7 +27,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingAggregateStore
+    namespace UsingAggregateStore
     {
         public class WhenDisposing
         {

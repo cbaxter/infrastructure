@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Test.Spark.Logging
 {
-    public static class UsingLogicalOperationScope
+    namespace UsingLogicalOperationScope
     {
         public class WhenCreatingNewScope
         {

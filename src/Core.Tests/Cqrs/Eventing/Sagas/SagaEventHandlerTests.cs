@@ -25,7 +25,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSagaEventHandler
+    namespace UsingSagaEventHandler
     {
         public abstract class UsingSagaEventHandlerBase : IDisposable
         {
@@ -93,7 +93,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private class FakeSaga : Saga
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             {
@@ -106,10 +106,10 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         {
             public Guid SourceId { get { return AggregateId; } }
             public Guid Id { get; set; }

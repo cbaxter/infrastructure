@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark
 {
-    public static class UsingObjectMapper
+    namespace UsingObjectMapper
     {
         public class WhenGettingObjectState
         {

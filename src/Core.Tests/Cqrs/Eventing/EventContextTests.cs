@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventContext
+    namespace UsingEventContext
     {
         public class WhenCreatingNewContext
         {

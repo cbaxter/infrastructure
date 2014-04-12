@@ -25,7 +25,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingWebMessageFactory
+    namespace UsingWebMessageFactory
     {
         public class WhenCreatingNewMessages
         {

@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingHeaderCollectionConverter
+    namespace UsingHeaderCollectionConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {

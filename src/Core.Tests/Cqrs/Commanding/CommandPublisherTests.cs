@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandPublisher
+    namespace UsingCommandPublisher
     {
         public class WhenCreatingNewPublisher
         {
@@ -126,7 +126,7 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
     }
 }

@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingMessageReceiver
+    namespace UsingMessageReceiver
     {
         public class WhenCreatingNewReceiver
         {
@@ -78,7 +78,7 @@ namespace Test.Spark.Messaging
             }
         }
 
-        private sealed class FakeCommandProcessor : IProcessMessages<Object>
+        internal sealed class FakeCommandProcessor : IProcessMessages<Object>
         {
             private readonly ManualResetEvent commandProcessed = new ManualResetEvent(false);
 

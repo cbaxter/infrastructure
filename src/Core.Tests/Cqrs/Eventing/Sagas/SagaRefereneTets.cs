@@ -19,7 +19,7 @@ using Xunit;
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
     // ReSharper disable NotResolvedInText
-    public static class UsingSagaReference
+    namespace UsingSagaReference
     {
         public class WhenCreatingSagaReference
         {

@@ -25,7 +25,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventProcessor
+    namespace UsingEventProcessor
     {
         public abstract class UsingEventProcessorBase
         {
@@ -101,7 +101,7 @@ namespace Test.Spark.Cqrs.Eventing
             }
         }
 
-        private class FakeEventHandler : EventHandler
+        internal class FakeEventHandler : EventHandler
         {
             public Boolean Handled { get; private set; }
 
@@ -116,14 +116,14 @@ namespace Test.Spark.Cqrs.Eventing
             }
         }
 
-        private class FakeAggregate : Aggregate
+        internal class FakeAggregate : Aggregate
         {
             [UsedImplicitly]
             public void Handle(FakeEvent command)
             { }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingEventEnvelopeConverter
+    namespace UsingEventEnvelopeConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
@@ -49,7 +49,7 @@ namespace Test.Spark.Serialization.Converters
     ""i"": 1
   },
   ""e"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Event""
   },
   ""c"": ""4fabd791-ef41-4d6b-9579-fcd9189d492b""
@@ -77,7 +77,7 @@ namespace Test.Spark.Serialization.Converters
     ""i"": 1
   },
   ""e"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Event""
   },
   ""c"": ""4fabd791-ef41-4d6b-9579-fcd9189d492b""
@@ -100,7 +100,7 @@ namespace Test.Spark.Serialization.Converters
     ""i"": 1
   },
   ""e"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Event""
   }
 }");
@@ -121,7 +121,7 @@ namespace Test.Spark.Serialization.Converters
     ""i"": 1
   },
   ""e"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventEnvelopeConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Event""
   },
   ""c"": ""4fabd791-ef41-4d6b-9579-fcd9189d492b"",
@@ -141,7 +141,7 @@ namespace Test.Spark.Serialization.Converters
                 var envelope = new EventEnvelope(correlationId, aggregateId, version, new FakeEvent("My Event"));
                 var bson = WriteBson(envelope);
 
-                Validate("7AAAAAVhABAAAAAEQ+kvUb3Jw0mBFiDBhsdVrwN2ABoAAAAQdgADAAAAEGMAAgAAABBpAAEAAAAAA2UAlwAAAAIkdHlwZQBwAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdFdmVudEVudmVsb3BlQ29udmVydGVyK0Zha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAJAAAATXkgRXZlbnQAAAVjABAAAAAEkderT0Hva02VefzZGJ1JKwA=", bson);
+                Validate(bson, "7AAAAAVhABAAAAAEQ+kvUb3Jw0mBFiDBhsdVrwN2ABoAAAAQdgADAAAAEGMAAgAAABBpAAEAAAAAA2UAlwAAAAIkdHlwZQBwAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdFdmVudEVudmVsb3BlQ29udmVydGVyLkZha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAJAAAATXkgRXZlbnQAAAVjABAAAAAEkderT0Hva02VefzZGJ1JKwA=");
             }
         }
 
@@ -150,7 +150,7 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "7AAAAAVhABAAAAAEQ+kvUb3Jw0mBFiDBhsdVrwN2ABoAAAAQdgADAAAAEGMAAgAAABBpAAEAAAAAA2UAlwAAAAIkdHlwZQBwAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdFdmVudEVudmVsb3BlQ29udmVydGVyK0Zha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAJAAAATXkgRXZlbnQAAAVjABAAAAAEkderT0Hva02VefzZGJ1JKwA=";
+                var bson = "7AAAAAVhABAAAAAEQ+kvUb3Jw0mBFiDBhsdVrwN2ABoAAAAQdgADAAAAEGMAAgAAABBpAAEAAAAAA2UAlwAAAAIkdHlwZQBwAAAAVGVzdC5TcGFyay5TZXJpYWxpemF0aW9uLkNvbnZlcnRlcnMuVXNpbmdFdmVudEVudmVsb3BlQ29udmVydGVyLkZha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAJAAAATXkgRXZlbnQAAAVjABAAAAAEkderT0Hva02VefzZGJ1JKwA=";
                 var envelope = ReadBson<EventEnvelope>(bson);
                 
                 Assert.Equal(new EventVersion(3, 2, 1), envelope.Version);
@@ -159,7 +159,7 @@ namespace Test.Spark.Serialization.Converters
             }
         }
 
-        public class FakeEvent : Event
+        internal class FakeEvent : Event
         {
             public String Property { get; private set; }
 

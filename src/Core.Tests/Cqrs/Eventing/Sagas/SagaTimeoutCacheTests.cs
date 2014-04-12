@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using Moq;
 using Spark;
@@ -21,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class SagaTimeoutCacheTests
+    namespace UsingSagaTimeoutCache
     {
 
         public abstract class UsingPopulatedSagaTimeoutCache

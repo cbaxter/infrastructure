@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommand
+    namespace UsingCommand
     {
         public class WhenGettingCommandHeaders
         {
@@ -95,7 +95,7 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
     }
 

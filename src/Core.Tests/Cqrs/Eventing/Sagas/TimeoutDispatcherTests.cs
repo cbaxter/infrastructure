@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingTimeoutDispatcher
+    namespace UsingTimeoutDispatcher
     {
         public class WhenDisposing
         {
@@ -294,16 +294,16 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private class FakeSaga : Saga
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             { }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
 
-        private class FakeTimer : ITimer
+        internal class FakeTimer : ITimer
         {
             private readonly Action callback;
 

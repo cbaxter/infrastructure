@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Logging
 {
-    public static class UsingActivityScope
+    namespace UsingActivityScope
     {
         public class WhenCreatingNewDiagnosticContext
         {

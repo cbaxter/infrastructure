@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class ApplyMethodMappingTests
+    namespace UsingApplyMethodMapping
     {
         public class WhenCreatingMapping
         {

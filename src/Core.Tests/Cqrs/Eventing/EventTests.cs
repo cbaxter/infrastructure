@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEvent
+    namespace UsingEvent
     {
         public class WhenGettingAggregateId
         {
@@ -116,7 +116,7 @@ namespace Test.Spark.Cqrs.Eventing
             }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         {
             public Guid FakeId { get { return AggregateId; } }
         }

@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Threading
 {
-    public static class UsingInlineTaskScheduler
+    namespace UsingInlineTaskScheduler
     {
         public class WhenQueuingTasks
         {

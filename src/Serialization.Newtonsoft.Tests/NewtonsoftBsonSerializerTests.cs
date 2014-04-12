@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization
 {
-    public static class UsingNewtonsoftBsonSerializer
+    namespace UsingNewtonsoftBsonSerializer
     {
         public class WhenSerializingData
         {

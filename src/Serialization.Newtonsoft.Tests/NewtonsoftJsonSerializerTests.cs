@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization
 {
-    public static class UsingNewtonsoftJsonSerializer
+    namespace UsingNewtonsoftJsonSerializer
     {
         public class WhenSerializingData
         {

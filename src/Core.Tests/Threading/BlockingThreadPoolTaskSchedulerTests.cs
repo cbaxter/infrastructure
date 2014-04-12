@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Threading
 {
-    public static class UsingBlockingThreadPoolTaskScheduler
+    namespace UsingBlockingThreadPoolTaskScheduler
     {
         public class WhenInitializing
         {

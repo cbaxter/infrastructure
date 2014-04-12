@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization
 {
-    public static class UsingDeflateSerializer
+    namespace UsingDeflateSerializer
     {
         public sealed class WhenSerializingStream
         {

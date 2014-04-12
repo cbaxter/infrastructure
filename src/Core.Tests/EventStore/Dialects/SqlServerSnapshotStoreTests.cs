@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Test.Spark.EventStore.Dialects
 {
-    public static class UsingSnapshotStoreWithSqlServer
+    namespace UsingSnapshotStoreWithSqlServer
     {
         public abstract class UsingInitializedSnapshotStore : IDisposable
         {

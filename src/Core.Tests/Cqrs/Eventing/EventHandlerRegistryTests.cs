@@ -27,7 +27,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventHandlerRegistry
+    namespace UsingEventHandlerRegistry
     {
         public class WhenCreatingNewRegistry
         {
@@ -296,7 +296,7 @@ namespace Test.Spark.Cqrs.Eventing
             { }
         }
 
-        private class FakeTypeLocator : ILocateTypes
+        internal class FakeTypeLocator : ILocateTypes
         {
             private readonly IEnumerable<Type> knownTypes;
 

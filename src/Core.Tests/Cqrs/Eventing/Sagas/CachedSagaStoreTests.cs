@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingCachedSagaStore
+    namespace UsingCachedSagaStore
     {
         public class WhenCreatingSaga
         {

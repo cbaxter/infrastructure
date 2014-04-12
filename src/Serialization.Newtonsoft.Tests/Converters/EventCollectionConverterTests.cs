@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingEventCollectionConverter
+    namespace UsingEventCollectionConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
@@ -42,7 +42,7 @@ namespace Test.Spark.Serialization.Converters
                 Validate(json, @"
 [
   {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Property""
   }
 ]");
@@ -63,7 +63,7 @@ namespace Test.Spark.Serialization.Converters
                 var events = ReadJson<EventCollection>(@"
 [
   {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter+FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingEventCollectionConverter.FakeEvent, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Property""
   }
 ]");
@@ -79,7 +79,7 @@ namespace Test.Spark.Serialization.Converters
                 var events = new EventCollection(new[] { new FakeEvent("My Property") });
                 var bson = WriteBson(events);
 
-                Validate("pAAAAAMwAJwAAAACJHR5cGUAcgAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nRXZlbnRDb2xsZWN0aW9uQ29udmVydGVyK0Zha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAMAAAATXkgUHJvcGVydHkAAAA=", bson);
+                Validate(bson, "pAAAAAMwAJwAAAACJHR5cGUAcgAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nRXZlbnRDb2xsZWN0aW9uQ29udmVydGVyLkZha2VFdmVudCwgU3BhcmsuU2VyaWFsaXphdGlvbi5OZXd0b25zb2Z0LlRlc3RzAAJQcm9wZXJ0eQAMAAAATXkgUHJvcGVydHkAAAA=");
             }
         }
 

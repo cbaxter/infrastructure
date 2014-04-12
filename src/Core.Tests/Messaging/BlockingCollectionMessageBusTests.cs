@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingBlockingCollectionMessageBus
+    namespace UsingBlockingCollectionMessageBus
     {
         public class WhenSendingMessage
         {

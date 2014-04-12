@@ -20,7 +20,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark
 {
-    public static class UsingObjectHasher
+    namespace UsingObjectHasher
     {
         public class WhenHashingNullValues
         {

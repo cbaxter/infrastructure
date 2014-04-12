@@ -7,7 +7,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark
 {
-    public static class UsingValueObject
+    namespace UsingValueObject
     {
         public class WhenCreatingValueObject
         {

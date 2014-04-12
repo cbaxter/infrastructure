@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSagaTimeout
+    namespace UsingSagaTimeout
     {
         public class WhenCreatingTimeout
         {

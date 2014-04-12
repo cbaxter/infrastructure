@@ -19,7 +19,7 @@ using Xunit;
 namespace Test.Spark
 {
     // ReSharper disable NotResolvedInText
-    public static class UsingSystemTime
+    namespace UsingSystemTime
     {
         public class WhenGettingCurrentTime
         {

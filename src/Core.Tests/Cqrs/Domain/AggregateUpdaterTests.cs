@@ -26,7 +26,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingAggregateUpdater
+    namespace UsingAggregateUpdater
     {
         public class WhenCreatingNewUpdater
         {
@@ -133,16 +133,16 @@ namespace Test.Spark.Cqrs.Domain
             }
         }
 
-        private class NoDefaultConstructorAggregate : Aggregate
+        internal class NoDefaultConstructorAggregate : Aggregate
         {
             public NoDefaultConstructorAggregate(Object arg) { }
         }
 
         [ApplyByConvention, ApplyByAttribute]
-        private class MultipleStrategiesAggregate : Aggregate
+        internal class MultipleStrategiesAggregate : Aggregate
         { }
 
-        private class ImplicitStrategyAggregate : Aggregate
+        internal class ImplicitStrategyAggregate : Aggregate
         {
             public readonly IList<Event> AppliedEvents = new List<Event>();
 
@@ -154,7 +154,7 @@ namespace Test.Spark.Cqrs.Domain
         }
 
         [ApplyByAttribute]
-        private class ExplicitStrategyAggregate : Aggregate
+        internal class ExplicitStrategyAggregate : Aggregate
         {
             public readonly IList<Event> AppliedEvents = new List<Event>();
 
@@ -166,14 +166,14 @@ namespace Test.Spark.Cqrs.Domain
         }
 
         [ApplyByConvention(ApplyOptional = true)]
-        private class OptionalApplyAggregate : Aggregate
+        internal class OptionalApplyAggregate : Aggregate
         { }
 
         [ApplyByConvention(ApplyOptional = false)]
-        private class RequiredApplyAggregate : Aggregate
+        internal class RequiredApplyAggregate : Aggregate
         { }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

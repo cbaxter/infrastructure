@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Test.Spark.EventStore
 {
-    public static class UsingCommit
+    namespace UsingCommit
     {
         public class WhenCreatingNewCommit
         {

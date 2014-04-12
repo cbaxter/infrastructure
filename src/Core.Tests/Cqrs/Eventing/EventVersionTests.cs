@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventVersion
+    namespace UsingEventVersion
     {
         public class WhenCreatingNewVersion
         {

@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingMessageConverter
+    namespace UsingMessageConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
@@ -45,7 +45,7 @@ namespace Test.Spark.Serialization.Converters
   ""p"": {
     ""a"": ""092df347-8562-4b59-99a3-57e1e0d6fbc4"",
     ""c"": {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
       ""Property"": ""My Command""
     }
   }
@@ -71,7 +71,7 @@ namespace Test.Spark.Serialization.Converters
   ""p"": {
     ""a"": ""092df347-8562-4b59-99a3-57e1e0d6fbc4"",
     ""c"": {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
       ""Property"": ""My Command""
     }
   }
@@ -90,7 +90,7 @@ namespace Test.Spark.Serialization.Converters
   ""p"": {
     ""a"": ""092df347-8562-4b59-99a3-57e1e0d6fbc4"",
     ""c"": {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
       ""Property"": ""My Command""
     }
   }
@@ -108,7 +108,7 @@ namespace Test.Spark.Serialization.Converters
   ""p"": {
     ""a"": ""092df347-8562-4b59-99a3-57e1e0d6fbc4"",
     ""c"": {
-      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+      ""$type"": ""Test.Spark.Serialization.Converters.UsingMessageConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
       ""Property"": ""My Command""
     },
   },
@@ -125,9 +125,9 @@ namespace Test.Spark.Serialization.Converters
                 var id = Guid.Parse("A96662A6-ABA8-4CF9-9882-86E7F52BF18C");
                 var aggregateId = Guid.Parse("61296B2F-F040-472D-95DF-B1C3A32A7C7E");
                 var message = new Message<CommandEnvelope>(id, HeaderCollection.Empty, new CommandEnvelope(aggregateId, new FakeCommand("My Command")));
-                var json = WriteBson(message);
+                var bson = WriteBson(message);
 
-                Validate("﻿3gAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALUAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCVAAAAAiR0eXBlAGwAAABUZXN0LlNwYXJrLlNlcmlhbGl6YXRpb24uQ29udmVydGVycy5Vc2luZ01lc3NhZ2VDb252ZXJ0ZXIrRmFrZUNvbW1hbmQsIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkACwAAAE15IENvbW1hbmQAAAAA", json);
+                Validate(bson, "﻿3gAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALUAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCVAAAAAiR0eXBlAGwAAABUZXN0LlNwYXJrLlNlcmlhbGl6YXRpb24uQ29udmVydGVycy5Vc2luZ01lc3NhZ2VDb252ZXJ0ZXIuRmFrZUNvbW1hbmQsIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkACwAAAE15IENvbW1hbmQAAAAA");
             }
         }
 
@@ -136,14 +136,14 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "3gAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALUAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCVAAAAAiR0eXBlAGwAAABUZXN0LlNwYXJrLlNlcmlhbGl6YXRpb24uQ29udmVydGVycy5Vc2luZ01lc3NhZ2VDb252ZXJ0ZXIrRmFrZUNvbW1hbmQsIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkACwAAAE15IENvbW1hbmQAAAAA";
+                var bson = "3gAAAAVpZAAQAAAABKZiZqmoq/lMmIKG5/Ur8YwDaAAFAAAAAANwALUAAAAFYQAQAAAABC9rKWFA8C1Hld+xw6MqfH4DYwCVAAAAAiR0eXBlAGwAAABUZXN0LlNwYXJrLlNlcmlhbGl6YXRpb24uQ29udmVydGVycy5Vc2luZ01lc3NhZ2VDb252ZXJ0ZXIuRmFrZUNvbW1hbmQsIFNwYXJrLlNlcmlhbGl6YXRpb24uTmV3dG9uc29mdC5UZXN0cwACUHJvcGVydHkACwAAAE15IENvbW1hbmQAAAAA";
                 var message = ReadBson<Message<CommandEnvelope>>(bson);
 
                 Assert.Equal(Guid.Parse("A96662A6-ABA8-4CF9-9882-86E7F52BF18C"), message.Id);
             }
         }
 
-        public class FakeCommand : Command
+        internal class FakeCommand : Command
         {
             public String Property { get; private set; }
 

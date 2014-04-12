@@ -21,7 +21,7 @@ using Xunit.Extensions;
 namespace Test.Spark
 {
     // ReSharper disable NotResolvedInText
-    public static class UsingVerify
+    namespace UsingVerify
     {
         public class WhenCheckingForTrueCondition
         {

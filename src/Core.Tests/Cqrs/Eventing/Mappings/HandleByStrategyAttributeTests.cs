@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Mappings
 {
-    public static class UsingHandleByStrategyAttribute
+    namespace UsingHandleByStrategyAttribute
     {
         public class WhenResolvingServices
         {

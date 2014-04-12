@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandHandlerRegistry
+    namespace UsingCommandHandlerRegistry
     {
         public class WhenCreatingNewRegistry
         {
@@ -149,10 +149,10 @@ namespace Test.Spark.Cqrs.Commanding
         }
 
         [HandleByConvention, HandleByAttribute]
-        private class MultipleStrategiesAggregate : Aggregate
+        internal class MultipleStrategiesAggregate : Aggregate
         { }
 
-        private class ImplicitStrategyAggregate : Aggregate
+        internal class ImplicitStrategyAggregate : Aggregate
         {
             protected override bool RequiresExplicitCreate { get { return false; } }
 
@@ -161,7 +161,7 @@ namespace Test.Spark.Cqrs.Commanding
             { }
         }
 
-        private class AlternateImplicitStrategyAggregate : Aggregate
+        internal class AlternateImplicitStrategyAggregate : Aggregate
         {
             protected override bool RequiresExplicitCreate { get { return false; } }
 
@@ -170,7 +170,7 @@ namespace Test.Spark.Cqrs.Commanding
             { }
         }
 
-        private class ServicedAggregate : Aggregate
+        internal class ServicedAggregate : Aggregate
         {
             protected override bool RequiresExplicitCreate { get { return false; } }
 
@@ -180,7 +180,7 @@ namespace Test.Spark.Cqrs.Commanding
         }
 
         [HandleByAttribute]
-        private class ExplicitStrategyAggregate : Aggregate
+        internal class ExplicitStrategyAggregate : Aggregate
         {
             protected override bool RequiresExplicitCreate { get { return false; } }
 
@@ -189,14 +189,14 @@ namespace Test.Spark.Cqrs.Commanding
             { }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
 
         [UsedImplicitly]
-        private class AlternateFakeCommand : Command
+        internal class AlternateFakeCommand : Command
         { }
 
-        private class FakeService
+        internal class FakeService
         { }
     }
 }

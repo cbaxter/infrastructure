@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization.Converters
 {
-    public static class UsingCommandEnvelopeConverter
+    namespace UsingCommandEnvelopeConverter
     {
         public class WhenWritingJson : UsingJsonConverter
         {
@@ -41,7 +41,7 @@ namespace Test.Spark.Serialization.Converters
 {
   ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
   ""c"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Command""
   }
 }");
@@ -63,7 +63,7 @@ namespace Test.Spark.Serialization.Converters
 {
   ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
   ""c"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Command""
   }
 }");
@@ -76,7 +76,7 @@ namespace Test.Spark.Serialization.Converters
                 var envelope = ReadJson<CommandEnvelope>(@"
 {
   ""c"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Command""
   },
   ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb""
@@ -91,7 +91,7 @@ namespace Test.Spark.Serialization.Converters
 {
   ""a"": ""a6c45a28-c572-4d5b-ac18-7b0ec2d723fb"",
   ""c"": {
-    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter+FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
+    ""$type"": ""Test.Spark.Serialization.Converters.UsingCommandEnvelopeConverter.FakeCommand, Spark.Serialization.Newtonsoft.Tests"",
     ""Property"": ""My Command""
   },
 }");
@@ -106,9 +106,9 @@ namespace Test.Spark.Serialization.Converters
             {
                 var aggregateId = Guid.Parse("61296B2F-F040-472D-95DF-B1C3A32A7C7E");
                 var envelope = new CommandEnvelope(aggregateId, new FakeCommand("My Command"));
-                var json = WriteBson(envelope);
+                var bson = WriteBson(envelope);
 
-                Validate("vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA", json);
+                Validate(bson, "vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyLkZha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA");
             }
         }
 
@@ -117,14 +117,14 @@ namespace Test.Spark.Serialization.Converters
             [Fact]
             public void CanDeserializeValidBson()
             {
-                var bson = "vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyK0Zha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA";
+                var bson = "vQAAAAVhABAAAAAEL2spYUDwLUeV37HDoyp8fgNjAJ0AAAACJHR5cGUAdAAAAFRlc3QuU3BhcmsuU2VyaWFsaXphdGlvbi5Db252ZXJ0ZXJzLlVzaW5nQ29tbWFuZEVudmVsb3BlQ29udmVydGVyLkZha2VDb21tYW5kLCBTcGFyay5TZXJpYWxpemF0aW9uLk5ld3RvbnNvZnQuVGVzdHMAAlByb3BlcnR5AAsAAABNeSBDb21tYW5kAAAA";
                 var envelope = ReadBson<CommandEnvelope>(bson);
 
                 Assert.Equal(Guid.Parse("61296B2F-F040-472D-95DF-B1C3A32A7C7E"), envelope.AggregateId);
             }
         }
 
-        public class FakeCommand : Command
+        internal class FakeCommand : Command
         {
             public String Property { get; private set; }
 

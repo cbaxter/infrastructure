@@ -21,7 +21,7 @@ using EventHandler = Spark.Cqrs.Eventing.EventHandler;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventHandler
+    namespace UsingEventHandler
     {
         public class WhenCreatingNewHandler
         {
@@ -98,7 +98,7 @@ namespace Test.Spark.Cqrs.Eventing
         }
 
         [UsedImplicitly]
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventDispatcher
+    namespace UsingEventDispatcher
     {
         public class WhenCreatingNewDispatcher
         {

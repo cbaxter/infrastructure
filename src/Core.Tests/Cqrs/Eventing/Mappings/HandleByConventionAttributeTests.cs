@@ -24,7 +24,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Cqrs.Eventing.Mappings
 {
-    public static class UsingHandleByConventionAttribute
+    namespace UsingHandleByConventionAttribute
     {
         public class WhenUsingDefaultHandleMethodMappingAttribute
         {

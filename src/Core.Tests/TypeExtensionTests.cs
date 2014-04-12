@@ -20,7 +20,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark
 {
-    public static class UsingTypeExtensions
+    namespace UsingTypeExtensions
     {
         public class WhenCheckingTypeDerivesFromAnotherType
         {
@@ -110,11 +110,11 @@ namespace Test.Spark
                 InlineData(typeof(IDictionary<String, String>[, ,]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][,,], mscorlib"),
                 InlineData(typeof(IDictionary<String, String>[,]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][,], mscorlib"),
                 InlineData(typeof(IDictionary<String, String>[]), "System.Collections.Generic.IDictionary`2[[System.String, mscorlib],[System.String, mscorlib]][], mscorlib"),
-                InlineData(typeof(ParentType<Int32>.ChildType<String>.GrantChildType<Boolean>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1+GrantChildType`1[[System.Int32, mscorlib],[System.String, mscorlib],[System.Boolean, mscorlib]], Spark.Core.Tests"),
-                InlineData(typeof(ParentType<Int32>.ChildType<String>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1[[System.Int32, mscorlib],[System.String, mscorlib]], Spark.Core.Tests"),
-                InlineData(typeof(ParentType<Int32>.ChildType), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType[[System.Int32, mscorlib]], Spark.Core.Tests"),
-                InlineData(typeof(ParentType.ChildType<String>), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType+ChildType`1[[System.String, mscorlib]], Spark.Core.Tests"),
-                InlineData(typeof(ParentType.ChildType), "Test.Spark.UsingTypeExtensions+WhenGettingShortAssemblyQualifiedName+ParentType+ChildType, Spark.Core.Tests"),
+                InlineData(typeof(ParentType<Int32>.ChildType<String>.GrantChildType<Boolean>), "Test.Spark.UsingTypeExtensions.WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1+GrantChildType`1[[System.Int32, mscorlib],[System.String, mscorlib],[System.Boolean, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType<Int32>.ChildType<String>), "Test.Spark.UsingTypeExtensions.WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType`1[[System.Int32, mscorlib],[System.String, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType<Int32>.ChildType), "Test.Spark.UsingTypeExtensions.WhenGettingShortAssemblyQualifiedName+ParentType`1+ChildType[[System.Int32, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType.ChildType<String>), "Test.Spark.UsingTypeExtensions.WhenGettingShortAssemblyQualifiedName+ParentType+ChildType`1[[System.String, mscorlib]], Spark.Core.Tests"),
+                InlineData(typeof(ParentType.ChildType), "Test.Spark.UsingTypeExtensions.WhenGettingShortAssemblyQualifiedName+ParentType+ChildType, Spark.Core.Tests"),
             ]
             public void ReturnTypeNameWithNoCultureVersionOrPublicKeys(Type type, String expectedTypeName)
             {

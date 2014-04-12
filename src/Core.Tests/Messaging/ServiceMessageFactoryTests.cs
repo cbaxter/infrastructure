@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingServiceMessageFactory
+    namespace UsingServiceMessageFactory
     {
         public class WhenCreatingNewMessages
         {

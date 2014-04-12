@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingSagaMetadata
+    namespace UsingSagaMetadata
     {
         public class WhenCheckingCanStartWithEventType
         {
@@ -106,7 +106,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             }
         }
 
-        private sealed class FakeSaga : Saga
+        internal sealed class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             {
@@ -123,17 +123,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             { }
         }
 
-        public sealed class FakeInitiatingEvent : Event
+        internal sealed class FakeInitiatingEvent : Event
         {
             public Guid Id { get; set; }
         }
 
-        public sealed class FakeHandledEvent : Event
+        internal sealed class FakeHandledEvent : Event
         {
             public Guid Id { get; set; }
         }
 
-        public sealed class FakeUnhandledEvent : Event
+        internal sealed class FakeUnhandledEvent : Event
         {
             public Guid Id { get; set; }
         }
