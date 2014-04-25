@@ -21,16 +21,17 @@ using System.Runtime.Serialization;
 namespace Spark
 {
     /// <summary>
-    /// Performs a deep-copy on any non-recursive object graph.
+    /// Performs a deep-copy on any object graph.
     /// </summary>
     public static class ObjectCopier
     {
-        private static readonly IDictionary<Type, Func<Object, Object>> Copiers = new ConcurrentDictionary<Type, Func<Object, Object>>();
         private static readonly IDictionary<Type, Func<Array, Int32[], Array>> ArrayBuilders = new ConcurrentDictionary<Type, Func<Array, Int32[], Array>>();
+        private static readonly IDictionary<Type, Func<Object, IDictionary<Object, Object>, Object>> Copiers = new ConcurrentDictionary<Type, Func<Object, IDictionary<Object, Object>, Object>>();
         private static readonly MethodInfo GetUninitializedObjectMethod = typeof(FormatterServices).GetMethod("GetUninitializedObject", BindingFlags.Static | BindingFlags.Public);
         private static readonly MethodInfo CopyObjectMethod = typeof(ObjectCopier).GetMethod("CopyObject", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo SetFieldValueMethod = typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(Object), typeof(Object) });
         private static readonly MethodInfo ArrayLengthMethod = typeof(Array).GetMethod("GetLength", new[] { typeof(Int32) });
+        private static readonly MethodInfo DictionaryAddMethod = typeof(IDictionary<Object, Object>).GetMethod("Add");
 
         /// <summary>
         /// Perform a deep-copy on a non-recursive object graph.
@@ -38,7 +39,7 @@ namespace Spark
         /// <param name="value">The non-recursive object graph from which to create a deep copy.</param>
         public static Object Copy(Object value)
         {
-            return CopyObject(value);
+            return CopyObject(value, new Dictionary<Object, Object>());
         }
 
         /// <summary>
@@ -49,38 +50,47 @@ namespace Spark
         public static T Copy<T>(T value)
             where T : class
         {
-            return (T)CopyObject(value);
+            return (T)CopyObject(value, new Dictionary<Object, Object>());
         }
 
         /// <summary>
         /// Determine type of <paramref name="value"/> and process accordingly.
         /// </summary>
         /// <param name="value">The non-recursive object graph from which to create a deep copy.</param>
-        private static Object CopyObject(Object value)
+        /// <param name="visited">The set of visited reference objects.</param>
+        private static Object CopyObject(Object value, IDictionary<Object, Object> visited)
         {
             if (value == null)
                 return null;
 
-            var type = value.GetType();
+            Type type = value.GetType();
             if (type.IsValueType || typeof(String).IsAssignableFrom(type))
                 return value;
 
-            return type.IsArray ? CopyArray((Array)value) : CopyReference(value);
+            Object copy;
+            if (visited.TryGetValue(value, out copy))
+                return copy;
+
+            return type.IsArray ? CopyArray((Array)value, visited) : CopyReference(value, visited);
         }
 
         /// <summary>
         /// Perform a deep copy of an array value.
         /// </summary>
         /// <param name="value">The array from which to create a deep copy.</param>
-        private static Object CopyArray(Array value)
+        /// <param name="visited">The set of visited reference objects.</param>
+        private static Object CopyArray(Array value, IDictionary<Object, Object> visited)
         {
-            var type = value.GetType();
-
+            Array copy;
+            Type type = value.GetType();
             Func<Array, Int32[], Array> factory;
+
             if (!ArrayBuilders.TryGetValue(type, out factory))
                 ArrayBuilders[type] = factory = CompileArrayCreation(value);
 
-            return CopyArrayValues(value, factory.Invoke(value, GetArrayBounds(value)));
+            visited.Add(value, copy = factory.Invoke(value, GetArrayBounds(value)));
+
+            return CopyArrayValues(value, copy, visited);
         }
 
         /// <summary>
@@ -118,12 +128,13 @@ namespace Spark
         /// </summary>
         /// <param name="source">The source array.</param>
         /// <param name="target">The target array.</param>
-        private static Array CopyArrayValues(Array source, Array target)
+        /// <param name="visited">The set of visited reference objects.</param>
+        private static Array CopyArrayValues(Array source, Array target, IDictionary<Object, Object> visited)
         {
             if (source.Rank == 1)
             {
                 for (var i = 0; i < source.Length; i++)
-                    target.SetValue(CopyObject(source.GetValue(i)), i);
+                    target.SetValue(CopyObject(source.GetValue(i), visited), i);
             }
             else
             {
@@ -131,7 +142,7 @@ namespace Spark
                 for (var dimension = 0; dimension < source.Rank; dimension++)
                     lengths[dimension] = source.GetLength(dimension);
 
-                CopyArrayValues(source, target, lengths, new Int32[source.Rank], 0);
+                CopyArrayValues(source, target, lengths, new Int32[source.Rank], 0, visited);
             }
 
             return target;
@@ -145,14 +156,15 @@ namespace Spark
         /// <param name="lengths">The set of array lengths that make up the multi-dimensional array.</param>
         /// <param name="indicies">The indicies of the multi-dimensional array to be processed.</param>
         /// <param name="dimension">The current array dimension being processed.</param>
-        private static void CopyArrayValues(Array source, Array target, Int32[] lengths, Int32[] indicies, Int32 dimension)
+        /// <param name="visited">The set of visited reference objects.</param>
+        private static void CopyArrayValues(Array source, Array target, Int32[] lengths, Int32[] indicies, Int32 dimension, IDictionary<Object, Object> visited)
         {
             if (dimension == source.Rank - 1)
             {
                 indicies[dimension] = 0;
                 while (indicies[dimension] < lengths[dimension])
                 {
-                    target.SetValue(source.GetValue(indicies), indicies);
+                    target.SetValue(CopyObject(source.GetValue(indicies), visited), indicies);
                     indicies[dimension]++;
                 }
             }
@@ -161,7 +173,7 @@ namespace Spark
                 indicies[dimension] = 0;
                 while (indicies[dimension] < lengths[dimension])
                 {
-                    CopyArrayValues(source, target, lengths, indicies, dimension + 1);
+                    CopyArrayValues(source, target, lengths, indicies, dimension + 1, visited);
                     indicies[dimension]++;
                 }
             }
@@ -171,51 +183,58 @@ namespace Spark
         /// Performs a deep copy on a non-recursive reference object.
         /// </summary>
         /// <param name="value">The non-recursive object graph to copy.</param>
-        private static Object CopyReference(Object value)
+        /// <param name="visited">The set of visited reference objects.</param>
+        private static Object CopyReference(Object value, IDictionary<Object, Object> visited)
         {
-            var type = value.GetType();
+            Type type = value.GetType();
+            Func<Object, IDictionary<Object, Object>, Object> factory;
 
-            Func<Object, Object> factory;
             if (!Copiers.TryGetValue(type, out factory))
                 Copiers[type] = factory = CompileObjectMapping(type);
 
-            return factory.Invoke(value);
+            return factory.Invoke(value, visited);
         }
 
         /// <summary>
         /// Create an object factory method
         /// </summary>
         /// <param name="type">The object type for which a factory method is to be created.</param>
-        private static Func<Object, Object> CompileObjectMapping(Type type)
+        private static Func<Object, IDictionary<Object, Object>, Object> CompileObjectMapping(Type type)
         {
-            var argument = Expression.Parameter(typeof(Object), "value");
-            var templateInstance = Expression.Variable(type, "template");
-            var copiedInstance = Expression.Variable(type, "copy");
+            var copy = Expression.Variable(type, "copy");
+            var template = Expression.Variable(type, "template");
+            var value = Expression.Parameter(typeof(Object), "value");
+            var visited = Expression.Parameter(typeof(IDictionary<Object, Object>), "visited");
+            var body = Expression.Block(new[] { template, copy }, GetMethodBody(value, template, copy, visited));
 
-            return Expression.Lambda<Func<Object, Object>>(Expression.Block(new[] { templateInstance, copiedInstance }, GetMethodBody(argument, templateInstance, copiedInstance)), argument).Compile();
+            return Expression.Lambda<Func<Object, IDictionary<Object, Object>, Object>>(body, value, visited).Compile();
         }
 
         /// <summary>
         /// Determins the set of expressions that comprise an object factory method's body.
         /// </summary>
-        /// <param name="argument">The value argument that represents the object to copy.</param>
-        /// <param name="templateInstance">The template instance variable reference.</param>
-        /// <param name="copiedInstance">The copy instance variable reference.</param>
-        private static IEnumerable<Expression> GetMethodBody(ParameterExpression argument, ParameterExpression templateInstance, ParameterExpression copiedInstance)
+        /// <param name="value">The value argument that represents the object to copy.</param>
+        /// <param name="template">The template instance variable reference.</param>
+        /// <param name="copied">The copy instance variable reference.</param>
+        /// <param name="visited">The visited argument reference.</param>
+        private static IEnumerable<Expression> GetMethodBody(ParameterExpression value, ParameterExpression template, ParameterExpression copied, ParameterExpression visited)
         {
-            var returnTarget = Expression.Label(templateInstance.Type);
+            var returnTarget = Expression.Label(template.Type);
 
             // assign template instance variable to input argument.
-            yield return Expression.Assign(templateInstance, Expression.Convert(argument, templateInstance.Type));
+            yield return Expression.Assign(template, Expression.Convert(value, template.Type));
 
             // must use FormatterServices.GetUninitializedObject if no public default ctor (slower).
-            if (templateInstance.Type.GetConstructor(Type.EmptyTypes) == null)
-                yield return Expression.Assign(copiedInstance, Expression.Convert(Expression.Call(GetUninitializedObjectMethod, Expression.Constant(templateInstance.Type)), templateInstance.Type));
+            if (template.Type.GetConstructor(Type.EmptyTypes) == null)
+                yield return Expression.Assign(copied, Expression.Convert(Expression.Call(GetUninitializedObjectMethod, Expression.Constant(template.Type)), template.Type));
             else
-                yield return Expression.Assign(copiedInstance, Expression.New(templateInstance.Type));
+                yield return Expression.Assign(copied, Expression.New(template.Type));
+
+            // add the copy to the reference map to ensure that we will not attempt to create a copy more than once.
+            yield return Expression.Call(visited, DictionaryAddMethod, value, copied);
 
             // set all public or private field values in type hierarchy.
-            var type = templateInstance.Type;
+            var type = template.Type;
             while (type != typeof(Object) && type != null)
             {
                 var fields = type.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -223,30 +242,31 @@ namespace Spark
                 {
                     // use slower reflection option to set read-only fields (not possible via Expression.Assign).
                     if (field.IsInitOnly)
-                        yield return GetImmutableFieldMapping(field, templateInstance, copiedInstance);
+                        yield return GetImmutableFieldMapping(field, template, copied, visited);
                     else
-                        yield return GetMutableFieldMapping(field, templateInstance, copiedInstance);
+                        yield return GetMutableFieldMapping(field, template, copied, visited);
                 }
 
                 type = type.BaseType;
             }
 
             // return copied value.
-            yield return Expression.Return(returnTarget, copiedInstance);
-            yield return Expression.Label(returnTarget, Expression.TypeAs(Expression.Constant(null), templateInstance.Type));
+            yield return Expression.Return(returnTarget, copied);
+            yield return Expression.Label(returnTarget, Expression.TypeAs(Expression.Constant(null), template.Type));
         }
 
         /// <summary>
         /// Creates an assignment expression suitable for a mutable object field.
         /// </summary>
         /// <param name="field">The field to be assigned.</param>
-        /// <param name="templateInstance">The template instance variable reference.</param>
-        /// <param name="copiedInstance">The copy instance variable reference.</param>
-        private static BinaryExpression GetMutableFieldMapping(FieldInfo field, ParameterExpression templateInstance, ParameterExpression copiedInstance)
+        /// <param name="template">The template instance variable reference.</param>
+        /// <param name="copy">The copy instance variable reference.</param>
+        /// <param name="visited">The visited argument reference.</param>
+        private static BinaryExpression GetMutableFieldMapping(FieldInfo field, ParameterExpression template, ParameterExpression copy, ParameterExpression visited)
         {
             return Expression.Assign(
-                       Expression.Field(copiedInstance, field),
-                       Expression.Convert(Expression.Call(CopyObjectMethod, Expression.Convert(Expression.Field(templateInstance, field), typeof(Object))), field.FieldType)
+                       Expression.Field(copy, field),
+                       Expression.Convert(Expression.Call(CopyObjectMethod, Expression.Convert(Expression.Field(template, field), typeof(Object)), visited), field.FieldType)
                    );
         }
 
@@ -254,11 +274,12 @@ namespace Spark
         /// Creates an assignment expression suitable for a immutable object field using slower reflection alternative.
         /// </summary>
         /// <param name="field">The field to be assigned.</param>
-        /// <param name="templateInstance">The template instance variable reference.</param>
-        /// <param name="copiedInstance">The copy instance variable reference.</param>
-        private static MethodCallExpression GetImmutableFieldMapping(FieldInfo field, ParameterExpression templateInstance, ParameterExpression copiedInstance)
+        /// <param name="template">The template instance variable reference.</param>
+        /// <param name="copy">The copy instance variable reference.</param>
+        /// <param name="visited">The visited argument reference.</param>
+        private static MethodCallExpression GetImmutableFieldMapping(FieldInfo field, ParameterExpression template, ParameterExpression copy, ParameterExpression visited)
         {
-            var arguments = new Expression[] { copiedInstance, Expression.Call(CopyObjectMethod, Expression.Convert(Expression.Field(templateInstance, field), typeof(Object))) };
+            var arguments = new Expression[] { copy, Expression.Call(CopyObjectMethod, Expression.Convert(Expression.Field(template, field), typeof(Object)), visited) };
 
             return Expression.Call(Expression.Constant(field), SetFieldValueMethod, arguments);
         }
