@@ -258,7 +258,7 @@ namespace Test.Spark.EventStore.Dialects
                 SnapshotStore.Save(snapshot2);
                 SnapshotStore.Save(snapshot3);
 
-                Assert.Equal(20, SnapshotStore.GetLastSnapshot(streamId).Version);
+                Assert.Equal(20, SnapshotStore.GetLastSnapshot(typeof(Object), streamId).Version);
             }
         }
 
@@ -274,7 +274,7 @@ namespace Test.Spark.EventStore.Dialects
                 SnapshotStore.Save(snapshot1);
                 SnapshotStore.Save(snapshot2);
 
-                Assert.Equal(10, SnapshotStore.GetSnapshot(streamId, 20).Version);
+                Assert.Equal(10, SnapshotStore.GetSnapshot(typeof(Object), streamId, 20).Version);
             }
 
             [SqlServerFactAttribute]
@@ -287,7 +287,7 @@ namespace Test.Spark.EventStore.Dialects
                 SnapshotStore.Save(snapshot1);
                 SnapshotStore.Save(snapshot2);
 
-                Assert.Equal(10, SnapshotStore.GetSnapshot(streamId, 10).Version);
+                Assert.Equal(10, SnapshotStore.GetSnapshot(typeof(Object), streamId, 10).Version);
             }
 
             [SqlServerFactAttribute]
@@ -295,7 +295,7 @@ namespace Test.Spark.EventStore.Dialects
             {
                 var streamId = Guid.NewGuid();
 
-                Assert.Null(SnapshotStore.GetSnapshot(streamId, 10));
+                Assert.Null(SnapshotStore.GetSnapshot(typeof(Object), streamId, 10));
             }
         }
     }

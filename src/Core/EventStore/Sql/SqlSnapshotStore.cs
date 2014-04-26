@@ -115,10 +115,12 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Gets the most recent snapshot for the specified <paramref name="streamId"/> and <paramref name="maximumVersion"/>.
         /// </summary>
+        /// <param name="type">The snapshot type.</param>
         /// <param name="streamId">The unique stream identifier.</param>
         /// <param name="maximumVersion">The maximum snapshot version.</param>
-        public Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion)
+        public Snapshot GetSnapshot(Type type, Guid streamId, Int32 maximumVersion)
         {
+            Verify.NotNull(type, "type");
             Verify.NotDisposed(this, disposed);
 
             using (var command = dialect.CreateCommand(dialect.GetSnapshot))
@@ -128,7 +130,7 @@ namespace Spark.EventStore.Sql
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(maximumVersion));
 
-                return dialect.QuerySingle(command, CreateSnapshot);
+                return dialect.QuerySingle(command, record => CreateSnapshot(type, record));
             }
         }
 
@@ -211,10 +213,11 @@ namespace Spark.EventStore.Sql
         /// <summary>
         /// Creates a new <see cref="Snapshot"/>.
         /// </summary>
+        /// <param name="type">The snapshot type.</param>
         /// <param name="record">The record from which to create the new <see cref="Snapshot"/>.</param>
-        private Snapshot CreateSnapshot(IDataRecord record)
+        private Snapshot CreateSnapshot(Type type, IDataRecord record)
         {
-            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), serializer.Deserialize<Object>(record.GetBytes(Column.State)));
+            return new Snapshot(record.GetGuid(Column.StreamId), record.GetInt32(Column.Version), serializer.Deserialize(record.GetBytes(Column.State), type));
         }
     }
 }

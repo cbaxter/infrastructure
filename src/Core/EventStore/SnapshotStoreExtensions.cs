@@ -10,7 +10,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * IN THE SOFTWARE.t
  */
 
 namespace Spark.EventStore
@@ -23,13 +23,14 @@ namespace Spark.EventStore
         /// <summary>
         /// Gets the last snapshot for the specified <paramref name="streamId"/>.
         /// </summary>
+        /// <param name="type">The snapshot type.</param>
         /// <param name="snapshotStore">The snapshot store.</param>
         /// <param name="streamId">The unique stream identifier.</param>
-        public static Snapshot GetLastSnapshot(this IRetrieveSnapshots snapshotStore, Guid streamId)
+        public static Snapshot GetLastSnapshot(this IRetrieveSnapshots snapshotStore, Type type, Guid streamId)
         {
             Verify.NotNull(snapshotStore, "snapshotStore");
 
-            return snapshotStore.GetSnapshot(streamId, Int32.MaxValue);
+            return snapshotStore.GetSnapshot(type, streamId, Int32.MaxValue);
         }
     }
 }

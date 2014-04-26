@@ -31,7 +31,7 @@ namespace Spark.Data.SqlClient
         /// <summary>
         /// The <see cref="DbParameter"/> size to use when using (MAX) for VARBINARY or VARCHAR fields.
         /// </summary>
-        protected const Int32 Max = -1;
+        protected const Int32 Max = Int32.MaxValue;
 
         /// <summary>
         /// The Sql-Server databse provider factory.

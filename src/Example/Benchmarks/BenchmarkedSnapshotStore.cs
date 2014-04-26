@@ -25,11 +25,12 @@ namespace Spark.Example.Benchmarks
         /// <summary>
         /// Gets the most recent snapshot for the specified <paramref name="streamId"/> and <paramref name="maximumVersion"/>.
         /// </summary>
+        /// <param name="type">The snapshot type.</param>
         /// <param name="streamId">The unique stream identifier.</param>
         /// <param name="maximumVersion">The maximum snapshot version.</param>
-        public Snapshot GetSnapshot(Guid streamId, Int32 maximumVersion)
+        public Snapshot GetSnapshot(Type type, Guid streamId, Int32 maximumVersion)
         {
-            var result = snapshotStore.GetSnapshot(streamId, maximumVersion);
+            var result = snapshotStore.GetSnapshot(type, streamId, maximumVersion);
 
             statistics.IncrementQueryCount();
 

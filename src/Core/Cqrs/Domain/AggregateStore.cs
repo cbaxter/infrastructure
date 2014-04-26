@@ -92,7 +92,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="id">The unique aggregate id.</param>
         private Aggregate GetOrCreate(Type aggregateType, Guid id)
         {
-            Snapshot snapshot = snapshotStore.GetLastSnapshot(id);
+            Snapshot snapshot = snapshotStore.GetLastSnapshot(aggregateType, id);
             Aggregate aggregate;
 
             if (snapshot == null)
