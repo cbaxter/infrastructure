@@ -109,6 +109,7 @@
     <Compile Include="Data\SqlClient\SqlSequentialGuid.cs" />
     <Compile Include="Data\SqlClient\SqlTransientErrorRegistry.cs" />
     <Compile Include="Data\DbTransientErrorRegistry.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
     <Compile Include="Cqrs\Domain\Entity.cs" />
