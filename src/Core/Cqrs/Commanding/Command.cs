@@ -70,5 +70,15 @@ namespace Spark.Cqrs.Commanding
         {
             return Headers.GetUserName();
         }
+
+        /// <summary>
+        /// Creates a new <see cref="CommandContext"/> based on the current command using the specified <paramref name="aggregateId"/>.
+        /// </summary>
+        /// <param name="aggregateId">The aggregate identifier associated with the new command context.</param>
+        public CommandContext CreateContext(Guid aggregateId)
+        {
+            var headers = CommandContext.Current == null ? HeaderCollection.Empty : CommandContext.Current.Headers;
+            return new CommandContext(GuidStrategy.NewGuid(), headers, new CommandEnvelope(aggregateId, this));
+        }
     }
 }
