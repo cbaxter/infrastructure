@@ -124,6 +124,18 @@ namespace Test.Spark.Cqrs.Commanding
 
                 publisher.Verify(mock => mock.Publish(It.Is<Header[]>(headers => Equals(headers.Single(), header)), It.IsAny<CommandEnvelope>()), Times.Once());
             }
+
+            [Fact]
+            public void CanPublishMultipleCommandsToSameAggregate()
+            {
+                var aggregateId = GuidStrategy.NewGuid();
+                var publisher = new Mock<IPublishCommands>();
+                var commands = new[] { new FakeCommand(), new FakeCommand() };
+
+                publisher.Object.Publish(aggregateId, commands);
+
+                publisher.Verify(mock => mock.Publish(null, It.IsAny<CommandEnvelope>()), Times.Exactly(2));
+            }
         }
 
         internal class FakeCommand : Command
