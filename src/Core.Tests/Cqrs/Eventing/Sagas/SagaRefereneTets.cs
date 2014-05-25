@@ -28,12 +28,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             {
                 Assert.Throws<ArgumentNullException>(() => new SagaReference(null, GuidStrategy.NewGuid()));
             }
-
-            [Fact]
-            public void SagaIdCannotEqualEmptyGuid()
-            {
-                Assert.Throws<ArgumentException>(() => new SagaReference(typeof(Saga), Guid.Empty));
-            }
         }
 
         public class WhenTestingEquality
