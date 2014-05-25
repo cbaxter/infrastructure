@@ -28,7 +28,7 @@ namespace Test.Spark.Serialization.Converters
             {
                 var json = WriteJson(default(Binary));
 
-                Validate("null", json);
+                Validate(json, "null");
             }
 
             [Fact]

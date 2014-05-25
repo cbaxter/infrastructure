@@ -37,7 +37,7 @@ namespace Test.Spark.Serialization.Converters
                 var value = new EmailAddress("CBaxter@sparksoftware.net");
                 var json = WriteJson(value);
 
-                Validate("\"cbaxter@sparksoftware.net\"", json);
+                Validate(json, "\"cbaxter@sparksoftware.net\"");
             }
 
             [Fact]
@@ -46,7 +46,7 @@ namespace Test.Spark.Serialization.Converters
                 var value = new TestId(123);
                 var json = WriteJson(value);
 
-                Validate("123", json);
+                Validate(json, "123");
             }
         }
 

@@ -30,7 +30,7 @@ namespace Test.Spark.Serialization.Converters
             {
                 var json = WriteJson(default(EventCollection));
 
-                Validate("null", json);
+                Validate(json, "null");
             }
 
             [Fact]
