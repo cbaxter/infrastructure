@@ -64,6 +64,7 @@
     <Compile Include="Converters\EventEnvelopeConverterTests.cs" />
     <Compile Include="Converters\CommandEnvelopeConverterTests.cs" />
     <Compile Include="Converters\CommitDataConverterTests.cs" />
+    <Compile Include="Converters\ValueObjectKeyedDictionaryConverterTests.cs" />
     <Compile Include="Converters\ValueObjectConverterTests.cs" />
     <Compile Include="Converters\StateObjectConverterTests.cs" />
     <Compile Include="Converters\EventCollectionConverterTests.cs" />

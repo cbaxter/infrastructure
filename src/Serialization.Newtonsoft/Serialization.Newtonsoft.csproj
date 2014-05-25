@@ -60,6 +60,7 @@
     <Compile Include="Converters\EventVersionConverter.cs" />
     <Compile Include="Converters\EventEnvelopeConverter.cs" />
     <Compile Include="Converters\CommitDataConverter.cs" />
+    <Compile Include="Converters\ValueObjectKeyedDictionaryConverter.cs" />
     <Compile Include="Converters\ValueObjectConverter.cs" />
     <Compile Include="Converters\StateObjectConverter.cs" />
     <Compile Include="JsonReaderExtensions.cs" />
