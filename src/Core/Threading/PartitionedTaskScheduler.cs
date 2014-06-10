@@ -56,7 +56,7 @@ namespace Spark.Threading
         private Int32 queuedTasks;
 
         /// <summary>
-        /// Gets the bounded capacity of this <see cref="BlockingThreadPoolTaskScheduler"/> instance.
+        /// Gets the bounded capacity of this <see cref="PartitionedTaskScheduler "/> instance.
         /// </summary>
         public Int32 BoundedCapacity { get { return boundedCapacity; } }
 
