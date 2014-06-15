@@ -53,7 +53,7 @@ namespace Spark.Cqrs.Domain
         /// Add the specified <see cref="Entity"/> to the collection.
         /// </summary>
         /// <param name="entity">The entity to add to the collection.</param>
-        public void Add(Entity entity)
+        internal void Add(Entity entity)
         {
             Verify.NotNull(entity, "entity");
 
@@ -70,7 +70,7 @@ namespace Spark.Cqrs.Domain
         /// Determines whether the <see cref="EntityCollection"/> contains the specified <paramref name="entity"/>.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public Boolean Contains(Entity entity)
+        internal Boolean Contains(Entity entity)
         {
             return entity != null && Contains(entity.Id);
         }
@@ -85,7 +85,7 @@ namespace Spark.Cqrs.Domain
         /// Removes the <see cref="Entity"/> from the <see cref="EntityCollection"/>.
         /// </summary>
         /// <param name="entity">The entity to remove.</param>
-        public Boolean Remove(Entity entity)
+        internal Boolean Remove(Entity entity)
         {
             return entity != null && Remove(entity.Id);
         }
