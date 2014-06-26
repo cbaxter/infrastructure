@@ -59,6 +59,7 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="Binary.cs" />
     <Compile Include="Configuration\SagaStoreElement.cs" />
+    <Compile Include="CoreAssembly.cs" />
     <Compile Include="Cqrs\Commanding\CommandContext.cs" />
     <Compile Include="Cqrs\Commanding\CommandEnvelope.cs" />
     <Compile Include="Cqrs\Commanding\CommandHandler.cs" />
