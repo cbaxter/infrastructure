@@ -38,6 +38,12 @@ namespace Spark.Cqrs.Domain
         public Int32 Version { get { return version; } internal set { version = value; } }
 
         /// <summary>
+        /// Returns <value>true</value> if this aggregate has already been created; otherwise returns <value>false</value>.
+        /// </summary>
+        [IgnoreDataMember]
+        protected Boolean Created { get { return Version > 0; } }
+
+        /// <summary>
         /// Return <value>true</value> if this aggregate must be explicitly created by another <see cref="Aggregate"/> instance or an exception 
         /// has been made via <see cref="CanCreateAggregate"/>; otherwise return <value>false</value> (default = <value>true</value>).
         /// </summary>
