@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -132,11 +133,11 @@ namespace Spark.Serialization.Converters
                 if (propertyName == TypePropertyName)
                 {
                     objectType = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
-                    stateObject = (StateObject)Activator.CreateInstance(objectType);
+                    stateObject = (StateObject)FormatterServices.GetUninitializedObject(objectType);
                 }
                 else
                 {
-                    stateObject = stateObject ?? (StateObject)Activator.CreateInstance(objectType);
+                    stateObject = stateObject ?? (StateObject)FormatterServices.GetUninitializedObject(objectType);
                     state.Add(propertyName, serializer.Deserialize(reader, stateObject.GetFieldType(propertyName)));
                 }
             }
