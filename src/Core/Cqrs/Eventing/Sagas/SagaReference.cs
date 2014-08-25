@@ -41,7 +41,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         public SagaReference(Type sagaType, Guid sagaId)
         {
             Verify.NotNull(sagaType, "sagaType");
-            Verify.NotEqual(Guid.Empty, sagaId, "sagaId");
 
             this.sagaType = sagaType;
             this.sagaId = sagaId;

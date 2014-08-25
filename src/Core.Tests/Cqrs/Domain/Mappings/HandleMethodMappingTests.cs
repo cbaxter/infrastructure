@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class HandleMethodMappingTests
+    namespace UsingHandleMethodMapping
     {
         public class WhenCreatingMapping
         {

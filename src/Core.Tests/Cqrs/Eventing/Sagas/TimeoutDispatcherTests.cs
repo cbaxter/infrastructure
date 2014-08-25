@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingTimeoutDispatcher
+    namespace UsingTimeoutDispatcher
     {
         public class WhenDisposing
         {
@@ -53,7 +53,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 sagaStore = new Mock<IStoreSagas>();
                 eventPublisher = new Mock<IPublishEvents>();
                 timeoutDispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
-                sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(5));
+                sagaTimeout = new SagaTimeout(typeof(FakeSaga), GuidStrategy.NewGuid(), now.AddMinutes(5));
 
                 SystemTime.OverrideWith(() => now);
 
@@ -220,7 +220,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 now = DateTime.UtcNow;
                 sagaStore = new Mock<IStoreSagas>();
                 eventPublisher = new Mock<IPublishEvents>();
-                sagaTimeout = new SagaTimeout(GuidStrategy.NewGuid(), typeof(FakeSaga), 1, now.AddMinutes(-5));
+                sagaTimeout = new SagaTimeout(typeof(FakeSaga), GuidStrategy.NewGuid(), now.AddMinutes(-5));
 
                 SystemTime.OverrideWith(() => now);
                 Assert.DoesNotThrow(() => new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback)));
@@ -254,21 +254,56 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void DispatchElapsedSagatTimeouts()
             {
                 timer.InvokeCallback();
-                
+
                 eventPublisher.Verify(mock => mock.Publish(It.IsAny<IEnumerable<Header>>(), It.IsAny<EventEnvelope>()), Times.Once());
             }
         }
 
-        private class FakeSaga : Saga
+        public class WhenEnsuringElapsedTimeoutsDispatched : IDisposable
+        {
+            private readonly Mock<IPublishEvents> eventPublisher;
+            private readonly Mock<IStoreSagas> sagaStore;
+            private readonly DateTime now;
+            private FakeTimer timer;
+
+            public WhenEnsuringElapsedTimeoutsDispatched()
+            {
+                now = DateTime.UtcNow;
+                SystemTime.OverrideWith(() => now);
+                sagaStore = new Mock<IStoreSagas>();
+                eventPublisher = new Mock<IPublishEvents>();
+            }
+
+            public void Dispose()
+            {
+                SystemTime.ClearOverride();
+            }
+
+            [Fact]
+            public void RescheduleTimer()
+            {
+                var dispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
+
+                sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new SagaTimeout[0]);
+                eventPublisher.Setup(mock => mock.Publish(It.IsAny<IEnumerable<Header>>(), It.IsAny<EventEnvelope>())).Throws(new InvalidOperationException());
+                dispatcher.EnsureElapsedTimeoutsDispatched();
+                timer.InvokeCallback();
+
+                Assert.True(timer.Changed);
+                sagaStore.Verify(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>()), Times.Once());
+            }
+        }
+
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             { }
         }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
 
-        private class FakeTimer : ITimer
+        internal class FakeTimer : ITimer
         {
             private readonly Action callback;
 

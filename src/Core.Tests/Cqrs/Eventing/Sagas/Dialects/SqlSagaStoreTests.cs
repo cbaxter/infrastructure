@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
 {
-    public static class UsingSagaStoreWithSqlServer
+    namespace UsingSagaStoreWithSqlServer
     {
         public abstract class UsingInitializedSagaStore : IDisposable
         {
@@ -170,7 +170,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
                 var sagaTimeout = SagaStore.GetScheduledTimeouts(timeout.AddMinutes(1)).Single();
                 Assert.Equal(saga.CorrelationId, sagaTimeout.SagaId);
                 Assert.Equal(saga.GetType(), sagaTimeout.SagaType);
-                Assert.Equal(saga.Version, sagaTimeout.Version);
                 Assert.Equal(saga.Timeout, sagaTimeout.Timeout);
             }
 
@@ -306,13 +305,13 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
         }
 
         [Serializable]
-        private class FakeSaga : Saga
+        internal class FakeSaga : Saga
         {
             protected override void Configure(SagaConfiguration saga)
             { }
         }
 
-        public class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

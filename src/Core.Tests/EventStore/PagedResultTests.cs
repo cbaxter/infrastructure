@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.EventStore
 {
-    public static class UsingPagedResult
+    namespace UsingPagedResult
     {
         // ReSharper disable NotResolvedInText
         public class WhenCreatingPagedResult

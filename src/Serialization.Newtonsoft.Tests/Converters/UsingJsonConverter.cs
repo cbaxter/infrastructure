@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Hosting;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
@@ -24,11 +23,6 @@ namespace Test.Spark.Serialization.Converters
 {
     public abstract class UsingJsonConverter
     {
-        static UsingJsonConverter()
-        {
-            
-        }
-
         protected String WriteBson(Object value)
         {
             using (var memoryStream = new MemoryStream())
@@ -84,9 +78,7 @@ namespace Test.Spark.Serialization.Converters
 
         protected T ReadBson<T>(String bson)
         {
-            using (var memoryStream = new MemoryStream(Convert.FromBase64String(RemovePreamble(bson)), writable: false))
-            using (var bsonReader = new BsonReader(memoryStream))
-                return NewtonsoftBsonSerializer.Default.Serializer.Deserialize<T>(bsonReader);
+            return NewtonsoftBsonSerializer.Default.Deserialize<T>(Convert.FromBase64String(RemovePreamble(bson)));
         }
 
         protected T ReadBson<T>(String bson, JsonConverter converter)
@@ -101,9 +93,7 @@ namespace Test.Spark.Serialization.Converters
 
         protected T ReadJson<T>(String json)
         {
-            using (var stringReader = new StringReader(RemovePreamble(json)))
-            using (var jsonReader = new JsonTextReader(stringReader))
-                return NewtonsoftBsonSerializer.Default.Serializer.Deserialize<T>(jsonReader);
+            return NewtonsoftJsonSerializer.Default.Deserialize<T>(Encoding.UTF8.GetBytes(json));
         }
 
         protected T ReadJson<T>(String json, JsonConverter converter)

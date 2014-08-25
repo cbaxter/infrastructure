@@ -23,7 +23,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Logging
 {
-    public static class UsingLogger
+    namespace UsingLogger
     {
         public class WhenCreatingLogger
         {

@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingPipelineHook
+    namespace UsingPipelineHook
     {
         public class WhenPreGetOverriden
         {

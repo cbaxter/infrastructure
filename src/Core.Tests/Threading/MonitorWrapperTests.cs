@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Threading
 {
-    public static class UsingSMonitorWrapper
+    namespace UsingSMonitorWrapper
     {
         public class WhenWaiting
         {

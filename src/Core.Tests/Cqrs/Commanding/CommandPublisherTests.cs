@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandPublisher
+    namespace UsingCommandPublisher
     {
         public class WhenCreatingNewPublisher
         {
@@ -124,9 +124,21 @@ namespace Test.Spark.Cqrs.Commanding
 
                 publisher.Verify(mock => mock.Publish(It.Is<Header[]>(headers => Equals(headers.Single(), header)), It.IsAny<CommandEnvelope>()), Times.Once());
             }
+
+            [Fact]
+            public void CanPublishMultipleCommandsToSameAggregate()
+            {
+                var aggregateId = GuidStrategy.NewGuid();
+                var publisher = new Mock<IPublishCommands>();
+                var commands = new[] { new FakeCommand(), new FakeCommand() };
+
+                publisher.Object.Publish(aggregateId, commands);
+
+                publisher.Verify(mock => mock.Publish(null, It.IsAny<CommandEnvelope>()), Times.Exactly(2));
+            }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
     }
 }

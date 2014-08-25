@@ -24,6 +24,11 @@ namespace Spark.Cqrs.Domain
     public abstract class EntityCollection : IEnumerable<Entity>
     {
         /// <summary>
+        /// Get the base <see cref="Entity"/> <see cref="Type"/>.
+        /// </summary>
+        internal abstract Type EntityType { get; }
+
+        /// <summary>
         /// Get the backing <see cref="IDictionary"/> instance.
         /// </summary>
         protected abstract IDictionary Dictionary { get; }
@@ -32,11 +37,6 @@ namespace Spark.Cqrs.Domain
         /// Get the set of entities currently stored within this <see cref="EntityCollection"/> instance.
         /// </summary>
         protected abstract IEnumerable<Entity> Entities { get; }
-
-        /// <summary>
-        /// Get the base <see cref="Entity"/> <see cref="Type"/>.
-        /// </summary>
-        public abstract Type EntityType { get; }
 
         /// <summary>
         /// Gets the number of entities contained in the <see cref="EntityCollection"/>.
@@ -53,7 +53,7 @@ namespace Spark.Cqrs.Domain
         /// Add the specified <see cref="Entity"/> to the collection.
         /// </summary>
         /// <param name="entity">The entity to add to the collection.</param>
-        public void Add(Entity entity)
+        internal void Add(Entity entity)
         {
             Verify.NotNull(entity, "entity");
 
@@ -70,7 +70,7 @@ namespace Spark.Cqrs.Domain
         /// Determines whether the <see cref="EntityCollection"/> contains the specified <paramref name="entity"/>.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public Boolean Contains(Entity entity)
+        internal Boolean Contains(Entity entity)
         {
             return entity != null && Contains(entity.Id);
         }
@@ -85,7 +85,7 @@ namespace Spark.Cqrs.Domain
         /// Removes the <see cref="Entity"/> from the <see cref="EntityCollection"/>.
         /// </summary>
         /// <param name="entity">The entity to remove.</param>
-        public Boolean Remove(Entity entity)
+        internal Boolean Remove(Entity entity)
         {
             return entity != null && Remove(entity.Id);
         }
@@ -121,6 +121,11 @@ namespace Spark.Cqrs.Domain
         private readonly Dictionary<Guid, TEntity> dictionary = new Dictionary<Guid, TEntity>();
 
         /// <summary>
+        /// Get the base <see cref="Entity"/> <see cref="Type"/>.
+        /// </summary>
+        internal override Type EntityType { get { return typeof(TEntity); } }
+
+        /// <summary>
         /// Get the backing <see cref="IDictionary"/> instance.
         /// </summary>
         protected override IDictionary Dictionary { get { return dictionary; } }
@@ -131,15 +136,10 @@ namespace Spark.Cqrs.Domain
         protected override IEnumerable<Entity> Entities { get { return dictionary.Values; } }
 
         /// <summary>
-        /// Get the base <see cref="Entity"/> <see cref="Type"/>.
-        /// </summary>
-        public override Type EntityType { get { return typeof(TEntity); } }
-
-        /// <summary>
         /// Gets the number of entities contained in the <see cref="EntityCollection"/>.
         /// </summary>
         public override Int32 Count { get { return dictionary.Count; } }
-        
+
         /// <summary>
         /// Gets the <see cref="Entity"/> identified by the specified <paramref name="id"/>.
         /// </summary>
@@ -193,13 +193,22 @@ namespace Spark.Cqrs.Domain
         }
 
         /// <summary>
+        /// Gets an existing <see cref="Entity"/> if exists within the <see cref="EntityCollection"/>; otherwise returns <value>default(<typeparamref name="TEntity"/>)</value>.
+        /// </summary>
+        /// <param name="id">The unique entity identifier.</param>
+        public TEntity Get(Guid id)
+        {
+            TEntity entity;
+            return TryGet(id, out entity) ? entity : default(TEntity);
+        }
+
+        /// <summary>
         /// Gets an existing <see cref="Entity"/> if exists within the <see cref="EntityCollection"/>; otherwise adds and returns a using
         /// the specified <paramref name="factory"/> method.
         /// </summary>
         /// <param name="id">The unique entity identifier.</param>
         /// <param name="factory">The <see cref="Entity"/> factory methods.</param>
-        public TEntity GetOrAdd
-            (Guid id, Func<Guid, TEntity> factory)
+        public TEntity GetOrAdd(Guid id, Func<Guid, TEntity> factory)
         {
             TEntity entity;
             if (TryGet(id, out entity))

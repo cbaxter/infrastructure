@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
-    public static class UsingHookableSagaStore
+    namespace UsingHookableSagaStore
     {
         public class WhenCreatingSagaStore
         {

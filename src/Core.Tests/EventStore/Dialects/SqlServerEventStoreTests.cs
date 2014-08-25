@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Test.Spark.EventStore.Dialects
 {
-    public static class UsingEventStoreWithSqlServer
+    namespace UsingEventStoreWithSqlServer
     {
         public abstract class UsingInitializedEventStore : IDisposable
         {

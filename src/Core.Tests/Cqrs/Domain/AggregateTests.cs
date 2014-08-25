@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingAggregate
+    namespace UsingAggregate
     {
         public class WhenVerifyingUninitialized
         {

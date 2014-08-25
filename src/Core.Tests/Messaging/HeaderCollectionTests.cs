@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingHeaderCollection
+    namespace UsingHeaderCollection
     {
         public class WhenReferencingEmptyHeaders
         {

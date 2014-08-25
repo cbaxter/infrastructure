@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class UsingHandleByStrategyAttribute
+    namespace UsingHandleByStrategyAttribute
     {
         public class WhenResolvingServices
         {

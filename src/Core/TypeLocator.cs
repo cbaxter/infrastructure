@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Spark.Cqrs.Eventing.Sagas;
 using Spark.Logging;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -52,7 +53,7 @@ namespace Spark
         /// <param name="assemblies">The set of assemblies from which types are located.</param>
         public TypeLocator(params Assembly[] assemblies)
         {
-            this.assemblies = assemblies == null || assemblies.Length == 0 ? AppDomain.CurrentDomain.GetAssemblies() : assemblies.ToArray();
+            this.assemblies = assemblies == null || assemblies.Length == 0 ? AppDomain.CurrentDomain.GetAssemblies() : assemblies.Concat(CoreAssembly.Reference).ToArray();
         }
 
         /// <summary>

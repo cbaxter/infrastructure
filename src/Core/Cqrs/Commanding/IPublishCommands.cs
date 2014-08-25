@@ -37,6 +37,20 @@ namespace Spark.Cqrs.Commanding
     public static class CommandPublisherExtensions
     {
         /// <summary>
+        /// Publishes the set of <paramref name="commands"/> with only the default message headers.
+        /// </summary>
+        /// <param name="publisher">The command publisher.</param>
+        /// <param name="aggregateId">The <see cref="Aggregate"/> identifier that will handle the specified <paramref name="commands"/>.</param>
+        /// <param name="commands">The commands to be published.</param>
+        public static void Publish(this IPublishCommands publisher, Guid aggregateId, IEnumerable<Command> commands)
+        {
+            Verify.NotNull(publisher, "publisher");
+
+            foreach (var command in commands.EmptyIfNull())
+                publisher.Publish(aggregateId, command);
+        }
+
+        /// <summary>
         /// Publishes the specified <paramref name="command"/> with only the default message headers.
         /// </summary>
         /// <param name="publisher">The command publisher.</param>
@@ -62,7 +76,7 @@ namespace Spark.Cqrs.Commanding
 
             publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
         }
-        
+
         /// <summary>
         /// Publishes the specified <paramref name="command"/> with the enumerable set of custom message headers.
         /// </summary>

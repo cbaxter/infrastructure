@@ -19,7 +19,7 @@ using Xunit;
 namespace Test.Spark.Cqrs.Eventing.Sagas
 {
     // ReSharper disable NotResolvedInText
-    public static class UsingSagaReference
+    namespace UsingSagaReference
     {
         public class WhenCreatingSagaReference
         {
@@ -27,12 +27,6 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void SagaTypeCannotBeNull()
             {
                 Assert.Throws<ArgumentNullException>(() => new SagaReference(null, GuidStrategy.NewGuid()));
-            }
-
-            [Fact]
-            public void SagaIdCannotEqualEmptyGuid()
-            {
-                Assert.Throws<ArgumentException>(() => new SagaReference(typeof(Saga), Guid.Empty));
             }
         }
 

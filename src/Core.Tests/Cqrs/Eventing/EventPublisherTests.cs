@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventPublisher
+    namespace UsingEventPublisher
     {
         public class WhenCreatingNewPublisher
         {

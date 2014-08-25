@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Test.Spark.Data.SqlClient
 {
-    public static class UsingSqlSequentialGuid
+    namespace UsingSqlSequentialGuid
     {
         public class WhenCreatingNewGuid
         {

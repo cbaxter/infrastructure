@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing
 {
-    public static class UsingEventDispatcher
+    namespace UsingEventDispatcher
     {
         public class WhenCreatingNewDispatcher
         {
@@ -59,15 +59,25 @@ namespace Test.Spark.Cqrs.Eventing
                 eventPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<EventEnvelope>()), Times.Never());
             }
 
+            protected sealed class FakeEvent : Event
+            { }
+        }
+
+        public class WhenEnsureingPersistedCommitsDispatched
+        {
+            private readonly Mock<IPublishEvents> eventPublisher = new Mock<IPublishEvents>();
+            private readonly Mock<IStoreEvents> eventStore = new Mock<IStoreEvents>();
+
             [Fact]
             public void DispatchUndispatchedCommitsIfMarkingDispatched()
             {
                 var e = new FakeEvent();
                 var commit = new Commit(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), 1, HeaderCollection.Empty, new EventCollection(new Event[] { e }));
+                var dispatcher = new EventDispatcher(eventStore.Object, eventPublisher.Object, new EventStoreSettings { MarkDispatched = true });
 
                 eventStore.Setup(mock => mock.GetUndispatched()).Returns(new[] { commit });
 
-                Assert.DoesNotThrow(() => new EventDispatcher(eventStore.Object, eventPublisher.Object, new EventStoreSettings { MarkDispatched = true }));
+                dispatcher.EnsurePersistedCommitsDispatched();
 
                 eventPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<EventEnvelope>()), Times.Once());
             }

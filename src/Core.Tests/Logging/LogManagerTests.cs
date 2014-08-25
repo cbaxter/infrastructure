@@ -19,7 +19,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Logging
 {
-    public class UsingLogManager
+    namespace UsingLogManager
     {
         public class WhenCreatingLogger
         {
@@ -94,7 +94,7 @@ namespace Test.Spark.Logging
             [Fact]
             public void LoggerIsNamedAfterDeclaringClassFullName()
             {
-                Assert.Equal("Test.Spark.Logging.UsingLogManager+LoggerClass", LoggerClass.Log.Name);
+                Assert.Equal("Test.Spark.Logging.UsingLogManager.LoggerClass", LoggerClass.Log.Name);
             }
         }
 
@@ -113,11 +113,11 @@ namespace Test.Spark.Logging
             {
                 var logger = LogManager.GetLogger(typeof(WhenGettingNamedLogger));
 
-                Assert.Equal("Test.Spark.Logging.UsingLogManager+WhenGettingNamedLogger", logger.Name);
+                Assert.Equal("Test.Spark.Logging.UsingLogManager.WhenGettingNamedLogger", logger.Name);
             }
         }
 
-        public sealed class LoggerClass
+        internal sealed class LoggerClass
         {
             public static readonly ILog Log = LogManager.GetCurrentClassLogger();
         }

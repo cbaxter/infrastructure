@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -14,7 +15,6 @@ using Newtonsoft.Json;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
-using Spark.Cqrs.Domain;
 
 namespace Spark.Serialization.Converters
 {
@@ -24,7 +24,6 @@ namespace Spark.Serialization.Converters
     public sealed class StateObjectConverter : JsonConverter
     {
         private const String TypePropertyName = "$type";
-        private const String ValuesPropertyName = "$values";
         private static readonly Type StateObjectType = typeof(StateObject);
 
         /// <summary>
@@ -111,29 +110,6 @@ namespace Spark.Serialization.Converters
             }
         }
 
-        private void WriteEntityCollection(JsonWriter writer, Type propertyType, IEnumerable<Entity> propertyValue, JsonSerializer serializer)
-        {
-            var instanceType = propertyValue.GetType();
-
-            if (instanceType == propertyType)
-            {
-                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
-            }
-            else
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName(TypePropertyName);
-                serializer.Serialize(writer, instanceType.GetFullNameWithAssembly());
-
-                writer.WritePropertyName(ValuesPropertyName);
-
-                EntityCollectionConverter.Default.WriteJson(writer, propertyValue, serializer);
-
-                writer.WriteEndObject();
-            }
-        }
-
         /// <summary>
         /// Reads the JSON representation of an <see cref="StateObject"/> instance.
         /// </summary>
@@ -157,11 +133,11 @@ namespace Spark.Serialization.Converters
                 if (propertyName == TypePropertyName)
                 {
                     objectType = Type.GetType(serializer.Deserialize<String>(reader), throwOnError: true, ignoreCase: true);
-                    stateObject = (StateObject)Activator.CreateInstance(objectType);
+                    stateObject = (StateObject)FormatterServices.GetUninitializedObject(objectType);
                 }
                 else
                 {
-                    stateObject = stateObject ?? (StateObject)Activator.CreateInstance(objectType);
+                    stateObject = stateObject ?? (StateObject)FormatterServices.GetUninitializedObject(objectType);
                     state.Add(propertyName, serializer.Deserialize(reader, stateObject.GetFieldType(propertyName)));
                 }
             }

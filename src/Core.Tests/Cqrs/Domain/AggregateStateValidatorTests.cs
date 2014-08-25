@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingAggregateStateValidator
+    namespace UsingAggregateStateValidator
     {
         public class WhenInvokingPostGet
         {
@@ -130,7 +130,7 @@ namespace Test.Spark.Cqrs.Domain
             }
         }
 
-        private class FakeAggregate : Aggregate
+        internal class FakeAggregate : Aggregate
         {
             public Guid State { get; set; }
         }

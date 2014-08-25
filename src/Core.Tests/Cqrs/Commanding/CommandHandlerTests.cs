@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Commanding
 {
-    public static class UsingCommandHandler
+    namespace UsingCommandHandler
     {
         public class WhenCreatingNewHandler
         {
@@ -169,7 +169,7 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeAggregate : Aggregate
+        internal class FakeAggregate : Aggregate
         {
             private readonly Boolean explicitCreateRequired;
 
@@ -192,7 +192,7 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeAggregateWithExplicitCreate : Aggregate
+        internal class FakeAggregateWithExplicitCreate : Aggregate
         {
             protected override bool CanCreateAggregate(Command command)
             {
@@ -206,10 +206,10 @@ namespace Test.Spark.Cqrs.Commanding
             }
         }
 
-        private class FakeCommand : Command
+        internal class FakeCommand : Command
         { }
 
-        private class FakeEvent : Event
+        internal class FakeEvent : Event
         { }
     }
 }

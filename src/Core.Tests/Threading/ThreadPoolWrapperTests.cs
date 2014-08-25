@@ -6,7 +6,7 @@ using Xunit;
 // ReSharper disable AccessToDisposedClosure
 namespace Test.Spark.Threading
 {
-    public static class UsingThreadPoolWrapper
+    namespace UsingThreadPoolWrapper
     {
         public class WhenQueuingUserWorkItem
         {

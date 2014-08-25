@@ -51,7 +51,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
-            this.timer = new TimerWrapper(_ => OnTimerElapsed(), null, TimeSpan.Zero, System.Threading.Timeout.InfiniteTimeSpan);
+            this.timer = new TimerWrapper(_ => DispatchElapsedTimeouts(), null, System.Threading.Timeout.InfiniteTimeSpan, System.Threading.Timeout.InfiniteTimeSpan);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
-            this.timer = timer(OnTimerElapsed);
+            this.timer = timer(DispatchElapsedTimeouts);
         }
 
         /// <summary>
@@ -89,6 +89,17 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
+        /// Ensure any un-dispatched timeouts are processed before handling new timeouts.
+        /// </summary>
+        /// <remarks>
+        /// The dispatcher must be started after the IoC container has been built to ensure that any <see cref="Lazy{T}"/> circular dependencies can be resolved.
+        /// </remarks>
+        public void EnsureElapsedTimeoutsDispatched()
+        {
+            DispatchElapsedTimeouts();
+        }
+
+        /// <summary>
         ///  When overriden, defines the custom behavior to be invoked after attempting to save the specified <paramref name="saga"/>.
         /// </summary>
         /// <param name="saga">The modified <see cref="Saga"/> instance if <paramref name="error"/> is <value>null</value>; otherwise the original <see cref="Saga"/> instance if <paramref name="error"/> is not <value>null</value>.</param>
@@ -103,7 +114,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             {
                 var timeout = saga.Timeout.Value;
 
-                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.CorrelationId, saga.GetType(), saga.Version, timeout));
+                TimeoutCache.ScheduleTimeout(new SagaTimeout(saga.GetType(), saga.CorrelationId, timeout));
             }
             else
             {
@@ -116,7 +127,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <summary>
         /// Publish any pending saga timeouts.
         /// </summary>
-        private void OnTimerElapsed()
+        private void DispatchElapsedTimeouts()
         {
             try
             {
@@ -165,7 +176,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             var eventPublisher = lazyEventPublisher.Value;
             foreach (var sagaTimeout in sagaTimeouts)
             {
-                var eventVersion = new EventVersion(sagaTimeout.Version, 1, 1);
+                var eventVersion = new EventVersion(Int32.MaxValue, 1, 1);
                 var e = new Timeout(sagaTimeout.SagaType, sagaTimeout.Timeout);
 
                 eventPublisher.Publish(HeaderCollection.Empty, new EventEnvelope(GuidStrategy.NewGuid(), sagaTimeout.SagaId, eventVersion, e));

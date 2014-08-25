@@ -20,7 +20,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark
 {
-    public static class UsingObjectHasher
+    namespace UsingObjectHasher
     {
         public class WhenHashingNullValues
         {
@@ -77,7 +77,7 @@ namespace Test.Spark
             public void DictionaryHashedConsistently()
             {
                 var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
-
+                
                 Assert.Equal(ObjectHasher.Hash(dictionary), ObjectHasher.Hash(dictionary));
             }
 
@@ -88,6 +88,26 @@ namespace Test.Spark
                     ObjectHasher.Hash(new Dictionary<String, Object> { { "Value 2", 2 }, { "Value 3", 3 }, { "Value 1", 1 } }),
                     ObjectHasher.Hash(new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } })
                 );
+            }
+
+            [Fact]
+            public void HashImpactedByReferenceEquality()
+            {
+                var dict1 = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
+                var dict2 = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
+
+                Assert.NotEqual(new { a = dict1, b = dict1 }, new { a = dict1, b = dict2 });
+            }
+
+            [Fact]
+            public void CircularReferenceDoesNotResultInStackOverflow()
+            {
+                var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
+    
+                //NOTE: When `Keys` is accessed, a `KeyCollection` instance is created that holds a reference to the underlying `dictionary` and 
+                //      would cause a `StackOverflowException` to be thrown if not handled correctly.
+                Assert.NotNull(dictionary.Keys); 
+                Assert.DoesNotThrow(() => ObjectHasher.Hash(dictionary));
             }
         }
 
@@ -124,7 +144,7 @@ namespace Test.Spark
 
                 Assert.NotEqual(graph.NonHashedField, ObjectHasher.Hash(graph));
             }
-            
+
             private class CustomObject
             {
                 [NonHashed]

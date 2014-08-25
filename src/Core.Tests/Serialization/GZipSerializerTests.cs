@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Test.Spark.Serialization
 {
-    public static class UsingGZipSerializer
+    namespace UsingGZipSerializer
     {
         public sealed class WhenSerializingStream
         {

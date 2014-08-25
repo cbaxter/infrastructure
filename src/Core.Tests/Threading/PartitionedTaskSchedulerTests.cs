@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Threading
 {
-    public static class UsingPartitionedTaskScheduler
+    namespace UsingPartitionedTaskScheduler
     {
         public class WhenInitializing
         {

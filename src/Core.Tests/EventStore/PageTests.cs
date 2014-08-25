@@ -20,7 +20,7 @@ using Xunit;
 namespace Test.Spark.EventStore
 {
     // ReSharper disable NotResolvedInText
-    public static class UsingPage
+    namespace UsingPage
     {
         public class WhenCreatingPage
         {

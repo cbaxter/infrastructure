@@ -20,7 +20,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingHeader
+    namespace UsingHeader
     {
         public class WhenCreatingHeader
         {

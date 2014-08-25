@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Eventing.Mappings
 {
-    public static class UsingHandleByRegistrationAttribute
+    namespace UsingHandleByRegistrationAttribute
     {
         public class WhenLocatingHandleMethods
         {

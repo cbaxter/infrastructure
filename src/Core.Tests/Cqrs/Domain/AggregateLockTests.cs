@@ -23,7 +23,7 @@ using Xunit;
 namespace Test.Spark.Cqrs.Domain
 {
     // ReSharper disable AccessToDisposedClosure
-    public static class UsingAggregateLock
+    namespace UsingAggregateLock
     {
         public class WhenAquiringAggregateLock
         {

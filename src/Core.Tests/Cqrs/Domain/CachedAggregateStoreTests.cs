@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingCachedAggregateStore
+    namespace UsingCachedAggregateStore
     {
         public class WhenGettingAggregate
         {
@@ -128,7 +128,7 @@ namespace Test.Spark.Cqrs.Domain
             }
         }
 
-        private class FakeAggregate : Aggregate
+        internal class FakeAggregate : Aggregate
         {
             public String CacheKey { get { return String.Concat(GetType().GetFullNameWithAssembly(), "-", Id); } }
             public FakeAggregate() { Id = GuidStrategy.NewGuid(); }

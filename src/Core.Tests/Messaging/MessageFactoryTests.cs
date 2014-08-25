@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    public static class UsingMessageFactory
+    namespace UsingMessageFactory
     {
         public class WhenCreatingNewMessages
         {
@@ -81,7 +81,7 @@ namespace Test.Spark.Messaging
             }
         }
 
-        private class FakeMessageFactory : MessageFactory
+        internal class FakeMessageFactory : MessageFactory
         { }
     }
 }

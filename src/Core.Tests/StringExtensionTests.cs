@@ -19,7 +19,7 @@ using Xunit.Extensions;
 #pragma warning disable 1720
 namespace Test.Spark
 {
-    public static class UsingStringExtensions
+    namespace UsingStringExtensions
     {
         public class WhenEnsuringNotNull
         {

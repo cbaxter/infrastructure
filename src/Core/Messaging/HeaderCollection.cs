@@ -64,10 +64,10 @@ namespace Spark.Messaging
         {
             String value;
             if (!TryGetValue(Header.Timestamp, out value) || value == null)
-                return SystemTime.Now;
+                return SystemTime.GetTimestamp();
             
             DateTime timestamp;
-            return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out timestamp) ? timestamp : SystemTime.Now;
+            return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out timestamp) ? timestamp : SystemTime.GetTimestamp();
         }
 
         /// <summary>

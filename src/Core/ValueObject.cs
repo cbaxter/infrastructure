@@ -247,21 +247,21 @@ namespace Spark
         }
 
         /// <summary>
+        /// Indicates whether this instance and a specified <see cref="ValueObject{T}"/> are equal.
+        /// </summary>
+        /// <param name="other">Another <see cref="ValueObject{T}"/> to compare.</param>
+        public Boolean Equals(ValueObject<T> other)
+        {
+            return other != null && Equals(other.value);
+        }
+
+        /// <summary>
         /// Indicates whether this instance and a specified <typeparamref name="T"/> are equal.
         /// </summary>
         /// <param name="other">Another <typeparamref name="T"/> to compare.</param>
         public virtual Boolean Equals(T other)
         {
             return value.Equals(other);
-        }
-
-        /// <summary>
-        /// Indicates whether this instance and a specified <see cref="ValueObject{T}"/> are equal.
-        /// </summary>
-        /// <param name="other">Another <see cref="ValueObject{T}"/> to compare.</param>
-        public virtual Boolean Equals(ValueObject<T> other)
-        {
-            return other != null && other.value.Equals(value);
         }
 
         /// <summary>

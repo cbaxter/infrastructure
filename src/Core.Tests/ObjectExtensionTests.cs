@@ -18,7 +18,7 @@ using Xunit;
 #pragma warning disable 1720
 namespace Test.Spark
 {
-    public static class UsingObjectExtensions
+    namespace UsingObjectExtensions
     {
         public class WhenCheckingIfNull
         {

@@ -22,7 +22,7 @@ using Xunit.Extensions;
 
 namespace Test.Spark.Cqrs.Domain.Mappings
 {
-    public static class UsingApplyByAttributeAttribute
+    namespace UsingApplyByAttributeAttribute
     {
         public class WhenLocatingApplyMethods
         {

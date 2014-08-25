@@ -59,6 +59,7 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="Binary.cs" />
     <Compile Include="Configuration\SagaStoreElement.cs" />
+    <Compile Include="CoreAssembly.cs" />
     <Compile Include="Cqrs\Commanding\CommandContext.cs" />
     <Compile Include="Cqrs\Commanding\CommandEnvelope.cs" />
     <Compile Include="Cqrs\Commanding\CommandHandler.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Cqrs\Eventing\Sagas\SagaActivator.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaCommand.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaLock.cs" />
+    <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCollection.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutHandler.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaMetadata.cs" />
     <Compile Include="Cqrs\Eventing\Sagas\SagaTimeoutCache.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="Data\SqlClient\SqlSequentialGuid.cs" />
     <Compile Include="Data\SqlClient\SqlTransientErrorRegistry.cs" />
     <Compile Include="Data\DbTransientErrorRegistry.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DateTimeFormat.cs" />
     <Compile Include="Cqrs\Domain\AggregateStateValidator.cs" />
     <Compile Include="Cqrs\Domain\Entity.cs" />

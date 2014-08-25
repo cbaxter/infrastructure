@@ -96,5 +96,21 @@ namespace Spark.Serialization
                 return result;
             }
         }
+
+        /// <summary>
+        /// Deserializes a binary field in to an object graph.
+        /// </summary>
+        /// <param name="serializer">The <see cref="ISerializeObjects"/> implementation being extended.</param>
+        /// <param name="buffer">The binary data to be deserialized in to an object graph.</param>
+        /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
+        public static Object Deserialize(this ISerializeObjects serializer, Byte[] buffer, Type type)
+        {
+            using (var stream = new MemoryStream(buffer, writable: false))
+            {
+                var result = serializer.Deserialize(stream, type);
+
+                return result;
+            }
+        }
     }
 }

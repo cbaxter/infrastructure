@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingPipelineHook
+    namespace UsingPipelineHook
     {
         public class WhenPreGetOverriden
         {

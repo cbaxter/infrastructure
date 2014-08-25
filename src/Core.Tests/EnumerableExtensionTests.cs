@@ -20,7 +20,7 @@ using Xunit;
 #pragma warning disable 1720
 namespace Test.Spark
 {
-    public static class UsingEnumerableExtensions
+    namespace UsingEnumerableExtensions
     {
         public class WhenConvertingToArray
         {

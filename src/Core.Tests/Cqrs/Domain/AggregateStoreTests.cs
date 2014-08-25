@@ -27,7 +27,7 @@ using Xunit;
 
 namespace Test.Spark.Cqrs.Domain
 {
-    public static class UsingAggregateStore
+    namespace UsingAggregateStore
     {
         public class WhenDisposing
         {
@@ -80,12 +80,12 @@ namespace Test.Spark.Cqrs.Domain
                 var events = new Event[] { new FakeEvent(), new FakeEvent() };
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object);
 
-                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, snapshot));
+                snapshotStore.Setup(mock => mock.GetSnapshot(typeof(FakeAggregate), id, Int32.MaxValue)).Returns(new Snapshot(id, 10, snapshot));
                 eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 11, HeaderCollection.Empty, new EventCollection(events)) });
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
 
-                snapshotStore.Verify(mock => mock.GetSnapshot(id, Int32.MaxValue), Times.Once());
+                snapshotStore.Verify(mock => mock.GetSnapshot(typeof(FakeAggregate), id, Int32.MaxValue), Times.Once());
 
                 Assert.Equal(11, aggregate.Version);
             }
@@ -100,7 +100,7 @@ namespace Test.Spark.Cqrs.Domain
                 for (var i = 0; i < 10; i++)
                     commits.Add(new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 11 + i, HeaderCollection.Empty, EventCollection.Empty));
 
-                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
+                snapshotStore.Setup(mock => mock.GetSnapshot(typeof(FakeAggregate), id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
                 eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(commits);
 
                 var aggregate = aggregateStore.Get(typeof(FakeAggregate), id);
@@ -116,7 +116,7 @@ namespace Test.Spark.Cqrs.Domain
                 var id = GuidStrategy.NewGuid();
                 var aggregateStore = new AggregateStore(aggregateUpdater.Object, snapshotStore.Object, eventStore.Object, new AggregateStoreSettings());
 
-                snapshotStore.Setup(mock => mock.GetSnapshot(id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
+                snapshotStore.Setup(mock => mock.GetSnapshot(typeof(FakeAggregate), id, Int32.MaxValue)).Returns(new Snapshot(id, 10, new FakeAggregate(id, 10)));
                 eventStore.Setup(mock => mock.GetStream(id, 11)).Returns(new[] { new Commit(1L, DateTime.UtcNow, Guid.NewGuid(), id, 12, HeaderCollection.Empty, EventCollection.Empty) });
 
                 var ex = Assert.Throws<InvalidOperationException>(() => aggregateStore.Get(typeof(FakeAggregate), id));
