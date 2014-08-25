@@ -1,70 +1,102 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
 
-    <Import Project="..\lib\MSBuild\MSBuild.Community.Tasks\MSBuild.Community.Tasks.Targets"/>
-    <UsingTask AssemblyFile="packages\xunit.runners.2.0.0-alpha-build1611\tools\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
+  <Import Project="..\lib\MSBuild\MSBuild.Community.Tasks\MSBuild.Community.Tasks.Targets"/>
+  <UsingTask AssemblyFile="packages\xunit.runners.2.0.0-alpha-build1611\tools\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
 
+  <!--
+  * Build Configuration Properies
+  **************************************************
+  -->
+  <PropertyGroup>
+    <SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>
+    <Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <MajorVersion Condition="'$(MajorVersion)' == ''">0</MajorVersion>
+    <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
+    <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
+    <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
+  </PropertyGroup>
+
+  <!--
+  * Clean
+  * Remove any output from previous builds.
+  **************************************************
+  -->
+  <Target Name="Clean">
+    <ItemGroup>
+      <CleanFiles Include="**\bin\$(Configuration)\**" Exclude="**\bin\$(Configuration)\*.vshost.exe" />
+      <CleanFiles Include="**\obj\$(Configuration)\**" />
+    </ItemGroup>
+
+    <Delete Files="@(CleanFiles)" TreatErrorsAsWarnings="true" />
+  </Target>
+
+  <!--
+  * StampVersionInfo
+  * Generates VersionInfo.cs based on the build date.
+  **************************************************
+  -->
+  <Target Name="StampVersionInfo" DependsOnTargets="Clean">
     <PropertyGroup>
-        <SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>
-        <Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
-        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-        <MajorVersion Condition="'$(MajorVersion)' == ''">0</MajorVersion>
-        <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
-        <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
-        <Commit Condition="'$(Commit)' == ''">Unknown</Commit>
-        <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
+      <GetBuildDateScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Date.Subtract(new DateTime(2012, 11, 18)).TotalDays).ToString(); } ]]></GetBuildDateScript>
+      <GetBuildTimeScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Subtract(DateTime.Today).TotalMinutes).ToString(); } ]]></GetBuildTimeScript>
     </PropertyGroup>
 
-    <Target Name="Clean">
-        <ItemGroup>
-            <CleanFiles Include="**\bin\$(Configuration)\**" Exclude="**\bin\$(Configuration)\*.vshost.exe" />
-            <CleanFiles Include="**\obj\$(Configuration)\**" />
-        </ItemGroup>
+    <Script Language="C#" Code="$(GetBuildDateScript)" Imports="System">
+      <Output TaskParameter="ReturnValue" PropertyName="BuildDate" />
+    </Script>
 
-        <Delete Files="@(CleanFiles)" TreatErrorsAsWarnings="true" />
-    </Target>
+    <Script Language="C#" Code="$(GetBuildTimeScript)" Imports="System">
+      <Output TaskParameter="ReturnValue" PropertyName="BuildTime" />
+    </Script>
 
-    <Target Name="StampVersionInfo" DependsOnTargets="Clean"> 
-        <PropertyGroup>
-            <GetBuildDateScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Date.Subtract(new DateTime(2012, 11, 18)).TotalDays).ToString(); } ]]></GetBuildDateScript>
-            <GetBuildTimeScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Subtract(DateTime.Today).TotalMinutes).ToString(); } ]]></GetBuildTimeScript>
-        </PropertyGroup>
+    <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(RevisionNumber).0">
+      <Output TaskParameter="Value" PropertyName="AssemblyVersion" />
+    </CreateProperty>
 
-        <Script Language="C#" Code="$(GetBuildDateScript)" Imports="System">
-            <Output TaskParameter="ReturnValue" PropertyName="BuildDate" />
-        </Script>
+    <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(BuildDate).$(BuildTime)">
+      <Output TaskParameter="Value" PropertyName="FileVersion" />
+    </CreateProperty>
 
-        <Script Language="C#" Code="$(GetBuildTimeScript)" Imports="System">
-            <Output TaskParameter="ReturnValue" PropertyName="BuildTime" />
-        </Script>
+    <AssemblyInfo CodeLanguage="CS" OutputFile=".shared\VersionInfo.cs" AssemblyVersion="$(AssemblyVersion)" AssemblyFileVersion="$(FileVersion)" AssemblyConfiguration="$(Configuration)" />
+  </Target>
 
-        <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(RevisionNumber).0">
-            <Output TaskParameter="Value" PropertyName="AssemblyVersion" />
-        </CreateProperty>
+  <!--
+  * Compile
+  * Rebuild the project solution.
+  **************************************************
+  -->
+  <Target Name="Compile" DependsOnTargets="StampVersionInfo">
+    <MSBuild Projects=".nuget\NuGet.Targets" Targets="RestorePackages" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
+    <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+  </Target>
 
-        <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(BuildDate).$(BuildTime)">
-            <Output TaskParameter="Value" PropertyName="FileVersion" />
-        </CreateProperty>
+  <!--
+  * Test
+  * Run all xUnit tests in project solution.
+  **************************************************
+  -->
+  <Target Name="Test" DependsOnTargets="Compile">
+    <ItemGroup>
+      <TestAssemblies Include="**\bin\$(Configuration)\*.Tests.dll" />
+      <TestAssemblies Include="**\bin\*.Tests.dll" />
+    </ItemGroup>
 
-        <AssemblyInfo CodeLanguage="CS"
-                      OutputFile=".shared\VersionInfo.cs"
-                      AssemblyVersion="$(AssemblyVersion)"
-                      AssemblyFileVersion="$(FileVersion)"
-                      AssemblyConfiguration="$(Configuration)"
-                      AssemblyInformationalVersion="$(Commit)" />
-    </Target>
+    <xunit Assemblies="@(TestAssemblies)" />
+  </Target>
 
-    <Target Name="Compile" DependsOnTargets="StampVersionInfo">
-        <MSBuild Projects=".nuget\NuGet.Targets" Targets="RestorePackages" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
-        <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
-    </Target>
+  <!--
+  * Test
+  * Run all xUnit tests in project solution.
+  **************************************************
+  -->
+  <Target Name="Test" DependsOnTargets="Compile">
+    <ItemGroup>
+      <TestAssemblies Include="**\bin\$(Configuration)\*.Tests.dll" />
+      <TestAssemblies Include="**\bin\*.Tests.dll" />
+    </ItemGroup>
 
-    <Target Name="Test" DependsOnTargets="Compile">
-        <ItemGroup>
-            <TestAssemblies Include="**\bin\$(Configuration)\*.Tests.dll" />
-            <TestAssemblies Include="**\bin\*.Tests.dll" />
-        </ItemGroup>
-
-        <xunit Assemblies="@(TestAssemblies)" />
-    </Target>
+    <xunit Assemblies="@(TestAssemblies)" />
+  </Target>
 
 </Project>
