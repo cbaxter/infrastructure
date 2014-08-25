@@ -1,5 +1,6 @@
 # Build Folders
 # -------------------------
+bin/
 src/**/bin/
 src/**/obj/
 

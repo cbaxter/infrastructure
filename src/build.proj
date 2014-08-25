@@ -14,6 +14,7 @@
     <MajorVersion Condition="'$(MajorVersion)' == ''">0</MajorVersion>
     <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
     <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
+    <BuildOutput Condition="'$(BuildOutput)' == ''">$(SolutionDir)\..\bin</BuildOutput>
     <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
   </PropertyGroup>
 
@@ -29,6 +30,8 @@
     </ItemGroup>
 
     <Delete Files="@(CleanFiles)" TreatErrorsAsWarnings="true" />
+    <RemoveDir Directories="$(BuildOutput)"/>
+    <MakeDir Directories="$(BuildOutput)" />
   </Target>
 
   <!--
@@ -97,6 +100,22 @@
     </ItemGroup>
 
     <xunit Assemblies="@(TestAssemblies)" />
+  </Target>
+
+  <!--
+  * Package
+  * Package build output for official releases.
+  **************************************************
+  -->
+  <Target Name="Package" DependsOnTargets="Test">
+    <ItemGroup>
+      <BinaryFiles Include="$(SolutionDir)\Core\bin\$(Configuration)\Spark.Core.*" />
+      <BinaryFiles Include="$(SolutionDir)\Serialization.Newtonsoft\bin\$(Configuration)\Spark.Serialization.Newtonsoft.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(BinaryFiles)" DestinationFolder="$(BuildOutput)" />
+    
+    <!--TODO: NuGet Packages-->
   </Target>
 
 </Project>
