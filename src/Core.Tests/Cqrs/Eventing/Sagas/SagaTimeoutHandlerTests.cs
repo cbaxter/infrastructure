@@ -99,7 +99,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void IgnoreTimeoutIfTimeoutDoesNotMatchScheduled()
             {
-                var timeout = SystemTime.Now;
+                var timeout = SystemTime.Now.Subtract(TimeSpan.FromSeconds(1));
                 var saga = ConfigureSagaTimeout(timeout);
 
                 using (var eventContext = CreateEventContext(saga, SystemTime.Now))

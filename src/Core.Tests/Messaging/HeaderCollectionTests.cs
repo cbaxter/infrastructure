@@ -76,8 +76,13 @@ namespace Test.Spark.Messaging
             }
         }
 
-        public class WhenGettingTimestamp
+        public class WhenGettingTimestamp : IDisposable
         {
+            public void Dispose()
+            {
+                SystemTime.ClearOverride();
+            }
+
             [Fact]
             public void ReturnCurrentSystemTimeIfNotSpecified()
             {
@@ -85,7 +90,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.Equal(now, headers.GetTimestamp());
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
             }
 
             [Fact]
@@ -96,7 +101,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.Equal(now, headers.GetTimestamp());
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
             }
 
             [Fact]
@@ -106,7 +111,7 @@ namespace Test.Spark.Messaging
                 var header = new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false);
                 var headers = new HeaderCollection(header.ToEnumerable());
 
-                Assert.Equal(now, headers.GetTimestamp());
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
             }
 
             [Fact]
@@ -117,7 +122,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.Equal(now, headers.GetTimestamp());
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
             }
         }
 
