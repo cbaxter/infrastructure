@@ -35,12 +35,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// Returns <value>true</value> if the saga handles the <see cref="Timeout"/> event; otherwise <value>false</value>.
-        /// </summary>
-        [IgnoreDataMember]
-        private Boolean HandlesTimeout { get; set; }
-
-        /// <summary>
         /// The saga correlation identifier associated with this saga instance.
         /// </summary>
         [IgnoreDataMember]
@@ -69,14 +63,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         [IgnoreDataMember]
         public Int32 Version { get; internal set; }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="Saga"/>.
-        /// </summary>
-        protected Saga()
-        {
-            HandlesTimeout = GetMetadata().CanHandle(typeof(Timeout));
-        }
 
         /// <summary>
         /// Gets the saga metadata for this saga instance.
@@ -150,7 +136,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time when a timeout should occur.</param>
         protected void ScheduleTimeout(DateTime timeout)
         {
-            if (!HandlesTimeout)
+            if (!GetMetadata().CanHandle(typeof(Timeout)))
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
 
             if (TimeoutScheduled)

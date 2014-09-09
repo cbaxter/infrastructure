@@ -27,6 +27,7 @@
     <ItemGroup>
       <CleanFiles Include="**\bin\$(Configuration)\**" Exclude="**\bin\$(Configuration)\*.vshost.exe" />
       <CleanFiles Include="**\obj\$(Configuration)\**" />
+      <CleanFiles Include="$(BuildOutput)\**" />
     </ItemGroup>
 
     <Delete Files="@(CleanFiles)" TreatErrorsAsWarnings="true" />
