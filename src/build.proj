@@ -1,6 +1,5 @@
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
+<Project ToolsVersion="12.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="..\lib\MSBuild\MSBuild.Community.Tasks\MSBuild.Community.Tasks.Targets"/>
   <UsingTask AssemblyFile="packages\xunit.runners.2.0.0-alpha-build1611\tools\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
 
   <!--
@@ -40,19 +39,27 @@
   * Generates VersionInfo.cs based on the build date.
   **************************************************
   -->
+  <UsingTask TaskName="CreateFileVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
+    <ParameterGroup>
+      <BuildDate ParameterType="System.String" Output="true" />
+      <BuildTime ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[ 
+          var now = DateTime.Now;
+          BuildDate = Convert.ToInt32(now.Date.Subtract(new DateTime(2012, 11, 18)).TotalDays).ToString();
+          BuildTime = Convert.ToInt32(now.Subtract(now.Date).TotalMinutes).ToString();
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
   <Target Name="StampVersionInfo" DependsOnTargets="Clean">
-    <PropertyGroup>
-      <GetBuildDateScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Date.Subtract(new DateTime(2012, 11, 18)).TotalDays).ToString(); } ]]></GetBuildDateScript>
-      <GetBuildTimeScript><![CDATA[ public static string ScriptMain() { return Convert.ToInt32(DateTime.Now.Subtract(DateTime.Today).TotalMinutes).ToString(); } ]]></GetBuildTimeScript>
-    </PropertyGroup>
-
-    <Script Language="C#" Code="$(GetBuildDateScript)" Imports="System">
-      <Output TaskParameter="ReturnValue" PropertyName="BuildDate" />
-    </Script>
-
-    <Script Language="C#" Code="$(GetBuildTimeScript)" Imports="System">
-      <Output TaskParameter="ReturnValue" PropertyName="BuildTime" />
-    </Script>
+    <CreateFileVersion>
+      <Output TaskParameter="BuildDate" PropertyName="BuildDate" />
+      <Output TaskParameter="BuildTime" PropertyName="BuildTime" />
+    </CreateFileVersion>
 
     <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(RevisionNumber).0">
       <Output TaskParameter="Value" PropertyName="AssemblyVersion" />
@@ -62,7 +69,7 @@
       <Output TaskParameter="Value" PropertyName="FileVersion" />
     </CreateProperty>
 
-    <AssemblyInfo CodeLanguage="CS" OutputFile=".shared\VersionInfo.cs" AssemblyVersion="$(AssemblyVersion)" AssemblyFileVersion="$(FileVersion)" AssemblyConfiguration="$(Configuration)" />
+    <WriteLinesToFile File=".shared/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(FileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
   </Target>
 
   <!--
@@ -115,7 +122,7 @@
     </ItemGroup>
 
     <Copy SourceFiles="@(BinaryFiles)" DestinationFolder="$(BuildOutput)" />
-    
+
     <!--TODO: NuGet Packages-->
   </Target>
 
