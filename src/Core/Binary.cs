@@ -22,7 +22,7 @@ namespace Spark
     /// <summary>
     /// An immutable <see cref="T:Byte[]"/> utility wrapper wrapper for strongly typed byte array references.
     /// </summary>
-    public class Binary : IComparable, IComparable<Binary>, IComparable<Byte[]>, IEquatable<Binary>, IEquatable<Byte[]>, IEnumerable<Byte>
+    public sealed class Binary : IComparable, IComparable<Binary>, IComparable<Byte[]>, IEquatable<Binary>, IEquatable<Byte[]>, IEnumerable<Byte>
     {
         private static readonly IReadOnlyDictionary<Char, Byte> HexMap = new Dictionary<Char, Byte> { { '0', 0 }, { '1', 1 }, { '2', 2 }, { '3', 3 }, { '4', 4 }, { '5', 5 }, { '6', 6 }, { '7', 7 }, { '8', 8 }, { '9', 9 }, { 'A', 10 }, { 'B', 11 }, { 'C', 12 }, { 'D', 13 }, { 'E', 14 }, { 'F', 15 } };
         private readonly Byte[] data;

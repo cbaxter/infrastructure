@@ -47,8 +47,8 @@ namespace Spark.Serialization
             Verify.NotNull(graph, "graph");
             Verify.NotNull(stream, "stream");
 
-            using (var deflateStream = new GZipStream(stream, CompressionMode.Compress))
-                serializer.Serialize(deflateStream, graph, type);
+            using (var gzipStream = new GZipStream(stream, CompressionMode.Compress))
+                serializer.Serialize(gzipStream, graph, type);
         }
 
         /// <summary>
@@ -60,8 +60,8 @@ namespace Spark.Serialization
         {
             Verify.NotNull(stream, "stream");
 
-            using (var deflateStream = new GZipStream(stream, CompressionMode.Decompress))
-                return serializer.Deserialize(deflateStream, type);
+            using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
+                return serializer.Deserialize(gzipStream, type);
         }
     }
 }

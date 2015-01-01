@@ -21,26 +21,26 @@ namespace Spark.EventStore
     public sealed class Snapshot
     {
         /// <summary>
-        /// The stream identifier associated with this commit.
+        /// The stream identifier associated with this snapshot.
         /// </summary>
         public Guid StreamId { get; private set; }
 
         /// <summary>
-        /// Gets the current version of the event stream.
+        /// Gets the event stream version associated with this snapshot.
         /// </summary>
         public Int32 Version { get; private set; }
 
         /// <summary>
-        /// Gets the set of events associated with this commit.
+        /// Gets the snapshot state.
         /// </summary>
         public Object State { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Commit"/>.
+        /// Initializes a new instance of <see cref="Snapshot"/>.
         /// </summary>
         /// <param name="streamId">The stream id.</param>
-        /// <param name="version">The stream state version.</param>
-        /// <param name="state">The stream state.</param>
+        /// <param name="version">The snapshot version.</param>
+        /// <param name="state">The snapshot state.</param>
         public Snapshot(Guid streamId, Int32 version, Object state)
         { 
             Verify.NotEqual(Guid.Empty, streamId, "streamId");
