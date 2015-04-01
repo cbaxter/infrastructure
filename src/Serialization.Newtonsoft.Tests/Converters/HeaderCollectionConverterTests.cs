@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
+using System.Runtime.Remoting.Channels;
 using Spark;
 using Spark.Messaging;
 using Xunit;
@@ -86,13 +89,18 @@ namespace Test.Spark.Serialization.Converters
             public void CanSerializeToBson()
             {
                 var now = new DateTime(2013, 6, 1, 12, 30, 45, DateTimeKind.Utc);
-
-                SystemTime.OverrideWith(() => now);
-
-                var headers = new ServiceMessageFactory().Create(null, new Object()).Headers;
+                var headers = new HeaderCollection(new Dictionary<String, String>
+                {
+                    { Header.Origin, "serverName" },
+                    { Header.Timestamp, now.ToString(CultureInfo.InvariantCulture) },
+                    { Header.RemoteAddress, "127.0.0.1" },
+                    { Header.UserAddress, "192.168.1.1" },
+                    { Header.UserName, "testUser" }
+                });
+                
                 var bson = WriteBson(headers);
 
-                Validate("YgAAAAJfbwAMAAAAV29ya3N0YXRpb24AAl90AB0AAAAyMDEzLTA2LTAxVDEyOjMwOjQ1LjAwMDAwMDBaAAJfcgAcAAAAZmU4MDo6MzViOTpiNzVlOmM4MDpjNTc5JTExAAA=", bson);
+                Validate(bson, "awAAAAJfbwALAAAAc2VydmVyTmFtZQACX3QAFAAAADA2LzAxLzIwMTMgMTI6MzA6NDUAAl9yAAoAAAAxMjcuMC4wLjEAAl9jAAwAAAAxOTIuMTY4LjEuMQACX2kACQAAAHRlc3RVc2VyAAA=");
             }
         }
 
