@@ -143,7 +143,7 @@ namespace Test.Spark
             [Fact]
             public void SetCanBeNull()
             {
-                Assert.DoesNotThrow(() => default(IDisposable[]).DisposeAll());
+                default(IDisposable[]).DisposeAll();
             }
 
             [Fact]

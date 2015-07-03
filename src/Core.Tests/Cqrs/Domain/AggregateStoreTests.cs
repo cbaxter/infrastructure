@@ -34,11 +34,11 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void CanCallDisposeMoreThanOnce()
             {
-                var aggregateStore = new AggregateStore(new Mock<IApplyEvents>().Object, new Mock<IStoreSnapshots>().Object, new Mock<IStoreEvents>().Object);
-
-                aggregateStore.Dispose();
-
-                Assert.DoesNotThrow(() => aggregateStore.Dispose());
+                using (var aggregateStore = new AggregateStore(new Mock<IApplyEvents>().Object, new Mock<IStoreSnapshots>().Object, new Mock<IStoreEvents>().Object))
+                {
+                    aggregateStore.Dispose(); 
+                    aggregateStore.Dispose();
+                }
             }
         }
 
@@ -197,10 +197,10 @@ namespace Test.Spark.Cqrs.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<DuplicateCommitException>();
 
-                // ReSharper disable AccessToDisposedClosure
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                    Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, context));
-                // ReSharper restore AccessToDisposedClosure
+                    aggregateStore.Save(aggregate, context);
+
+                eventStore.Verify(mock => mock.Save(It.IsAny<Commit>()), Times.Once);
             }
 
             private class FakeAggregate : Aggregate

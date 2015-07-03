@@ -28,7 +28,7 @@ namespace Test.Spark.Messaging
             {
                 var messageFactory = new FakeMessageFactory();
 
-                Assert.DoesNotThrow(() => messageFactory.Create(null, new Object()));
+                Assert.NotNull(messageFactory.Create(null, new Object()));
             }
 
             [Fact]

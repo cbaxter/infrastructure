@@ -58,12 +58,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePreGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreGet(null, Guid.Empty));
+                var hook = new TestHook();
+
+                hook.PreGet(null, Guid.Empty);
+
+                Assert.True(hook.PreGetHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); }
+                public Boolean PreGetHandled { get; private set; }
+                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); PreGetHandled = true; }
             }
         }
 
@@ -104,12 +109,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePostGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostGet(null));
+                var hook = new TestHook();
+
+                hook.PostGet(null);
+
+                Assert.True(hook.PostGetHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostGet(Aggregate aggregate) { base.PostGet(null); }
+                public Boolean PostGetHandled { get; private set; }
+                public override void PostGet(Aggregate aggregate) { base.PostGet(null); PostGetHandled = true; }
             }
         }
 
@@ -150,12 +160,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePreSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreSave(null, null));
+                var hook = new TestHook();
+
+                hook.PreSave(null, null);
+
+                Assert.True(hook.PreSaveHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreSave(Aggregate aggregate, CommandContext context) { base.PreSave(null, null); }
+                public Boolean PreSaveHandled { get; private set; }
+                public override void PreSave(Aggregate aggregate, CommandContext context) { base.PreSave(null, null); PreSaveHandled = true; }
             }
         }
 
@@ -196,12 +211,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePostSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostSave(null, null, null));
+                var hook = new TestHook();
+
+                hook.PostSave(null, null, null);
+
+                Assert.True(hook.PostSaveHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostSave(Aggregate aggregate, Commit commit, Exception error) { base.PostSave(null, null, null); }
+                public Boolean PostSaveHandled { get; private set; }
+                public override void PostSave(Aggregate aggregate, Commit commit, Exception error) { base.PostSave(null, null, null); PostSaveHandled = true; }
             }
         }
     }

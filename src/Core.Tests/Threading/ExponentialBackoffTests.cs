@@ -101,21 +101,22 @@ namespace Test.Spark.Threading
 
         public class WhenWaitOrTimeout
         {
+            public WhenWaitOrTimeout()
+            {
+                SystemTime.ClearOverride();
+            }
+
             [Fact]
             public void WaitIfCanRetry()
             {
-                SystemTime.ClearOverride();
-
                 var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(100));
 
-                Assert.DoesNotThrow(() => backoff.WaitOrTimeout(new Exception()));
+                backoff.WaitOrTimeout(new Exception());
             }
 
             [Fact]
             public void TimeoutIfCannotRetry()
             {
-                SystemTime.ClearOverride();
-
                 var backoff = new ExponentialBackoff(TimeSpan.FromMilliseconds(1));
 
                 Thread.Sleep(20);

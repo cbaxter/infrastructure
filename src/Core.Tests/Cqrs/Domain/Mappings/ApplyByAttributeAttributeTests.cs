@@ -5,7 +5,6 @@ using Spark.Cqrs.Domain.Mappings;
 using Spark.Cqrs.Eventing;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using Spark.Logging;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -39,7 +38,7 @@ namespace Test.Spark.Logging
                 var logManager = new LogManager();
                 var logger = (Logger)logManager.CreateLogger("LogManager.UnknownSource");
 
-                Assert.Equal(Trace.Listeners.Count,  logger.TraceSource.Listeners.Count);
+                Assert.Equal(Trace.Listeners.Count, logger.TraceSource.Listeners.Count);
             }
 
             [Fact]
@@ -75,7 +74,7 @@ namespace Test.Spark.Logging
             {
                 var logManager = new LogManager();
 
-                Assert.DoesNotThrow(() => logManager.CreateLogger(name));
+                Assert.NotNull(logManager.CreateLogger(name));
             }
 
             [Theory, InlineData("LogManager.TEST"), InlineData("LogManager.Test"), InlineData("LogManager.test")]

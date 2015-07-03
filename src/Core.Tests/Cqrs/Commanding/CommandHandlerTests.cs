@@ -110,7 +110,11 @@ namespace Test.Spark.Cqrs.Commanding
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregateWithExplicitCreate), envelope.AggregateId)).Returns(aggregate);
 
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
-                    Assert.DoesNotThrow(() => commandHandler.Handle(context));
+                {
+                    commandHandler.Handle(context);
+
+                    Assert.True(aggregate.Handled);
+                }
             }
 
             [Fact]
@@ -123,7 +127,11 @@ namespace Test.Spark.Cqrs.Commanding
                 AggregateStore.Setup(mock => mock.Get(typeof(FakeAggregate), envelope.AggregateId)).Returns(aggregate);
 
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, envelope))
-                    Assert.DoesNotThrow(() => commandHandler.Handle(context));
+                {
+                    commandHandler.Handle(context);
+
+                    Assert.True(aggregate.Handled);
+                }
             }
 
             [Fact]
@@ -173,6 +181,7 @@ namespace Test.Spark.Cqrs.Commanding
         {
             private readonly Boolean explicitCreateRequired;
 
+            public Boolean Handled { get; private set; }
             protected override bool RequiresExplicitCreate { get { return explicitCreateRequired; } }
 
             public FakeAggregate()
@@ -189,11 +198,14 @@ namespace Test.Spark.Cqrs.Commanding
             public void Handle(FakeCommand command)
             {
                 Raise(new FakeEvent());
+                Handled = true;
             }
         }
 
         internal class FakeAggregateWithExplicitCreate : Aggregate
         {
+            public Boolean Handled { get; private set; }
+
             protected override bool CanCreateAggregate(Command command)
             {
                 return command is FakeCommand;
@@ -203,6 +215,7 @@ namespace Test.Spark.Cqrs.Commanding
             public void Handle(FakeCommand command)
             {
                 Raise(new FakeEvent());
+                Handled = true;
             }
         }
 

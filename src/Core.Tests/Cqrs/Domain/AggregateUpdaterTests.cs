@@ -8,7 +8,6 @@ using Spark.Cqrs.Domain;
 using Spark.Cqrs.Domain.Mappings;
 using Spark.Cqrs.Eventing;
 using Spark.Resources;
-using Test.Spark.Cqrs.Commanding;
 using Xunit;
 
 /* Copyright (c) 2013 Spark Software Ltd.
@@ -37,7 +36,7 @@ namespace Test.Spark.Cqrs.Domain
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new Type[0]);
 
-                Assert.DoesNotThrow(() => new AggregateUpdater(typeLocator.Object));
+                Assert.NotNull(new AggregateUpdater(typeLocator.Object));
             }
 
             [Fact]
@@ -108,7 +107,7 @@ namespace Test.Spark.Cqrs.Domain
             }
 
             [Fact]
-            public void IgnoreEventIfApplyMethodOptionalAndNotDefined()
+            public void CanApplyEventIfApplyMethodOptionalAndNotDefined()
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new[] { typeof(OptionalApplyAggregate) });
 
@@ -116,7 +115,7 @@ namespace Test.Spark.Cqrs.Domain
                 var aggregate = new OptionalApplyAggregate();
                 var e = new FakeEvent();
 
-                Assert.DoesNotThrow(() => updater.Apply(e, aggregate));
+                updater.Apply(e, aggregate);
             }
 
             [Fact]

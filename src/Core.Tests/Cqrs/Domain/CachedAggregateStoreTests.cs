@@ -120,11 +120,12 @@ namespace Test.Spark.Cqrs.Domain
             public void CanCallDisposeMoreThanOnce()
             {
                 var decoratedAggregateStore = new Mock<IStoreAggregates>();
-                var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object);
 
-                cachedAggregateStore.Dispose();
-
-                Assert.DoesNotThrow(() => cachedAggregateStore.Dispose());
+                using (var cachedAggregateStore = new CachedAggregateStore(decoratedAggregateStore.Object))
+                {
+                    cachedAggregateStore.Dispose();
+                    cachedAggregateStore.Dispose();
+                }
             }
         }
 

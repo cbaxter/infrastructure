@@ -31,7 +31,11 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             public void CanAquireLockIfNoLockAquired()
             {
                 using (var sagaLock = new SagaLock(typeof(Saga), GuidStrategy.NewGuid()))
-                    Assert.DoesNotThrow(() => sagaLock.Aquire());
+                {
+                    sagaLock.Aquire();
+
+                    Assert.True(sagaLock.Aquired);
+                }
             }
 
             [Fact]
@@ -127,7 +131,9 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 using (var sagaLock = new SagaLock(typeof(Saga), GuidStrategy.NewGuid()))
                 {
                     sagaLock.Aquire();
-                    Assert.DoesNotThrow(() => sagaLock.Release());
+                    sagaLock.Release();
+
+                    Assert.False(sagaLock.Aquired);
                 }
             }
 
@@ -167,12 +173,12 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void CanDisposeMoreThanOnce()
             {
-                var sagaLock = new SagaLock(typeof(Saga), GuidStrategy.NewGuid());
-
-                sagaLock.Aquire();
-                sagaLock.Dispose();
-
-                Assert.DoesNotThrow(() => sagaLock.Dispose());
+                using (var sagaLock = new SagaLock(typeof(Saga), GuidStrategy.NewGuid()))
+                {
+                    sagaLock.Aquire();
+                    sagaLock.Dispose();
+                    sagaLock.Dispose();
+                }
             }
         }
     }

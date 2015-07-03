@@ -1,7 +1,6 @@
 ﻿using System;
 using Spark;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 

@@ -31,7 +31,11 @@ namespace Test.Spark.Cqrs.Domain
             public void CanAquireLockIfNoLockAquired()
             {
                 using (var aggregateLock = new AggregateLock(typeof(Aggregate), GuidStrategy.NewGuid()))
-                    Assert.DoesNotThrow(() => aggregateLock.Aquire());
+                {
+                    aggregateLock.Aquire();
+
+                    Assert.True(aggregateLock.Aquired);
+                }
             }
 
             [Fact]
@@ -127,7 +131,9 @@ namespace Test.Spark.Cqrs.Domain
                 using (var aggregateLock = new AggregateLock(typeof(Aggregate), GuidStrategy.NewGuid()))
                 {
                     aggregateLock.Aquire();
-                    Assert.DoesNotThrow(() => aggregateLock.Release());
+                    aggregateLock.Release();
+
+                    Assert.False(aggregateLock.Aquired);
                 }
             }
 
@@ -172,7 +178,7 @@ namespace Test.Spark.Cqrs.Domain
                 aggregateLock.Aquire();
                 aggregateLock.Dispose();
 
-                Assert.DoesNotThrow(() => aggregateLock.Dispose());
+                aggregateLock.Dispose();
             }
         }
     }

@@ -64,7 +64,10 @@ namespace Test.Spark.Cqrs.Eventing
                 var messageBus = new Mock<ISendMessages<EventEnvelope>>();
                 var publisher = new EventPublisher(messageFactory.Object, messageBus.Object);
 
-                Assert.DoesNotThrow(() => publisher.Publish(null, EventEnvelope.Empty));
+                publisher.Publish(null, EventEnvelope.Empty);
+
+                messageFactory.Verify(mock => mock.Create(null, EventEnvelope.Empty), Times.Once);
+                messageBus.Verify(mock => mock.Send(It.IsAny<Message<EventEnvelope>>()), Times.Once);
             }
         }
     }

@@ -4,7 +4,6 @@ using Spark.Cqrs.Domain;
 using Spark.Cqrs.Domain.Mappings;
 using Spark.Cqrs.Eventing;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -40,8 +39,11 @@ namespace Test.Spark.Cqrs.Domain.Mappings
                 var attribute = new ApplyByConventionAttribute { MethodName = "Custom" };
                 var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
                 var applyMethod = applyMethods.Single().Value;
+                var aggregate = new FakeAggregate();
 
-                Assert.DoesNotThrow(() => applyMethod(new FakeAggregate(), new FakeEvent()));
+                applyMethod(aggregate, new FakeEvent());
+
+                Assert.True(aggregate.Handled);
             }
 
             [Fact]
@@ -50,19 +52,26 @@ namespace Test.Spark.Cqrs.Domain.Mappings
                 var attribute = new ApplyByConventionAttribute { MethodName = "Custom" };
                 var applyMethods = attribute.GetApplyMethods(typeof(FakeAggregate));
                 var applyMethod = applyMethods.Single().Value;
+                var aggregate = new FakeAggregate();
 
-                Assert.DoesNotThrow(() => applyMethod(new FakeAggregate(), new FakeEvent()));
+                applyMethod(aggregate, new FakeEvent());
+
+                Assert.True(aggregate.Handled);
             }
 
             protected class FakeAggregate : Aggregate
             {
+                public Boolean Handled { get; private set; }
+
                 public void Apply(FakeEvent e)
                 {
                     throw new MethodAccessException();
                 }
 
                 public void Custom(FakeEvent e)
-                { }
+                {
+                    Handled = true;
+                }
             }
 
             protected class FakeEvent : Event

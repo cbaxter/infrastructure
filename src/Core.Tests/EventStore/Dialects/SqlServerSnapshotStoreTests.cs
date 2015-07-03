@@ -50,6 +50,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenInitializingSnapshotStore
         {
             [SqlServerFactAttribute]
@@ -57,15 +58,15 @@ namespace Test.Spark.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFactAttribute]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
-                Assert.DoesNotThrow(() => new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -91,9 +92,9 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenDisposingSnapshotStore : UsingInitializedSnapshotStore
         {
-
             [SqlServerFactAttribute]
             public void CanDisposeSynchronousStore()
             {
@@ -109,14 +110,15 @@ namespace Test.Spark.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings());
-
-                snapshotStore.Dispose();
-
-                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+                using (var snapshotStore = new SqlSnapshotStore(new SqlSnapshotStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new SnapshotStoreSettings()))
+                {
+                    snapshotStore.Dispose();
+                    snapshotStore.Dispose();
+                }
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenInsertingSnapshot : UsingInitializedSnapshotStore
         {
             public WhenInsertingSnapshot()
@@ -129,8 +131,9 @@ namespace Test.Spark.EventStore.Dialects
                 var snapshot = new Snapshot(Guid.NewGuid(), 1, new Object());
 
                 SnapshotStore.Save(snapshot);
+                SnapshotStore.Save(snapshot);
 
-                Assert.DoesNotThrow(() => SnapshotStore.Save(snapshot));
+                Assert.Equal(1, CountSnapshots(snapshot.StreamId));
             }
 
             [SqlServerFactAttribute]
@@ -142,9 +145,24 @@ namespace Test.Spark.EventStore.Dialects
 
                 SnapshotStore.Save(snapshot1);
                 SnapshotStore.Save(snapshot2);
+
+                Assert.Equal(2, CountSnapshots(streamId));
+            }
+
+            private Int32 CountSnapshots(Guid streamId)
+            {
+                using (var connection = SqlServerConnection.Create())
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                {
+                    command.Parameters.AddWithValue("@StreamId", streamId);
+                    connection.Open();
+
+                    return (Int32)command.ExecuteScalar();
+                }
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenReplacingSnapshot : UsingInitializedSnapshotStore
         {
             [SqlServerFactAttribute]
@@ -184,6 +202,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenUsingAsyncSnapshotStore : UsingInitializedSnapshotStore
         {
             public WhenUsingAsyncSnapshotStore()
@@ -217,6 +236,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenPurgingSnapshots : UsingInitializedSnapshotStore
         {
             [SqlServerFactAttribute]
@@ -244,6 +264,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingLastSnapshot : UsingInitializedSnapshotStore
         {
             [SqlServerFactAttribute]
@@ -262,6 +283,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingSnapshotVersion : UsingInitializedSnapshotStore
         {
             [SqlServerFactAttribute]

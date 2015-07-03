@@ -54,7 +54,7 @@ namespace Test.Spark.Cqrs.Eventing
 
                 eventStore.Setup(mock => mock.GetUndispatched()).Returns(new[] { commit });
 
-                Assert.DoesNotThrow(() => new EventDispatcher(eventStore.Object, eventPublisher.Object, new EventStoreSettings { MarkDispatched = false }));
+                Assert.NotNull(new EventDispatcher(eventStore.Object, eventPublisher.Object, new EventStoreSettings { MarkDispatched = false }));
 
                 eventPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<EventEnvelope>()), Times.Never());
             }
@@ -96,7 +96,9 @@ namespace Test.Spark.Cqrs.Eventing
             {
                 var eventDispatcher = new EventDispatcher(eventStore.Object, eventPublisher.Object);
 
-                Assert.DoesNotThrow(() => eventDispatcher.PostSave(null, new Commit(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty), null));
+                eventDispatcher.PostSave(null, new Commit(GuidStrategy.NewGuid(), GuidStrategy.NewGuid(), 1, HeaderCollection.Empty, EventCollection.Empty), null);
+
+                eventPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<EventEnvelope>()), Times.Never());
             }
 
             [Fact]
@@ -105,6 +107,7 @@ namespace Test.Spark.Cqrs.Eventing
                 var eventDispatcher = new EventDispatcher(eventStore.Object, eventPublisher.Object);
 
                 eventDispatcher.PostSave(null, null, null);
+
                 eventPublisher.Verify(mock => mock.Publish(HeaderCollection.Empty, It.IsAny<EventEnvelope>()), Times.Never());
             }
 

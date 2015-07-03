@@ -8,7 +8,6 @@ using Moq;
 using Spark.Messaging;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -34,12 +33,12 @@ namespace Test.Spark.Messaging
             {
                 var messageFactory = new WebMessageFactory();
 
-                Assert.DoesNotThrow(() => messageFactory.Create(new[]
-                    {
-                        new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false), 
-                        new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false), 
-                        new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false)
-                    }, new Object()));
+                Assert.NotNull(messageFactory.Create(new[]
+                {
+                    new Header(Header.UserName, "nbawdy@sparksoftware.net", checkReservedNames: false), 
+                    new Header(Header.RemoteAddress, IPAddress.Loopback.ToString(), checkReservedNames: false), 
+                    new Header(Header.UserAddress, IPAddress.Loopback.ToString(), checkReservedNames: false)
+                }, new Object()));
             }
 
             [Fact]

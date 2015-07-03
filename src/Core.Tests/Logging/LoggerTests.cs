@@ -1,12 +1,10 @@
-﻿using Spark.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using Spark.Logging;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -98,7 +96,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("FatalMethods")]
+            [Theory, MemberData("FatalMethods")]
             public void LogMessageIfFatalEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Critical);
@@ -112,7 +110,7 @@ namespace Test.Spark.Logging
                 Assert.Equal(1, listener.Messages.Count(m => m == expectedMessage));
             }
 
-            [Theory, PropertyData("FatalMethods")]
+            [Theory, MemberData("FatalMethods")]
             public void DoNotLogMessageIfFatalDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);
@@ -149,7 +147,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("ErrorMethods")]
+            [Theory, MemberData("ErrorMethods")]
             public void LogMessageIfErrorEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Error);
@@ -163,7 +161,7 @@ namespace Test.Spark.Logging
                 Assert.Equal(1, listener.Messages.Count(m => m == expectedMessage));
             }
 
-            [Theory, PropertyData("ErrorMethods")]
+            [Theory, MemberData("ErrorMethods")]
             public void DoNotLogMessageIfErrorDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);
@@ -200,7 +198,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("WarnMethods")]
+            [Theory, MemberData("WarnMethods")]
             public void LogMessageIfWarnEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Warning);
@@ -214,7 +212,7 @@ namespace Test.Spark.Logging
                 Assert.Equal(1, listener.Messages.Count(m => m == expectedMessage));
             }
 
-            [Theory, PropertyData("WarnMethods")]
+            [Theory, MemberData("WarnMethods")]
             public void DoNotLogMessageIfWarnDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);
@@ -251,7 +249,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("InfoMethods")]
+            [Theory, MemberData("InfoMethods")]
             public void LogMessageIfInfoEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Information);
@@ -265,7 +263,7 @@ namespace Test.Spark.Logging
                 Assert.Equal(1, listener.Messages.Count(m => m == expectedMessage));
             }
 
-            [Theory, PropertyData("InfoMethods")]
+            [Theory, MemberData("InfoMethods")]
             public void DoNotLogMessageIfInfoDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);
@@ -302,7 +300,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("DebugMethods")]
+            [Theory, MemberData("DebugMethods")]
             public void LogMessageIfDebugEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Verbose);
@@ -316,7 +314,7 @@ namespace Test.Spark.Logging
                 Assert.Equal(1, listener.Messages.Count(m => m == expectedMessage));
             }
 
-            [Theory, PropertyData("DebugMethods")]
+            [Theory, MemberData("DebugMethods")]
             public void DoNotLogMessageIfDebugDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);
@@ -353,7 +351,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("TraceMethods")]
+            [Theory, MemberData("TraceMethods")]
             public void LogMessageIfTraceEnabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.All);
@@ -377,7 +375,7 @@ namespace Test.Spark.Logging
                 }
             }
 
-            [Theory, PropertyData("TraceMethods")]
+            [Theory, MemberData("TraceMethods")]
             public void DoNotLogMessageIfTraceDisabled(Expression<Action<ILog>> expression, String expectedMessage)
             {
                 var logger = new Logger("MyTestLogger", SourceLevels.Off);

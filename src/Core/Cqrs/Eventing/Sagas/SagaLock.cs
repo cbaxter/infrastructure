@@ -39,6 +39,11 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Guid SagaId { get { return sagaReference.SagaId; } }
 
         /// <summary>
+        /// Indicates if the underlying saga lock has been aquired.
+        /// </summary>
+        public Boolean Aquired { get { return lockReference != null; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="SagaLock"/>.
         /// </summary>
         /// <param name="sagaType">The saga type associated with this saga lock instance.</param>
@@ -61,7 +66,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void Aquire()
         {
-            if (lockReference != null) throw new InvalidOperationException(Exceptions.SagaLockAlreadyHeld.FormatWith(SagaType, SagaId));
+            if (Aquired) throw new InvalidOperationException(Exceptions.SagaLockAlreadyHeld.FormatWith(SagaType, SagaId));
 
             lock (GlobalLock)
             {
@@ -79,7 +84,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void Release()
         {
-            if (lockReference == null) throw new InvalidOperationException(Exceptions.SagaLockNotHeld.FormatWith(SagaType, SagaId));
+            if (!Aquired) throw new InvalidOperationException(Exceptions.SagaLockNotHeld.FormatWith(SagaType, SagaId));
 
             Monitor.Exit(lockReference);
 
@@ -89,9 +94,9 @@ namespace Spark.Cqrs.Eventing.Sagas
 
                 if (lockReference.Count == 0)
                     SagaLocks.Remove(sagaReference);
-            }
 
-            lockReference = null;
+                lockReference = null;
+            }
         }
 
         /// <summary>
@@ -99,7 +104,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public void Dispose()
         {
-            if (lockReference == null)
+            if (!Aquired)
                 return;
 
             Release();

@@ -40,6 +40,11 @@ namespace Spark.Cqrs.Domain
         public Guid Aggregateid { get { return id; } }
 
         /// <summary>
+        /// Indicates if the underlying aggregate lock has been aquired.
+        /// </summary>
+        public Boolean Aquired { get { return lockReference != null; } }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="AggregateLock"/>.
         /// </summary>
         /// <param name="aggregateType">The aggregate type associated with this aggregate lock instance.</param>
@@ -55,7 +60,7 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         public void Aquire()
         {
-            if (lockReference != null) throw new InvalidOperationException(Exceptions.AggregateLockAlreadyHeld.FormatWith(AggregateType, Aggregateid));
+            if (Aquired) throw new InvalidOperationException(Exceptions.AggregateLockAlreadyHeld.FormatWith(AggregateType, Aggregateid));
 
             lock (GlobalLock)
             {
@@ -73,7 +78,7 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         public void Release()
         {
-            if (lockReference == null) throw new InvalidOperationException(Exceptions.AggregateLockNotHeld.FormatWith(AggregateType, Aggregateid));
+            if (!Aquired) throw new InvalidOperationException(Exceptions.AggregateLockNotHeld.FormatWith(AggregateType, Aggregateid));
 
             Monitor.Exit(lockReference);
 
@@ -83,9 +88,9 @@ namespace Spark.Cqrs.Domain
 
                 if (lockReference.Count == 0)
                     AggregateLocks.Remove(id);
-            }
 
-            lockReference = null;
+                lockReference = null;
+            }
         }
 
         /// <summary>
@@ -93,7 +98,7 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         public void Dispose()
         {
-            if (lockReference == null)
+            if (!Aquired)
                 return;
 
             Release();

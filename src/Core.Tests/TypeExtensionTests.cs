@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Spark;
 using Xunit;
+
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
  * This source is subject to the GNU Lesser General Public License.
@@ -16,7 +16,6 @@ using Xunit;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE. 
  */
-using Xunit.Extensions;
 
 namespace Test.Spark
 {
@@ -121,7 +120,7 @@ namespace Test.Spark
                 var simpleAssemblyQualifiedName = type.GetFullNameWithAssembly();
 
                 Assert.Equal(expectedTypeName, simpleAssemblyQualifiedName);
-                Assert.DoesNotThrow(() => Type.GetType(simpleAssemblyQualifiedName, throwOnError: true));
+                Assert.NotNull(Type.GetType(simpleAssemblyQualifiedName, throwOnError: true));
             }
 
             // ReSharper disable UnusedTypeParameter

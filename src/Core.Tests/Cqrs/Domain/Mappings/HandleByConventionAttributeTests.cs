@@ -42,8 +42,11 @@ namespace Test.Spark.Cqrs.Domain.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeAggregate), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var aggregate = new FakeAggregate();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeAggregate(), new FakeCommand()));
+                handleMethod(aggregate, new FakeCommand());
+
+                Assert.True(aggregate.Handled);
             }
 
             [Fact]
@@ -52,19 +55,25 @@ namespace Test.Spark.Cqrs.Domain.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeAggregate), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var aggregate = new FakeAggregate();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeAggregate(), new FakeCommand()));
+                handleMethod(aggregate, new FakeCommand());
+
+                Assert.True(aggregate.Handled);
             }
 
             protected class FakeAggregate : Aggregate
             {
+                public Boolean Handled { get; private set; }
                 public void Handle(FakeCommand e)
                 {
                     throw new MethodAccessException();
                 }
 
                 public void Custom(FakeCommand e)
-                { }
+                {
+                    Handled = true;
+                }
             }
 
             protected class FakeCommand : Command

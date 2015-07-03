@@ -134,11 +134,11 @@ namespace Test.Spark.Messaging
             [Fact]
             public void CanCallDisposeMultipleTimes()
             {
-                var bus = new BlockingCollectionMessageBus<Object>();
-
-                bus.Dispose();
-
-                Assert.DoesNotThrow(() => bus.Dispose());
+                using (var bus = new BlockingCollectionMessageBus<Object>())
+                {
+                    bus.Dispose();
+                    bus.Dispose();
+                }
             }
 
             [Fact]

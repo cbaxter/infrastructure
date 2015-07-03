@@ -56,12 +56,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void BasePreGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreGet(null, Guid.Empty));
+                var hook = new TestHook();
+
+                hook.PreGet(null, Guid.Empty);
+
+                Assert.True(hook.PreGetInvoked);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); }
+                public Boolean PreGetInvoked { get; private set; }
+                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); PreGetInvoked = true; }
             }
         }
 
@@ -102,12 +107,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void BasePostGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostGet(null));
+                var hook = new TestHook();
+
+                hook.PostGet(null);
+
+                Assert.True(hook.PostGetInvoked);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostGet(Saga saga) { base.PostGet(null); }
+                public Boolean PostGetInvoked { get; private set; }
+                public override void PostGet(Saga saga) { base.PostGet(null); PostGetInvoked = true; }
             }
         }
 
@@ -148,12 +158,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void BasePreSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreSave(null, null));
+                var hook = new TestHook();
+
+                hook.PreSave(null, null);
+
+                Assert.True(hook.PreSaveInvoked);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreSave(Saga saga, SagaContext context) { base.PreSave(null, null); }
+                public Boolean PreSaveInvoked { get; private set; }
+                public override void PreSave(Saga saga, SagaContext context) { base.PreSave(null, null); PreSaveInvoked = true; }
             }
         }
 
@@ -194,12 +209,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void BasePostSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostSave(null, null, null));
+                var hook = new TestHook();
+
+                hook.PostSave(null, null, null);
+
+                Assert.True(hook.PostSaveInvoked);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostSave(Saga saga, SagaContext context, Exception error) { base.PostSave(null, null, null); }
+                public Boolean PostSaveInvoked { get; private set; }
+                public override void PostSave(Saga saga, SagaContext context, Exception error) { base.PostSave(null, null, null); PostSaveInvoked = true; }
             }
         }
     }

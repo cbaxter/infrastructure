@@ -3,7 +3,6 @@ using Spark;
 using Spark.Messaging;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -36,7 +35,7 @@ namespace Test.Spark.Messaging
             [Fact]
             public void HeaderNameCanBeReservedNameIfKeyValuePair()
             {
-                Assert.DoesNotThrow(() => new Header(Header.Timestamp, SystemTime.Now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false));
+                Assert.Equal(Header.Timestamp, new Header(Header.Timestamp, SystemTime.Now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false).Name);
             }
         }
 
@@ -77,7 +76,7 @@ namespace Test.Spark.Messaging
             {
                 var header = new Header("Header", null);
 
-                Assert.DoesNotThrow(() => header.GetHashCode());
+                Assert.InRange(header.GetHashCode(), Int32.MinValue, Int32.MaxValue);
             }
         }
 

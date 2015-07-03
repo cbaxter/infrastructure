@@ -196,7 +196,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var sagaStore = new Mock<IStoreSagas>();
                 var cache = new SagaTimeoutCache(sagaStore.Object, TimeSpan.FromMinutes(5));
 
-                Assert.DoesNotThrow(() => cache.ClearTimeout(new SagaReference(typeof(Saga), GuidStrategy.NewGuid())));
+                cache.ClearTimeout(new SagaReference(typeof(Saga), GuidStrategy.NewGuid()));
             }
 
             [Fact]

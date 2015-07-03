@@ -51,7 +51,7 @@ namespace Test.Spark.EventStore
             [Fact]
             public void PageRetrieverCanReturnNullSafely()
             {
-                Assert.DoesNotThrow(() => new PagedResult<Object>(10, (lastResult, page) => null).ToList());
+                Assert.Equal(0, new PagedResult<Object>(10, (lastResult, page) => null).Count());
             }
 
             [Fact]

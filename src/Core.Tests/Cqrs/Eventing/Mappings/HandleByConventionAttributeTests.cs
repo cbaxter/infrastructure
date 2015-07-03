@@ -7,7 +7,6 @@ using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -43,8 +42,11 @@ namespace Test.Spark.Cqrs.Eventing.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeHandler), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var handler = new FakeHandler();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeHandler(), new FakeEvent()));
+                handleMethod(handler, new FakeEvent());
+
+                Assert.True(handler.Handled);
             }
 
             [Fact]
@@ -53,20 +55,27 @@ namespace Test.Spark.Cqrs.Eventing.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeHandler), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var handler = new FakeHandler();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeHandler(), new FakeEvent()));
+                handleMethod(handler, new FakeEvent());
+
+                Assert.True(handler.Handled);
             }
 
             [EventHandler]
             protected class FakeHandler
             {
+                public Boolean Handled { get; private set; }
+
                 public void Handle(FakeEvent e)
                 {
                     throw new MethodAccessException();
                 }
 
                 public void Custom(FakeEvent e)
-                { }
+                {
+                    Handled = true;
+                }
             }
 
             protected class FakeEvent : Event

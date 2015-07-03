@@ -47,6 +47,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenInitializingEventStore
         {
             [SqlServerFactAttribute]
@@ -54,15 +55,15 @@ namespace Test.Spark.EventStore.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
             [SqlServerFact]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
-                Assert.DoesNotThrow(() => new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
+                Assert.NotNull(new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer()));
                 Assert.True(TableExists());
             }
 
@@ -88,6 +89,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenDisposingSnapshotStore : UsingInitializedEventStore
         {
 
@@ -106,14 +108,15 @@ namespace Test.Spark.EventStore.Dialects
             [SqlServerFactAttribute]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings());
-
-                snapshotStore.Dispose();
-
-                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+                using (var snapshotStore = new SqlEventStore(new SqlEventStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new EventStoreSettings()))
+                {
+                    snapshotStore.Dispose();
+                    snapshotStore.Dispose();
+                }
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingCommit : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -152,6 +155,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenMarkingCommitDispatched : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -166,6 +170,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenMigratingCommit : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -195,6 +200,7 @@ namespace Test.Spark.EventStore.Dialects
             { }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenDeletingStreams : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -223,6 +229,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenPurgingEventStore : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -236,6 +243,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingUndispatchedCommits : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -253,6 +261,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingAllCommits : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -270,6 +279,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingCommitRange : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -292,6 +302,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingCommitsFromVersion : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]
@@ -309,6 +320,7 @@ namespace Test.Spark.EventStore.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingStreams : UsingInitializedEventStore
         {
             [SqlServerFactAttribute]

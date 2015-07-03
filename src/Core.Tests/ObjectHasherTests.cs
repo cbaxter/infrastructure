@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Spark;
 using Xunit;
-using Xunit.Extensions;
 
 /* Copyright (c) 2013 Spark Software Ltd.
  * 
@@ -77,7 +76,7 @@ namespace Test.Spark
             public void DictionaryHashedConsistently()
             {
                 var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
-                
+
                 Assert.Equal(ObjectHasher.Hash(dictionary), ObjectHasher.Hash(dictionary));
             }
 
@@ -103,11 +102,11 @@ namespace Test.Spark
             public void CircularReferenceDoesNotResultInStackOverflow()
             {
                 var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
-    
+
                 //NOTE: When `Keys` is accessed, a `KeyCollection` instance is created that holds a reference to the underlying `dictionary` and 
                 //      would cause a `StackOverflowException` to be thrown if not handled correctly.
-                Assert.NotNull(dictionary.Keys); 
-                Assert.DoesNotThrow(() => ObjectHasher.Hash(dictionary));
+                Assert.NotNull(dictionary.Keys);
+                Assert.NotEqual(Guid.Empty, ObjectHasher.Hash(dictionary));
             }
         }
 

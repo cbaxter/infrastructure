@@ -40,7 +40,7 @@ namespace Test.Spark.Cqrs.Eventing
             {
                 var typeLocator = new FakeTypeLocator();
 
-                Assert.DoesNotThrow(() => new EventHandlerRegistry(typeLocator, serviceProvider.Object, sagaStore.Object, new Lazy<IPublishCommands>(() => commandPublisher.Object)));
+                Assert.NotNull(new EventHandlerRegistry(typeLocator, serviceProvider.Object, sagaStore.Object, new Lazy<IPublishCommands>(() => commandPublisher.Object)));
             }
 
             [Fact]

@@ -64,8 +64,12 @@ namespace Test.Spark.Cqrs.Commanding
                 var messageFactory = new Mock<ICreateMessages>();
                 var messageBus = new Mock<ISendMessages<CommandEnvelope>>();
                 var publisher = new CommandPublisher(messageFactory.Object, messageBus.Object);
+                var payload = new FakeCommand();
 
-                Assert.DoesNotThrow(() => publisher.Publish(GuidStrategy.NewGuid(), new FakeCommand(), null));
+                publisher.Publish(GuidStrategy.NewGuid(), payload, null);
+
+                messageFactory.Verify(mock => mock.Create(null, It.IsAny<CommandEnvelope>()), Times.Once);
+                messageBus.Verify(mock => mock.Send(It.IsAny<Message<CommandEnvelope>>()), Times.Once);
             }
 
             [Fact]

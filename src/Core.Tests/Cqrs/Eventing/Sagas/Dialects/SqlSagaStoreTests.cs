@@ -9,7 +9,6 @@ using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
 using Spark.Data;
-using Spark.Resources;
 using Spark.Serialization;
 using Test.Spark.Data;
 using Xunit;
@@ -56,6 +55,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenInitializingSagaStore
         {
             public void DialectCannotBeNull()
@@ -84,15 +84,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
                 Assert.True(TableExists());
             }
 
             [SqlServerFact]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
                 Assert.True(TableExists());
             }
 
@@ -118,6 +118,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenCreatingSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -146,6 +147,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingScheduledTimeouts : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -194,19 +196,22 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingNewCompletedSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
             public void DoNotInsertNewSagaIfCompleted()
             {
                 var saga = new FakeSaga { Version = 0, Completed = true };
+                var result = default(Saga);
 
-                // Since we are using a regular Fact attribute rather than a SqlServerFact, any attempt to access
-                // the database will throw an exception; thus if no exception thrown we did not try to save.
-                Assert.DoesNotThrow(() => SagaStore.Save(saga, SagaContext));
+                SagaStore.Save(saga, SagaContext);
+
+                Assert.False(SagaStore.TryGetSaga(typeof(FakeSaga), saga.CorrelationId, out result));
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingNewSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -233,6 +238,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingExistingSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -260,6 +266,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingCompletedSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -291,16 +298,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenDisposingSnapshotStore
         {
             [SqlServerFact]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object);
-
-                snapshotStore.Dispose();
-
-                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+                using (var snapshotStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object))
+                {
+                    snapshotStore.Dispose();
+                    snapshotStore.Dispose();
+                }
             }
         }
 

@@ -30,11 +30,11 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             [Fact]
             public void CanSafelyDisposeMoreThanOnce()
             {
-                var dispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => new Mock<IStoreSagas>().Object), new Lazy<IPublishEvents>(() => new Mock<IPublishEvents>().Object));
-
-                dispatcher.Dispose();
-
-                Assert.DoesNotThrow(() => dispatcher.Dispose());
+                using (var dispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => new Mock<IStoreSagas>().Object), new Lazy<IPublishEvents>(() => new Mock<IPublishEvents>().Object)))
+                {
+                    dispatcher.Dispose();
+                    dispatcher.Dispose();
+                }
             }
         }
 
@@ -211,6 +211,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
         {
             private readonly Mock<IStoreSagas> sagaStore;
             private readonly Mock<IPublishEvents> eventPublisher;
+            private readonly TimeoutDispatcher timeoutDispatcher;
             private readonly SagaTimeout sagaTimeout;
             private readonly DateTime now;
             private FakeTimer timer;
@@ -223,8 +224,8 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 sagaTimeout = new SagaTimeout(typeof(FakeSaga), GuidStrategy.NewGuid(), now.AddMinutes(-5));
 
                 SystemTime.OverrideWith(() => now);
-                Assert.DoesNotThrow(() => new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback)));
-
+               
+                timeoutDispatcher = new TimeoutDispatcher(new Lazy<IStoreSagas>(() => sagaStore.Object), new Lazy<IPublishEvents>(() => eventPublisher.Object), callback => timer = new FakeTimer(callback));
                 sagaStore.Setup(mock => mock.GetScheduledTimeouts(It.IsAny<DateTime>())).Returns(new[] { sagaTimeout });
             }
 

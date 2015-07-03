@@ -48,7 +48,7 @@ namespace Spark.Cqrs.Domain
         }
 
         /// <summary>
-        /// Verify that the specified <paramref name="aggregate"/> state has not been corrupted after a failed save attempt and update the check sum if the save was successful..
+        /// Verify that the specified <paramref name="aggregate"/> state has not been corrupted after a failed save attempt and update the check sum if the save was successful.
         /// </summary>
         /// <param name="aggregate">The modified <see cref="Aggregate"/> instance if <paramref name="commit"/> is not <value>null</value>; otherwise the original <see cref="Aggregate"/> instance if <paramref name="error"/> is not <value>null</value>.</param>
         /// <param name="commit">The <see cref="Commit"/> generated if the save was successful; otherwise <value>null</value>.</param>

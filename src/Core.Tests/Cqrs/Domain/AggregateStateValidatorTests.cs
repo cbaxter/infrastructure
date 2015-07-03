@@ -101,7 +101,9 @@ namespace Test.Spark.Cqrs.Domain
 
                 aggregate.UpdateHash();
 
-                Assert.DoesNotThrow(() => pipelineHook.PostSave(aggregate, null, new InvalidOperationException()));
+                pipelineHook.PostSave(aggregate, null, new InvalidOperationException());
+
+                aggregate.VerifyHash();
             }
 
             [Fact]
@@ -126,7 +128,9 @@ namespace Test.Spark.Cqrs.Domain
                 aggregate.UpdateHash();
                 aggregate.State = Guid.NewGuid();
 
-                Assert.DoesNotThrow(() => pipelineHook.PostSave(aggregate, commit, null));
+                pipelineHook.PostSave(aggregate, commit, null);
+
+                aggregate.VerifyHash();
             }
         }
 

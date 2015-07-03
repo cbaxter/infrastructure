@@ -37,7 +37,7 @@ namespace Test.Spark.Cqrs.Commanding
             {
                 typeLocator.Setup(mock => mock.GetTypes(It.IsAny<Func<Type, Boolean>>())).Returns(new Type[0]);
 
-                Assert.DoesNotThrow(() => new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object));
+                Assert.NotNull(new CommandHandlerRegistry(aggregateStore.Object, typeLocator.Object, serviceProvider.Object));
             }
 
             [Fact]
