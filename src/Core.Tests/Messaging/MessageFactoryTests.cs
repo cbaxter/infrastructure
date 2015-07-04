@@ -67,7 +67,7 @@ namespace Test.Spark.Messaging
             }
 
             [Fact]
-            public void DoNotSetTimestampIfAlreadySet()
+            public void AlwaysSetTimestamp()
             {
                 var now = DateTime.UtcNow;
                 var messageFactory = new FakeMessageFactory();
@@ -77,7 +77,7 @@ namespace Test.Spark.Messaging
 
                 var message = messageFactory.Create(new[] { new Header(Header.Timestamp, timestamp.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false) }, new Object());
 
-                Assert.Equal(timestamp, message.Headers.GetTimestamp());
+                Assert.True(message.Headers.GetTimestamp() > timestamp);
             }
         }
 

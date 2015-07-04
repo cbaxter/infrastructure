@@ -42,8 +42,8 @@ namespace Test.Spark.Serialization.Converters
 
                 Validate(json, @"
 {
-  ""_o"": """ + headers.GetOrigin() + @""",
   ""_t"": """ + headers.GetTimestamp().ToString(DateTimeFormat.RoundTrip) + @""",
+  ""_o"": """ + headers.GetOrigin() + @""",
   ""_r"": """ + headers.GetRemoteAddress() + @"""
 }");
             }

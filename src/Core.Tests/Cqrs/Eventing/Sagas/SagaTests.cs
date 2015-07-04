@@ -153,7 +153,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 {
                     saga.CanStartWith((FakeEvent e) => e.Id);
                 }
-                
+
                 [UsedImplicitly]
                 public void Handle(FakeEvent e)
                 {

@@ -188,15 +188,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="command">The command to be published.</param>
         protected void Publish(Guid aggregateId, Command command)
         {
-            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
-
-            var context = SagaContext.Current;
-            if (context == null)
-                throw new InvalidOperationException(Exceptions.NoSagaContext);
-
-            context.Publish(aggregateId, GetUserHeadersFromEventContext(), command);
-
-            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
+            Publish(aggregateId, command, (IEnumerable<Header>)null);
         }
 
         /// <summary>
@@ -207,16 +199,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="headers">The set of one or more custom message headers.</param>
         protected void Publish(Guid aggregateId, Command command, params Header[] headers)
         {
-            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
-
-            var context = SagaContext.Current;
-            if (context == null)
-                throw new InvalidOperationException(Exceptions.NoSagaContext);
-
-            var baseHeaders = GetUserHeadersFromEventContext();
-            context.Publish(aggregateId, headers != null && headers.Length > 0 ? headers.Concat(baseHeaders).Distinct(header => header.Name) : baseHeaders, command);
-
-            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
+            Publish(aggregateId, command, headers == null || headers.Length == 0 ? (IEnumerable<Header>)null : headers);
         }
 
         /// <summary>
@@ -233,31 +216,21 @@ namespace Spark.Cqrs.Eventing.Sagas
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoSagaContext);
 
-            context.Publish(aggregateId, (headers ?? Enumerable.Empty<Header>()).Concat(GetUserHeadersFromEventContext()).Distinct(header => header.Name), command);
+            context.Publish(aggregateId, headers == null ? GetHeadersFromEventContext() : headers.Concat(GetHeadersFromEventContext()).Distinct(header => header.Name), command);
 
             Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>
-        /// Get the <value>Header.UserAddress</value> and <value>Header.UserName</value> headers from the underlying event context.
+        /// Get the headers from the current <see cref="EventContext"/>.
         /// </summary>
-        private static IEnumerable<Header> GetUserHeadersFromEventContext()
+        private static IEnumerable<Header> GetHeadersFromEventContext()
         {
             var context = EventContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoEventContext);
 
-            var value = String.Empty;
-            var result = new List<Header>();
-            var eventHeaders = context.Headers;
-
-            if (eventHeaders.TryGetValue(Header.UserAddress, out value) || eventHeaders.TryGetValue(Header.RemoteAddress, out value))
-                result.Add(new Header(Header.UserAddress, value, checkReservedNames: false));
-
-            if (eventHeaders.TryGetValue(Header.UserName, out value))
-                result.Add(new Header(Header.UserName, value, checkReservedNames: false));
-
-            return result;
+            return context.Headers;
         }
 
         /// <summary>
