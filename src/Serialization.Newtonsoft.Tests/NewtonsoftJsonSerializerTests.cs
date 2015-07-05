@@ -30,6 +30,7 @@ namespace Test.Spark.Serialization
             public void IncludeTypeWhenDeclaringTypeDoesNotMatchSpecifiedType()
             {
                 String json;
+
                 using (var memoryStream = new MemoryStream())
                 {
                     NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
@@ -39,6 +40,33 @@ namespace Test.Spark.Serialization
                 }
 
                 Assert.Contains("{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib\",\"key\":\"value\"}", json);
+            }
+
+            [Fact]
+            public void UseDataMemberNameWhenSpecified()
+            {
+                String json;
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
+                    NewtonsoftJsonSerializer.Default.Serialize(memoryStream, new ClassWithDataMember("Test String"), typeof(Object));
+
+                    json = Encoding.UTF8.GetString(memoryStream.ToArray());
+                }
+
+                Assert.Contains("{\"$type\":\"Test.Spark.Serialization.UsingNewtonsoftJsonSerializer.WhenSerializingData+ClassWithDataMember, Spark.Serialization.Newtonsoft.Tests\",\"t\":\"Test String\"}", json);
+            }
+
+            public class ClassWithDataMember
+            {
+                [DataMember(Name = "t")]
+                public String Test { get; private set; }
+
+                public ClassWithDataMember(String test)
+                {
+                    Test = test;
+                }
             }
         }
 

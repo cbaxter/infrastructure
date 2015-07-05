@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <owners>$author$</owners>
+    <authors>$author$</authors>
+    <version>$version$</version>
+    <description>$description$</description>
+    <!--
+    <iconUrl></iconUrl>
+    <licenseUrl></licenseUrl>
+    <projectUrl></projectUrl>
+    -->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>cqrs event sourcing logging json.net serialization</tags>
+    <dependencies>
+      <dependency id="Spark.Core" version="$version$" />
+    </dependencies>
+  </metadata>
+</package>

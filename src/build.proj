@@ -15,6 +15,7 @@
     <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
     <BuildOutput Condition="'$(BuildOutput)' == ''">$(SolutionDir)\..\bin</BuildOutput>
     <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
+    <NuGetExe>$(NuGetDir)\nuget.exe</NuGetExe>
   </PropertyGroup>
 
   <!--
@@ -35,8 +36,8 @@
   </Target>
 
   <!--
-  * StampVersionInfo
-  * Generates VersionInfo.cs based on the build date.
+  * CreateFileVersion
+  * Generates build date and time parameters.
   **************************************************
   -->
   <UsingTask TaskName="CreateFileVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
@@ -55,6 +56,11 @@
     </Task>
   </UsingTask>
 
+  <!--
+  * StampVersionInfo
+  * Generates VersionInfo.cs based on the build date.
+  **************************************************
+  -->
   <Target Name="StampVersionInfo" DependsOnTargets="Clean">
     <CreateFileVersion>
       <Output TaskParameter="BuildDate" PropertyName="BuildDate" />
@@ -120,10 +126,13 @@
       <BinaryFiles Include="$(SolutionDir)\Core\bin\$(Configuration)\Spark.Core.*" />
       <BinaryFiles Include="$(SolutionDir)\Serialization.Newtonsoft\bin\$(Configuration)\Spark.Serialization.Newtonsoft.*" />
     </ItemGroup>
-
     <Copy SourceFiles="@(BinaryFiles)" DestinationFolder="$(BuildOutput)" />
 
-    <!--TODO: NuGet Packages-->
+    <ItemGroup>
+      <Package Include="Core" />
+      <Package Include="Serialization.Newtonsoft" />
+    </ItemGroup>
+    <Exec Command="$(NuGetExe) pack %(Package.Identity)\%(Package.Identity).csproj -OutputDirectory $(BuildOutput)" />
   </Target>
 
 </Project>

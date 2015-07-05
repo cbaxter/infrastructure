@@ -287,6 +287,7 @@
     <None Include="..\.shared\Infrastructure.snk">
       <Link>Properties\Infrastructure.snk</Link>
     </None>
+    <None Include="Properties\Core.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialectStatements.resx">

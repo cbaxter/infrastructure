@@ -78,6 +78,7 @@
     <None Include="..\.shared\Infrastructure.snk">
       <Link>Properties\Infrastructure.snk</Link>
     </None>
+    <None Include="Properties\Serialization.Newtonsoft.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
