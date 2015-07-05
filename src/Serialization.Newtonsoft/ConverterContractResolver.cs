@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -27,8 +29,9 @@ namespace Spark.Serialization
     /// </remarks>
     public sealed class ConverterContractResolver : DefaultContractResolver
     {
+        private static readonly Boolean CanUseNonPublicSetters = AppDomain.CurrentDomain.IsFullyTrusted;
         private readonly IList<JsonConverter> knownConverters;
-        
+
         /// <summary>
         /// Initializes a new instance of <see cref="ConverterContractResolver"/> using the set of specified <see cref="JsonConverter"/> objects.
         /// </summary>
@@ -56,6 +59,40 @@ namespace Spark.Serialization
             contract.Converter = knownConverters.FirstOrDefault(converter => converter.CanConvert(objectType));
 
             return contract;
+        }
+
+        /// <summary>
+        /// Determines which contract type is created for the given type.
+        /// </summary>
+        /// <param name="objectType">Type of the object.</param>
+        protected override JsonObjectContract CreateObjectContract(Type objectType)
+        {
+            var contract = base.CreateObjectContract(objectType);
+
+            if (contract.DefaultCreator == null)
+                contract.DefaultCreator = () => FormatterServices.GetUninitializedObject(objectType);
+
+            return contract;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="JsonProperty"/> for the given class <paramref name="member"/>.
+        /// </summary>
+        /// <param name="memberSerialization">The member's parent <see cref="MemberSerialization"/>.</param>
+        /// <param name="member">The member to create a <see cref="JsonProperty"/> for.</param>
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var jsonProperty = base.CreateProperty(member, memberSerialization);
+            var property = jsonProperty.Writable ? null : member as PropertyInfo;
+            var dataMember = member.GetCustomAttributes().OfType<DataMemberAttribute>().SingleOrDefault();
+
+            if (dataMember != null && dataMember.Name.IsNotNullOrWhiteSpace() && jsonProperty.PropertyName.Equals(jsonProperty.UnderlyingName))
+                jsonProperty.PropertyName = dataMember.Name;
+
+            if (property != null)
+                jsonProperty.Writable = property.GetSetMethod(nonPublic: CanUseNonPublicSetters) != null;
+
+            return jsonProperty;
         }
     }
 }
