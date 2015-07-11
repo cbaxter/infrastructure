@@ -84,7 +84,9 @@
   **************************************************
   -->
   <Target Name="Compile" DependsOnTargets="StampVersionInfo">
-    <MSBuild Projects=".nuget\NuGet.Targets" Targets="RestorePackages" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
+    <MSBuild Projects=".nuget\NuGet.Targets" Targets="CheckPrerequisites" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
+    <Exec Command="$(NuGetExe) restore Infrastructure.sln" />
+    
     <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
   </Target>
 
