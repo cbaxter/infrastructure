@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Serialization;
 
 /* Copyright (c) 2015 Spark Software Ltd.
  * 
@@ -19,7 +19,7 @@ using Newtonsoft.Json.Bson;
  */
 
 namespace Spark.Serialization
-{    
+{
     /// <summary>
     /// A BSON serializer using on JSON.NET.
     /// </summary>
@@ -30,7 +30,7 @@ namespace Spark.Serialization
         /// <summary>
         /// The default Newtonsoft BSON Serializer instance.
         /// </summary>
-        public static readonly NewtonsoftBsonSerializer Default = new NewtonsoftBsonSerializer(Enumerable.Empty<JsonConverter>());
+        public static readonly NewtonsoftBsonSerializer Default = new NewtonsoftBsonSerializer(new ConverterContractResolver(Enumerable.Empty<JsonConverter>()));
 
         /// <summary>
         /// The <see cref="JsonSerializer"/> used by this <see cref="NewtonsoftBsonSerializer"/> instance.
@@ -40,12 +40,12 @@ namespace Spark.Serialization
         /// <summary>
         /// Initializes a new instance of <see cref="NewtonsoftBsonSerializer"/> with a set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.
         /// </summary>
-        /// <param name="jsonConverters">The set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.</param>
-        public NewtonsoftBsonSerializer(IEnumerable<JsonConverter> jsonConverters)
+        /// <param name="contractResolver">The underlying JSON.NET contract resolver.</param>
+        public NewtonsoftBsonSerializer(IContractResolver contractResolver)
         {
             serializer = new JsonSerializer
                 {
-                    ContractResolver = new ConverterContractResolver(jsonConverters),
+                    ContractResolver = contractResolver,
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,
@@ -65,7 +65,7 @@ namespace Spark.Serialization
             using (var bsonWriter = new BsonWriter(stream))
                 serializer.Serialize(bsonWriter, graph, type);
         }
-        
+
         /// <summary>
         /// Deserialize an object graph from the speciied <paramref name="stream"/>.
         /// </summary>

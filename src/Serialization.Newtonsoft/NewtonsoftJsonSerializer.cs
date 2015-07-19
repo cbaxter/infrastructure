@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 /* Copyright (c) 2015 Spark Software Ltd.
  * 
@@ -30,7 +30,7 @@ namespace Spark.Serialization
         /// <summary>
         /// The default Newtonsoft JSON Serializer instance.
         /// </summary>
-        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(Enumerable.Empty<JsonConverter>());
+        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(new ConverterContractResolver(Enumerable.Empty<JsonConverter>()));
 
         /// <summary>
         /// The <see cref="JsonSerializer"/> used by this <see cref="NewtonsoftJsonSerializer"/> instance.
@@ -40,12 +40,12 @@ namespace Spark.Serialization
         /// <summary>
         /// Initializes a new instance of <see cref="NewtonsoftJsonSerializer"/> with a set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.
         /// </summary>
-        /// <param name="jsonConverters">The set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.</param>
-        public NewtonsoftJsonSerializer(IEnumerable<JsonConverter> jsonConverters)
+        /// <param name="contractResolver">The underlying JSON.NET contract resolver.</param>
+        public NewtonsoftJsonSerializer(IContractResolver contractResolver)
         {
             serializer = new JsonSerializer
                 {
-                    ContractResolver = new ConverterContractResolver(jsonConverters),
+                    ContractResolver = contractResolver,
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,
