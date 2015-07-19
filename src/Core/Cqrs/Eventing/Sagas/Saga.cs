@@ -222,15 +222,31 @@ namespace Spark.Cqrs.Eventing.Sagas
         }
 
         /// <summary>
-        /// Get the headers from the current <see cref="EventContext"/>.
+        /// Get the core headers from the current <see cref="EventContext"/>.
         /// </summary>
         private static IEnumerable<Header> GetHeadersFromEventContext()
         {
             var context = EventContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoEventContext);
+            
+            var value = String.Empty;
+            var result = new List<Header>();
+            var eventHeaders = context.Headers;
 
-            return context.Headers;
+            if (eventHeaders.TryGetValue(Header.Origin, out value))
+                result.Add(new Header(Header.Origin, value, checkReservedNames: false));
+
+            if (eventHeaders.TryGetValue(Header.RemoteAddress, out value))
+                result.Add(new Header(Header.RemoteAddress, value, checkReservedNames: false));
+
+            if (eventHeaders.TryGetValue(Header.UserAddress, out value))
+                result.Add(new Header(Header.UserAddress, value, checkReservedNames: false));
+
+            if (eventHeaders.TryGetValue(Header.UserName, out value))
+                result.Add(new Header(Header.UserName, value, checkReservedNames: false));
+
+            return result;
         }
 
         /// <summary>
