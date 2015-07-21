@@ -1,4 +1,4 @@
-<Project ToolsVersion="12.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <UsingTask AssemblyFile="packages\xunit.runner.msbuild.2.0.0\build\portable-net45+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
 
@@ -14,8 +14,6 @@
     <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
     <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
     <BuildOutput Condition="'$(BuildOutput)' == ''">$(SolutionDir)\..\bin</BuildOutput>
-    <NuGetDir>$(SolutionDir)\.nuget</NuGetDir>
-    <NuGetExe>$(NuGetDir)\nuget.exe</NuGetExe>
   </PropertyGroup>
 
   <!--
@@ -36,11 +34,11 @@
   </Target>
 
   <!--
-  * CreateFileVersion
+  * CreateFileVersionC:\Program Files (x86)\MSBuildv
   * Generates build date and time parameters.
   **************************************************
   -->
-  <UsingTask TaskName="CreateFileVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
+  <UsingTask TaskName="CreateFileVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <BuildDate ParameterType="System.String" Output="true" />
       <BuildTime ParameterType="System.String" Output="true" />
@@ -84,9 +82,6 @@
   **************************************************
   -->
   <Target Name="Compile" DependsOnTargets="StampVersionInfo">
-    <MSBuild Projects=".nuget\NuGet.Targets" Targets="CheckPrerequisites" Properties="SolutionDir=$(MSBuildProjectDirectory);ProjectDir=$(NuGetDir);DownloadNuGetExe=true;RequireRestoreConsent=false;" />
-    <Exec Command="$(NuGetExe) restore Infrastructure.sln" />
-    
     <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
   </Target>
 

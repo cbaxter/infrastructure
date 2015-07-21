@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using Newtonsoft.Json;
@@ -45,12 +46,13 @@ namespace Test.Spark.Serialization
             [Fact]
             public void UseDataMemberNameWhenSpecified()
             {
+                NewtonsoftJsonSerializer serializer = new NewtonsoftJsonSerializer(new DataMemberContractResolver(Enumerable.Empty<JsonConverter>()));
                 String json;
 
                 using (var memoryStream = new MemoryStream())
                 {
-                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
-                    NewtonsoftJsonSerializer.Default.Serialize(memoryStream, new ClassWithDataMember("Test String"), typeof(Object));
+                    serializer.Serializer.Formatting = Formatting.None;
+                    serializer.Serialize(memoryStream, new ClassWithDataMember("Test String"), typeof(Object));
 
                     json = Encoding.UTF8.GetString(memoryStream.ToArray());
                 }
@@ -92,30 +94,32 @@ namespace Test.Spark.Serialization
             public void UseDefaultConstructorWhenSpecified()
             {
                 Byte[] json = Encoding.UTF8.GetBytes("{\"$type\":\"Test.Spark.Serialization.UsingNewtonsoftJsonSerializer.WhenDeserializingData+ClassWithDefaultConstructor, Spark.Serialization.Newtonsoft.Tests\",\"test\":\"Test String\"}");
+                NewtonsoftJsonSerializer serializer = new NewtonsoftJsonSerializer(new DataMemberContractResolver(Enumerable.Empty<JsonConverter>()));
                 ClassWithDefaultConstructor graph;
 
                 using (var memoryStream = new MemoryStream(json, writable: false))
                 {
-                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
+                    serializer.Serializer.Formatting = Formatting.None;
 
-                    graph = (ClassWithDefaultConstructor)NewtonsoftJsonSerializer.Default.Deserialize(memoryStream, typeof(Object));
+                    graph = (ClassWithDefaultConstructor)serializer.Deserialize(memoryStream, typeof(Object));
                 }
 
                 Assert.Equal("Test String", graph.Test);
                 Assert.True(graph.DefaultConstructorInvoked);
             }
-            
+
             [Fact]
             public void CanUseCustomDataMemberNames()
             {
                 Byte[] json = Encoding.UTF8.GetBytes("{\"$type\":\"Test.Spark.Serialization.UsingNewtonsoftJsonSerializer.WhenDeserializingData+ClassWithCustomMemberName, Spark.Serialization.Newtonsoft.Tests\",\"t\":\"Test String\"}");
+                NewtonsoftJsonSerializer serializer = new NewtonsoftJsonSerializer(new DataMemberContractResolver(Enumerable.Empty<JsonConverter>()));
                 ClassWithCustomMemberName graph;
 
                 using (var memoryStream = new MemoryStream(json, writable: false))
                 {
-                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
+                    serializer.Serializer.Formatting = Formatting.None;
 
-                    graph = (ClassWithCustomMemberName)NewtonsoftJsonSerializer.Default.Deserialize(memoryStream, typeof(Object));
+                    graph = (ClassWithCustomMemberName)serializer.Deserialize(memoryStream, typeof(Object));
                 }
 
                 Assert.Equal("Test String", graph.Test);
@@ -125,13 +129,14 @@ namespace Test.Spark.Serialization
             public void CanUsePrivateSetterInFullTrustEnvironment()
             {
                 Byte[] json = Encoding.UTF8.GetBytes("{\"$type\":\"Test.Spark.Serialization.UsingNewtonsoftJsonSerializer.WhenDeserializingData+ClassWithPrivateSetter, Spark.Serialization.Newtonsoft.Tests\",\"t\":\"Test String\"}");
+                NewtonsoftJsonSerializer serializer = new NewtonsoftJsonSerializer(new DataMemberContractResolver(Enumerable.Empty<JsonConverter>()));
                 ClassWithPrivateSetter graph;
 
                 using (var memoryStream = new MemoryStream(json, writable: false))
                 {
-                    NewtonsoftJsonSerializer.Default.Serializer.Formatting = Formatting.None;
+                    serializer.Serializer.Formatting = Formatting.None;
 
-                    graph = (ClassWithPrivateSetter)NewtonsoftJsonSerializer.Default.Deserialize(memoryStream, typeof(Object));
+                    graph = (ClassWithPrivateSetter)serializer.Deserialize(memoryStream, typeof(Object));
                 }
 
                 Assert.Equal("Test String", graph.Test);
