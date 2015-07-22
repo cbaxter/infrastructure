@@ -9,11 +9,12 @@
   <PropertyGroup>
     <SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>
     <Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
-    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <MajorVersion Condition="'$(MajorVersion)' == ''">0</MajorVersion>
     <MinorVersion Condition="'$(MinorVersion)' == ''">0</MinorVersion>
     <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <BuildOutput Condition="'$(BuildOutput)' == ''">$(SolutionDir)\..\bin</BuildOutput>
+    <NuGetExe Condition="'$(NuGetExe)' == ''">$(LOCALAPPDATA)\NuGet\NuGet.exe</NuGetExe>
   </PropertyGroup>
 
   <!--
@@ -114,11 +115,20 @@
   </Target>
 
   <!--
+  * CheckPreconditions
+  * Check NuGet.exe exists at specified location.
+  **************************************************
+  -->
+  <Target Name="CheckPreconditions">
+    <Error Text="NuGet.exe not found: $(NuGetExe)" Condition="!Exists($(NuGetExe))" />
+  </Target>
+
+  <!--
   * Package
   * Package build output for official releases.
   **************************************************
   -->
-  <Target Name="Package" DependsOnTargets="Test">
+  <Target Name="Package" DependsOnTargets="CheckPreconditions; Test">
     <ItemGroup>
       <BinaryFiles Include="$(SolutionDir)\Core\bin\$(Configuration)\Spark.Core.*" />
       <BinaryFiles Include="$(SolutionDir)\Serialization.Newtonsoft\bin\$(Configuration)\Spark.Serialization.Newtonsoft.*" />
