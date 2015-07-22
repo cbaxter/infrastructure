@@ -90,7 +90,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 100, now.Ticks + 100);
             }
 
             [Fact]
@@ -101,7 +101,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 100, now.Ticks + 100);
             }
 
             [Fact]
@@ -111,7 +111,7 @@ namespace Test.Spark.Messaging
                 var header = new Header(Header.Timestamp, now.ToString(DateTimeFormat.RoundTrip), checkReservedNames: false);
                 var headers = new HeaderCollection(header.ToEnumerable());
 
-                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 100, now.Ticks + 100);
             }
 
             [Fact]
@@ -122,7 +122,7 @@ namespace Test.Spark.Messaging
                 var now = DateTime.UtcNow;
 
                 SystemTime.OverrideWith(() => now);
-                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 10, now.Ticks + 10);
+                Assert.InRange(headers.GetTimestamp().Ticks, now.Ticks - 100, now.Ticks + 100);
             }
         }
 
