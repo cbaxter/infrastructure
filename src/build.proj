@@ -18,11 +18,20 @@
   </PropertyGroup>
 
   <!--
+  * CheckPreconditions
+  * Check NuGet.exe exists at specified location.
+  **************************************************
+  -->
+  <Target Name="CheckPreconditions">
+    <Error Text="NuGet.exe not found: $(NuGetExe)" Condition="!Exists($(NuGetExe))" />
+  </Target>
+
+  <!--
   * Clean
   * Remove any output from previous builds.
   **************************************************
   -->
-  <Target Name="Clean">
+  <Target Name="Clean" DependsOnTargets="CheckPreconditions">
     <ItemGroup>
       <CleanFiles Include="**\bin\$(Configuration)\**" Exclude="**\bin\$(Configuration)\*.vshost.exe" />
       <CleanFiles Include="**\obj\$(Configuration)\**" />
@@ -83,6 +92,7 @@
   **************************************************
   -->
   <Target Name="Compile" DependsOnTargets="StampVersionInfo">
+    <Exec Command="$(NuGetExe) restore Infrastructure.sln" />
     <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
   </Target>
 
@@ -115,20 +125,11 @@
   </Target>
 
   <!--
-  * CheckPreconditions
-  * Check NuGet.exe exists at specified location.
-  **************************************************
-  -->
-  <Target Name="CheckPreconditions">
-    <Error Text="NuGet.exe not found: $(NuGetExe)" Condition="!Exists($(NuGetExe))" />
-  </Target>
-
-  <!--
   * Package
   * Package build output for official releases.
   **************************************************
   -->
-  <Target Name="Package" DependsOnTargets="CheckPreconditions; Test">
+  <Target Name="Package" DependsOnTargets="Test">
     <ItemGroup>
       <BinaryFiles Include="$(SolutionDir)\Core\bin\$(Configuration)\Spark.Core.*" />
       <BinaryFiles Include="$(SolutionDir)\Serialization.Newtonsoft\bin\$(Configuration)\Spark.Serialization.Newtonsoft.*" />
