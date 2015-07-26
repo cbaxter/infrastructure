@@ -32,13 +32,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Spark.Core.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -51,12 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.shared\ProductInfo.cs">
-      <Link>Properties\ProductInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\.shared\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
-    </Compile>
     <Compile Include="Annotations.cs" />
     <Compile Include="Binary.cs" />
     <Compile Include="Configuration\SagaStoreElement.cs" />
@@ -176,6 +163,7 @@
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Properties\ProductInfo.cs" />
     <Compile Include="TransientErrorRegistry.cs" />
     <Compile Include="Logging\ActivityScope.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
@@ -283,11 +271,9 @@
     <Compile Include="TypeLocator.cs" />
     <Compile Include="ValueObject.cs" />
     <Compile Include="Verify.cs" />
+    <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.shared\Infrastructure.snk">
-      <Link>Properties\Infrastructure.snk</Link>
-    </None>
     <None Include="Properties\Core.nuspec" />
   </ItemGroup>
   <ItemGroup>
@@ -315,7 +301,7 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   -->
   <Target Name="BeforeBuild">
-    <WriteLinesToFile File="../.shared/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyFileVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyConfiguration(&quot;Debug&quot;)];" />
+    <WriteLinesToFile File="Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyFileVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyConfiguration(&quot;Debug&quot;)];" />
   </Target>
   <Target Name="AfterBuild">
   </Target>

@@ -35,12 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Moq, Version=4.2.1507.118, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1507.0118\lib\net40\Moq.dll</HintPath>
@@ -69,10 +63,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.shared\ProductInfo.cs">
+    <Compile Include="..\Core\Properties\ProductInfo.cs">
       <Link>Properties\ProductInfo.cs</Link>
     </Compile>
-    <Compile Include="..\.shared\VersionInfo.cs">
+    <Compile Include="..\Core\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="BinaryTests.cs" />
@@ -194,9 +188,6 @@
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.shared\Infrastructure.snk">
-      <Link>Properties\Infrastructure.snk</Link>
-    </None>
     <None Include="App.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>

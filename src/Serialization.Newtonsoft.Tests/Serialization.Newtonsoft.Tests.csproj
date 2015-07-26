@@ -35,12 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -64,10 +58,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.shared\ProductInfo.cs">
+    <Compile Include="..\Core\Properties\ProductInfo.cs">
       <Link>Properties\ProductInfo.cs</Link>
     </Compile>
-    <Compile Include="..\.shared\VersionInfo.cs">
+    <Compile Include="..\Core\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Converters\BinaryConverterTests.cs" />
@@ -86,9 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.shared\Infrastructure.snk">
-      <Link>Properties\Infrastructure.snk</Link>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

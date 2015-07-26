@@ -46,10 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.shared\ProductInfo.cs">
+    <Compile Include="..\Core\Properties\ProductInfo.cs">
       <Link>Properties\ProductInfo.cs</Link>
     </Compile>
-    <Compile Include="..\.shared\VersionInfo.cs">
+    <Compile Include="..\Core\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Benchmarks\BenchmarkedSagaStore.cs" />

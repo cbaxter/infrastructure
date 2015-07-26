@@ -83,7 +83,7 @@
       <Output TaskParameter="Value" PropertyName="FileVersion" />
     </CreateProperty>
 
-    <WriteLinesToFile File=".shared/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(FileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
+    <WriteLinesToFile File="Core/Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(FileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
   </Target>
 
   <!--
