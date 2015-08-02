@@ -69,7 +69,7 @@
   * Generates VersionInfo.cs based on the build date.
   **************************************************
   -->
-  <Target Name="StampVersionInfo" DependsOnTargets="Clean">
+  <Target Name="GenerateVersionInfo" DependsOnTargets="Clean">
     <CreateFileVersion>
       <Output TaskParameter="BuildDate" PropertyName="BuildDate" />
       <Output TaskParameter="BuildTime" PropertyName="BuildTime" />
@@ -80,10 +80,8 @@
     </CreateProperty>
 
     <CreateProperty Value="$(MajorVersion).$(MinorVersion).$(BuildDate).$(BuildTime)">
-      <Output TaskParameter="Value" PropertyName="FileVersion" />
+      <Output TaskParameter="Value" PropertyName="AssemblyFileVersion" />
     </CreateProperty>
-
-    <WriteLinesToFile File="Core/Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(FileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
   </Target>
 
   <!--
@@ -91,9 +89,9 @@
   * Rebuild the project solution.
   **************************************************
   -->
-  <Target Name="Compile" DependsOnTargets="StampVersionInfo">
+  <Target Name="Compile" DependsOnTargets="GenerateVersionInfo">
     <Exec Command="$(NuGetExe) restore Infrastructure.sln" />
-    <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="Infrastructure.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform);AssemblyVersion=$(AssemblyVersion);AssemblyFileVersion=$(AssemblyFileVersion)" />
   </Target>
 
   <!--

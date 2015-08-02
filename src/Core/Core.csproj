@@ -9,6 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Spark</RootNamespace>
     <AssemblyName>Spark.Core</AssemblyName>
+    <AssemblyVersion Condition=" '$(AssemblyVersion)' == '' ">0.0.0.0</AssemblyVersion>
+    <AssemblyFileVersion Condition=" '$(AssemblyFileVersion)' == '' ">0.0.0.0</AssemblyFileVersion>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -301,7 +303,7 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   -->
   <Target Name="BeforeBuild">
-    <WriteLinesToFile File="Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyFileVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyConfiguration(&quot;Debug&quot;)];" />
+    <WriteLinesToFile File="Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(AssemblyFileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
   </Target>
   <Target Name="AfterBuild">
   </Target>
