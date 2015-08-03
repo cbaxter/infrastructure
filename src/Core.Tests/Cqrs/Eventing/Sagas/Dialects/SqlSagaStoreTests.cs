@@ -9,22 +9,21 @@ using Spark.Cqrs.Eventing.Sagas;
 using Spark.Cqrs.Eventing.Sagas.Sql;
 using Spark.Cqrs.Eventing.Sagas.Sql.Dialects;
 using Spark.Data;
-using Spark.Resources;
 using Spark.Serialization;
 using Test.Spark.Data;
 using Xunit;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
@@ -56,6 +55,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenInitializingSagaStore
         {
             public void DialectCannotBeNull()
@@ -84,15 +84,15 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             {
                 DropExistingTable();
 
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
                 Assert.True(TableExists());
             }
 
             [SqlServerFact]
             public void WillNotTouchTableIfExists()
             {
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
-                Assert.DoesNotThrow(() => new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
+                Assert.NotNull(new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object));
                 Assert.True(TableExists());
             }
 
@@ -118,6 +118,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenCreatingSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -146,6 +147,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenGettingScheduledTimeouts : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -194,19 +196,22 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingNewCompletedSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
             public void DoNotInsertNewSagaIfCompleted()
             {
                 var saga = new FakeSaga { Version = 0, Completed = true };
+                var result = default(Saga);
 
-                // Since we are using a regular Fact attribute rather than a SqlServerFact, any attempt to access
-                // the database will throw an exception; thus if no exception thrown we did not try to save.
-                Assert.DoesNotThrow(() => SagaStore.Save(saga, SagaContext));
+                SagaStore.Save(saga, SagaContext);
+
+                Assert.False(SagaStore.TryGetSaga(typeof(FakeSaga), saga.CorrelationId, out result));
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingNewSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -233,6 +238,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingExistingSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -260,6 +266,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenSavingCompletedSaga : UsingInitializedSagaStore
         {
             [SqlServerFact]
@@ -291,16 +298,17 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             }
         }
 
+        [Collection(SqlServerConnection.Name)]
         public class WhenDisposingSnapshotStore
         {
             [SqlServerFact]
             public void CanSafelyCallDisposeMultipleTimes()
             {
-                var snapshotStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object);
-
-                snapshotStore.Dispose();
-
-                Assert.DoesNotThrow(() => snapshotStore.Dispose());
+                using (var snapshotStore = new SqlSagaStore(new SqlSagaStoreDialect(SqlServerConnection.Name), new BinarySerializer(), new Mock<ILocateTypes>().Object))
+                {
+                    snapshotStore.Dispose();
+                    snapshotStore.Dispose();
+                }
             }
         }
 

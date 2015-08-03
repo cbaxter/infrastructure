@@ -4,17 +4,17 @@ using Spark.Cqrs.Domain;
 using Spark.EventStore;
 using Xunit;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark.Cqrs.Domain
@@ -58,12 +58,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePreGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreGet(null, Guid.Empty));
+                var hook = new TestHook();
+
+                hook.PreGet(null, Guid.Empty);
+
+                Assert.True(hook.PreGetHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); }
+                public Boolean PreGetHandled { get; private set; }
+                public override void PreGet(Type aggregateType, Guid id) { base.PreGet(null, Guid.Empty); PreGetHandled = true; }
             }
         }
 
@@ -104,12 +109,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePostGetCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostGet(null));
+                var hook = new TestHook();
+
+                hook.PostGet(null);
+
+                Assert.True(hook.PostGetHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostGet(Aggregate aggregate) { base.PostGet(null); }
+                public Boolean PostGetHandled { get; private set; }
+                public override void PostGet(Aggregate aggregate) { base.PostGet(null); PostGetHandled = true; }
             }
         }
 
@@ -150,12 +160,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePreSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PreSave(null, null));
+                var hook = new TestHook();
+
+                hook.PreSave(null, null);
+
+                Assert.True(hook.PreSaveHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PreSave(Aggregate aggregate, CommandContext context) { base.PreSave(null, null); }
+                public Boolean PreSaveHandled { get; private set; }
+                public override void PreSave(Aggregate aggregate, CommandContext context) { base.PreSave(null, null); PreSaveHandled = true; }
             }
         }
 
@@ -196,12 +211,17 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void BasePostSaveCanBeIgnored()
             {
-                Assert.DoesNotThrow(() => new TestHook().PostSave(null, null, null));
+                var hook = new TestHook();
+
+                hook.PostSave(null, null, null);
+
+                Assert.True(hook.PostSaveHandled);
             }
 
             private sealed class TestHook : PipelineHook
             {
-                public override void PostSave(Aggregate aggregate, Commit commit, Exception error) { base.PostSave(null, null, null); }
+                public Boolean PostSaveHandled { get; private set; }
+                public override void PostSave(Aggregate aggregate, Commit commit, Exception error) { base.PostSave(null, null, null); PostSaveHandled = true; }
             }
         }
     }

@@ -12,17 +12,17 @@ using Spark.Resources;
 using Test.Spark.Configuration;
 using Xunit;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark.Cqrs.Domain
@@ -34,11 +34,11 @@ namespace Test.Spark.Cqrs.Domain
             [Fact]
             public void CanCallDisposeMoreThanOnce()
             {
-                var aggregateStore = new AggregateStore(new Mock<IApplyEvents>().Object, new Mock<IStoreSnapshots>().Object, new Mock<IStoreEvents>().Object);
-
-                aggregateStore.Dispose();
-
-                Assert.DoesNotThrow(() => aggregateStore.Dispose());
+                using (var aggregateStore = new AggregateStore(new Mock<IApplyEvents>().Object, new Mock<IStoreSnapshots>().Object, new Mock<IStoreEvents>().Object))
+                {
+                    aggregateStore.Dispose(); 
+                    aggregateStore.Dispose();
+                }
             }
         }
 
@@ -197,10 +197,10 @@ namespace Test.Spark.Cqrs.Domain
 
                 eventStore.Setup(mock => mock.Save(It.IsAny<Commit>())).Throws<DuplicateCommitException>();
 
-                // ReSharper disable AccessToDisposedClosure
                 using (var context = new CommandContext(GuidStrategy.NewGuid(), HeaderCollection.Empty, CommandEnvelope.Empty))
-                    Assert.DoesNotThrow(() => aggregateStore.Save(aggregate, context));
-                // ReSharper restore AccessToDisposedClosure
+                    aggregateStore.Save(aggregate, context);
+
+                eventStore.Verify(mock => mock.Save(It.IsAny<Commit>()), Times.Once);
             }
 
             private class FakeAggregate : Aggregate

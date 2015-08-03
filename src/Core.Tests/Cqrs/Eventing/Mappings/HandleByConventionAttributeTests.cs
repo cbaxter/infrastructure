@@ -7,19 +7,18 @@ using Spark.Cqrs.Eventing;
 using Spark.Cqrs.Eventing.Mappings;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark.Cqrs.Eventing.Mappings
@@ -43,8 +42,11 @@ namespace Test.Spark.Cqrs.Eventing.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeHandler), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var handler = new FakeHandler();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeHandler(), new FakeEvent()));
+                handleMethod(handler, new FakeEvent());
+
+                Assert.True(handler.Handled);
             }
 
             [Fact]
@@ -53,20 +55,27 @@ namespace Test.Spark.Cqrs.Eventing.Mappings
                 var attribute = new HandleByConventionAttribute { MethodName = "Custom" };
                 var handleMethods = attribute.GetHandleMethods(typeof(FakeHandler), new Mock<IServiceProvider>().Object);
                 var handleMethod = handleMethods.Single().Value;
+                var handler = new FakeHandler();
 
-                Assert.DoesNotThrow(() => handleMethod(new FakeHandler(), new FakeEvent()));
+                handleMethod(handler, new FakeEvent());
+
+                Assert.True(handler.Handled);
             }
 
             [EventHandler]
             protected class FakeHandler
             {
+                public Boolean Handled { get; private set; }
+
                 public void Handle(FakeEvent e)
                 {
                     throw new MethodAccessException();
                 }
 
                 public void Custom(FakeEvent e)
-                { }
+                {
+                    Handled = true;
+                }
             }
 
             protected class FakeEvent : Event

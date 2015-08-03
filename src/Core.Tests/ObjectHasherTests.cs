@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Spark;
 using Xunit;
-using Xunit.Extensions;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark
@@ -77,7 +76,7 @@ namespace Test.Spark
             public void DictionaryHashedConsistently()
             {
                 var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
-                
+
                 Assert.Equal(ObjectHasher.Hash(dictionary), ObjectHasher.Hash(dictionary));
             }
 
@@ -103,11 +102,11 @@ namespace Test.Spark
             public void CircularReferenceDoesNotResultInStackOverflow()
             {
                 var dictionary = new Dictionary<String, Object> { { "Value 1", 1 }, { "Value 2", 2 }, { "Value 3", 3 } };
-    
+
                 //NOTE: When `Keys` is accessed, a `KeyCollection` instance is created that holds a reference to the underlying `dictionary` and 
                 //      would cause a `StackOverflowException` to be thrown if not handled correctly.
-                Assert.NotNull(dictionary.Keys); 
-                Assert.DoesNotThrow(() => ObjectHasher.Hash(dictionary));
+                Assert.NotNull(dictionary.Keys);
+                Assert.NotEqual(Guid.Empty, ObjectHasher.Hash(dictionary));
             }
         }
 

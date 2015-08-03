@@ -13,8 +13,8 @@ namespace Spark.Example.Modules
         {
             // Register common infrastructure.
             builder.Register(context => new AutofacServiceProvider(context.Resolve<ILifetimeScope>())).As<IServiceProvider>().SingleInstance();
+            builder.RegisterInstance(NewtonsoftJsonSerializer.Default).As<ISerializeObjects>().SingleInstance();
             builder.RegisterType<SqlTransientErrorRegistry>().As<IDetectTransientErrors>().SingleInstance();
-            builder.RegisterType<NewtonsoftJsonSerializer>().As<ISerializeObjects>().SingleInstance();
             builder.RegisterType<ServiceMessageFactory>().As<ICreateMessages>().SingleInstance();
             builder.RegisterType<TypeLocator>().As<ILocateTypes>().SingleInstance();
         }

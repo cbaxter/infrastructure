@@ -1,29 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{76DE91DB-0A1B-4219-9CE6-A8E61CD1B5DF}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{7B1219D8-005E-4A65-BE2B-050077236655}"
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{7B1219D8-005E-4A65-BE2B-050077236655}"
 	ProjectSection(SolutionItems) = preProject
 		build.proj = build.proj
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{84EEABF1-72A4-4BD8-8879-17F035425347}"
-	ProjectSection(SolutionItems) = preProject
-		.shared\Infrastructure.snk = .shared\Infrastructure.snk
-		.shared\ProductInfo.cs = .shared\ProductInfo.cs
-		.shared\PublicKey.txt = .shared\PublicKey.txt
-		.shared\VersionInfo.cs = .shared\VersionInfo.cs
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{DFD230FA-76D5-4EF4-8035-80E848CF798B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{569A5CD0-BACA-4B6E-A84E-56B0CB10B62F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{CFF3E57D-1325-4E10-8E14-4898814487BE}"
 EndProject

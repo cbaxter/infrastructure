@@ -3,19 +3,18 @@ using System.Globalization;
 using Spark;
 using Spark.Resources;
 using Xunit;
-using Xunit.Extensions;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Test.Spark
@@ -28,7 +27,7 @@ namespace Test.Spark
             [Fact]
             public void TrueDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.True(true, "paramName", "Custom Message"));
+                Verify.True(true, "paramName", "Custom Message");
             }
 
             [Fact]
@@ -46,7 +45,7 @@ namespace Test.Spark
             [Fact]
             public void FalseDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.False(false, "paramName", "Custom Message"));
+                Verify.False(false, "paramName", "Custom Message");
             }
 
             [Fact]
@@ -64,7 +63,7 @@ namespace Test.Spark
             [Fact]
             public void BaseTypeFoundDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.TypeDerivesFrom(typeof(Exception), typeof(ArgumentException), "paramName"));
+                Verify.TypeDerivesFrom(typeof(Exception), typeof(ArgumentException), "paramName");
             }
 
             [Fact]
@@ -82,14 +81,14 @@ namespace Test.Spark
             [Fact]
             public void EqualValueDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.Equal(Guid.Empty, Guid.Empty, "paramName"));
+                Verify.Equal(Guid.Empty, Guid.Empty, "paramName");
             }
 
             [Fact]
             public void NotEqualThrowsArgumentException()
             {
                 var actual = Guid.NewGuid();
-                var expectedEx = new ArgumentOutOfRangeException("paramName", actual,Exceptions.ArgumentNotEqualToValue.FormatWith(Guid.Empty));
+                var expectedEx = new ArgumentOutOfRangeException("paramName", actual, Exceptions.ArgumentNotEqualToValue.FormatWith(Guid.Empty));
                 var actualEx = Assert.Throws<ArgumentOutOfRangeException>(() => Verify.Equal(Guid.Empty, actual, "paramName"));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);
@@ -101,7 +100,7 @@ namespace Test.Spark
             [Fact]
             public void NotEqualValueDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.NotEqual(Guid.Empty, Guid.NewGuid(), "paramName"));
+                Verify.NotEqual(Guid.Empty, Guid.NewGuid(), "paramName");
             }
 
             [Fact]
@@ -137,7 +136,7 @@ namespace Test.Spark
             [Fact]
             public void NullExpectedValueDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.GreaterThan(null, (Comparable)1, "paramName"));
+                Verify.GreaterThan(null, (Comparable)1, "paramName");
             }
 
             [Fact]
@@ -161,7 +160,7 @@ namespace Test.Spark
             [Fact]
             public void ActualGreaterThanExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.GreaterThan(1, 2, "paramName"));
+                Verify.GreaterThan(1, 2, "paramName");
             }
 
             private class Comparable : IComparable
@@ -213,7 +212,7 @@ namespace Test.Spark
             [Fact]
             public void NullExpectedValueDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(null, (Comparable)1, "paramName"));
+                Verify.GreaterThanOrEqual(null, (Comparable)1, "paramName");
             }
 
             [Fact]
@@ -228,13 +227,13 @@ namespace Test.Spark
             [Fact]
             public void ActualEqualToExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(1, 1, "paramName"));
+                Verify.GreaterThanOrEqual(1, 1, "paramName");
             }
 
             [Fact]
             public void ActualGreaterThanExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.GreaterThanOrEqual(1, 2, "paramName"));
+                Verify.GreaterThanOrEqual(1, 2, "paramName");
             }
 
             private class Comparable : IComparable
@@ -304,7 +303,7 @@ namespace Test.Spark
             [Fact]
             public void ActualLessThanExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.LessThan(2, 1, "paramName"));
+                Verify.LessThan(2, 1, "paramName");
             }
 
             private class Comparable : IComparable
@@ -365,13 +364,13 @@ namespace Test.Spark
             [Fact]
             public void ActualEqualToExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.LessThanOrEqual(1, 1, "paramName"));
+                Verify.LessThanOrEqual(1, 1, "paramName");
             }
 
             [Fact]
             public void ActualLessThanExpectedDoesNotThrowException()
             {
-                Assert.DoesNotThrow(() => Verify.LessThanOrEqual(2, 1, "paramName"));
+                Verify.LessThanOrEqual(2, 1, "paramName");
             }
 
             private class Comparable : IComparable
@@ -405,19 +404,19 @@ namespace Test.Spark
             [Fact]
             public void NotNullValueDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.NotNull((Object)0, "paramName"));
+                Verify.NotNull((Object)0, "paramName");
             }
 
             [Fact]
             public void NotNullReferenceDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.NotNull(new Object(), "paramName"));
+                Verify.NotNull(new Object(), "paramName");
             }
 
             [Fact]
             public void NotNullNullableDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.NotNull((Int32?)0, "paramName"));
+                Verify.NotNull((Int32?)0, "paramName");
             }
 
             [Fact]
@@ -444,7 +443,7 @@ namespace Test.Spark
             [Fact]
             public void NotEmptyValueDoesNotThrow()
             {
-                Assert.DoesNotThrow(() => Verify.NotNullOrWhiteSpace("Value", "paramName"));
+                Verify.NotNullOrWhiteSpace("Value", "paramName");
             }
 
             [Theory, InlineData(" "), InlineData("\r"), InlineData("\n"), InlineData("\r\n"), InlineData("\t")]

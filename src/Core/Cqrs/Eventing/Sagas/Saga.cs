@@ -10,17 +10,17 @@ using Spark.Logging;
 using Spark.Messaging;
 using Spark.Resources;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Spark.Cqrs.Eventing.Sagas
@@ -33,12 +33,6 @@ namespace Spark.Cqrs.Eventing.Sagas
     {
         private static readonly IDictionary<Type, SagaMetadata> SagaMetadataCache = new ConcurrentDictionary<Type, SagaMetadata>();
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Returns <value>true</value> if the saga handles the <see cref="Timeout"/> event; otherwise <value>false</value>.
-        /// </summary>
-        [IgnoreDataMember]
-        private Boolean HandlesTimeout { get; set; }
 
         /// <summary>
         /// The saga correlation identifier associated with this saga instance.
@@ -69,14 +63,6 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         [IgnoreDataMember]
         public Int32 Version { get; internal set; }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="Saga"/>.
-        /// </summary>
-        protected Saga()
-        {
-            HandlesTimeout = GetMetadata().CanHandle(typeof(Timeout));
-        }
 
         /// <summary>
         /// Gets the saga metadata for this saga instance.
@@ -150,7 +136,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time when a timeout should occur.</param>
         protected void ScheduleTimeout(DateTime timeout)
         {
-            if (!HandlesTimeout)
+            if (!GetMetadata().CanHandle(typeof(Timeout)))
                 throw new InvalidOperationException(Exceptions.SagaTimeoutNotHandled.FormatWith(GetType()));
 
             if (TimeoutScheduled)
@@ -202,15 +188,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="command">The command to be published.</param>
         protected void Publish(Guid aggregateId, Command command)
         {
-            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
-
-            var context = SagaContext.Current;
-            if (context == null)
-                throw new InvalidOperationException(Exceptions.NoSagaContext);
-
-            context.Publish(aggregateId, GetUserHeadersFromEventContext(), command);
-
-            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
+            Publish(aggregateId, command, (IEnumerable<Header>)null);
         }
 
         /// <summary>
@@ -221,16 +199,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="headers">The set of one or more custom message headers.</param>
         protected void Publish(Guid aggregateId, Command command, params Header[] headers)
         {
-            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
-
-            var context = SagaContext.Current;
-            if (context == null)
-                throw new InvalidOperationException(Exceptions.NoSagaContext);
-
-            var baseHeaders = GetUserHeadersFromEventContext();
-            context.Publish(aggregateId, headers != null && headers.Length > 0 ? headers.Concat(baseHeaders).Distinct(header => header.Name) : baseHeaders, command);
-
-            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
+            Publish(aggregateId, command, headers == null || headers.Length == 0 ? (IEnumerable<Header>)null : headers);
         }
 
         /// <summary>
@@ -247,25 +216,31 @@ namespace Spark.Cqrs.Eventing.Sagas
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoSagaContext);
 
-            context.Publish(aggregateId, (headers ?? Enumerable.Empty<Header>()).Concat(GetUserHeadersFromEventContext()).Distinct(header => header.Name), command);
+            context.Publish(aggregateId, headers == null ? GetHeadersFromEventContext() : headers.Concat(GetHeadersFromEventContext()).Distinct(header => header.Name), command);
 
             Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>
-        /// Get the <value>Header.UserAddress</value> and <value>Header.UserName</value> headers from the underlying event context.
+        /// Get the core headers from the current <see cref="EventContext"/>.
         /// </summary>
-        private static IEnumerable<Header> GetUserHeadersFromEventContext()
+        private static IEnumerable<Header> GetHeadersFromEventContext()
         {
             var context = EventContext.Current;
             if (context == null)
                 throw new InvalidOperationException(Exceptions.NoEventContext);
-
+            
             var value = String.Empty;
             var result = new List<Header>();
             var eventHeaders = context.Headers;
 
-            if (eventHeaders.TryGetValue(Header.UserAddress, out value) || eventHeaders.TryGetValue(Header.RemoteAddress, out value))
+            if (eventHeaders.TryGetValue(Header.Origin, out value))
+                result.Add(new Header(Header.Origin, value, checkReservedNames: false));
+
+            if (eventHeaders.TryGetValue(Header.RemoteAddress, out value))
+                result.Add(new Header(Header.RemoteAddress, value, checkReservedNames: false));
+
+            if (eventHeaders.TryGetValue(Header.UserAddress, out value))
                 result.Add(new Header(Header.UserAddress, value, checkReservedNames: false));
 
             if (eventHeaders.TryGetValue(Header.UserName, out value))

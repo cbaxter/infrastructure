@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
-/* Copyright (c) 2013 Spark Software Ltd.
+/* Copyright (c) 2015 Spark Software Ltd.
  * 
- * This source is subject to the GNU Lesser General Public License.
- * See: http://www.gnu.org/copyleft/lesser.html
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  * 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
- * IN THE SOFTWARE. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 namespace Spark.Serialization
@@ -30,7 +30,7 @@ namespace Spark.Serialization
         /// <summary>
         /// The default Newtonsoft JSON Serializer instance.
         /// </summary>
-        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(Enumerable.Empty<JsonConverter>());
+        public static readonly NewtonsoftJsonSerializer Default = new NewtonsoftJsonSerializer(new ConverterContractResolver(Enumerable.Empty<JsonConverter>()));
 
         /// <summary>
         /// The <see cref="JsonSerializer"/> used by this <see cref="NewtonsoftJsonSerializer"/> instance.
@@ -40,12 +40,12 @@ namespace Spark.Serialization
         /// <summary>
         /// Initializes a new instance of <see cref="NewtonsoftJsonSerializer"/> with a set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.
         /// </summary>
-        /// <param name="jsonConverters">The set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.</param>
-        public NewtonsoftJsonSerializer(IEnumerable<JsonConverter> jsonConverters)
+        /// <param name="contractResolver">The underlying JSON.NET contract resolver.</param>
+        public NewtonsoftJsonSerializer(IContractResolver contractResolver)
         {
             serializer = new JsonSerializer
                 {
-                    ContractResolver = new ConverterContractResolver(jsonConverters),
+                    ContractResolver = contractResolver,
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,

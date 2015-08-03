@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Spark</RootNamespace>
     <AssemblyName>Spark.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AssemblyVersion Condition=" '$(AssemblyVersion)' == '' ">0.0.0.0</AssemblyVersion>
+    <AssemblyFileVersion Condition=" '$(AssemblyFileVersion)' == '' ">0.0.0.0</AssemblyFileVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,13 +34,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Spark.Core.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\.shared\Infrastructure.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -50,12 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.shared\ProductInfo.cs">
-      <Link>Properties\ProductInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\.shared\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
-    </Compile>
     <Compile Include="Annotations.cs" />
     <Compile Include="Binary.cs" />
     <Compile Include="Configuration\SagaStoreElement.cs" />
@@ -175,6 +165,7 @@
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Properties\ProductInfo.cs" />
     <Compile Include="TransientErrorRegistry.cs" />
     <Compile Include="Logging\ActivityScope.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
@@ -282,11 +273,10 @@
     <Compile Include="TypeLocator.cs" />
     <Compile Include="ValueObject.cs" />
     <Compile Include="Verify.cs" />
+    <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.shared\Infrastructure.snk">
-      <Link>Properties\Infrastructure.snk</Link>
-    </None>
+    <None Include="Properties\Core.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Cqrs\Eventing\Sagas\Sql\Dialects\SqlServerDialectStatements.resx">
@@ -311,9 +301,10 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
+  -->
   <Target Name="BeforeBuild">
+    <WriteLinesToFile File="Properties/VersionInfo.cs" Overwrite="true" Lines="using System.Reflection%3b;;[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)];[assembly: AssemblyFileVersion(&quot;$(AssemblyFileVersion)&quot;)];[assembly: AssemblyConfiguration(&quot;$(Configuration)&quot;)];" />
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  -->
 </Project>

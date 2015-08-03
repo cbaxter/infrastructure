@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyCompany("Spark Software Ltd")]
 [assembly: AssemblyProduct("Spark Infrastructure")]
-[assembly: AssemblyCopyright("Copyright © Spark Software Ltd 2012")]
+[assembly: AssemblyCopyright("Copyright © Spark Software Ltd 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
