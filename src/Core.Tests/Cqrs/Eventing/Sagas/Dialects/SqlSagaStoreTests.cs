@@ -99,7 +99,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             private void DropExistingTable()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Saga') DROP TABLE [dbo].[Saga];", connection))
+                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Saga') DROP TABLE [Saga];", connection))
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -109,7 +109,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas.Dialects
             private Boolean TableExists()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Saga';", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Saga';", connection))
                 {
                     connection.Open();
 

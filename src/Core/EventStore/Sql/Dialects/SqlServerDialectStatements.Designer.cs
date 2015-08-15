@@ -61,7 +61,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;.
+        ///   Looks up a localized string similar to DELETE FROM [Commit] WHERE [StreamId] = @streamId;.
         /// </summary>
         internal static string DeleteStream {
             get {
@@ -132,7 +132,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];.
         /// </summary>
         internal static string GetRange {
             get {
@@ -141,7 +141,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP(1) [StreamId],[Version],[State] FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;.
+        ///   Looks up a localized string similar to SELECT TOP(1) [StreamId],[Version],[State] FROM [Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;.
         /// </summary>
         internal static string GetSnapshot {
             get {
@@ -150,7 +150,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];.
         /// </summary>
         internal static string GetStream {
             get {
@@ -159,7 +159,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [StreamId] FROM [Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];.
         /// </summary>
         internal static string GetStreams {
             get {
@@ -168,7 +168,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];.
+        ///   Looks up a localized string similar to SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];.
         /// </summary>
         internal static string GetUndispatched {
             get {
@@ -177,7 +177,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);.
+        ///   Looks up a localized string similar to INSERT INTO [Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);.
         /// </summary>
         internal static string InsertCommit {
             get {
@@ -186,7 +186,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);.
+        ///   Looks up a localized string similar to INSERT INTO [Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);.
         /// </summary>
         internal static string InsertSnapshot {
             get {
@@ -204,7 +204,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TRUNCATE TABLE [dbo].[Commit];.
+        ///   Looks up a localized string similar to TRUNCATE TABLE [Commit];.
         /// </summary>
         internal static string PurgeCommits {
             get {
@@ -213,7 +213,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TRUNCATE TABLE [dbo].[Snapshot];.
+        ///   Looks up a localized string similar to TRUNCATE TABLE [Snapshot];.
         /// </summary>
         internal static string PurgeSnapshots {
             get {
@@ -222,10 +222,10 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UPDATE TOP(1) [dbo].[Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
+        ///   Looks up a localized string similar to UPDATE TOP(1) [Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
         ///IF @@ROWCOUNT = 0
         ///BEGIN
-        ///    INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
+        ///    INSERT INTO [Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
         ///END;.
         /// </summary>
         internal static string ReplaceSnapshot {
@@ -235,7 +235,7 @@ namespace Spark.EventStore.Sql.Dialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UPDATE [dbo].[Commit] SET [Data] = @data WHERE [Id] = @id;.
+        ///   Looks up a localized string similar to UPDATE [Commit] SET [Data] = @data WHERE [Id] = @id;.
         /// </summary>
         internal static string UpdateCommit {
             get {

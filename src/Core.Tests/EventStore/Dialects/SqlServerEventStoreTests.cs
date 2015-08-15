@@ -70,7 +70,7 @@ namespace Test.Spark.EventStore.Dialects
             private void DropExistingTable()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Commit') DROP TABLE [dbo].[Commit];", connection))
+                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Commit') DROP TABLE [Commit];", connection))
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -80,7 +80,7 @@ namespace Test.Spark.EventStore.Dialects
             private Boolean TableExists()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Commit';", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Commit';", connection))
                 {
                     connection.Open();
 
