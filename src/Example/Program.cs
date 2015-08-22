@@ -24,18 +24,21 @@ namespace Spark.Example
     internal static class Program
     {
         private const Int32 NumberOfCommandsToPublish = 100000;
+        private const Int32 NumberOfIterations = 1;
 
         /// <summary>
         /// The main entry point for the test program.
         /// </summary>
         internal static void Main()
         {
-            var container = Initialize();
+            for (var i = 0; i < NumberOfIterations; i++)
+            {
+                var container = Initialize();
 
-            Purge(container);
-            PublishCommands(container);
-
-            WaitForCompletion(container);
+                Purge(container);
+                PublishCommands(container);
+                WaitForCompletion(container);
+            }
 
             if (Debugger.IsAttached)
             {
@@ -105,7 +108,7 @@ namespace Spark.Example
             }
 
             // Generate a random set of commands to exercise the underlying infrastructure.
-            for (var i = 10; i < (NumberOfCommandsToPublish - 10); i++)
+            for (var i = 10; i < NumberOfCommandsToPublish; i++)
             {
                 switch (randomizer.Next(0, 11))
                 {
@@ -152,7 +155,7 @@ namespace Spark.Example
             var eventBus = container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>();
             var statistics = container.Resolve<Statistics>();
 
-            while (commandBus.Count > 0 || eventBus.Count > 0)
+            while (statistics.Processing)
                 Thread.Sleep(100);
 
             // Wait for command bus drain and shut-down.

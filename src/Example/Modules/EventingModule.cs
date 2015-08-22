@@ -22,10 +22,10 @@ namespace Spark.Example.Modules
             // Register underlying eventing infrastructure.
             builder.RegisterType<BlockingCollectionMessageBus<EventEnvelope>>().AsSelf().As<ISendMessages<EventEnvelope>>().As<IReceiveMessages<EventEnvelope>>().SingleInstance();
             builder.RegisterType<MessageReceiver<EventEnvelope>>().AsSelf().SingleInstance().AutoActivate();
-            builder.RegisterType<EventProcessor>().As<IProcessMessages<EventEnvelope>>().SingleInstance();
             builder.RegisterType<EventHandlerRegistry>().As<IRetrieveEventHandlers>().SingleInstance();
             builder.RegisterType<TimeoutDispatcher>().As<PipelineHook>().SingleInstance();
-            builder.RegisterType<EventPublisher>().As<IPublishEvents>().SingleInstance();
+            builder.RegisterType<EventPublisher>().Named<IPublishEvents>("EventPublisher").SingleInstance();
+            builder.RegisterType<EventProcessor>().Named<IProcessMessages<EventEnvelope>>("EventProcessor").SingleInstance();
 
             // Register all event handlers.
             builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies()).Where(type => type.GetCustomAttribute<EventHandlerAttribute>() != null);
@@ -38,6 +38,8 @@ namespace Spark.Example.Modules
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new BenchmarkedSagaStore(sagaStore, context.Resolve<Statistics>()), "SagaStore").Named<IStoreSagas>("BenchmarkedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new CachedSagaStore(sagaStore), "BenchmarkedSagaStore").Named<IStoreSagas>("CachedSagaStore").SingleInstance();
             builder.RegisterDecorator<IStoreSagas>((context, sagaStore) => new HookableSagaStore(sagaStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedSagaStore").As<IStoreSagas>().SingleInstance();
+            builder.RegisterDecorator<IPublishEvents>((context, eventPublisher) => new EventPublisherWrapper(eventPublisher, context.Resolve<Statistics>()), "EventPublisher").As<IPublishEvents>().SingleInstance();
+            builder.RegisterDecorator<IProcessMessages<EventEnvelope>>((context, eventProcessor) => new EventProcessorWrapper(eventProcessor, context.Resolve<Statistics>()), "EventProcessor").As<IProcessMessages<EventEnvelope>>().SingleInstance();
         }
     }
 }

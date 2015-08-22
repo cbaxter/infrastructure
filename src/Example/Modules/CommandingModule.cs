@@ -19,9 +19,9 @@ namespace Spark.Example.Modules
             // Register underlying commanding infrastructure.
             builder.RegisterType<BlockingCollectionMessageBus<CommandEnvelope>>().AsSelf().As<ISendMessages<CommandEnvelope>>().As<IReceiveMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<MessageReceiver<CommandEnvelope>>().AsSelf().SingleInstance().AutoActivate();
-            builder.RegisterType<CommandProcessor>().As<IProcessMessages<CommandEnvelope>>().SingleInstance();
             builder.RegisterType<CommandHandlerRegistry>().As<IRetrieveCommandHandlers>().SingleInstance();
-            builder.RegisterType<CommandPublisher>().As<IPublishCommands>().SingleInstance();
+            builder.RegisterType<CommandPublisher>().Named<IPublishCommands>("CommandPublisher").SingleInstance();
+            builder.RegisterType<CommandProcessor>().Named<IProcessMessages<CommandEnvelope>>("CommandProcessor").SingleInstance();
 
             // Register data store infrastructure.
             builder.RegisterType<SqlEventStoreDialect>().AsSelf().As<IEventStoreDialect>().SingleInstance();
@@ -40,6 +40,8 @@ namespace Spark.Example.Modules
             builder.RegisterDecorator<IStoreAggregates>((context, aggregateStore) => new HookableAggregateStore(aggregateStore, context.Resolve<IEnumerable<PipelineHook>>()), "CachedAggregateStore").As<IRetrieveAggregates>().As<IStoreAggregates>().SingleInstance();
             builder.RegisterDecorator<IStoreSnapshots>((context, snapshotStore) => new BenchmarkedSnapshotStore(snapshotStore, context.Resolve<Statistics>()), "SnapshotStore").As<IStoreSnapshots>().SingleInstance();
             builder.RegisterDecorator<IStoreEvents>((context, eventStore) => new BenchmarkedEventStore(eventStore, context.Resolve<Statistics>()), "EventStore").As<IStoreEvents>().SingleInstance();
+            builder.RegisterDecorator<IPublishCommands>((context, commandPublisher) => new CommandPublisherWrapper(commandPublisher, context.Resolve<Statistics>()), "CommandPublisher").As<IPublishCommands>().SingleInstance();
+            builder.RegisterDecorator<IProcessMessages<CommandEnvelope>>((context, commandProcessor) => new CommandProcessorWrapper(commandProcessor, context.Resolve<Statistics>()), "CommandProcessor").As<IProcessMessages<CommandEnvelope>>().SingleInstance();
         }
     }
 }

@@ -55,9 +55,13 @@
     <Compile Include="Benchmarks\BenchmarkedSagaStore.cs" />
     <Compile Include="Benchmarks\BenchmarkedSnapshotStore.cs" />
     <Compile Include="Benchmarks\BenchmarkedEventStore.cs" />
+    <Compile Include="Benchmarks\EventProcessorWrapper.cs" />
+    <Compile Include="Benchmarks\CommandProcessorWrapper.cs" />
+    <Compile Include="Benchmarks\EventPublisherWrapper.cs" />
     <Compile Include="Benchmarks\SagaHook.cs" />
     <Compile Include="Benchmarks\CommandHook.cs" />
     <Compile Include="Benchmarks\Statistics.cs" />
+    <Compile Include="Benchmarks\CommandPublisherWrapper.cs" />
     <Compile Include="Denormalizers\AccountDenormalizer.cs" />
     <Compile Include="Domain\Account.cs" />
     <Compile Include="Domain\AccountStatus.cs" />

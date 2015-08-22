@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using System.Threading;
 
 namespace Spark.Example.Benchmarks
@@ -11,8 +12,18 @@ namespace Spark.Example.Benchmarks
     {
         private readonly Timer timer;
         private readonly Object syncLock = new Object();
-        private Int64 commands, queries, inserts, updates, deletes, conflicts, totalCommands, totalQueries, totalInserts, totalUpdates, totalDeletes, totalConflicts;
+        private readonly StringBuilder lineBuilder = new StringBuilder();
+
+        private Int64 events, totalEvents, eventsQueued, totalEventsQueued;
+        private Int64 commands, conflicts, totalCommands, totalConflicts, commandsQueued, totalCommandsQueued;
+        private Int64 queries, inserts, updates, deletes, totalQueries, totalInserts, totalUpdates, totalDeletes;
+        private DateTime startTime, endTime;
         private Boolean disabled = true;
+
+        /// <summary>
+        /// Indicates whether or not one or more commands and/or events are still being processed.
+        /// </summary>
+        public Boolean Processing => commandsQueued > 0 || eventsQueued > 0;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Statistics"/>.
@@ -27,12 +38,15 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void StartCapture()
         {
-            Console.WriteLine("Started @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", SystemTime.Now);
+            Console.WriteLine("Started @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", startTime = SystemTime.Now);
             Console.WriteLine();
-            Console.WriteLine("      Commands    Operations       Queries       Inserts       Updates       Deletes     Conflicts");
-            Console.WriteLine("--------------------------------------------------------------------------------------------------");
+            Console.WriteLine("|         Commands        |          Events         |                                 Database                                |");
+            Console.WriteLine("|   Processed      Queued |   Processed      Queued |  Operations     Queries     Inserts     Updates     Deletes   Conflicts |");
+            Console.WriteLine("|-------------------------|-------------------------|-------------------------------------------------------------------------|");
 
-            commands = queries = inserts = updates = deletes = conflicts = totalCommands = totalQueries = totalInserts = totalUpdates = totalDeletes = totalConflicts = 0;
+            events = totalEvents = eventsQueued = totalEventsQueued = 0;
+            commands = conflicts = totalCommands = totalConflicts = commandsQueued = totalCommandsQueued = 0;
+            queries = inserts = updates = deletes = totalQueries = totalInserts = totalUpdates = totalDeletes = 0;
             timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
             disabled = false;
         }
@@ -42,40 +56,138 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         public void StopCapture()
         {
-            var line = String.Empty;
-
             disabled = true;
+            endTime = SystemTime.Now;
             timer.Change(Timeout.Infinite, Timeout.Infinite);
+
             WriteStatisticsLine();
+            WriteAverages();
 
-            // Build Line
-            Console.WriteLine("--------------------------------------------------------------------------------------------------");
-            line += totalCommands.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += (totalQueries + totalInserts + totalUpdates + totalDeletes).ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalQueries.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalInserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalUpdates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalDeletes.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-            line += totalConflicts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-
-            Console.WriteLine(line);
             Console.WriteLine();
-            Console.WriteLine("Stopped @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", SystemTime.Now);
+            Console.WriteLine("Stopped @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", endTime);
             Console.WriteLine();
         }
 
         /// <summary>
-        /// Increment command count.
+        /// Report statistics captured since the last interval.
         /// </summary>
-        public void IncrementCommandCount()
+        private void WriteStatisticsLine()
+        {
+            lock (syncLock)
+            {
+                // Build Line
+                lineBuilder.Clear();
+                lineBuilder.Append("|");
+                lineBuilder.Append(commands.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(commandsQueued.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(" |");
+                lineBuilder.Append(events.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(eventsQueued.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(" |");
+                lineBuilder.Append((queries + inserts + updates + deletes).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(queries.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(inserts.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(updates.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(deletes.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(conflicts.ToString(CultureInfo.InvariantCulture).PadLeft(12));
+                lineBuilder.Append(" |");
+
+                // Reset Counters
+                commands = 0;
+                queries = 0;
+                inserts = 0;
+                updates = 0;
+                deletes = 0;
+                conflicts = 0;
+                events = 0;
+
+                totalCommandsQueued += commandsQueued;
+                totalEventsQueued += eventsQueued;
+            }
+
+            Console.WriteLine(lineBuilder);
+        }
+
+        /// <summary>
+        /// Report all averages.
+        /// </summary>
+        private void WriteAverages()
+        {
+            var elapsedSeconds = Convert.ToInt64(endTime.Subtract(startTime).TotalSeconds);
+
+            Console.WriteLine("|-------------------------|-------------------------|-------------------------------------------------------------------------|");
+
+            lineBuilder.Clear();
+            lineBuilder.Append("|");
+            lineBuilder.Append((totalCommands / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalCommandsQueued / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append(" |");
+            lineBuilder.Append((totalEvents / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalEventsQueued / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append(" |");
+            lineBuilder.Append(((totalQueries + totalInserts + totalUpdates + totalDeletes) / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalQueries / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalInserts / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalUpdates / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalDeletes / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append((totalConflicts / elapsedSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(12));
+            lineBuilder.Append(" |");
+
+            Console.WriteLine(lineBuilder);
+        }
+
+        /// <summary>
+        /// Increment queued command count.
+        /// </summary>
+        public void IncrementQueuedCommands()
+        {
+            if (disabled) return;
+            lock (syncLock)
+            {
+                commandsQueued++;
+            }
+        }
+
+        /// <summary>
+        /// Decrement queued command count and increment processed command count.
+        /// </summary>
+        public void DecrementQueuedCommands()
         {
             if (disabled) return;
             lock (syncLock)
             {
                 commands++;
                 totalCommands++;
+                commandsQueued--;
             }
         }
+
+        /// <summary>
+        /// Increment queued event count.
+        /// </summary>
+        public void IncrementQueuedEvents()
+        {
+            if (disabled) return;
+            lock (syncLock)
+            {
+                eventsQueued++;
+            }
+        }
+
+        /// <summary>
+        /// Decrement queued event count and increment processed event count.
+        /// </summary>
+        public void DecrementQueuedEvents()
+        {
+            if (disabled) return;
+            lock (syncLock)
+            {
+                events++;
+                totalEvents++;
+                eventsQueued--;
+            }
+        }
+
 
         /// <summary>
         /// Increment query count.
@@ -140,36 +252,6 @@ namespace Spark.Example.Benchmarks
                 conflicts++;
                 totalConflicts++;
             }
-        }
-
-        /// <summary>
-        /// Report statistics captured since the last interval.
-        /// </summary>
-        private void WriteStatisticsLine()
-        {
-            var line = String.Empty;
-
-            lock (syncLock)
-            {
-                // Build Line
-                line += commands.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += (queries + inserts + updates + deletes).ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += queries.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += inserts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += updates.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += deletes.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-                line += conflicts.ToString(CultureInfo.InvariantCulture).PadLeft(14);
-
-                // Reset Counters
-                commands = 0;
-                queries = 0;
-                inserts = 0;
-                updates = 0;
-                deletes = 0;
-                conflicts = 0;
-            }
-
-            Console.WriteLine(line);
         }
     }
 }

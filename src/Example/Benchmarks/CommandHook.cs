@@ -31,8 +31,6 @@ namespace Spark.Example.Benchmarks
         {
             base.PostSave(aggregate, commit, error);
 
-            statistics.IncrementCommandCount();
-
             if (error is ConcurrencyException)
                 statistics.IncrementConflictCount();
         }

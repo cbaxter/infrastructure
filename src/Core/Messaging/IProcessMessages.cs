@@ -16,11 +16,10 @@
 namespace Spark.Messaging
 {
     /// <summary>
-    /// Message sender.
+    /// Message processor.
     /// </summary>
     public interface IProcessMessages<T>
     {
-
         /// <summary>
         /// Processes the specified message instance synchornously.
         /// </summary>
