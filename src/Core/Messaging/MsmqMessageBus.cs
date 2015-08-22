@@ -22,7 +22,7 @@ using Spark.Serialization;
 namespace Spark.Messaging
 {
     /// <summary>
-    /// An in memory message bus based on a <see cref="BlockingCollection{T}"/> for use by single-process applications.
+    /// A MSMQ message bus for use by local and/or remote applications.
     /// </summary>
     public abstract class MsmqMessageBus
     {
@@ -33,7 +33,7 @@ namespace Spark.Messaging
     }
 
     /// <summary>
-    /// An in memory message bus based on a <see cref="BlockingCollection{T}"/> for use by single-process applications.
+    /// A MSMQ message bus for use by local and/or remote applications.
     /// </summary>
     public class MsmqMessageBus<T> : MsmqMessageBus, ISendMessages<T>, IReceiveMessages<T>, IDisposable
     {
@@ -46,8 +46,9 @@ namespace Spark.Messaging
         private Boolean disposed;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="BlockingCollectionMessageBus{T}"/>.
-        /// </summary>
+        /// Initializes a new instance of <see cref="MsmqMessageBus{T}"/>./// </summary>
+        /// <param name="path">The MSMQ queue path.</param>
+        /// <param name="serializer">The message serializer.</param>
         public MsmqMessageBus(String path, ISerializeObjects serializer)
         {
             Verify.NotNullOrWhiteSpace(path, nameof(path));
@@ -62,7 +63,7 @@ namespace Spark.Messaging
         }
 
         /// <summary>
-        /// Releases all managed resources used by the current instance of the <see cref="BlockingCollectionMessageBus"/> class.
+        /// Releases all managed resources used by the current instance of the <see cref="MsmqMessageBus"/> class.
         /// </summary>
         public void Dispose()
         {
@@ -112,7 +113,7 @@ namespace Spark.Messaging
         /// <summary>
         /// Blocks until a message is available or the bus has been disposed.
         /// </summary>
-        /// <returns>The message received or null.</returns>
+        /// <returns>The received message or null.</returns>
         public Message<T> Receive()
         {
             Message<T> result = null;
