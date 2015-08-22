@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -165,6 +166,7 @@
     <Compile Include="EventStore\Sql\ISnapshotStoreDialect.cs" />
     <Compile Include="EventStore\Sql\SqlEventStore.cs" />
     <Compile Include="EventStore\Sql\SqlSnapshotStore.cs" />
+    <Compile Include="Messaging\MsmqMessageBus.cs" />
     <Compile Include="Properties\ProductInfo.cs" />
     <Compile Include="TransientErrorRegistry.cs" />
     <Compile Include="Logging\ActivityScope.cs" />
