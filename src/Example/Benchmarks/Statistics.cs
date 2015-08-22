@@ -113,7 +113,7 @@ namespace Spark.Example.Benchmarks
         /// </summary>
         private void WriteAverages()
         {
-            var elapsedSeconds = Convert.ToInt64(endTime.Subtract(startTime).TotalSeconds);
+            var elapsedSeconds = Math.Max(1, Convert.ToInt64(endTime.Subtract(startTime).TotalSeconds));
 
             Console.WriteLine("|-------------------------|-------------------------|-------------------------------------------------------------------------|");
 
