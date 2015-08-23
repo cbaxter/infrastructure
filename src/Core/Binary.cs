@@ -116,8 +116,7 @@ namespace Spark
         /// <param name="other">Another object to compare.</param>
         public Boolean Equals(Byte[] other)
         {
-            if (other == null) return false;
-            if (other.Length != Length) return false;
+            if (other?.Length != Length) return false;
             if (ReferenceEquals(data, other)) return true;
 
             for (var i = 0; i < data.Length; i++)

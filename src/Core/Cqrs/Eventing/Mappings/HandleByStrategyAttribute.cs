@@ -63,7 +63,7 @@ namespace Spark.Cqrs.Eventing.Mappings
             var eventParameter = Expression.Parameter(typeof(Event), "e");
             var eventHandlerParameter = Expression.Parameter(typeof(Object), "eventHandler");
             var body = Expression.Call(Expression.Convert(eventHandlerParameter, handleMethod.ReflectedType), handleMethod, GetMethodArguments(handleMethod, eventParameter, serviceProvider));
-            var expression = Expression.Lambda<Action<Object, Event>>(body, new[] { eventHandlerParameter, eventParameter });
+            var expression = Expression.Lambda<Action<Object, Event>>(body, eventHandlerParameter, eventParameter);
 
             return expression.Compile();
         }
@@ -84,7 +84,7 @@ namespace Spark.Cqrs.Eventing.Mappings
             {
                 var expression = parameter.GetCustomAttribute<TransientAttribute>() == null
                                      ? Expression.Constant(serviceProvider.GetService(parameter.ParameterType)) as Expression
-                                     : Expression.Call(Expression.Constant(serviceProvider), GetServiceMethod, new Expression[] { Expression.Constant(parameter.ParameterType) });
+                                     : Expression.Call(Expression.Constant(serviceProvider), GetServiceMethod, Expression.Constant(parameter.ParameterType));
 
                 yield return Expression.Convert(expression, parameter.ParameterType);
             }

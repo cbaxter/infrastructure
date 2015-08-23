@@ -47,7 +47,7 @@ namespace Test.Spark.Data.SqlClient
 
                 typeof(SqlErrorCollection).GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(collection, new object[] { error });
 
-                return (SqlException)typeof(SqlException).GetMethod("CreateException", BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(SqlErrorCollection), typeof(String) }, null).Invoke(null, new object[] { collection, "7.0.0" }) as SqlException;
+                return (SqlException)typeof(SqlException).GetMethod("CreateException", BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(SqlErrorCollection), typeof(String) }, null).Invoke(null, new object[] { collection, "7.0.0" });
             }
 
             internal static T Construct<T>(Type[] types, params object[] p)

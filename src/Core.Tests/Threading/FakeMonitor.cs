@@ -26,38 +26,33 @@ namespace Test.Spark.Threading
         {
             Monitor.Pulse(obj);
 
-            if (AfterPulse != null)
-                AfterPulse.Invoke();
+            AfterPulse?.Invoke();
         }
 
         public void PulseAll(Object obj)
         {
             Monitor.PulseAll(obj);
 
-            if (AfterPulse != null)
-                AfterPulse.Invoke();
+            AfterPulse?.Invoke();
         }
 
         public void Wait(Object obj)
         {
-            if (BeforeWait != null)
-                BeforeWait.Invoke();
+            BeforeWait?.Invoke();
 
             Monitor.Wait(obj);
         }
 
         public Boolean Wait(Object obj, TimeSpan timeout)
         {
-            if (BeforeWait != null)
-                BeforeWait.Invoke();
+            BeforeWait?.Invoke();
 
             return Monitor.Wait(obj, timeout);
         }
 
         public Boolean Wait(Object obj, TimeSpan timeout, Boolean exitContext)
         {
-            if (BeforeWait != null)
-                BeforeWait.Invoke();
+            BeforeWait?.Invoke();
 
             return Monitor.Wait(obj, timeout, exitContext);
         }

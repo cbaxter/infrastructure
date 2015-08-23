@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Spark;
 using Spark.Logging;
 using Spark.Resources;
 using System;

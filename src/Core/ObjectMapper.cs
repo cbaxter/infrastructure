@@ -35,7 +35,7 @@ namespace Spark
         private static readonly ConstructorInfo MissingMemberExceptionConstructor = typeof(MissingMemberException).GetConstructor(new[] { typeof(String), typeof(String) });
         private static readonly ConstructorInfo DictionaryConstructor = typeof(Dictionary<String, Object>).GetConstructor(new[] { typeof(Int32) });
         private static readonly IDictionary<Type, ObjectBinding> Bindings = new ConcurrentDictionary<Type, ObjectBinding>();
-        
+
         /// <summary>
         /// Get the field type for the specified <paramref name="type"/> attribute <paramref name="name"/>.
         /// </summary>
@@ -72,7 +72,7 @@ namespace Spark
 
             GetBinding(value.GetType()).SetState(value, state);
         }
-        
+
         /// <summary>
         /// Get the object binding for the specified object <paramref name="type"/>.
         /// </summary>
@@ -167,7 +167,7 @@ namespace Spark
                 var tryGetValue = Expression.Call(state, DictionaryTryGetValueMethod, Expression.Constant(binding.Metadata.Name), result);
                 var assignValue = Expression.Assign(Expression.Field(source, binding.Field), Expression.Convert(result, binding.Field.FieldType));
                 var expression = binding.Metadata.IsRequired
-                                     ? Expression.IfThenElse(tryGetValue, assignValue, Expression.Throw(Expression.New(MissingMemberExceptionConstructor, new Expression[] { Expression.Constant(type.FullName), Expression.Constant(binding.Metadata.Name) })))
+                                     ? Expression.IfThenElse(tryGetValue, assignValue, Expression.Throw(Expression.New(MissingMemberExceptionConstructor, Expression.Constant(type.FullName), Expression.Constant(binding.Metadata.Name))))
                                      : Expression.IfThen(tryGetValue, assignValue);
 
                 methodBody.Add(expression);
@@ -249,7 +249,7 @@ namespace Spark
                 return fieldInfo.IsInitOnly ||
                        fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null ||
                        fieldInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null ||
-                       propertyInfo != null && propertyInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null;
+                       propertyInfo?.GetCustomAttribute<IgnoreDataMemberAttribute>() != null;
             }
         }
 

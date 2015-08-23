@@ -124,7 +124,7 @@ namespace Test.Spark.Cqrs.Commanding
                 var publisher = new Mock<IPublishCommands>();
                 var header = new Header("MyHeader", "MyValue");
 
-                publisher.Object.Publish(aggregateId, command, new[] { header });
+                publisher.Object.Publish(aggregateId, command, header);
 
                 publisher.Verify(mock => mock.Publish(It.Is<Header[]>(headers => Equals(headers.Single(), header)), It.IsAny<CommandEnvelope>()), Times.Once());
             }

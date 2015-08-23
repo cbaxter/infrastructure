@@ -80,7 +80,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="error">The <see cref="Exception"/> thrown if the save was unsuccessful; otherwise <value>null</value>.</param>
         public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
         {
-            if (commit != null && commit.Id.HasValue)
+            if (commit?.Id != null)
                 DispatchCommit(commit);
             else
                 Log.WarnFormat("Commit not dispatched");

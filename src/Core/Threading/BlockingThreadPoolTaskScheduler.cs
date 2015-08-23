@@ -138,7 +138,7 @@ namespace Spark.Threading
             }
             finally
             {
-                PulseIfRequired(task, taskWasPreviouslyQueued);
+                PulseIfRequired(task);
             }
         }
 
@@ -146,8 +146,7 @@ namespace Spark.Threading
         /// Notify a thread in the waiting queue that a <see cref="Task"/> execution slot has been made available.
         /// </summary>
         /// <param name="task">The <see cref="Task"/> to be executed.</param>
-        /// <param name="taskWasPreviouslyQueued">A <see cref="Boolean"/> denoting whether or not the task has previously been queued.</param>
-        private void PulseIfRequired(Task task, Boolean taskWasPreviouslyQueued)
+        private void PulseIfRequired(Task task)
         {
             lock (queuedTasks)
             {

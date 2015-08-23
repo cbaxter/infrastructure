@@ -71,7 +71,7 @@ namespace Spark.Cqrs.Domain.Mappings
             var aggregateParameter = Expression.Parameter(typeof(Aggregate), "aggregate");
             var arguments = new Expression[] { Expression.Convert(eventParameter, eventType) };
             var body = Expression.Call(Expression.Convert(aggregateParameter, applyMethod.ReflectedType), applyMethod, arguments);
-            var expression = Expression.Lambda<Action<Aggregate, Event>>(body, new[] { aggregateParameter, eventParameter });
+            var expression = Expression.Lambda<Action<Aggregate, Event>>(body, aggregateParameter, eventParameter);
 
             return expression.Compile();
         }

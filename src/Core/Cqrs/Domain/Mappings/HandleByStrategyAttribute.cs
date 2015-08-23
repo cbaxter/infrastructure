@@ -65,7 +65,7 @@ namespace Spark.Cqrs.Domain.Mappings
             var commandParameter = Expression.Parameter(typeof(Command), "command");
             var aggregateParameter = Expression.Parameter(typeof(Aggregate), "aggregate");
             var body = Expression.Call(Expression.Convert(aggregateParameter, handleMethod.ReflectedType), handleMethod, GetMethodArguments(handleMethod, commandParameter, serviceProvider));
-            var expression = Expression.Lambda<Action<Aggregate, Command>>(body, new[] { aggregateParameter, commandParameter });
+            var expression = Expression.Lambda<Action<Aggregate, Command>>(body, aggregateParameter, commandParameter);
 
             return expression.Compile();
         }
@@ -86,7 +86,7 @@ namespace Spark.Cqrs.Domain.Mappings
             {
                 var expression = parameter.GetCustomAttribute<TransientAttribute>() == null
                                      ? Expression.Constant(serviceProvider.GetService(parameter.ParameterType)) as Expression
-                                     : Expression.Call(Expression.Constant(serviceProvider), GetServiceMethod, new Expression[] { Expression.Constant(parameter.ParameterType) });
+                                     : Expression.Call(Expression.Constant(serviceProvider), GetServiceMethod, Expression.Constant(parameter.ParameterType));
 
                 yield return Expression.Convert(expression, parameter.ParameterType);
             }
