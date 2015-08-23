@@ -89,7 +89,7 @@ namespace Spark.Cqrs.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} Command Handler ({1})", CommandType, AggregateType);
+            return $"{CommandType} Command Handler ({AggregateType})";
         }
     }
 }

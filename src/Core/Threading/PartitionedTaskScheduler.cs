@@ -366,7 +366,7 @@ namespace Spark.Threading
             /// </summary>
             public override String ToString()
             {
-                return String.Format("Partition #{0}", id);
+                return $"Partition #{id}";
             }
         }
     }

@@ -144,7 +144,7 @@ namespace Spark.Cqrs.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", CommandId, Command);
+            return $"{CommandId} - {Command}";
         }
     }
 }

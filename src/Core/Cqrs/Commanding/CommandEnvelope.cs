@@ -59,7 +59,7 @@ namespace Spark.Cqrs.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", Command.GetType(), AggregateId);
+            return $"{Command.GetType()} - {AggregateId}";
         }
     }
 }

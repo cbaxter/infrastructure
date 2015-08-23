@@ -99,7 +99,7 @@ namespace Spark.EventStore
         /// </summary>
         public override string ToString()
         {
-            return String.Format("{0} - {1}", GetType(), Id);
+            return $"{GetType()} - {Id}";
         }
     }
 }

@@ -627,7 +627,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             {
                 var correlationId = GuidStrategy.NewGuid();
 
-                Assert.Equal(String.Format("{0} - {1}", typeof(FakeSaga), correlationId), new FakeSaga { CorrelationId = correlationId }.ToString());
+                Assert.Equal($"{typeof (FakeSaga)} - {correlationId}", new FakeSaga { CorrelationId = correlationId }.ToString());
             }
 
             private class FakeSaga : Saga

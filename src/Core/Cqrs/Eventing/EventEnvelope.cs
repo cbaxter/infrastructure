@@ -75,7 +75,7 @@ namespace Spark.Cqrs.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", Event.GetType(), AggregateId);
+            return $"{Event.GetType()} - {AggregateId}";
         }
     }
 }

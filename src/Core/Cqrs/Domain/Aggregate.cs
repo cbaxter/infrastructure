@@ -146,7 +146,7 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         public override string ToString()
         {
-            return String.Format("{0} - {1} (v{2})", GetType().FullName, Id, Version);
+            return $"{GetType().FullName} - {Id} (v{Version})";
         }
     }
 }

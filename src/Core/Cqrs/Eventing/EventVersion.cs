@@ -112,7 +112,7 @@ namespace Spark.Cqrs.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} (Event {1} of {2})", Version, Item, Count);
+            return $"{Version} (Event {Item} of {Count})";
         }
     }
 }

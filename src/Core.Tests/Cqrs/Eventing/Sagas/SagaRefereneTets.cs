@@ -74,7 +74,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var correlationId = GuidStrategy.NewGuid();
                 var reference = new SagaReference(typeof(Saga), correlationId);
 
-                Assert.Equal(String.Format("{0} - {1}", typeof(Saga), correlationId), reference.ToString());
+                Assert.Equal($"{typeof (Saga)} - {correlationId}", reference.ToString());
             }
         }
     }

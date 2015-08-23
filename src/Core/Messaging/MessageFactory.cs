@@ -65,7 +65,7 @@ namespace Spark.Messaging
         {
             var properties = IPGlobalProperties.GetIPGlobalProperties();
 
-            return properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : String.Format("{0}.{1}", properties.HostName, properties.DomainName);
+            return properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : $"{properties.HostName}.{properties.DomainName}";
         }
     }
 }

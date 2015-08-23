@@ -43,7 +43,7 @@ namespace Test.Spark.Logging
 
                 traceSource.Listeners.Add(listener);
                 using (new LogicalOperationScope(traceSource, traceSource.Name, traceEnabled: true))
-                    Assert.Equal(1, listener.Messages.Count(m => m.Trim() == String.Format("Logical operation {0} started", traceSource.Name)));
+                    Assert.Equal(1, listener.Messages.Count(m => m.Trim() == $"Logical operation {traceSource.Name} started"));
             }
 
             [Fact]
@@ -54,7 +54,7 @@ namespace Test.Spark.Logging
 
                 traceSource.Listeners.Add(listener);
                 using (new LogicalOperationScope(traceSource, traceSource.Name, traceEnabled: false))
-                    Assert.Equal(0, listener.Messages.Count(m => m.Trim() == String.Format("Logical operation {0} started", traceSource.Name)));
+                    Assert.Equal(0, listener.Messages.Count(m => m.Trim() == $"Logical operation {traceSource.Name} started"));
             }
         }
 
@@ -136,7 +136,7 @@ namespace Test.Spark.Logging
                 traceSource.Listeners.Add(listener);
                 new LogicalOperationScope(traceSource, traceSource.Name, traceEnabled: true).Dispose();
 
-                Assert.Equal(1, listener.Messages.Count(m => m.Trim() == String.Format("Logical operation {0} stopped", traceSource.Name)));
+                Assert.Equal(1, listener.Messages.Count(m => m.Trim() == $"Logical operation {traceSource.Name} stopped"));
             }
 
             [Fact]
@@ -148,7 +148,7 @@ namespace Test.Spark.Logging
                 traceSource.Listeners.Add(listener);
                 new LogicalOperationScope(traceSource, traceSource.Name, traceEnabled: false).Dispose();
 
-                Assert.Equal(0, listener.Messages.Count(m => m.Trim() == String.Format("Logical operation {0} stopped", traceSource.Name)));
+                Assert.Equal(0, listener.Messages.Count(m => m.Trim() == $"Logical operation {traceSource.Name} stopped"));
             }
         }
         // ReSharper restore AccessToDisposedClosure

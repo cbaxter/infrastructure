@@ -97,7 +97,7 @@ namespace Spark.Cqrs.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", AggregateId, Event);
+            return $"{AggregateId} - {Event}";
         }
     }
 }

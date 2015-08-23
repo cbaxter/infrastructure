@@ -95,7 +95,7 @@ namespace Spark.Cqrs.Eventing
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} Event Handler ({1})", EventType, HandlerType);
+            return $"{EventType} Event Handler ({HandlerType})";
         }
     }
 }

@@ -173,7 +173,7 @@ namespace Test.Spark.Cqrs.Commanding
             {
                 var command = new CommandHandler(typeof(FakeAggregate), typeof(FakeCommand), new Mock<IStoreAggregates>().Object, (a, c) => { });
 
-                Assert.Equal(String.Format("{0} Command Handler ({1})", typeof(FakeCommand), typeof(FakeAggregate)), command.ToString());
+                Assert.Equal($"{typeof (FakeCommand)} Command Handler ({typeof (FakeAggregate)})", command.ToString());
             }
         }
 

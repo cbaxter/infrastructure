@@ -103,7 +103,7 @@ namespace Spark.Messaging
         /// </summary>
         public override string ToString()
         {
-            return String.Format("[{0},{1}]", name, value);
+            return $"[{name},{value}]";
         }
     }
 }

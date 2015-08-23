@@ -95,7 +95,7 @@ namespace Spark.EventStore
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", skip, take);
+            return $"{skip} - {take}";
         }
     }
 }

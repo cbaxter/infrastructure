@@ -94,7 +94,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1} @ {2}", sagaType, sagaId, timeout);
+            return $"{sagaType} - {sagaId} @ {timeout}";
         }
 
         /// <summary>

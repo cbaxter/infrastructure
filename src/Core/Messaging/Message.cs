@@ -114,7 +114,7 @@ namespace Spark.Messaging
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", Id, Payload);
+            return $"{Id} - {Payload}";
         }
     }
 }

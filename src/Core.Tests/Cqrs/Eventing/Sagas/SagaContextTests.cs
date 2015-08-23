@@ -147,7 +147,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var sagaId = GuidStrategy.NewGuid();
 
                 using (var context = new SagaContext(sagaType, sagaId, new FakeEvent()))
-                    Assert.Equal(String.Format("{0} - {1}", sagaType, sagaId), context.ToString());
+                    Assert.Equal($"{sagaType} - {sagaId}", context.ToString());
             }
         }
 
