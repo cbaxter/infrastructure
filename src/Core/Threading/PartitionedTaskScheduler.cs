@@ -131,12 +131,12 @@ namespace Spark.Threading
         /// <param name="monitor">The monitor implementation used to synchronize object access.</param>
         internal PartitionedTaskScheduler(Func<Task, Object> hash, Int32 maximumConcurrencyLevel, Int32 boundedCapacity, IQueueUserWorkItems threadPool, ISynchronizeAccess monitor)
         {
-            Verify.NotNull(hash, "hash");
-            Verify.NotNull(monitor, "monitor");
-            Verify.NotNull(threadPool, "threadPool");
-            Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
-            Verify.GreaterThan(0, maximumConcurrencyLevel, "maximumConcurrencyLevel");
-            Verify.LessThanOrEqual(MaximumWorkerThreads, maximumConcurrencyLevel, "maximumConcurrencyLevel");
+            Verify.NotNull(hash, nameof(hash));
+            Verify.NotNull(monitor, nameof(monitor));
+            Verify.NotNull(threadPool, nameof(threadPool));
+            Verify.GreaterThan(0, boundedCapacity, nameof(boundedCapacity));
+            Verify.GreaterThan(0, maximumConcurrencyLevel, nameof(maximumConcurrencyLevel));
+            Verify.LessThanOrEqual(MaximumWorkerThreads, maximumConcurrencyLevel, nameof(maximumConcurrencyLevel));
 
             Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, maximumConcurrencyLevel);
 

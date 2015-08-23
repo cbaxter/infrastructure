@@ -39,8 +39,8 @@ namespace Spark.Cqrs.Eventing.Mappings
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
         internal HandleMethodCollection GetHandleMethods(Type handlerType, IServiceProvider serviceProvider)
         {
-            Verify.NotNull(handlerType, "handlerType");
-            Verify.NotNull(serviceProvider, "serviceProvider");
+            Verify.NotNull(handlerType, nameof(handlerType));
+            Verify.NotNull(serviceProvider, nameof(serviceProvider));
 
             return MapHandleMethodsFor(handlerType, serviceProvider);
         }

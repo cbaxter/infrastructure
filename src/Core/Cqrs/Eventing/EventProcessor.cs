@@ -51,8 +51,8 @@ namespace Spark.Cqrs.Eventing
         /// <param name="settings">The event processor configuration settings.</param>
         internal EventProcessor(IRetrieveEventHandlers eventHandlerRegistry, IDetectTransientErrors transientErrorRegistry, IProcessEventSettings settings)
         {
-            Verify.NotNull(eventHandlerRegistry, "eventHandlerRegistry");
-            Verify.NotNull(settings, "settings");
+            Verify.NotNull(eventHandlerRegistry, nameof(eventHandlerRegistry));
+            Verify.NotNull(settings, nameof(settings));
 
             this.retryTimeout = settings.RetryTimeout;
             this.eventHandlerRegistry = eventHandlerRegistry;
@@ -77,7 +77,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="message">The <see cref="Event"/> message.</param>
         public Task ProcessAsync(Message<EventEnvelope> message)
         {
-            Verify.NotNull(message, "message");
+            Verify.NotNull(message, nameof(message));
 
             return Task.Factory.StartNew(state => Process((Message<EventEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
         }

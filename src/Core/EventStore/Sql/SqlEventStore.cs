@@ -64,9 +64,9 @@ namespace Spark.EventStore.Sql
         /// <param name="settings">The event store settings.</param>
         internal SqlEventStore(IEventStoreDialect dialect, ISerializeObjects serializer, IStoreEventSettings settings)
         {
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNull(settings, "settings");
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(serializer, nameof(serializer));
+            Verify.NotNull(settings, nameof(settings));
+            Verify.NotNull(dialect, nameof(dialect));
 
             this.dialect = dialect;
             this.serializer = serializer;
@@ -158,8 +158,8 @@ namespace Spark.EventStore.Sql
         public IReadOnlyList<Commit> GetRange(Int64 skip, Int64 take)
         {
             Verify.NotDisposed(this, disposed);
-            Verify.GreaterThan(0, take, "take");
-            Verify.GreaterThanOrEqual(0, skip, "skip");
+            Verify.GreaterThan(0, take, nameof(take));
+            Verify.GreaterThanOrEqual(0, skip, nameof(skip));
 
             using (var command = dialect.CreateCommand(dialect.GetRange))
             {
@@ -208,7 +208,7 @@ namespace Spark.EventStore.Sql
         public IEnumerable<Commit> GetStream(Guid streamId, Int32 minimumVersion)
         {
             Verify.NotDisposed(this, disposed);
-            Verify.GreaterThan(0, minimumVersion, "minimumVersion");
+            Verify.GreaterThan(0, minimumVersion, nameof(minimumVersion));
 
             return new PagedResult<Commit>(pageSize, (lastResult, page) => GetStreamFrom(streamId, lastResult == null ? minimumVersion : lastResult.Version + 1));
         }
@@ -257,7 +257,7 @@ namespace Spark.EventStore.Sql
         public void Save(Commit commit)
         {
             Verify.NotDisposed(this, disposed);
-            Verify.NotNull(commit, "commit");
+            Verify.NotNull(commit, nameof(commit));
 
             var data = serializer.Serialize(new CommitData(commit.Headers, commit.Events));
             using (var command = dialect.CreateCommand(dialect.InsertCommit))
@@ -308,8 +308,8 @@ namespace Spark.EventStore.Sql
         public void Migrate(Int64 id, HeaderCollection headers, EventCollection events)
         {
             Verify.NotDisposed(this, disposed);
-            Verify.NotNull(headers, "headers");
-            Verify.NotNull(events, "events");
+            Verify.NotNull(headers, nameof(headers));
+            Verify.NotNull(events, nameof(events));
 
             var data = serializer.Serialize(new CommitData(headers, events));
             using (var command = dialect.CreateCommand(dialect.UpdateCommit))

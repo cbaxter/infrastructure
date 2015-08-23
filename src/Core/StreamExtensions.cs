@@ -28,7 +28,7 @@ namespace Spark
         /// <param name="buffer">>An array of bytes.</param>
         public static void Write(this Stream stream, Byte[] buffer)
         {
-            Verify.NotNull(stream, "stream");
+            Verify.NotNull(stream, nameof(stream));
 
             stream.Write(buffer, 0, buffer.Length);
         }

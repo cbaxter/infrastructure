@@ -161,7 +161,7 @@ namespace Spark.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
+            Verify.NotNullOrWhiteSpace(name, nameof(name));
 
             return Instance.CreateLogger(name);
         }
@@ -172,7 +172,7 @@ namespace Spark.Logging
         /// <param name="type">The type associated with the logger.</param>
         public static ILog GetLogger(Type type)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             return Instance.CreateLogger(type.FullName);
         }

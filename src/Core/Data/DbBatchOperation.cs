@@ -102,7 +102,7 @@ namespace Spark.Data
         /// <param name="parameter">The parameter for which the source column is to be retrieved.</param>
         private static String GetColumnName(IDataParameter parameter)
         {
-            Verify.NotNull(parameter, "parameter");
+            Verify.NotNull(parameter, nameof(parameter));
 
             if (parameter.SourceColumn.IsNullOrWhiteSpace())
                 throw new MappingException(Exceptions.ParameterSourceColumnNotSet.FormatWith(parameter.ParameterName));

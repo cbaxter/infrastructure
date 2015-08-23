@@ -47,12 +47,12 @@ namespace Spark.Cqrs.Commanding
         /// <param name="executor">The command handler executor.</param>
         public CommandHandler(Type aggregateType, Type commandType, IStoreAggregates aggregateStore, Action<Aggregate, Command> executor)
         {
-            Verify.NotNull(executor, "executor");
-            Verify.NotNull(commandType, "commandType");
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.NotNull(aggregateStore, "aggregateStore");
-            Verify.TypeDerivesFrom(typeof(Command), commandType, "commandType");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(executor, nameof(executor));
+            Verify.NotNull(commandType, nameof(commandType));
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
+            Verify.TypeDerivesFrom(typeof(Command), commandType, nameof(commandType));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             this.aggregateStore = aggregateStore;
             this.aggregateType = aggregateType;

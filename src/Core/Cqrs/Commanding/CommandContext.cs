@@ -74,8 +74,8 @@ namespace Spark.Cqrs.Commanding
         /// <param name="envelope">The <see cref="CommandEnvelope"/> associated with this context.</param>
         public CommandContext(Guid commandId, HeaderCollection headers, CommandEnvelope envelope)
         {
-            Verify.NotNull(headers, "headers");
-            Verify.NotNull(envelope, "envelope");
+            Verify.NotNull(headers, nameof(headers));
+            Verify.NotNull(envelope, nameof(envelope));
 
             this.raisedEvents = new List<Event>();
             this.originalContext = currentContext;
@@ -122,7 +122,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="e">The <see cref="Event"/> to be raise.</param>
         internal void Raise(Event e)
         {
-            Verify.NotNull(e, "e");
+            Verify.NotNull(e, nameof(e));
             Verify.NotDisposed(this, disposed);
 
             raisedEvents.Add(e);

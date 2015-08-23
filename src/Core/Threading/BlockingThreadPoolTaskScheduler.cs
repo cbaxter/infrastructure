@@ -81,8 +81,8 @@ namespace Spark.Threading
         /// <param name="monitor">The monitor implementation used to synchronize object access.</param>
         internal BlockingThreadPoolTaskScheduler(Int32 boundedCapacity, IQueueUserWorkItems threadPool, ISynchronizeAccess monitor)
         {
-            Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
-            Verify.NotNull(threadPool, "threadPool");
+            Verify.GreaterThan(0, boundedCapacity, nameof(boundedCapacity));
+            Verify.NotNull(threadPool, nameof(threadPool));
 
             Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, MaximumConcurrencyLevel);
 

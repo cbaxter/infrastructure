@@ -28,7 +28,7 @@ namespace Spark.EventStore
         /// <param name="streamId">The unique stream identifier.</param>
         public static Snapshot GetLastSnapshot(this IRetrieveSnapshots snapshotStore, Type type, Guid streamId)
         {
-            Verify.NotNull(snapshotStore, "snapshotStore");
+            Verify.NotNull(snapshotStore, nameof(snapshotStore));
 
             return snapshotStore.GetSnapshot(type, streamId, Int32.MaxValue);
         }

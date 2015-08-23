@@ -46,9 +46,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="memoryCache">The underlying cache implementation.</param>
         internal CachedSagaStore(IStoreSagas sagaStore, TimeSpan slidingExpiration, MemoryCache memoryCache)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
-            Verify.NotNull(memoryCache, "memoryCache");
-            Verify.GreaterThanOrEqual(TimeSpan.FromSeconds(1), slidingExpiration, "sagaStore");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
+            Verify.NotNull(memoryCache, nameof(memoryCache));
+            Verify.GreaterThanOrEqual(TimeSpan.FromSeconds(1), slidingExpiration, nameof(sagaStore));
 
             this.sagaStore = sagaStore;
             this.memoryCache = memoryCache;
@@ -82,7 +82,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="saga">The <see cref="Saga"/> instance if found; otherwise <value>null</value>.</param>
         public Boolean TryGetSaga(Type type, Guid id, out Saga saga)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             var key = String.Concat(type.GetFullNameWithAssembly(), "-", id);
             using (var sagaLock = new SagaLock(type, id))
@@ -115,8 +115,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
         public Saga Save(Saga saga, SagaContext context)
         {
-            Verify.NotNull(saga, "saga");
-            Verify.NotNull(context, "context");
+            Verify.NotNull(saga, nameof(saga));
+            Verify.NotNull(context, nameof(context));
 
             var sagaType = saga.GetType();
             var key = String.Concat(sagaType.GetFullNameWithAssembly(), "-", saga.CorrelationId);

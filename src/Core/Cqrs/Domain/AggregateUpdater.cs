@@ -38,7 +38,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="typeLocator"></param>
         public AggregateUpdater(ILocateTypes typeLocator)
         {
-            Verify.NotNull(typeLocator, "typeLocator");
+            Verify.NotNull(typeLocator, nameof(typeLocator));
 
             knownApplyMethods = new ReadOnlyDictionary<Type, ApplyMethodCollection>(DiscoverAggregates(typeLocator));
         }
@@ -81,8 +81,8 @@ namespace Spark.Cqrs.Domain
         /// <param name="aggregate">The <see cref="Aggregate"/> instance on which the event is to be applied.</param>
         public void Apply(Event e, Aggregate aggregate)
         {
-            Verify.NotNull(e, "e");
-            Verify.NotNull(aggregate, "aggregate");
+            Verify.NotNull(e, nameof(e));
+            Verify.NotNull(aggregate, nameof(aggregate));
 
             var applyMethods = GetKnownApplyMethods(aggregate);
             var applyMethod = GetApplyMethod(aggregate, e, applyMethods);

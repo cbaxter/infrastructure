@@ -71,7 +71,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="pipelineHooks">The set of zero or more <see cref="PipelineHook"/> implementations used to extend <see cref="IStoreSagas"/> behavior.</param>
         private HookableSagaStore(IStoreSagas sagaStore, IList<PipelineHook> pipelineHooks)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
 
             this.sagaStore = sagaStore;
             this.preGetHooks = pipelineHooks.Where(pipelineHook => pipelineHook.ImplementsPreGet).ToArray();

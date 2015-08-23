@@ -16,8 +16,8 @@ namespace Spark.Example.Domain.Events
 
         protected CommandFailed(String reason, Command command)
         {
-            Verify.NotNull(command, "command");
-            Verify.NotNullOrWhiteSpace(reason, "reason");
+            Verify.NotNull(command, nameof(command));
+            Verify.NotNullOrWhiteSpace(reason, nameof(reason));
 
             Command = command;
             Reason = reason;

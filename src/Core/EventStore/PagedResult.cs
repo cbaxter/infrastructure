@@ -35,8 +35,8 @@ namespace Spark.EventStore
         /// <param name="pageRetriever">The paging function.</param>
         public PagedResult(Int64 pageSize, Func<T, Page, IEnumerable<T>> pageRetriever)
         {
-            Verify.NotNull(pageRetriever, "pageRetriever");
-            Verify.GreaterThan(0, pageSize, "pageSize");
+            Verify.NotNull(pageRetriever, nameof(pageRetriever));
+            Verify.GreaterThan(0, pageSize, nameof(pageSize));
 
             this.pageRetriever = pageRetriever;
             this.pageSize = pageSize;

@@ -46,7 +46,7 @@ namespace Spark
         public static T Parse<T>(String value)
            where T : ValueObject
         {
-            Verify.NotNull(value, "value");
+            Verify.NotNull(value, nameof(value));
 
             var result = default(ValueObject);
             if (TryParseInternal(typeof(T), value, out result))
@@ -62,9 +62,9 @@ namespace Spark
         /// <param name="value">The value to parse.</param>
         public static ValueObject Parse(Type type, String value)
         {
-            Verify.NotNull(type, "type");
-            Verify.NotNull(value, "value");
-            Verify.TypeDerivesFrom(typeof(ValueObject), type, "type");
+            Verify.NotNull(type, nameof(type));
+            Verify.NotNull(value, nameof(value));
+            Verify.TypeDerivesFrom(typeof(ValueObject), type, nameof(type));
 
             ValueObject result;
             if (TryParseInternal(type, value, out result))
@@ -82,7 +82,7 @@ namespace Spark
         public static Boolean TryParse<T>(String value, out T result)
             where T : ValueObject
         {
-            Verify.NotNull(value, "value");
+            Verify.NotNull(value, nameof(value));
 
             ValueObject valueObject;
             result = TryParseInternal(typeof(T), value, out valueObject) ? (T)valueObject : default(T);
@@ -98,9 +98,9 @@ namespace Spark
         /// <param name="result">The parsed instance of <paramref name="type"/>.</param>
         public static Boolean TryParse(Type type, String value, out ValueObject result)
         {
-            Verify.NotNull(type, "type");
-            Verify.NotNull(value, "value");
-            Verify.TypeDerivesFrom(typeof(ValueObject), type, "type");
+            Verify.NotNull(type, nameof(type));
+            Verify.NotNull(value, nameof(value));
+            Verify.TypeDerivesFrom(typeof(ValueObject), type, nameof(type));
 
             return TryParseInternal(type, value, out result);
         }
@@ -156,7 +156,7 @@ namespace Spark
         /// <param name="value">The raw value wrapped by this value object instance.</param>
         protected ValueObject(T value)
         {
-            if (ReferenceEquals(value, null)) throw new ArgumentNullException("value");
+            if (ReferenceEquals(value, null)) throw new ArgumentNullException(nameof(value));
 
             this.value = GetValue(value);
         }

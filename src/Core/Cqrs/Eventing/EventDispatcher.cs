@@ -46,8 +46,8 @@ namespace Spark.Cqrs.Eventing
         /// <param name="settings">The current event store settings.</param>
         internal EventDispatcher(IStoreEvents eventStore, IPublishEvents eventPublisher, IStoreEventSettings settings)
         {
-            Verify.NotNull(eventStore, "eventStore");
-            Verify.NotNull(eventPublisher, "eventPublisher");
+            Verify.NotNull(eventStore, nameof(eventStore));
+            Verify.NotNull(eventPublisher, nameof(eventPublisher));
 
             this.eventStore = eventStore;
             this.eventPublisher = eventPublisher;

@@ -72,7 +72,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="pipelineHooks">The set of zero or more <see cref="PipelineHook"/> implementations used to extend <see cref="IStoreAggregates"/> behavior.</param>
         private HookableAggregateStore(IStoreAggregates aggregateStore, IList<PipelineHook> pipelineHooks)
         {
-            Verify.NotNull(aggregateStore, "aggregateStore");
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
 
             this.aggregateStore = aggregateStore;
             this.preGetHooks = pipelineHooks.Where(pipelineHook => pipelineHook.ImplementsPreGet).ToArray();

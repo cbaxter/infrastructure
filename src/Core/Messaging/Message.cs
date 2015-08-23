@@ -43,8 +43,8 @@ namespace Spark.Messaging
         /// </summary>
         internal Message(Guid id, HeaderCollection headers)
         {
-            Verify.NotEqual(Guid.Empty, id, "id");
-            Verify.NotNull(headers, "headers");
+            Verify.NotEqual(Guid.Empty, id, nameof(id));
+            Verify.NotNull(headers, nameof(headers));
 
             this.id = id;
             this.headers = headers;
@@ -95,7 +95,7 @@ namespace Spark.Messaging
         public Message(Guid id, HeaderCollection headers, TPayload payload)
             : base(id, headers)
         {
-            Verify.NotNull((Object)payload, "payload");
+            Verify.NotNull((Object)payload, nameof(payload));
 
             this.payload = payload;
         }

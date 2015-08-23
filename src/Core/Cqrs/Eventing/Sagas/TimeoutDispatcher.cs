@@ -46,8 +46,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="eventPublisher">The event publisher.</param>
         public TimeoutDispatcher(Lazy<IStoreSagas> sagaStore, Lazy<IPublishEvents> eventPublisher)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
-            Verify.NotNull(eventPublisher, "eventPublisher");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
+            Verify.NotNull(eventPublisher, nameof(eventPublisher));
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));
@@ -62,9 +62,9 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timer">The timer factory.</param>
         internal TimeoutDispatcher(Lazy<IStoreSagas> sagaStore, Lazy<IPublishEvents> eventPublisher, Func<Action, ITimer> timer)
         {
-            Verify.NotNull(timer, "timer");
-            Verify.NotNull(sagaStore, "sagaStore");
-            Verify.NotNull(eventPublisher, "eventPublisher");
+            Verify.NotNull(timer, nameof(timer));
+            Verify.NotNull(sagaStore, nameof(sagaStore));
+            Verify.NotNull(eventPublisher, nameof(eventPublisher));
 
             this.lazyEventPublisher = eventPublisher;
             this.sagaTimeoutCache = new Lazy<SagaTimeoutCache>(() => new SagaTimeoutCache(sagaStore.Value, Settings.SagaStore.TimeoutCacheDuration));

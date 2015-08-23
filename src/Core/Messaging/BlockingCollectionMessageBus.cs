@@ -69,7 +69,7 @@ namespace Spark.Messaging
         /// <param name="boundedCapacity">The bounded size of the message bus.</param>
         public BlockingCollectionMessageBus(Int32 boundedCapacity)
         {
-            Verify.GreaterThan(0, boundedCapacity, "boundedCapacity");
+            Verify.GreaterThan(0, boundedCapacity, nameof(boundedCapacity));
 
             messageQueue = new BlockingCollection<Message<T>>(boundedCapacity);
             tokenSource = new CancellationTokenSource();
@@ -116,7 +116,7 @@ namespace Spark.Messaging
         public void Send(Message<T> message)
         {
             Verify.NotDisposed(this, disposed);
-            Verify.NotNull(message, "message");
+            Verify.NotNull(message, nameof(message));
 
             Log.TraceFormat("Sending message {0}", message.Id);
 

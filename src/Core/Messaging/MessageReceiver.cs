@@ -51,8 +51,8 @@ namespace Spark.Messaging
         /// <param name="messageProcessor">The message processor.</param>
         public MessageReceiver(IReceiveMessages<T> messageReceiver, IProcessMessages<T> messageProcessor)
         {
-            Verify.NotNull(messageReceiver, "messageReceiver");
-            Verify.NotNull(messageProcessor, "messageProcessor");
+            Verify.NotNull(messageReceiver, nameof(messageReceiver));
+            Verify.NotNull(messageProcessor, nameof(messageProcessor));
 
             this.messageReceiver = messageReceiver;
             this.messageProcessor = messageProcessor;

@@ -40,7 +40,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaId">The saga <see cref="Type"/> associated with this saga reference instance.</param>
         public SagaReference(Type sagaType, Guid sagaId)
         {
-            Verify.NotNull(sagaType, "sagaType");
+            Verify.NotNull(sagaType, nameof(sagaType));
 
             this.sagaType = sagaType;
             this.sagaId = sagaId;

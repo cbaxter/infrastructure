@@ -40,9 +40,9 @@ namespace Spark.Cqrs.Domain.Mappings
         /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
         internal HandleMethodCollection GetHandleMethods(Type aggregateType, IServiceProvider serviceProvider)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.NotNull(serviceProvider, "serviceProvider");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.NotNull(serviceProvider, nameof(serviceProvider));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             return MapHandleMethodsFor(aggregateType, serviceProvider);
         }

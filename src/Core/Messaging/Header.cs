@@ -57,8 +57,8 @@ namespace Spark.Messaging
         /// </summary>
         internal Header(String name, String value, Boolean checkReservedNames)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
-            Verify.False(checkReservedNames && ReservedNames.Contains(name), "name", Exceptions.ReservedHeaderName.FormatWith(name));
+            Verify.NotNullOrWhiteSpace(name, nameof(name));
+            Verify.False(checkReservedNames && ReservedNames.Contains(name), nameof(name), Exceptions.ReservedHeaderName.FormatWith(name));
 
             this.name = name;
             this.value = value;

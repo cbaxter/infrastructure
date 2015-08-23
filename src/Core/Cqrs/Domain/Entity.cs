@@ -46,7 +46,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="id">The unique entity identifier.</param>
         protected Entity(Guid id)
         {
-            Verify.NotEqual(Guid.Empty, id, "id");
+            Verify.NotEqual(Guid.Empty, id, nameof(id));
 
             Id = id;
         }
@@ -57,7 +57,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="e">The <see cref="Event"/> to be raised.</param>
         protected void Raise(Event e)
         {
-            Verify.NotNull(e, "e");
+            Verify.NotNull(e, nameof(e));
 
             CommandContext.GetCurrent().Raise(e);
         }

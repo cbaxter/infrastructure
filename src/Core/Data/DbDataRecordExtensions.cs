@@ -28,7 +28,7 @@ namespace Spark.Data
         /// <param name="i">The index of the field to find.</param>
         public static Byte[] GetBytes(this IDataRecord dataRecord, Int32 i)
         {
-            Verify.NotNull(dataRecord, "dataRecord");
+            Verify.NotNull(dataRecord, nameof(dataRecord));
 
             return (Byte[])dataRecord.GetValue(i);
         }
@@ -40,7 +40,7 @@ namespace Spark.Data
         /// <param name="i">The index of the field to find.</param>
         public static DateTime? GetNullableDateTime(this IDataRecord dataRecord, Int32 i)
         {
-            Verify.NotNull(dataRecord, "dataRecord");
+            Verify.NotNull(dataRecord, nameof(dataRecord));
 
             return dataRecord.IsDBNull(i) ? default(DateTime?) : dataRecord.GetDateTime(i);
         }

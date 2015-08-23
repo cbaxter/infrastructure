@@ -61,9 +61,9 @@ namespace Spark.Cqrs.Eventing
         /// <param name="e">The <see cref="Event"/>.</param>
         public EventContext(Guid aggregateId, HeaderCollection headers, Event e)
         {
-            Verify.NotEqual(Guid.Empty, aggregateId, "aggregateId");
-            Verify.NotNull(headers, "headers");
-            Verify.NotNull(e, "e");
+            Verify.NotEqual(Guid.Empty, aggregateId, nameof(aggregateId));
+            Verify.NotNull(headers, nameof(headers));
+            Verify.NotNull(e, nameof(e));
 
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;

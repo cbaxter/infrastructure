@@ -47,7 +47,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeout">The date/time associated with this saga timeout instance.</param>
         public SagaTimeout(Type sagaType, Guid sagaId, DateTime timeout)
         {
-            Verify.NotNull(sagaType, "sagaType");
+            Verify.NotNull(sagaType, nameof(sagaType));
 
             this.sagaId = sagaId;
             this.sagaType = sagaType;

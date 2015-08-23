@@ -45,8 +45,8 @@ namespace Spark.Cqrs.Domain
         public static TAggregate Create<TAggregate>(this IStoreAggregates aggregateStore, Guid id, Action<TAggregate> initializer)
             where TAggregate : Aggregate
         {
-            Verify.NotNull(aggregateStore, "aggregateStore");
-            Verify.NotNull(initializer, "initializer");
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
+            Verify.NotNull(initializer, nameof(initializer));
 
             var aggregate = aggregateStore.Get<TAggregate>(id);
             if (aggregate.Version > 0)
@@ -65,8 +65,8 @@ namespace Spark.Cqrs.Domain
         public static TAggregate GetOrCreate<TAggregate>(this IStoreAggregates aggregateStore, Guid id, Action<TAggregate> initializer)
             where TAggregate : Aggregate
         {
-            Verify.NotNull(aggregateStore, "aggregateStore");
-            Verify.NotNull(initializer, "initializer");
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
+            Verify.NotNull(initializer, nameof(initializer));
 
             var aggregate = aggregateStore.Get<TAggregate>(id);
             if (aggregate.Version > 0)

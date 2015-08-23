@@ -33,8 +33,8 @@ namespace Spark.Cqrs.Eventing
         /// <param name="messageSender">The message sender.</param>
         public EventPublisher(ICreateMessages messageFactory, ISendMessages<EventEnvelope> messageSender)
         {
-            Verify.NotNull(messageFactory, "messageFactory");
-            Verify.NotNull(messageSender, "messageSender");
+            Verify.NotNull(messageFactory, nameof(messageFactory));
+            Verify.NotNull(messageSender, nameof(messageSender));
 
             this.messageFactory = messageFactory;
             this.messageSender = messageSender;
@@ -47,7 +47,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="payload">The event payload to be published.</param>
         public void Publish(IEnumerable<Header> headers, EventEnvelope payload)
         {
-            Verify.NotNull(payload, "payload");
+            Verify.NotNull(payload, nameof(payload));
 
             Log.TraceFormat("Publishing {0} from {1}", payload.Event, payload.AggregateId);
 

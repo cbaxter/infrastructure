@@ -25,7 +25,7 @@ namespace Spark.Example.Modules
 
             public AutofacServiceProvider(ILifetimeScope lifetimeScope)
             {
-                Verify.NotNull(lifetimeScope, "lifetimeScope");
+                Verify.NotNull(lifetimeScope, nameof(lifetimeScope));
 
                 this.lifetimeScope = lifetimeScope;
             }

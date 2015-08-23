@@ -26,7 +26,7 @@ namespace Test.Spark.Messaging
             [Theory, InlineData(Header.Origin), InlineData(Header.RemoteAddress), InlineData(Header.Timestamp), InlineData(Header.UserAddress), InlineData(Header.UserName)]
             public void HeaderNameCannotBeReservedName(String name)
             {
-                var expectedEx = new ArgumentException(Exceptions.ReservedHeaderName.FormatWith(name), "name");
+                var expectedEx = new ArgumentException(Exceptions.ReservedHeaderName.FormatWith(name), nameof(name));
                 var actualEx = Assert.Throws<ArgumentException>(() =>new Header(name, "value"));
 
                 Assert.Equal(expectedEx.Message, actualEx.Message);

@@ -31,7 +31,7 @@ namespace Spark.Serialization
         /// <param name="serializer">The base serializer to wrap with GZip compression.</param>
         public GZipSerializer(ISerializeObjects serializer)
         {
-            Verify.NotNull(serializer, "serializer");
+            Verify.NotNull(serializer, nameof(serializer));
 
             this.serializer = serializer;
         }
@@ -44,8 +44,8 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being serialized.</param>
         public void Serialize(Stream stream, Object graph, Type type)
         {
-            Verify.NotNull(graph, "graph");
-            Verify.NotNull(stream, "stream");
+            Verify.NotNull(graph, nameof(graph));
+            Verify.NotNull(stream, nameof(stream));
 
             using (var gzipStream = new GZipStream(stream, CompressionMode.Compress))
                 serializer.Serialize(gzipStream, graph, type);
@@ -58,7 +58,7 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
         public Object Deserialize(Stream stream, Type type)
         {
-            Verify.NotNull(stream, "stream");
+            Verify.NotNull(stream, nameof(stream));
 
             using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
                 return serializer.Deserialize(gzipStream, type);

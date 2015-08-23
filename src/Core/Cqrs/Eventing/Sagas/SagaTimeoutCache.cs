@@ -43,7 +43,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeoutCacheDuration">The maximum cache duration for a given saga timeout (5 minute minimum).</param>
         public SagaTimeoutCache(IStoreSagas sagaStore, TimeSpan timeoutCacheDuration)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
 
             this.sagaStore = sagaStore;
             this.maximumCachedTimeout = DateTime.MinValue;

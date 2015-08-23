@@ -52,8 +52,8 @@ namespace Spark.Cqrs.Commanding
         /// <param name="settings">The command processor configuration settings.</param>
         internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IDetectTransientErrors transientErrorRegistry, IProcessCommandSettings settings)
         {
-            Verify.NotNull(commandHandlerRegistry, "commandHandlerRegistry");
-            Verify.NotNull(settings, "settings");
+            Verify.NotNull(commandHandlerRegistry, nameof(commandHandlerRegistry));
+            Verify.NotNull(settings, nameof(settings));
 
             this.retryTimeout = settings.RetryTimeout;
             this.transientErrorRegistry = transientErrorRegistry;
@@ -78,7 +78,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="message">The <see cref="Command"/> message.</param>
         public Task ProcessAsync(Message<CommandEnvelope> message)
         {
-            Verify.NotNull(message, "message");
+            Verify.NotNull(message, nameof(message));
 
             return Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
         }

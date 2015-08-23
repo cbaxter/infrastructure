@@ -81,9 +81,9 @@ namespace Spark.EventStore
         /// <param name="events">The optional set of events associated with this commit.</param>
         internal Commit(Int64? id, DateTime timestamp, Guid correlationId, Guid streamId, Int32 version, HeaderCollection headers, EventCollection events)
         {
-            Verify.NotEqual(Guid.Empty, correlationId, "correlationId");
-            Verify.NotEqual(Guid.Empty, streamId, "streamId");
-            Verify.GreaterThan(0, version, "version");
+            Verify.NotEqual(Guid.Empty, correlationId, nameof(correlationId));
+            Verify.NotEqual(Guid.Empty, streamId, nameof(streamId));
+            Verify.GreaterThan(0, version, nameof(version));
 
             Id = id;
             Timestamp = timestamp;

@@ -48,8 +48,8 @@ namespace Spark.Cqrs.Domain.Mappings
         /// <param name="aggregateType">The aggregate type.</param>
         internal ApplyMethodCollection GetApplyMethods(Type aggregateType)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             return MapApplyMethodsFor(aggregateType);
         }

@@ -70,8 +70,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The <see cref="Event"/>.</param>
         public SagaContext(Type sagaType, Guid sagaId, Event e)
         {
-            Verify.NotNull(sagaType, "sagaType");
-            Verify.NotNull(e, "e");
+            Verify.NotNull(sagaType, nameof(sagaType));
+            Verify.NotNull(e, nameof(e));
 
             this.originalContext = currentContext;
             this.thread = Thread.CurrentThread;

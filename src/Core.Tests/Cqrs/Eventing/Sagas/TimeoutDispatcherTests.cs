@@ -312,7 +312,7 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
 
             public FakeTimer(Action callback)
             {
-                Verify.NotNull(callback, "callback");
+                Verify.NotNull(callback, nameof(callback));
 
                 this.callback = callback;
             }

@@ -28,7 +28,7 @@ namespace Spark.Messaging
         /// <param name="messageProcessor">The message processor.</param>
         public InlineMessageBus(IProcessMessages<T> messageProcessor)
         {
-            Verify.NotNull(messageProcessor, "messageProcessor");
+            Verify.NotNull(messageProcessor, nameof(messageProcessor));
 
             this.messageProcessor = messageProcessor;
         }

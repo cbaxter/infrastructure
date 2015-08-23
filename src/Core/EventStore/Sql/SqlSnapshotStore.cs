@@ -57,9 +57,9 @@ namespace Spark.EventStore.Sql
         /// <param name="dialect">The database dialect associated with this <see cref="SqlSnapshotStore"/>.</param>
         internal SqlSnapshotStore(ISnapshotStoreDialect dialect, ISerializeObjects serializer, IStoreSnapshotSettings settings)
         {
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNull(settings, "settings");
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(serializer, nameof(serializer));
+            Verify.NotNull(settings, nameof(settings));
+            Verify.NotNull(dialect, nameof(dialect));
 
             this.dialect = dialect;
             this.serializer = serializer;
@@ -120,7 +120,7 @@ namespace Spark.EventStore.Sql
         /// <param name="maximumVersion">The maximum snapshot version.</param>
         public Snapshot GetSnapshot(Type type, Guid streamId, Int32 maximumVersion)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
             Verify.NotDisposed(this, disposed);
 
             using (var command = dialect.CreateCommand(dialect.GetSnapshot))

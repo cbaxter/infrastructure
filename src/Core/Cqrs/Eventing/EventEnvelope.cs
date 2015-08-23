@@ -62,7 +62,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="e">The event payload that originated from the specified <see cref="Aggregate"/>.</param>
         public EventEnvelope(Guid correlationId, Guid aggregateId, EventVersion version, Event e)
         {
-            Verify.NotNull(e, "e");
+            Verify.NotNull(e, nameof(e));
 
             this.correlationId = correlationId;
             this.aggregateId = aggregateId;

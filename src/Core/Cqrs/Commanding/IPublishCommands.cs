@@ -44,7 +44,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="commands">The commands to be published.</param>
         public static void Publish(this IPublishCommands publisher, Guid aggregateId, IEnumerable<Command> commands)
         {
-            Verify.NotNull(publisher, "publisher");
+            Verify.NotNull(publisher, nameof(publisher));
 
             foreach (var command in commands.EmptyIfNull())
                 publisher.Publish(aggregateId, command);
@@ -58,7 +58,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="command">The command to be published.</param>
         public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command)
         {
-            Verify.NotNull(publisher, "publisher");
+            Verify.NotNull(publisher, nameof(publisher));
 
             publisher.Publish(null, new CommandEnvelope(aggregateId, command));
         }
@@ -72,7 +72,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="headers">The set of one or more custom message headers.</param>
         public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command, params Header[] headers)
         {
-            Verify.NotNull(publisher, "publisher");
+            Verify.NotNull(publisher, nameof(publisher));
 
             publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
         }
@@ -86,7 +86,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="headers">The set of message headers associated with the command.</param>
         public static void Publish(this IPublishCommands publisher, Guid aggregateId, Command command, IEnumerable<Header> headers)
         {
-            Verify.NotNull(publisher, "publisher");
+            Verify.NotNull(publisher, nameof(publisher));
 
             publisher.Publish(headers, new CommandEnvelope(aggregateId, command));
         }

@@ -95,7 +95,7 @@ namespace Spark.Logging
         /// <param name="listeners">The underlying set of trace listeners.</param>
         public Logger(String name, SourceLevels level, TraceListenerCollection listeners)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
+            Verify.NotNullOrWhiteSpace(name, nameof(name));
 
             // Create the trace source.
             traceSource = new TraceSource(name, level);

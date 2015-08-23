@@ -37,8 +37,8 @@ namespace Spark.Cqrs.Domain
         /// <param name="commit">The generated <see cref="Commit"/></param>
         public SaveResult(Aggregate aggregate, Commit commit)
         {
-            Verify.NotNull(aggregate, "aggregate");
-            Verify.NotNull(commit, "commit");
+            Verify.NotNull(aggregate, nameof(aggregate));
+            Verify.NotNull(commit, nameof(commit));
 
             Aggregate = aggregate;
             Commit = commit;

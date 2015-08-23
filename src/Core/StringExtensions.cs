@@ -182,7 +182,7 @@ namespace Spark
         /// <param name="maxLength">The maximum string length allowed.</param>
         public static String Left(this String value, Int32 maxLength)
         {
-            Verify.GreaterThan(0, maxLength, "maxLength");
+            Verify.GreaterThan(0, maxLength, nameof(maxLength));
 
             return value == null || value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
@@ -194,7 +194,7 @@ namespace Spark
         /// <param name="maxLength">The maximum string length allowed.</param>
         public static String Right(this String value, Int32 maxLength)
         {
-            Verify.GreaterThan(0, maxLength, "maxLength");
+            Verify.GreaterThan(0, maxLength, nameof(maxLength));
 
             return value == null || value.Length <= maxLength ? value : value.Substring(value.Length - maxLength);
         }

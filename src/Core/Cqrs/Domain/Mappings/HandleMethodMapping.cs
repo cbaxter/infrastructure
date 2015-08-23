@@ -38,7 +38,7 @@ namespace Spark.Cqrs.Domain.Mappings
             /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
             internal HandleMethodMappingBuilder(IServiceProvider serviceProvider)
             {
-                Verify.NotNull(serviceProvider, "serviceProvider");
+                Verify.NotNull(serviceProvider, nameof(serviceProvider));
 
                 this.serviceProvider = serviceProvider;
             }
@@ -50,9 +50,9 @@ namespace Spark.Cqrs.Domain.Mappings
             /// <param name="handleMethod">The handle method to be invoked for commands of <paramref name="commandType"/>.</param>
             public void Register(Type commandType, Action<Aggregate, Command> handleMethod)
             {
-                Verify.NotNull(commandType, "commandType");
-                Verify.NotNull(handleMethod, "handleMethod");
-                Verify.TypeDerivesFrom(typeof(Command), commandType, "commandType");
+                Verify.NotNull(commandType, nameof(commandType));
+                Verify.NotNull(handleMethod, nameof(handleMethod));
+                Verify.TypeDerivesFrom(typeof(Command), commandType, nameof(commandType));
 
                 handleMethods.Add(commandType, handleMethod);
             }
@@ -71,7 +71,7 @@ namespace Spark.Cqrs.Domain.Mappings
             /// <param name="type">The service type to retrieve.</param>
             public Object GetService(Type type)
             {
-                Verify.NotNull(type, "type");
+                Verify.NotNull(type, nameof(type));
 
                 return serviceProvider.GetService(type);
             }

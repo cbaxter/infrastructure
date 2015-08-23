@@ -28,7 +28,7 @@ namespace Spark.EventStore
         /// <returns></returns>
         public static IEnumerable<Commit> GetAll(this IRetrieveEvents eventStore)
         {
-            Verify.NotNull(eventStore, "eventStore");
+            Verify.NotNull(eventStore, nameof(eventStore));
 
             return new PagedResult<Commit>(Settings.EventStore.PageSize, (lastResult, page) => eventStore.GetRange(lastResult == null ? 0L : lastResult.Id.GetValueOrDefault(), page.Take));
         }
@@ -40,7 +40,7 @@ namespace Spark.EventStore
         /// <param name="streamId">The unique stream identifier.</param>
         public static IEnumerable<Commit> GetStream(this IRetrieveEvents eventStore, Guid streamId)
         {
-            Verify.NotNull(eventStore, "eventStore");
+            Verify.NotNull(eventStore, nameof(eventStore));
 
             return eventStore.GetStream(streamId, 1);
         }

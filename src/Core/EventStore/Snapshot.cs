@@ -43,9 +43,9 @@ namespace Spark.EventStore
         /// <param name="state">The snapshot state.</param>
         public Snapshot(Guid streamId, Int32 version, Object state)
         { 
-            Verify.NotEqual(Guid.Empty, streamId, "streamId");
-            Verify.GreaterThan(0, version, "version");
-            Verify.NotNull(state, "state");
+            Verify.NotEqual(Guid.Empty, streamId, nameof(streamId));
+            Verify.GreaterThan(0, version, nameof(version));
+            Verify.NotNull(state, nameof(state));
 
             StreamId = streamId;
             Version = version;

@@ -52,9 +52,9 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
         public SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator)
         {
-            Verify.NotNull(typeLocator, "typeLocator");
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(typeLocator, nameof(typeLocator));
+            Verify.NotNull(serializer, nameof(serializer));
+            Verify.NotNull(dialect, nameof(dialect));
 
             this.dialect = dialect;
             this.serializer = serializer;
@@ -165,7 +165,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="saga">The <see cref="Saga"/> instance if found; otherwise <value>null</value>.</param>
         public Boolean TryGetSaga(Type type, Guid id, out Saga saga)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             using (var command = dialect.CreateCommand(dialect.GetSaga))
             {
@@ -203,7 +203,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
         public Saga Save(Saga saga, SagaContext context)
         {
-            Verify.NotNull(saga, "saga");
+            Verify.NotNull(saga, nameof(saga));
 
             if (saga.Version == 0 && saga.Completed)
                 return saga;

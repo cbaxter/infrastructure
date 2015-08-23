@@ -53,10 +53,10 @@ namespace Spark.Cqrs.Eventing
         /// <param name="item">The event oridinal within the specific aggregate <see cref="Version"/>.</param>
         public EventVersion(Int32 version, Int32 count, Int32 item)
         {
-            Verify.GreaterThan(0, version, "version");
-            Verify.GreaterThanOrEqual(0, count, "count");
-            Verify.GreaterThanOrEqual(0, item, "item");
-            Verify.LessThanOrEqual(count, item, "item");
+            Verify.GreaterThan(0, version, nameof(version));
+            Verify.GreaterThanOrEqual(0, count, nameof(count));
+            Verify.GreaterThanOrEqual(0, item, nameof(item));
+            Verify.LessThanOrEqual(count, item, nameof(item));
 
             this.version = version;
             this.count = count;

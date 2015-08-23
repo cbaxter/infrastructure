@@ -32,7 +32,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="aggregate">The loaded aggregate instance.</param>
         public override void PostGet(Aggregate aggregate)
         {
-            Verify.NotNull(aggregate, "aggregate");
+            Verify.NotNull(aggregate, nameof(aggregate));
 
             aggregate.VerifyHash();
         }

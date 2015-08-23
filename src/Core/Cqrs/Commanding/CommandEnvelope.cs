@@ -48,7 +48,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="command">The command payload that is to be processed by the specified <see cref="Aggregate"/>.</param>
         public CommandEnvelope(Guid aggregateId, Command command)
         {
-            Verify.NotNull(command, "command");
+            Verify.NotNull(command, nameof(command));
 
             this.aggregateId = aggregateId;
             this.command = command;

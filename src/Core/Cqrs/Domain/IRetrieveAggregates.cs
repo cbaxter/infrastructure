@@ -42,7 +42,7 @@ namespace Spark.Cqrs.Domain
         public static TAggregate Get<TAggregate>(this IRetrieveAggregates aggregateRepository, Guid id)
             where TAggregate : Aggregate
         {
-            Verify.NotNull(aggregateRepository, "aggregateRepository");
+            Verify.NotNull(aggregateRepository, nameof(aggregateRepository));
 
             return (TAggregate)aggregateRepository.Get(typeof(TAggregate), id);
         }

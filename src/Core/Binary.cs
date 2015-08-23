@@ -49,7 +49,7 @@ namespace Spark
         /// <param name="data">The underlying <see cref="Byte"/> array to wrap (underlying structure remains mutable).</param>
         public Binary(Byte[] data)
         {
-            Verify.NotNull(data, "data");
+            Verify.NotNull(data, nameof(data));
 
             this.data = data;
         }

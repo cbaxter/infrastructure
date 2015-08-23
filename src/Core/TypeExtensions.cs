@@ -43,9 +43,9 @@ namespace Spark
         /// <param name="baseType">The target type to find in the type inheritance hierarchy (can be generic type definition).</param>
         public static Type FindBaseType(this Type type, Type baseType)
         {
-            Verify.NotNull(type, "type");
-            Verify.NotNull(baseType, "baseType");
-            Verify.False(baseType.IsInterface, "baseType", Exceptions.TypeArgumentMustNotBeAnInterface);
+            Verify.NotNull(type, nameof(type));
+            Verify.NotNull(baseType, nameof(baseType));
+            Verify.False(baseType.IsInterface, nameof(baseType), Exceptions.TypeArgumentMustNotBeAnInterface);
 
             var subType = type.BaseType;
             while (subType != null && !Equal(subType, baseType))
@@ -70,7 +70,7 @@ namespace Spark
         /// <param name="type">The type for which the type hierarchy is to be retrieved.</param>
         public static IEnumerable<Type> GetTypeHierarchy(this Type type)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             yield return type;
 

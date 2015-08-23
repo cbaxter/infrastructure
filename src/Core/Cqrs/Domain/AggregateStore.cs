@@ -45,10 +45,10 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         internal AggregateStore(IApplyEvents aggregateUpdater, IStoreSnapshots snapshotStore, IStoreEvents eventStore, IStoreAggregateSettings settings)
         {
-            Verify.NotNull(settings, "settings");
-            Verify.NotNull(eventStore, "eventStore");
-            Verify.NotNull(snapshotStore, "snapshotStore");
-            Verify.NotNull(aggregateUpdater, "aggregateUpdater");
+            Verify.NotNull(settings, nameof(settings));
+            Verify.NotNull(eventStore, nameof(eventStore));
+            Verify.NotNull(snapshotStore, nameof(snapshotStore));
+            Verify.NotNull(aggregateUpdater, nameof(aggregateUpdater));
 
             this.snapshotInterval = settings.SnapshotInterval;
             this.aggregateUpdater = aggregateUpdater;
@@ -69,8 +69,8 @@ namespace Spark.Cqrs.Domain
         /// <param name="id">The unique aggregate id.</param>
         public Aggregate Get(Type aggregateType, Guid id)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             var aggregate = GetOrCreate(aggregateType, id);
             var originalAggregateVersion = aggregate.Version;
@@ -116,8 +116,8 @@ namespace Spark.Cqrs.Domain
         /// <param name="context">The command context containing the aggregate changes to be applied.</param>
         public SaveResult Save(Aggregate aggregate, CommandContext context)
         {
-            Verify.NotNull(aggregate, "aggregate");
-            Verify.NotNull(context, "context");
+            Verify.NotNull(aggregate, nameof(aggregate));
+            Verify.NotNull(context, nameof(context));
 
             var commit = CreateCommit(aggregate, context);
             try

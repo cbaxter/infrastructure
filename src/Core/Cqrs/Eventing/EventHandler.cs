@@ -51,11 +51,11 @@ namespace Spark.Cqrs.Eventing
         /// <param name="eventHandlerFactory">The event handler factory.</param>
         internal EventHandler(Type handlerType, Type eventType, Action<Object, Event> executor, Func<Object> eventHandlerFactory)
         {
-            Verify.NotNull(executor, "executor");
-            Verify.NotNull(eventType, "eventType");
-            Verify.NotNull(handlerType, "handlerType");
-            Verify.NotNull(eventHandlerFactory, "eventHandlerFactory");
-            Verify.TypeDerivesFrom(typeof(Event), eventType, "eventType");
+            Verify.NotNull(executor, nameof(executor));
+            Verify.NotNull(eventType, nameof(eventType));
+            Verify.NotNull(handlerType, nameof(handlerType));
+            Verify.NotNull(eventHandlerFactory, nameof(eventHandlerFactory));
+            Verify.TypeDerivesFrom(typeof(Event), eventType, nameof(eventType));
 
             this.eventHandlerFactory = eventHandlerFactory;
             this.handlerType = handlerType;
@@ -69,7 +69,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="delegateHandler">The delegate event handler.</param>
         protected EventHandler(EventHandler delegateHandler)
         {
-            Verify.NotNull(delegateHandler, "delegateHandler");
+            Verify.NotNull(delegateHandler, nameof(delegateHandler));
 
             this.eventHandlerFactory = delegateHandler.eventHandlerFactory;
             this.handlerType = delegateHandler.handlerType;
@@ -83,7 +83,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="context">The current event context.</param>
         public virtual void Handle(EventContext context)
         {
-            Verify.NotNull(context, "context");
+            Verify.NotNull(context, nameof(context));
 
             Log.TraceFormat("{0} handling event {0}", handlerType, context.Event);
 

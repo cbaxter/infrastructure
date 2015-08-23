@@ -39,8 +39,8 @@ namespace Spark.Cqrs.Commanding
         /// <param name="serviceProvider">The service locator used to retrieve singleton command handler dependencies.</param>
         public CommandHandlerRegistry(IStoreAggregates aggregateStore, ILocateTypes typeLocator, IServiceProvider serviceProvider)
         {
-            Verify.NotNull(typeLocator, "typeLocator");
-            Verify.NotNull(serviceProvider, "serviceProvider");
+            Verify.NotNull(typeLocator, nameof(typeLocator));
+            Verify.NotNull(serviceProvider, nameof(serviceProvider));
 
             knownCommandHandlers = DiscoverCommandHandlers(aggregateStore, typeLocator, serviceProvider);
         }
@@ -122,7 +122,7 @@ namespace Spark.Cqrs.Commanding
         /// <param name="command">The command for which to retrieve a <see cref="CommandHandler"/> instance.</param>
         public CommandHandler GetHandlerFor(Command command)
         {
-            Verify.NotNull(command, "command");
+            Verify.NotNull(command, nameof(command));
 
             CommandHandler commandHandler;
             Type commandType = command.GetType();

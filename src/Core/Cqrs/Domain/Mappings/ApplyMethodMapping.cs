@@ -38,9 +38,9 @@ namespace Spark.Cqrs.Domain.Mappings
             /// <param name="applyMethod">The apply method to be invoked for events of <paramref name="eventType"/>.</param>
             public void Register(Type eventType, Action<Aggregate, Event> applyMethod)
             {
-                Verify.NotNull(eventType, "eventType");
-                Verify.NotNull(applyMethod, "applyMethod");
-                Verify.TypeDerivesFrom(typeof(Event), eventType, "eventType");
+                Verify.NotNull(eventType, nameof(eventType));
+                Verify.NotNull(applyMethod, nameof(applyMethod));
+                Verify.TypeDerivesFrom(typeof(Event), eventType, nameof(eventType));
 
                 applyMethods.Add(eventType, applyMethod);
             }
