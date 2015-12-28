@@ -87,7 +87,7 @@ namespace Spark.Cqrs.Domain
             var applyMethods = GetKnownApplyMethods(aggregate);
             var applyMethod = GetApplyMethod(aggregate, e, applyMethods);
 
-            Log.TraceFormat("Applying event {0} to aggregate {1}", e, aggregate);
+            Log.Trace("Applying event {0} to aggregate {1}", e, aggregate);
             
             applyMethod(aggregate, e);
         }

@@ -82,12 +82,12 @@ namespace Spark.Messaging
         {
             Verify.NotDisposed(this, disposed);
 
-            Log.TraceFormat("Waiting for message drain");
+            Log.Trace("Waiting for message drain");
             messageQueue.CompleteAdding();
             while (!messageQueue.IsCompleted)
                 Thread.Sleep(10);
 
-            Log.TraceFormat("Cancel all blocked receive operations");
+            Log.Trace("Cancel all blocked receive operations");
             tokenSource.Cancel();
         }
 
@@ -99,14 +99,14 @@ namespace Spark.Messaging
             if (disposed)
                 return;
 
-            Log.TraceFormat("Disposing");
+            Log.Trace("Disposing");
 
             WaitForDrain();
             tokenSource.Dispose();
             messageQueue.Dispose();
             disposed = true;
 
-            Log.TraceFormat("Disposed");
+            Log.Trace("Disposed");
         }
 
         /// <summary>
@@ -118,11 +118,11 @@ namespace Spark.Messaging
             Verify.NotDisposed(this, disposed);
             Verify.NotNull(message, nameof(message));
 
-            Log.TraceFormat("Sending message {0}", message.Id);
+            Log.Trace("Sending message {0}", message.Id);
 
             messageQueue.Add(message);
 
-            Log.TraceFormat("Message {0} sent", message.Id);
+            Log.Trace("Message {0} sent", message.Id);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Spark.Messaging
             {
                 try
                 {
-                    Log.TraceFormat("Waiting for message");
+                    Log.Trace("Waiting for message");
                     message = messageQueue.Take(tokenSource.Token);
                 }
                 catch (OperationCanceledException)

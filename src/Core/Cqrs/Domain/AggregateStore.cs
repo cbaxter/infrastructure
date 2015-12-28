@@ -126,7 +126,7 @@ namespace Spark.Cqrs.Domain
             }
             catch (DuplicateCommitException)
             {
-                Log.WarnFormat("Duplicate commit: {0}", commit);
+                Log.Warn("Duplicate commit: {0}", commit);
             }
 
             // NOTE: Apply commit directly to existing aggregate. By default, each call to `Get` returns a new `Aggregate` instance.

@@ -69,7 +69,7 @@ namespace Spark.Cqrs.Commanding
             var command = context.Command;
             var aggregate = aggregateStore.Get(AggregateType, context.AggregateId);
 
-            Log.TraceFormat("Executing {0} command on aggregate {1}", command, aggregate);
+            Log.Trace("Executing {0} command on aggregate {1}", command, aggregate);
 
             aggregate.VerifyCanHandleCommand(command);
             executor(aggregate, command);
@@ -80,7 +80,7 @@ namespace Spark.Cqrs.Commanding
             }
             else
             {
-                Log.WarnFormat("Executing {0} command on aggregate {1} raised no events", command, aggregate);
+                Log.Warn("Executing {0} command on aggregate {1} raised no events", command, aggregate);
             }
         }
 

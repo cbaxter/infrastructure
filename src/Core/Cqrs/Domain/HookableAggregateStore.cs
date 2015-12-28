@@ -120,7 +120,7 @@ namespace Spark.Cqrs.Domain
         {
             foreach (var pipelineHook in preGetHooks)
             {
-                Log.TraceFormat("Invoking pre-get pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking pre-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PreGet(aggregateType, id);
             }
         }
@@ -133,7 +133,7 @@ namespace Spark.Cqrs.Domain
         {
             foreach (var pipelineHook in postGetHooks)
             {
-                Log.TraceFormat("Invoking post-get pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking post-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PostGet(aggregate);
             }
         }
@@ -172,7 +172,7 @@ namespace Spark.Cqrs.Domain
         {
             foreach (var pipelineHook in preSaveHooks)
             {
-                Log.TraceFormat("Invoking pre-save pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking pre-save pipeline hook: {0}", pipelineHook);
                 pipelineHook.PreSave(aggregate, context);
             }
         }
@@ -187,7 +187,7 @@ namespace Spark.Cqrs.Domain
         {
             foreach (var pipelineHook in postSaveHooks)
             {
-                Log.TraceFormat("Invoking post-save pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking post-save pipeline hook: {0}", pipelineHook);
                 pipelineHook.PostSave(aggregate, commit, error);
             }
         }

@@ -169,7 +169,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">Provides information about a cache entry that was removed from the cache.</param>
         private static void OnCacheItemRemoved(CacheEntryRemovedArguments e)
         {
-            Log.TraceFormat("Saga {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
+            Log.Trace("Saga {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
         }
     }
 }

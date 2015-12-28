@@ -87,10 +87,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Fatal(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Fatal("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.FatalFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.FatalFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.FatalFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.FatalFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Fatal("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Fatal("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Fatal("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Fatal("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Fatal(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Fatal(() => "My Test Message")), "My Test Message" };
                 }
@@ -138,10 +138,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Error(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Error("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.ErrorFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.ErrorFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.ErrorFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.ErrorFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Error("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Error("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Error("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Error("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Error(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Error(() => "My Test Message")), "My Test Message" };
                 }
@@ -189,10 +189,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Warn(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Warn("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.WarnFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.WarnFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.WarnFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.WarnFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Warn("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Warn("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Warn("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Warn("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Warn(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Warn(() => "My Test Message")), "My Test Message" };
                 }
@@ -240,10 +240,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Info(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Info("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.InfoFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.InfoFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.InfoFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.InfoFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Info("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Info("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Info("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Info("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Info(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Info(() => "My Test Message")), "My Test Message" };
                 }
@@ -291,10 +291,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Debug(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Debug("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.DebugFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.DebugFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.DebugFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.DebugFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Debug("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Debug("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Debug("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Debug("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Debug(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Debug(() => "My Test Message")), "My Test Message" };
                 }
@@ -342,10 +342,10 @@ namespace Test.Spark.Logging
                 {
                     yield return new Object[] { CreateExpressionFor(log => log.Trace(new Exception())), new Exception().ToString() };
                     yield return new Object[] { CreateExpressionFor(log => log.Trace("My Test Message")), "My Test Message" };
-                    yield return new Object[] { CreateExpressionFor(log => log.TraceFormat("My Test Message {0}", 0)), "My Test Message 0" };
-                    yield return new Object[] { CreateExpressionFor(log => log.TraceFormat("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
-                    yield return new Object[] { CreateExpressionFor(log => log.TraceFormat("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
-                    yield return new Object[] { CreateExpressionFor(log => log.TraceFormat("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Trace("My Test Message {0}", 0)), "My Test Message 0" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Trace("My Test Message {0} {1}", 0, 1)), "My Test Message 0 1" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Trace("My Test Message {0} {1} {2}", 0, 1, 2)), "My Test Message 0 1 2" };
+                    yield return new Object[] { CreateExpressionFor(log => log.Trace("My Test Message {0} {1} {2} {3}", 0, 1, 2, 3)), "My Test Message 0 1 2 3" };
                     yield return new Object[] { CreateExpressionFor(log => log.Trace(m => m("My Test Message"))), "My Test Message" };
                     yield return new Object[] { CreateExpressionFor(log => log.Trace(() => "My Test Message")), "My Test Message" };
                 }

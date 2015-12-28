@@ -85,7 +85,7 @@ namespace Spark.Cqrs.Eventing
         {
             Verify.NotNull(context, nameof(context));
 
-            Log.TraceFormat("{0} handling event {0}", handlerType, context.Event);
+            Log.Trace("{0} handling event {0}", handlerType, context.Event);
 
             Executor.Invoke(eventHandlerFactory(), context.Event);
         }

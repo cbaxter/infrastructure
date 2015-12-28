@@ -147,7 +147,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             Timeout = timeout;
             FlagTimeoutChangedOnSagaContext();
-            Log.TraceFormat("Timeout scheduled for {0}", timeout);
+            Log.Trace("Timeout scheduled for {0}", timeout);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="headers">The set of message headers associated with the command.</param>
         protected void Publish(Guid aggregateId, Command command, IEnumerable<Header> headers)
         {
-            Log.TraceFormat("Publishing {0} command to aggregate {1}", command, aggregateId);
+            Log.Trace("Publishing {0} command to aggregate {1}", command, aggregateId);
 
             var context = SagaContext.Current;
             if (context == null)
@@ -218,7 +218,7 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             context.Publish(aggregateId, headers == null ? GetHeadersFromEventContext() : headers.Concat(GetHeadersFromEventContext()).Distinct(header => header.Name), command);
 
-            Log.TraceFormat("Published {0} command to aggregate {1}", command, aggregateId);
+            Log.Trace("Published {0} command to aggregate {1}", command, aggregateId);
         }
 
         /// <summary>

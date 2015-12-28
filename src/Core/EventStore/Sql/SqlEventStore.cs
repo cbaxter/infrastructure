@@ -141,7 +141,7 @@ namespace Spark.EventStore.Sql
         {
             using (var command = dialect.CreateCommand(dialect.GetUndispatched))
             {
-                Log.TraceFormat("Getting next {0} undispatched commits after {1}", take, skip);
+                Log.Trace("Getting next {0} undispatched commits after {1}", take, skip);
 
                 command.Parameters.Add(dialect.CreateSkipParameter(skip + 1));
                 command.Parameters.Add(dialect.CreateTakeParameter(take));
@@ -163,7 +163,7 @@ namespace Spark.EventStore.Sql
 
             using (var command = dialect.CreateCommand(dialect.GetRange))
             {
-                Log.TraceFormat("Getting next {0} commits after {1}", take, skip);
+                Log.Trace("Getting next {0} commits after {1}", take, skip);
 
                 command.Parameters.Add(dialect.CreateSkipParameter(skip + 1));
                 command.Parameters.Add(dialect.CreateTakeParameter(take));
@@ -191,7 +191,7 @@ namespace Spark.EventStore.Sql
         {
             using (var command = dialect.CreateCommand(dialect.GetStreams))
             {
-                Log.TraceFormat("Getting next {0} stream identifiers after {1}", pageSize, streamId);
+                Log.Trace("Getting next {0} stream identifiers after {1}", pageSize, streamId);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateTakeParameter(pageSize));
@@ -222,7 +222,7 @@ namespace Spark.EventStore.Sql
         {
             using (var command = dialect.CreateCommand(dialect.GetStream))
             {
-                Log.TraceFormat("Getting next {0} commits for stream {1} from version {2}", pageSize, streamId, minimumVersion);
+                Log.Trace("Getting next {0} commits for stream {1} from version {2}", pageSize, streamId, minimumVersion);
 
                 command.Parameters.Add(dialect.CreateVersionParameter(minimumVersion));
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
@@ -242,7 +242,7 @@ namespace Spark.EventStore.Sql
 
             using (var command = dialect.CreateCommand(dialect.DeleteStream))
             {
-                Log.TraceFormat("Purging stream {0}", streamId);
+                Log.Trace("Purging stream {0}", streamId);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
 
@@ -262,7 +262,7 @@ namespace Spark.EventStore.Sql
             var data = serializer.Serialize(new CommitData(commit.Headers, commit.Events));
             using (var command = dialect.CreateCommand(dialect.InsertCommit))
             {
-                Log.TraceFormat("Inserting stream {0} commit for version {1}", commit.StreamId, commit.Version);
+                Log.Trace("Inserting stream {0} commit for version {1}", commit.StreamId, commit.Version);
 
                 command.Parameters.Add(dialect.CreateTimestampParameter(commit.Timestamp));
                 command.Parameters.Add(dialect.CreateCorrelationIdParameter(commit.CorrelationId));
@@ -290,7 +290,7 @@ namespace Spark.EventStore.Sql
             {
                 using (var command = dialect.CreateCommand(dialect.MarkDispatched))
                 {
-                    Log.TraceFormat("Marking commit {0} as dispatched", id);
+                    Log.Trace("Marking commit {0} as dispatched", id);
 
                     command.Parameters.Add(dialect.CreateIdParameter(id));
 
@@ -314,7 +314,7 @@ namespace Spark.EventStore.Sql
             var data = serializer.Serialize(new CommitData(headers, events));
             using (var command = dialect.CreateCommand(dialect.UpdateCommit))
             {
-                Log.TraceFormat("Updating commit {0}", id);
+                Log.Trace("Updating commit {0}", id);
 
                 command.Parameters.Add(dialect.CreateIdParameter(id));
                 command.Parameters.Add(dialect.CreateDataParameter(data));

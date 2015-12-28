@@ -161,7 +161,7 @@ namespace Spark.Cqrs.Eventing.Sagas
                 scheduledTimeout = timeout;
                 timer.Change(dueTime, System.Threading.Timeout.Infinite);
 
-                Log.TraceFormat("Timer due in {0}ms", dueTime);
+                Log.Trace("Timer due in {0}ms", dueTime);
             }
         }
 

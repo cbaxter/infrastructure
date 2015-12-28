@@ -179,7 +179,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             foreach (var pipelineHook in preGetHooks)
             {
-                Log.TraceFormat("Invoking pre-get pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking pre-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PreGet(type, id);
             }
         }
@@ -192,7 +192,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             foreach (var pipelineHook in postGetHooks)
             {
-                Log.TraceFormat("Invoking post-get pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking post-get pipeline hook: {0}", pipelineHook);
                 pipelineHook.PostGet(saga);
             }
         }
@@ -205,7 +205,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             foreach (var pipelineHook in preSaveHooks)
             {
-                Log.TraceFormat("Invoking pre-save pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking pre-save pipeline hook: {0}", pipelineHook);
                 pipelineHook.PreSave(saga, context);
             }
         }
@@ -220,7 +220,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         {
             foreach (var pipelineHook in postSaveHooks)
             {
-                Log.TraceFormat("Invoking post-save pipeline hook: {0}", pipelineHook);
+                Log.Trace("Invoking post-save pipeline hook: {0}", pipelineHook);
                 pipelineHook.PostSave(saga, context, error);
             }
         }

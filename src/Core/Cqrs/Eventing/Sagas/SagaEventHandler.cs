@@ -98,7 +98,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
             else
             {
-                Log.TraceFormat("{0} - {1} cannot be initiated by event {2}", sagaType, sagaId, context.Event);
+                Log.Trace("{0} - {1} cannot be initiated by event {2}", sagaType, sagaId, context.Event);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The event to be handled.</param>
         protected virtual void HandleSagaEvent(Saga saga, Event e)
         {
-            Log.TraceFormat("{0} handling event {1}", saga, e);
+            Log.Trace("{0} handling event {1}", saga, e);
 
             Executor(saga, e);
         }

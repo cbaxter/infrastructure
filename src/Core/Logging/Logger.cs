@@ -139,7 +139,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void FatalFormat(String format, Object arg)
+        public void Fatal(String format, Object arg)
         {
             if (fatalEnabled)
                 traceSource.TraceEvent(TraceEventType.Critical, NoIdentifier, String.Format(format, arg));
@@ -151,7 +151,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void FatalFormat(String format, Object arg0, Object arg1)
+        public void Fatal(String format, Object arg0, Object arg1)
         {
             if (fatalEnabled)
                 traceSource.TraceEvent(TraceEventType.Critical, NoIdentifier, String.Format(format, arg0, arg1));
@@ -164,7 +164,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void FatalFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Fatal(String format, Object arg0, Object arg1, Object arg2)
         {
             if (fatalEnabled)
                 traceSource.TraceEvent(TraceEventType.Critical, NoIdentifier, String.Format(format, arg0, arg1, arg2));
@@ -175,7 +175,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void FatalFormat(String format, params Object[] args)
+        public void Fatal(String format, params Object[] args)
         {
             if (fatalEnabled)
                 traceSource.TraceEvent(TraceEventType.Critical, NoIdentifier, String.Format(format, args));
@@ -226,7 +226,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void ErrorFormat(String format, Object arg)
+        public void Error(String format, Object arg)
         {
             if (errorEnabled)
                 traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, String.Format(format, arg));
@@ -238,7 +238,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void ErrorFormat(String format, Object arg0, Object arg1)
+        public void Error(String format, Object arg0, Object arg1)
         {
             if (errorEnabled)
                 traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, String.Format(format, arg0, arg1));
@@ -251,7 +251,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void ErrorFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Error(String format, Object arg0, Object arg1, Object arg2)
         {
             if (errorEnabled)
                 traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, String.Format(format, arg0, arg1, arg2));
@@ -262,7 +262,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void ErrorFormat(String format, params Object[] args)
+        public void Error(String format, params Object[] args)
         {
             if (errorEnabled)
                 traceSource.TraceEvent(TraceEventType.Error, NoIdentifier, String.Format(format, args));
@@ -313,7 +313,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void WarnFormat(String format, Object arg)
+        public void Warn(String format, Object arg)
         {
             if (warnEnabled)
                 traceSource.TraceEvent(TraceEventType.Warning, NoIdentifier, String.Format(format, arg));
@@ -325,7 +325,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void WarnFormat(String format, Object arg0, Object arg1)
+        public void Warn(String format, Object arg0, Object arg1)
         {
             if (warnEnabled)
                 traceSource.TraceEvent(TraceEventType.Warning, NoIdentifier, String.Format(format, arg0, arg1));
@@ -338,7 +338,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void WarnFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Warn(String format, Object arg0, Object arg1, Object arg2)
         {
             if (warnEnabled)
                 traceSource.TraceEvent(TraceEventType.Warning, NoIdentifier, String.Format(format, arg0, arg1, arg2));
@@ -349,7 +349,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void WarnFormat(String format, params Object[] args)
+        public void Warn(String format, params Object[] args)
         {
             if (warnEnabled)
                 traceSource.TraceEvent(TraceEventType.Warning, NoIdentifier, String.Format(format, args));
@@ -400,7 +400,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void InfoFormat(String format, Object arg)
+        public void Info(String format, Object arg)
         {
             if (infoEnabled)
                 traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, String.Format(format, arg));
@@ -412,7 +412,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void InfoFormat(String format, Object arg0, Object arg1)
+        public void Info(String format, Object arg0, Object arg1)
         {
             if (infoEnabled)
                 traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, String.Format(format, arg0, arg1));
@@ -425,7 +425,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void InfoFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Info(String format, Object arg0, Object arg1, Object arg2)
         {
             if (infoEnabled)
                 traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, String.Format(format, arg0, arg1, arg2));
@@ -436,7 +436,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void InfoFormat(String format, params Object[] args)
+        public void Info(String format, params Object[] args)
         {
             if (infoEnabled)
                 traceSource.TraceEvent(TraceEventType.Information, NoIdentifier, String.Format(format, args));
@@ -487,7 +487,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void DebugFormat(String format, Object arg)
+        public void Debug(String format, Object arg)
         {
             if (debugEnabled)
                 traceSource.TraceEvent(TraceEventType.Verbose, NoIdentifier, String.Format(format, arg));
@@ -499,7 +499,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void DebugFormat(String format, Object arg0, Object arg1)
+        public void Debug(String format, Object arg0, Object arg1)
         {
             if (debugEnabled)
                 traceSource.TraceEvent(TraceEventType.Verbose, NoIdentifier, String.Format(format, arg0, arg1));
@@ -512,7 +512,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void DebugFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Debug(String format, Object arg0, Object arg1, Object arg2)
         {
             if (debugEnabled)
                 traceSource.TraceEvent(TraceEventType.Verbose, NoIdentifier, String.Format(format, arg0, arg1, arg2));
@@ -523,7 +523,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void DebugFormat(String format, params Object[] args)
+        public void Debug(String format, params Object[] args)
         {
             if (debugEnabled)
                 traceSource.TraceEvent(TraceEventType.Verbose, NoIdentifier, String.Format(format, args));
@@ -574,7 +574,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        public void TraceFormat(String format, Object arg)
+        public void Trace(String format, Object arg)
         {
             if (traceEnabled)
                 System.Diagnostics.Trace.WriteLine(String.Format(format, arg), traceSource.Name);
@@ -586,7 +586,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        public void TraceFormat(String format, Object arg0, Object arg1)
+        public void Trace(String format, Object arg0, Object arg1)
         {
             if (traceEnabled)
                 System.Diagnostics.Trace.WriteLine(String.Format(format, arg0, arg1), traceSource.Name);
@@ -599,7 +599,7 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        public void TraceFormat(String format, Object arg0, Object arg1, Object arg2)
+        public void Trace(String format, Object arg0, Object arg1, Object arg2)
         {
             if (traceEnabled)
                 System.Diagnostics.Trace.WriteLine(String.Format(format, arg0, arg1, arg2), traceSource.Name);
@@ -610,7 +610,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        public void TraceFormat(String format, params Object[] args)
+        public void Trace(String format, params Object[] args)
         {
             if (traceEnabled)
                 System.Diagnostics.Trace.WriteLine(String.Format(format, args), traceSource.Name);

@@ -123,7 +123,7 @@ namespace Spark.Cqrs.Commanding
 
                     backoffContext = backoffContext ?? new ExponentialBackoff(retryTimeout);
                     backoffContext.WaitOrTimeout(ex);
-                    Log.WarnFormat(ex.Message);
+                    Log.Warn(ex.Message);
                 }
             } while (!done);
         }

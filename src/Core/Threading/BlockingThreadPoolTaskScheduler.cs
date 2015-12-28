@@ -84,7 +84,7 @@ namespace Spark.Threading
             Verify.GreaterThan(0, boundedCapacity, nameof(boundedCapacity));
             Verify.NotNull(threadPool, nameof(threadPool));
 
-            Log.TraceFormat("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, MaximumConcurrencyLevel);
+            Log.Trace("BoundedCapacity={0}, MaximumConcurrencyLevel={1}", boundedCapacity, MaximumConcurrencyLevel);
 
             this.monitor = monitor;
             this.threadPool = threadPool;

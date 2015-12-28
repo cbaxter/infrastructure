@@ -139,7 +139,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="e">Provides information about a cache entry that was removed from the cache.</param>
         private static void OnCacheItemRemoved(CacheEntryRemovedArguments e)
         {
-            Log.TraceFormat("Aggregate {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
+            Log.Trace("Aggregate {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Spark.Cqrs.Eventing
 
             foreach (var commit in eventStore.GetUndispatched())
             {
-                Log.WarnFormat("Processing undispatched commit {0}", commit.Id);
+                Log.Warn("Processing undispatched commit {0}", commit.Id);
                 DispatchCommit(commit);
             }
         }
@@ -83,7 +83,7 @@ namespace Spark.Cqrs.Eventing
             if (commit?.Id != null)
                 DispatchCommit(commit);
             else
-                Log.WarnFormat("Commit not dispatched");
+                Log.Warn("Commit not dispatched");
         }
 
         /// <summary>
