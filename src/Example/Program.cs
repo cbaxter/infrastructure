@@ -15,6 +15,7 @@ using Spark.Example.Domain;
 using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
 using Spark.Messaging;
+using Spark.Messaging.Msmq;
 
 namespace Spark.Example
 {
@@ -23,7 +24,7 @@ namespace Spark.Example
     /// </summary>
     internal static class Program
     {
-        private const Int32 NumberOfCommandsToPublish = 100000;
+        private const Int32 NumberOfCommandsToPublish = 20000; //0;
         private const Int32 NumberOfIterations = 1;
 
         /// <summary>
@@ -101,14 +102,14 @@ namespace Spark.Example
             var randomizer = new Random();
 
             // Ensure at least 10 accounts opened prior to randomized data generation.
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < Math.Min(NumberOfCommandsToPublish, 10); i++)
             {
                 accounts.Add(GuidStrategy.NewGuid());
                 commandPublisher.Publish(accounts[i], new OpenAccount((AccountType)randomizer.Next(1, 3)));
             }
 
             // Generate a random set of commands to exercise the underlying infrastructure.
-            for (var i = 10; i < NumberOfCommandsToPublish; i++)
+            for (var i = 10; i < NumberOfCommandsToPublish - 10; i++)
             {
                 switch (randomizer.Next(0, 11))
                 {
@@ -151,22 +152,22 @@ namespace Spark.Example
         /// <param name="container">The test IoC container.</param>
         private static void WaitForCompletion(ILifetimeScope container)
         {
-            var commandBus = container.Resolve<BlockingCollectionMessageBus<CommandEnvelope>>();
-            var eventBus = container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>();
+            var commandBus = container.Resolve<MessageReceiver<CommandEnvelope>>();
+            var eventBus = container.Resolve<MessageReceiver<EventEnvelope>>();
             var statistics = container.Resolve<Statistics>();
 
             while (statistics.Processing)
                 Thread.Sleep(100);
 
             // Wait for command bus drain and shut-down.
-            commandBus.WaitForDrain();
-            container.Resolve<MessageReceiver<CommandEnvelope>>().Dispose();
-            container.Resolve<BlockingCollectionMessageBus<CommandEnvelope>>().Dispose();
+            commandBus.Dispose();
+            //container.Resolve<MessageReceiver<CommandEnvelope>>().Dispose();
+            //container.Resolve<OptimisticMessageSender<CommandEnvelope>>().Dispose();
 
             // Wait for event bus drain and shut-down.
-            eventBus.WaitForDrain();
-            container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
-            container.Resolve<BlockingCollectionMessageBus<EventEnvelope>>().Dispose();
+            eventBus.Dispose();
+            //container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
+            //container.Resolve<OptimisticMessageSender<EventEnvelope>>().Dispose();
 
             // Stop statistics collection.
             statistics.StopCapture();

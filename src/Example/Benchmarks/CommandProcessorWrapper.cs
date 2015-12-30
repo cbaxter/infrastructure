@@ -38,16 +38,13 @@ namespace Spark.Example.Benchmarks
         /// Processes the specified message instance asynchornously.
         /// </summary>
         /// <param name="message">The message to process.</param>
-        public async Task ProcessAsync(Message<CommandEnvelope> message)
+        public Task ProcessAsync(Message<CommandEnvelope> message)
         {
-            try
-            {
-                await processor.ProcessAsync(message);
-            }
-            finally
-            {
-                statistics.DecrementQueuedCommands();
-            }
+            var task = processor.ProcessAsync(message);
+
+            task.ContinueWith(antecedent => statistics.DecrementQueuedCommands());
+
+            return task;
         }
     }
 }

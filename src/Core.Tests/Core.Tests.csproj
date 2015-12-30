@@ -154,8 +154,8 @@
     <Compile Include="Cqrs\Eventing\EventCollectionTests.cs" />
     <Compile Include="Logging\LogicalOperationScopeTests.cs" />
     <Compile Include="Logging\ActivityScopeTests.cs" />
-    <Compile Include="Messaging\InlineMessageBusTests.cs" />
-    <Compile Include="Messaging\MessageReceiverTests.cs" />
+    <Compile Include="Messaging\DirectMessageSenderTests.cs" />
+    <Compile Include="Messaging\FakeMessageProcessor.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />
     <Compile Include="Messaging\HeaderCollectionTests.cs" />
     <Compile Include="EventStore\PagedResultTests.cs" />
@@ -167,11 +167,12 @@
     <Compile Include="Messaging\HeaderTests.cs" />
     <Compile Include="Messaging\MessageFactoryTests.cs" />
     <Compile Include="Messaging\MessageTests.cs" />
-    <Compile Include="Messaging\BlockingCollectionMessageBusTests.cs" />
+    <Compile Include="Messaging\OptimisticMessageSenderTests.cs" />
     <Compile Include="Messaging\ServiceMessageFactoryTests.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="ObjectHasherTests.cs" />
     <Compile Include="ObjectMapperTests.cs" />
+    <Compile Include="ObjectPoolTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>
       </SubType>

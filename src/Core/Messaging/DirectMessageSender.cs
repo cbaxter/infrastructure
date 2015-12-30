@@ -18,15 +18,15 @@ namespace Spark.Messaging
     /// <summary>
     /// An inline message bus for use by single-process applications when the result must be processed immediately to ensure messages are not lost.
     /// </summary>
-    public sealed class InlineMessageBus<T> : ISendMessages<T>
+    public sealed class DirectMessageSender<T> : ISendMessages<T>
     {
         private readonly IProcessMessages<T> messageProcessor;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="InlineMessageBus{T}"/> using the specified <see cref="IProcessMessages{T}"/> instance.
+        /// Initializes a new instance of <see cref="DirectMessageSender{T}"/> using the specified <see cref="IProcessMessages{T}"/> instance.
         /// </summary>
         /// <param name="messageProcessor">The message processor.</param>
-        public InlineMessageBus(IProcessMessages<T> messageProcessor)
+        public DirectMessageSender(IProcessMessages<T> messageProcessor)
         {
             Verify.NotNull(messageProcessor, nameof(messageProcessor));
 
