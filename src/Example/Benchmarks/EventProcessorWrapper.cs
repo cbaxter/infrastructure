@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Spark.Cqrs.Eventing;
 using Spark.Messaging;
 
@@ -37,9 +38,16 @@ namespace Spark.Example.Benchmarks
         /// Processes the specified message instance asynchornously.
         /// </summary>
         /// <param name="message">The message to process.</param>
-        public Task ProcessAsync(Message<EventEnvelope> message)
+        public async Task ProcessAsync(Message<EventEnvelope> message)
         {
-            return processor.ProcessAsync(message).ContinueWith(task => statistics.DecrementQueuedEvents());
+            try
+            {
+                await processor.ProcessAsync(message);
+            }
+            finally
+            {
+                statistics.DecrementQueuedEvents();
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Spark.Cqrs.Commanding;
 using Spark.Messaging;
 
@@ -37,9 +38,16 @@ namespace Spark.Example.Benchmarks
         /// Processes the specified message instance asynchornously.
         /// </summary>
         /// <param name="message">The message to process.</param>
-        public Task ProcessAsync(Message<CommandEnvelope> message)
+        public async Task ProcessAsync(Message<CommandEnvelope> message)
         {
-            return processor.ProcessAsync(message).ContinueWith(task => statistics.DecrementQueuedCommands());
+            try
+            {
+                await processor.ProcessAsync(message);
+            }
+            finally
+            {
+                statistics.DecrementQueuedCommands();
+            }
         }
     }
 }
