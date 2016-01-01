@@ -69,10 +69,6 @@ namespace Spark.Messaging.Msmq
                 if (moveHandle == IntPtr.Zero) moveHandle = OpenQueue(FormatName);
                 return moveHandle;
             }
-            set
-            {
-                moveHandle = value;
-            }
         }
 
         /// <summary>
@@ -100,28 +96,40 @@ namespace Spark.Messaging.Msmq
         {
             base.Dispose(disposing);
 
-            if (MoveHandle != IntPtr.Zero)
+            if (moveHandle != IntPtr.Zero)
             {
-                CloseQueue(MoveHandle);
-                MoveHandle = IntPtr.Zero;
+                CloseQueue(moveHandle);
+                moveHandle = IntPtr.Zero;
             }
+        }
+
+        /// <summary>
+        /// Returns <value>true</value> if the message queue already exists or was created successfully; otherwise returns <value>false</value>.
+        /// </summary>
+        public Boolean EnsureQueueExists()
+        {
+            return InitializeMessageQueue(Path);
         }
 
         /// <summary>
         /// Attempts to initialize the message queue if the <paramref name="path"/> does not already exist.
         /// </summary>
         /// <param name="path">The queue path.</param>
-        public static void InitializeMessageQueue(String path)
+        public static Boolean InitializeMessageQueue(String path)
         {
             try
             {
                 path = path.Substring(path.LastIndexOf(':') + 1);
                 if (path.IndexOf(';') > 0) path = path.Substring(0, path.IndexOf(';'));
                 if (!Exists(path)) Create(path, transactional: false);
+
+                return true;
             }
             catch (Exception ex)
             {
                 Log.Warn(ex.Message);
+
+                return false;
             }
         }
 

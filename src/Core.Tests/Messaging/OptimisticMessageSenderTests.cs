@@ -93,7 +93,7 @@ namespace Test.Spark.Messaging
                 processor.WaitForMessage();
                 processor.ProcessNextMessage();
 
-                while (bus.Count > 0 && attempt < 10) Thread.Sleep(10);
+                while (bus.Count > 0 && attempt < 10) Thread.Sleep(100);
 
                 Assert.Equal(0, bus.Count);
             }
@@ -111,7 +111,7 @@ namespace Test.Spark.Messaging
                 processor.ThrowException(ex);
                 processor.ProcessNextMessage();
 
-                while (bus.Count > 0 && attempt < 10) Thread.Sleep(10);
+                while (bus.Count > 0 && attempt < 10) Thread.Sleep(100);
 
                 Assert.Equal(0, bus.Count);
             }

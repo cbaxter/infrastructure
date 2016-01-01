@@ -46,8 +46,10 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
@@ -156,6 +158,11 @@
     <Compile Include="Logging\ActivityScopeTests.cs" />
     <Compile Include="Messaging\DirectMessageSenderTests.cs" />
     <Compile Include="Messaging\FakeMessageProcessor.cs" />
+    <Compile Include="Messaging\Msmq\MessageQueueExtensions.cs" />
+    <Compile Include="Messaging\Msmq\MessageQueueFactAttribute.cs" />
+    <Compile Include="Messaging\Msmq\MessageQueueReceiverTests.cs" />
+    <Compile Include="Messaging\Msmq\MessageQueueTests.cs" />
+    <Compile Include="Messaging\Msmq\MessageQueueSenderTests.cs" />
     <Compile Include="Messaging\WebMessageFactoryTests.cs" />
     <Compile Include="Messaging\HeaderCollectionTests.cs" />
     <Compile Include="EventStore\PagedResultTests.cs" />

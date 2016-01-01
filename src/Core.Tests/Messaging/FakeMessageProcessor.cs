@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel.Design;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Spark.Messaging;
@@ -23,10 +23,12 @@ namespace Test.Spark.Messaging
     internal sealed class FakeMessageProcessor<T> : IProcessMessages<T>
     {
         private readonly TaskScheduler inlineTaskScheduler = new InlineTaskScheduler();
-        private Exception nextExceptionToThrow ;
-             
-        private EventWaitHandle Continue { get; } = new AutoResetEvent(initialState: false);
-        private EventWaitHandle Message { get; } = new AutoResetEvent(initialState: false);
+        private readonly EventWaitHandle processNextMessage = new AutoResetEvent(initialState: false);
+        private readonly EventWaitHandle waitForMessage = new AutoResetEvent(initialState: false);
+        private readonly List<Message<T>> messages = new List<Message<T>>();
+        private Exception nextExceptionToThrow;
+
+        public IReadOnlyList<Message<T>> Messages { get { return messages; } }
 
         public Task ProcessAsync(Message<T> message)
         {
@@ -35,8 +37,10 @@ namespace Test.Spark.Messaging
 
         public void Process(Message<T> message)
         {
-            Message.Set();
-            Continue.WaitOne();
+            waitForMessage.Set();
+            processNextMessage.WaitOne();
+
+            messages.Add(message);
 
             if (nextExceptionToThrow != null)
             {
@@ -48,20 +52,29 @@ namespace Test.Spark.Messaging
             }
         }
 
-        public void WaitForMessage() 
+        public void ProcessMessages(Int32 count)
         {
-            Message.WaitOne();
+            for (var i = 0; i < count; i++)
+            {
+                WaitForMessage();
+                ProcessNextMessage();
+            }
         }
-        
+
+        public void WaitForMessage()
+        {
+            waitForMessage.WaitOne();
+        }
+
         public void ProcessNextMessage()
         {
-            Continue.Set();
+            processNextMessage.Set();
         }
 
         public void ThrowException(Exception ex)
         {
             nextExceptionToThrow = ex;
-            Continue.Set();
+            processNextMessage.Set();
         }
     }
 }

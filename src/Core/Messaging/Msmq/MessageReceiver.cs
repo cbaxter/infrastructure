@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Messaging;
-using System.Threading;
 using System.Threading.Tasks;
 using Spark.Logging;
 using Spark.Serialization;
@@ -50,13 +49,14 @@ namespace Spark.Messaging.Msmq
     public class MessageReceiver<T> : MessageReceiver, IDisposable
     {
         private readonly IDictionary<Int64, Task> tasks = new ConcurrentDictionary<Int64, Task>();
-        private readonly ManualResetEvent idle = new ManualResetEvent(initialState: true);
+        private readonly Object criticalRegion = new Object();
         private readonly Type messageType = typeof(Message<T>);
         private readonly IProcessMessages<T> messageProcessor;
         private readonly ISerializeObjects serializer;
         private readonly MessageQueue processingQueue;
         private readonly MessageQueue pendingQueue;
         private readonly MessageQueue poisonQueue;
+        private Task receiverTask;
         private Boolean disposed;
 
         /// <summary>
@@ -72,13 +72,12 @@ namespace Spark.Messaging.Msmq
 
             MessageQueue.InitializeMessageQueue(path);
 
+            this.serializer = serializer;
+            this.messageProcessor = messageProcessor;
             this.pendingQueue = new MessageQueue(path, QueueAccessMode.Receive) { MessageReadPropertyFilter = MessageBodyOnly };
             this.poisonQueue = new MessageQueue(path + ";poison", QueueAccessMode.Receive) { MessageReadPropertyFilter = MessageBodyOnly };
             this.processingQueue = new MessageQueue(path + ";processing", QueueAccessMode.Receive) { MessageReadPropertyFilter = MessageBodyOnly };
-            this.messageProcessor = messageProcessor;
-            this.serializer = serializer;
-
-            Task.Run(() => EnureProcessingQueueEmpty());
+            this.receiverTask = Task.Run(() => EnureProcessingQueueEmpty());
         }
 
         /// <summary>
@@ -90,17 +89,21 @@ namespace Spark.Messaging.Msmq
                 return;
 
             Log.Trace("Disposing");
-            disposed = true;
+
+            // Ensure we are not in the process of scheduling a new receiver task
+            lock (criticalRegion)
+            {
+                disposed = true;
+            }
 
             // Wait for in-flight operations to complete.
-            idle.WaitOne();
+            Task.WaitAll(receiverTask);
             Task.WaitAll(tasks.Values.ToArray());
 
             // Dispose underlying resources.
             pendingQueue.Dispose();
             processingQueue.Dispose();
             poisonQueue.Dispose();
-            idle.Dispose();
             tasks.Clear();
 
             Log.Trace("Disposed");
@@ -115,7 +118,13 @@ namespace Spark.Messaging.Msmq
 
             if (!disposed)
             {
-                pendingQueue.PeekCompleted += (sender, e) => ProcessPendingMessages();
+                pendingQueue.PeekCompleted += (sender, e) =>
+                {
+                    lock (criticalRegion)
+                    {
+                        if (!disposed) receiverTask = Task.Run(() => ProcessPendingMessages());
+                    }
+                };
                 pendingQueue.BeginPeek();
             }
         }
@@ -142,8 +151,6 @@ namespace Spark.Messaging.Msmq
         {
             using (var messages = messageQueue.GetMessageEnumerator2())
             {
-                idle.Reset();
-
                 while (messages.MoveNext())
                 {
                     var message = messages.Current;
@@ -153,8 +160,6 @@ namespace Spark.Messaging.Msmq
 
                     handler.Invoke(message);
                 }
-
-                idle.Set();
             }
         }
 
