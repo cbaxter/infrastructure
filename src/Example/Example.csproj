@@ -79,6 +79,7 @@
     <Compile Include="Modules\CommonModule.cs" />
     <Compile Include="Modules\EventingModule.cs" />
     <Compile Include="Modules\ExampleModule.cs" />
+    <Compile Include="Modules\MessageBusType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sagas\MoneyTransferSaga.cs" />

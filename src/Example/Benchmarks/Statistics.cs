@@ -65,6 +65,7 @@ namespace Spark.Example.Benchmarks
 
             Console.WriteLine();
             Console.WriteLine("Stopped @ {0:yyyy-MM-dd HH:mm:ss,ffffff}", endTime);
+            Console.WriteLine("Duration = {0}", endTime.Subtract(startTime));
             Console.WriteLine();
         }
 
@@ -187,7 +188,6 @@ namespace Spark.Example.Benchmarks
                 eventsQueued--;
             }
         }
-
 
         /// <summary>
         /// Increment query count.

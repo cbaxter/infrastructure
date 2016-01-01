@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Autofac;
 using Spark.Cqrs.Commanding;
@@ -16,6 +18,7 @@ using Spark.Example.Domain.Commands;
 using Spark.Example.Modules;
 using Spark.Messaging;
 using Spark.Messaging.Msmq;
+using IContainer = Autofac.IContainer;
 
 namespace Spark.Example
 {
@@ -24,20 +27,33 @@ namespace Spark.Example
     /// </summary>
     internal static class Program
     {
-        private const Int32 NumberOfCommandsToPublish = 20000; //0;
-        private const Int32 NumberOfIterations = 1;
+        private static readonly IReadOnlyDictionary<String, MessageBusType> KnownMessageBusTypes;
+
+        static Program()
+        {
+            KnownMessageBusTypes = typeof(MessageBusType).GetFields().Where(field => field.GetCustomAttributes(inherit: false).OfType<DescriptionAttribute>().Any()).ToDictionary(
+                field => field.GetCustomAttributes(inherit: false).OfType<DescriptionAttribute>().Single().Description,
+                field => (MessageBusType)field.GetValue(null), StringComparer.InvariantCultureIgnoreCase
+            );
+        }
 
         /// <summary>
         /// The main entry point for the test program.
         /// </summary>
-        internal static void Main()
+        internal static void Main(String[] args)
         {
-            for (var i = 0; i < NumberOfIterations; i++)
+            var numberOfIterations = GetNumberOfIterations(args);
+            var numberOfCommands = GetNumberOfCommands(args);
+
+            CommandingModule.MessageBusType = GetCommandBusType(args);
+            EventingModule.MessageBusType = GetEventBusType(args);
+            
+            for (var i = 0; i < numberOfIterations; i++)
             {
                 var container = Initialize();
 
                 Purge(container);
-                PublishCommands(container);
+                PublishCommands(container, numberOfCommands);
                 WaitForCompletion(container);
             }
 
@@ -46,6 +62,83 @@ namespace Spark.Example
                 Console.Write("Press any key to continue . . . ");
                 Console.Read();
             }
+        }
+
+        /// <summary>
+        /// Get the number of test iterations to complete (i.e., testing setup/teardown).
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        private static Int32 GetNumberOfIterations(String[] args)
+        {
+            Int32 numberOfIterations;
+            if (args.Length > 0 && Int32.TryParse(args[0] ?? String.Empty, out numberOfIterations))
+                return numberOfIterations;
+
+            Console.Write("Number of iterations (default = 1): ");
+            return Int32.TryParse(Console.ReadLine() ?? String.Empty, out numberOfIterations) ? numberOfIterations : 1;
+        }
+
+        /// <summary>
+        /// Get the number of commands to publish/process.
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        private static Int32 GetNumberOfCommands(String[] args)
+        {
+            Int32 numberOfCommands;
+            if (args.Length > 1 && Int32.TryParse(args[1] ?? String.Empty, out numberOfCommands))
+                return numberOfCommands;
+
+            Console.Write("Number of commands (default = 20,000): ");
+            return Int32.TryParse(Console.ReadLine() ?? String.Empty, out numberOfCommands) ? numberOfCommands : 20000;
+        }
+
+        /// <summary>
+        /// Get the command bus type to be registered.
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        private static MessageBusType GetCommandBusType(String[] args)
+        {
+            if (args.Length > 2)
+                return GetMessageBusType(args[2]);
+
+            Console.Write("Command Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
+            String value = Console.ReadLine() ?? String.Empty;
+
+            return value.IsNullOrWhiteSpace() ? MessageBusType.MicrosoftMessageQueuing : GetMessageBusType(value);
+        }
+
+        /// <summary>
+        /// Get the event bus type to be registered.
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        private static MessageBusType GetEventBusType(String[] args)
+        {
+            if (args.Length > 3)
+                return GetMessageBusType(args[3]);
+
+            Console.Write("Event Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
+            String value = Console.ReadLine() ?? String.Empty;
+
+            return value.IsNullOrWhiteSpace() ? MessageBusType.MicrosoftMessageQueuing : GetMessageBusType(value);
+        }
+
+        /// <summary>
+        /// Gets a message bus type based on the specified string <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value to convert to an message bus type (i.e., name, value or unique description).</param>
+        public static MessageBusType GetMessageBusType(String value)
+        {
+            Int32 parsedValue;
+            Object boxedValue = Int32.TryParse(value, out parsedValue) ? parsedValue : (Object)value;
+
+            if (Enum.IsDefined(typeof(MessageBusType), boxedValue))
+                return (MessageBusType)Enum.ToObject(typeof(MessageBusType), boxedValue);
+
+            MessageBusType result;
+            if (KnownMessageBusTypes.TryGetValue(value, out result))
+                return result;
+
+            throw new InvalidOperationException("Unknown message bus type specified.");
         }
 
         /// <summary>
@@ -76,16 +169,17 @@ namespace Spark.Example
             var sagaStore = container.Resolve<IStoreSagas>();
             var statistics = container.Resolve<Statistics>();
 
-            Console.WriteLine("Purging event store...");
-            eventStore.Purge();
+            Console.WriteLine();
 
             Console.WriteLine("Purging snapshot store...");
             snapshotStore.Purge();
 
+            Console.WriteLine("Purging event store...");
+            eventStore.Purge();
+
             Console.WriteLine("Purging saga store...");
             sagaStore.Purge();
 
-            Console.WriteLine("Starting performance test...");
             Console.WriteLine();
 
             statistics.StartCapture();
@@ -95,21 +189,22 @@ namespace Spark.Example
         /// Publish a set of pre-defined test commands to evaluate infrastructure performance.
         /// </summary>
         /// <param name="container">The test IoC container.</param>
-        private static void PublishCommands(IComponentContext container)
+        /// <param name="numberOfCommands">The number of commands to publish.</param>
+        private static void PublishCommands(IComponentContext container, Int32 numberOfCommands)
         {
             var commandPublisher = container.Resolve<IPublishCommands>();
             var accounts = new List<Guid>();
             var randomizer = new Random();
 
             // Ensure at least 10 accounts opened prior to randomized data generation.
-            for (var i = 0; i < Math.Min(NumberOfCommandsToPublish, 10); i++)
+            for (var i = 0; i < Math.Min(numberOfCommands, 10); i++)
             {
                 accounts.Add(GuidStrategy.NewGuid());
                 commandPublisher.Publish(accounts[i], new OpenAccount((AccountType)randomizer.Next(1, 3)));
             }
 
             // Generate a random set of commands to exercise the underlying infrastructure.
-            for (var i = 10; i < NumberOfCommandsToPublish - 10; i++)
+            for (var i = 10; i < numberOfCommands - 10; i++)
             {
                 switch (randomizer.Next(0, 11))
                 {
@@ -152,22 +247,17 @@ namespace Spark.Example
         /// <param name="container">The test IoC container.</param>
         private static void WaitForCompletion(ILifetimeScope container)
         {
-            var commandBus = container.Resolve<MessageReceiver<CommandEnvelope>>();
-            var eventBus = container.Resolve<MessageReceiver<EventEnvelope>>();
             var statistics = container.Resolve<Statistics>();
 
+            // Wait for statistics to stop capturing.
             while (statistics.Processing)
                 Thread.Sleep(100);
 
-            // Wait for command bus drain and shut-down.
-            commandBus.Dispose();
-            //container.Resolve<MessageReceiver<CommandEnvelope>>().Dispose();
-            //container.Resolve<OptimisticMessageSender<CommandEnvelope>>().Dispose();
+            //Wait for all commands to be processed.
+            WaitForCommandBusDrain(container);
 
-            // Wait for event bus drain and shut-down.
-            eventBus.Dispose();
-            //container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
-            //container.Resolve<OptimisticMessageSender<EventEnvelope>>().Dispose();
+            //Wait for all events to be processed.
+            WaitForEventBusDrain(container);
 
             // Stop statistics collection.
             statistics.StopCapture();
@@ -179,6 +269,48 @@ namespace Spark.Example
 
             // Dispose underlying IoC container.
             container.Dispose();
+        }
+
+        /// <summary>
+        /// Wait for all commands to be processed before continuing.
+        /// </summary>
+        /// <param name="container">The test IoC container.</param>
+        private static void WaitForCommandBusDrain(ILifetimeScope container)
+        {
+            switch (CommandingModule.MessageBusType)
+            {
+                case MessageBusType.Inline:
+                    break;
+                case MessageBusType.Optimistic:
+                    container.Resolve<OptimisticMessageSender<CommandEnvelope>>().Dispose();
+                    break;
+                case MessageBusType.MicrosoftMessageQueuing:
+                    container.Resolve<MessageReceiver<CommandEnvelope>>().Dispose();
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Wait for all events to be processed before continuing.
+        /// </summary>
+        /// <param name="container">The test IoC container.</param>
+        private static void WaitForEventBusDrain(ILifetimeScope container)
+        {
+            switch (EventingModule.MessageBusType)
+            {
+                case MessageBusType.Inline:
+                    break;
+                case MessageBusType.Optimistic:
+                    container.Resolve<OptimisticMessageSender<EventEnvelope>>().Dispose();
+                    break;
+                case MessageBusType.MicrosoftMessageQueuing:
+                    container.Resolve<MessageReceiver<EventEnvelope>>().Dispose();
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }
