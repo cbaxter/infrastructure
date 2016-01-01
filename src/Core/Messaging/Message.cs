@@ -18,6 +18,7 @@ namespace Spark.Messaging
     /// <summary>
     /// A message envelope containing a unique identifier, message headers and associated payload.
     /// </summary>
+    [Serializable]
     public abstract class Message
     {
         private readonly Guid id;

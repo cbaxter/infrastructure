@@ -80,7 +80,20 @@ namespace Spark.Cqrs.Commanding
         {
             Verify.NotNull(message, nameof(message));
 
-            return Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+            return CreateTask(message);
+        }
+
+        /// <summary>
+        /// Create a new worker task that will be used to process the specified <see cref="Command"/> message.
+        /// </summary>
+        /// <param name="message">The <see cref="Command"/> message.</param>
+        private Task CreateTask(Message<CommandEnvelope> message)
+        {
+            var task = Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+
+            task.ConfigureAwait(continueOnCapturedContext: false);
+
+            return task;
         }
 
         /// <summary>

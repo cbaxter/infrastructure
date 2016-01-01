@@ -79,7 +79,20 @@ namespace Spark.Cqrs.Eventing
         {
             Verify.NotNull(message, nameof(message));
 
-            return Task.Factory.StartNew(state => Process((Message<EventEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+            return CreateTask(message);
+        }
+
+        /// <summary>
+        /// Create a new worker task that will be used to process the specified <see cref="Event"/> message.
+        /// </summary>
+        /// <param name="message">The <see cref="Event"/> message.</param>
+        private Task CreateTask(Message<EventEnvelope> message)
+        {
+            var task = Task.Factory.StartNew(state => Process((Message<EventEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+
+            task.ConfigureAwait(continueOnCapturedContext: false);
+
+            return task;
         }
 
         /// <summary>

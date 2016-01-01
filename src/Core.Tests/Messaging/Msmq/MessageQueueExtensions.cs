@@ -1,4 +1,8 @@
 ﻿using System;
+using System.IO;
+using Spark.Messaging;
+using Spark.Messaging.Msmq;
+using Spark.Serialization;
 
 /* Copyright (c) 2015 Spark Software Ltd.
  * 
@@ -13,39 +17,33 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Spark.Messaging
+namespace Test.Spark.Messaging.Msmq
 {
     /// <summary>
-    /// An inline message bus for use by single-process applications when the result must be processed immediately to ensure messages are not lost.
+    /// Extension methods of <see cref="MessageQueue"/> used to support unit tests.
     /// </summary>
-    public sealed class InlineMessageBus<T> : ISendMessages<T>
+    internal static class MessageQueueExtensions
     {
-        private readonly IProcessMessages<T> messageProcessor;
-
         /// <summary>
-        /// Initializes a new instance of <see cref="InlineMessageBus{T}"/> using the specified <see cref="IProcessMessages{T}"/> instance.
+        /// Sends a message to the specified message queue.
         /// </summary>
-        /// <param name="messageProcessor">The message processor.</param>
-        public InlineMessageBus(IProcessMessages<T> messageProcessor)
+        /// <param name="queue">The message queue.</param>
+        /// <param name="payload">The message payload to send.</param>
+        public static System.Messaging.Message SendMessage<T>(this MessageQueue queue, T payload)
         {
-            Verify.NotNull(messageProcessor, nameof(messageProcessor));
+            var message = new Message<T>(Guid.NewGuid(), HeaderCollection.Empty, payload);
+            var serializer = new BinarySerializer();
 
-            this.messageProcessor = messageProcessor;
-        }
+            using (var msmqMessage = new System.Messaging.Message())
+            using (var memoryStream = new MemoryStream())
+            {
+                serializer.Serialize(memoryStream, message, message.GetType());
+                msmqMessage.BodyStream = memoryStream;
+                msmqMessage.Recoverable = true;
 
-        /// <summary>
-        /// Publishes a message on the underlying message bus.
-        /// </summary>
-        /// <param name="message">The message to publish on the underlying message bus.</param>
-        public void Send(Message<T> message)
-        {
-            try
-            {
-                messageProcessor.Process(message);
-            }
-            catch (AggregateException ex)
-            {
-                throw ex.Flatten().InnerException;
+                queue.Send(msmqMessage);
+
+                return queue.PeekById(msmqMessage.Id);
             }
         }
     }
