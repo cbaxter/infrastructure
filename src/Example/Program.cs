@@ -47,7 +47,7 @@ namespace Spark.Example
 
             CommandingModule.MessageBusType = GetCommandBusType(args);
             EventingModule.MessageBusType = GetEventBusType(args);
-            
+
             for (var i = 0; i < numberOfIterations; i++)
             {
                 var container = Initialize();
@@ -70,12 +70,16 @@ namespace Spark.Example
         /// <param name="args">The command line arguments</param>
         private static Int32 GetNumberOfIterations(String[] args)
         {
-            Int32 numberOfIterations;
-            if (args.Length > 0 && Int32.TryParse(args[0] ?? String.Empty, out numberOfIterations))
-                return numberOfIterations;
+            Int32 result;
+            String value;
 
-            Console.Write("Number of iterations (default = 1): ");
-            return Int32.TryParse(Console.ReadLine() ?? String.Empty, out numberOfIterations) ? numberOfIterations : 1;
+            if (args.Length > 0 && Int32.TryParse(args[0] ?? String.Empty, out result)) return result;
+            do
+            {
+                Console.Write("Number of iterations (default = 1): ");
+            } while (!Int32.TryParse((value = Console.ReadLine()).IsNullOrWhiteSpace() ? "1" : value, out result));
+
+            return result;
         }
 
         /// <summary>
@@ -84,12 +88,16 @@ namespace Spark.Example
         /// <param name="args">The command line arguments</param>
         private static Int32 GetNumberOfCommands(String[] args)
         {
-            Int32 numberOfCommands;
-            if (args.Length > 1 && Int32.TryParse(args[1] ?? String.Empty, out numberOfCommands))
-                return numberOfCommands;
+            Int32 result;
+            String value;
 
-            Console.Write("Number of commands (default = 20,000): ");
-            return Int32.TryParse(Console.ReadLine() ?? String.Empty, out numberOfCommands) ? numberOfCommands : 20000;
+            if (args.Length > 1 && Int32.TryParse(args[1] ?? String.Empty, out result)) return result;
+            do
+            {
+                Console.Write("Number of commands (default = 20,000): ");
+            } while (!Int32.TryParse((value = Console.ReadLine()).IsNullOrWhiteSpace() ? "20000" : value, out result));
+
+            return result;
         }
 
         /// <summary>
@@ -98,13 +106,15 @@ namespace Spark.Example
         /// <param name="args">The command line arguments</param>
         private static MessageBusType GetCommandBusType(String[] args)
         {
-            if (args.Length > 2)
-                return GetMessageBusType(args[2]);
+            MessageBusType result;
 
-            Console.Write("Command Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
-            String value = Console.ReadLine() ?? String.Empty;
+            if (args.Length > 2 && TryGetMessageBusType(args[2], out result)) return result;
+            do
+            {
+                Console.Write("Command Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
+            } while (!TryGetMessageBusType(Console.ReadLine() ?? String.Empty, out result));
 
-            return value.IsNullOrWhiteSpace() ? MessageBusType.MicrosoftMessageQueuing : GetMessageBusType(value);
+            return result;
         }
 
         /// <summary>
@@ -113,32 +123,40 @@ namespace Spark.Example
         /// <param name="args">The command line arguments</param>
         private static MessageBusType GetEventBusType(String[] args)
         {
-            if (args.Length > 3)
-                return GetMessageBusType(args[3]);
+            MessageBusType result;
 
-            Console.Write("Event Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
-            String value = Console.ReadLine() ?? String.Empty;
+            if (args.Length > 3 && TryGetMessageBusType(args[3], out result)) return result;
+            do
+            {
+                Console.Write("Event Bus [1 = Inline, 2 = Optimistic, 3 = MSMQ] (default = MSMQ): ");
+            } while (!TryGetMessageBusType(Console.ReadLine() ?? String.Empty, out result));
 
-            return value.IsNullOrWhiteSpace() ? MessageBusType.MicrosoftMessageQueuing : GetMessageBusType(value);
+            return result;
         }
 
         /// <summary>
         /// Gets a message bus type based on the specified string <paramref name="value"/>.
         /// </summary>
         /// <param name="value">The value to convert to an message bus type (i.e., name, value or unique description).</param>
-        public static MessageBusType GetMessageBusType(String value)
+        /// <param name="result">The message bus type.</param>
+        public static Boolean TryGetMessageBusType(String value, out MessageBusType result)
         {
             Int32 parsedValue;
             Object boxedValue = Int32.TryParse(value, out parsedValue) ? parsedValue : (Object)value;
 
+            if (value.IsNullOrWhiteSpace())
+            {
+                result = MessageBusType.MicrosoftMessageQueuing;
+                return true;
+            }
+
             if (Enum.IsDefined(typeof(MessageBusType), boxedValue))
-                return (MessageBusType)Enum.ToObject(typeof(MessageBusType), boxedValue);
+            {
+                result = (MessageBusType)Enum.ToObject(typeof(MessageBusType), boxedValue);
+                return true;
+            }
 
-            MessageBusType result;
-            if (KnownMessageBusTypes.TryGetValue(value, out result))
-                return result;
-
-            throw new InvalidOperationException("Unknown message bus type specified.");
+            return KnownMessageBusTypes.TryGetValue(value, out result);
         }
 
         /// <summary>

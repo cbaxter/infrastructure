@@ -72,12 +72,12 @@ namespace Spark.Example.Modules
         private static void PurgeMessageQueue(params String[] subqueues)
         {
             using (var queue = new MessageQueue(MessageQueuePath))
-                queue.Purge();
+                if (MessageQueue.Exists(queue.Path)) queue.Purge();
 
             foreach (var subqueue in subqueues)
             {
                 using (var queue = new MessageQueue(MessageQueuePath + ";" + subqueue))
-                    queue.Purge();
+                    if (MessageQueue.Exists(queue.Path)) queue.Purge();
             }
         }
     }
