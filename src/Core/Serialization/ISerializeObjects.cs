@@ -50,7 +50,7 @@ namespace Spark.Serialization
         /// <param name="graph">The object to serialize.</param>
         public static void Serialize<T>(this ISerializeObjects serializer, Stream stream, T graph)
         {
-            Verify.NotNull(serializer, "serializer");
+            Verify.NotNull(serializer, nameof(serializer));
 
             serializer.Serialize(stream, graph, typeof(T));
         }
@@ -77,7 +77,7 @@ namespace Spark.Serialization
         /// <param name="stream">The <see cref="Stream"/> from which to deserialize an object graph.</param>
         public static T Deserialize<T>(this ISerializeObjects serializer, Stream stream)
         {
-            Verify.NotNull(serializer, "serializer");
+            Verify.NotNull(serializer, nameof(serializer));
 
             return (T)serializer.Deserialize(stream, typeof(T));
         }

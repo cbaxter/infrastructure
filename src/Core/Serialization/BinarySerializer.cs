@@ -30,8 +30,8 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being serialized.</param>
         public void Serialize(Stream stream, Object graph, Type type)
         {
-            Verify.NotNull(graph, "graph");
-            Verify.NotNull(stream, "stream");
+            Verify.NotNull(graph, nameof(graph));
+            Verify.NotNull(stream, nameof(stream));
 
             new BinaryFormatter().Serialize(stream, graph);
         }
@@ -43,7 +43,7 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
         public Object Deserialize(Stream stream, Type type)
         {
-            Verify.NotNull(stream, "stream");
+            Verify.NotNull(stream, nameof(stream));
 
             return new BinaryFormatter().Deserialize(stream);
         }

@@ -25,8 +25,6 @@ namespace Spark.Serialization
     /// </summary>
     public sealed class NewtonsoftJsonSerializer : ISerializeObjects
     {
-        private readonly JsonSerializer serializer;
-
         /// <summary>
         /// The default Newtonsoft JSON Serializer instance.
         /// </summary>
@@ -35,7 +33,7 @@ namespace Spark.Serialization
         /// <summary>
         /// The <see cref="JsonSerializer"/> used by this <see cref="NewtonsoftJsonSerializer"/> instance.
         /// </summary>
-        public JsonSerializer Serializer { get { return serializer; } }
+        public JsonSerializer Serializer { get; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="NewtonsoftJsonSerializer"/> with a set of custom <see cref="JsonConverter"/> instances to be used by <see cref="ConverterContractResolver"/>.
@@ -43,15 +41,15 @@ namespace Spark.Serialization
         /// <param name="contractResolver">The underlying JSON.NET contract resolver.</param>
         public NewtonsoftJsonSerializer(IContractResolver contractResolver)
         {
-            serializer = new JsonSerializer
-                {
-                    ContractResolver = contractResolver,
-                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                    MissingMemberHandling = MissingMemberHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.Auto
-                };
+            Serializer = new JsonSerializer
+            {
+                ContractResolver = contractResolver,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
         }
 
         /// <summary>
@@ -62,9 +60,9 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being serialized.</param>
         public void Serialize(Stream stream, Object graph, Type type)
         {
-            using (var streamWriter = new StreamWriter(stream, Encoding.UTF8))
+            using (var streamWriter = new StreamWriter(stream, Encoding.UTF8, bufferSize: 1024, leaveOpen: true))
             using (var jsonWriter = new JsonTextWriter(streamWriter))
-                serializer.Serialize(jsonWriter, graph, type);
+                Serializer.Serialize(jsonWriter, graph, type);
         }
 
         /// <summary>
@@ -74,9 +72,9 @@ namespace Spark.Serialization
         /// <param name="type">The <see cref="Type"/> of object being deserialized.</param>
         public Object Deserialize(Stream stream, Type type)
         {
-            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true, bufferSize: 1024))
             using (var jsonReader = new JsonTextReader(streamReader))
-                return serializer.Deserialize(jsonReader, type);
+                return Serializer.Deserialize(jsonReader, type);
         }
     }
 }

@@ -50,10 +50,10 @@ namespace Spark.Cqrs.Eventing.Sagas
         internal SagaEventHandler(EventHandler eventHandler, SagaMetadata sagaMetadata, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher, IStoreSagaSettings settings)
             : base(eventHandler)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
-            Verify.NotNull(sagaMetadata, "sagaMetadata");
-            Verify.NotNull(commandPublisher, "commandPublisher");
-            Verify.NotNull(settings, "settings");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
+            Verify.NotNull(sagaMetadata, nameof(sagaMetadata));
+            Verify.NotNull(commandPublisher, nameof(commandPublisher));
+            Verify.NotNull(settings, nameof(settings));
 
             this.sagaStore = sagaStore;
             this.sagaMetadata = sagaMetadata;
@@ -66,7 +66,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="context">The current event context.</param>
         public override void Handle(EventContext context)
         {
-            Verify.NotNull(context, "context");
+            Verify.NotNull(context, nameof(context));
 
             var sagaId = sagaMetadata.GetCorrelationId(context.Event);
             using (var sagaContext = new SagaContext(HandlerType, sagaId, context.Event))
@@ -98,7 +98,7 @@ namespace Spark.Cqrs.Eventing.Sagas
             }
             else
             {
-                Log.TraceFormat("{0} - {1} cannot be initiated by event {2}", sagaType, sagaId, context.Event);
+                Log.Trace("{0} - {1} cannot be initiated by event {2}", sagaType, sagaId, context.Event);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="e">The event to be handled.</param>
         protected virtual void HandleSagaEvent(Saga saga, Event e)
         {
-            Log.TraceFormat("{0} handling event {1}", saga, e);
+            Log.Trace("{0} handling event {1}", saga, e);
 
             Executor(saga, e);
         }

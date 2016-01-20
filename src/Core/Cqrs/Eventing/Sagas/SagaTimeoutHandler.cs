@@ -54,12 +54,12 @@ namespace Spark.Cqrs.Eventing.Sagas
                 }
                 else
                 {
-                    Log.WarnFormat("{0} received unexpected timeout at {1} when scheduled timeout is for {2}", saga, timeout.ToString(DateTimeFormat.RoundTrip), saga.Timeout.Value.ToString(DateTimeFormat.RoundTrip));
+                    Log.Warn("{0} received unexpected timeout at {1} when scheduled timeout is for {2}", saga, timeout.ToString(DateTimeFormat.RoundTrip), saga.Timeout.Value.ToString(DateTimeFormat.RoundTrip));
                 }
             }
             else
             {
-                Log.WarnFormat("{0} received unexpected timeout at {1} when no timeout is scheduled", saga, timeout.ToString(DateTimeFormat.RoundTrip));
+                Log.Warn("{0} received unexpected timeout at {1} when no timeout is scheduled", saga, timeout.ToString(DateTimeFormat.RoundTrip));
             }
         }
     }

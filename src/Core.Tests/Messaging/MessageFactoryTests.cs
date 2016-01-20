@@ -37,7 +37,7 @@ namespace Test.Spark.Messaging
                 var messageFactory = new FakeMessageFactory();
                 var properties = IPGlobalProperties.GetIPGlobalProperties();
                 var message = messageFactory.Create(HeaderCollection.Empty, new Object());
-                var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : String.Format("{0}.{1}", properties.HostName, properties.DomainName);
+                var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : $"{properties.HostName}.{properties.DomainName}";
 
                 Assert.Equal(serverName, message.Headers.GetOrigin());
             }
@@ -48,7 +48,7 @@ namespace Test.Spark.Messaging
                 var messageFactory = new FakeMessageFactory();
                 var properties = IPGlobalProperties.GetIPGlobalProperties();
                 var message = messageFactory.Create(new[] { new Header(Header.Origin, "NotThisMachineName", checkReservedNames: false) }, new Object());
-                var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : String.Format("{0}.{1}", properties.HostName, properties.DomainName);
+                var serverName = properties.DomainName.IsNullOrWhiteSpace() ? properties.HostName : $"{properties.HostName}.{properties.DomainName}";
 
                 Assert.NotEqual(serverName, message.Headers.GetOrigin());
             }

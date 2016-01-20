@@ -46,9 +46,9 @@ namespace Spark.Cqrs.Domain
         /// <param name="memoryCache">The underlying cache implementation.</param>
         internal CachedAggregateStore(IStoreAggregates aggregateStore, TimeSpan slidingExpiration, MemoryCache memoryCache)
         {
-            Verify.NotNull(memoryCache, "memoryCache");
-            Verify.NotNull(aggregateStore, "aggregateStore");
-            Verify.GreaterThanOrEqual(TimeSpan.FromSeconds(1), slidingExpiration, "aggregateStore");
+            Verify.NotNull(memoryCache, nameof(memoryCache));
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
+            Verify.GreaterThanOrEqual(TimeSpan.FromSeconds(1), slidingExpiration, nameof(aggregateStore));
 
             this.memoryCache = memoryCache;
             this.aggregateStore = aggregateStore;
@@ -71,7 +71,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="id">The unique aggregate id.</param>
         public Aggregate Get(Type aggregateType, Guid id)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
+            Verify.NotNull(aggregateType, nameof(aggregateType));
 
             var key = String.Concat(aggregateType.GetFullNameWithAssembly(), "-", id);
             using (var aggregateLock = new AggregateLock(aggregateType, id))
@@ -96,8 +96,8 @@ namespace Spark.Cqrs.Domain
         /// <param name="context">The command context containing the aggregate changes to be applied.</param>
         public SaveResult Save(Aggregate aggregate, CommandContext context)
         {
-            Verify.NotNull(aggregate, "aggregate");
-            Verify.NotNull(context, "context");
+            Verify.NotNull(aggregate, nameof(aggregate));
+            Verify.NotNull(context, nameof(context));
 
             var copy = aggregate.Copy();
             var aggregateType = aggregate.GetType();
@@ -139,7 +139,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="e">Provides information about a cache entry that was removed from the cache.</param>
         private static void OnCacheItemRemoved(CacheEntryRemovedArguments e)
         {
-            Log.TraceFormat("Aggregate {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
+            Log.Trace("Aggregate {0} was removed: {1}.", e.CacheItem.Key, e.RemovedReason);
         }
     }
 }

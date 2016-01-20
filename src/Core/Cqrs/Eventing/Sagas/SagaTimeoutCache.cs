@@ -43,7 +43,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="timeoutCacheDuration">The maximum cache duration for a given saga timeout (5 minute minimum).</param>
         public SagaTimeoutCache(IStoreSagas sagaStore, TimeSpan timeoutCacheDuration)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
 
             this.sagaStore = sagaStore;
             this.maximumCachedTimeout = DateTime.MinValue;
@@ -87,12 +87,12 @@ namespace Spark.Cqrs.Eventing.Sagas
 
             maximumCachedTimeout = now.Add(timeoutCacheDuration);
 
-            Log.DebugFormat("Loading saga timeouts scheduled before {0} from data store", maximumCachedTimeout);
+            Log.Debug("Loading saga timeouts scheduled before {0} from data store", maximumCachedTimeout);
 
             foreach (var sagaTimeout in sagaStore.GetScheduledTimeouts(maximumCachedTimeout))
                 ScheduleTimeoutInternal(sagaTimeout);
 
-            Log.TraceFormat("Loaded {0} saga timeouts", sagaTimeouts.Count);
+            Log.Trace("Loaded {0} saga timeouts", sagaTimeouts.Count);
         }
 
         /// <summary>
@@ -130,14 +130,14 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaTimeout">The saga timeout to schedule.</param>
         public void ScheduleTimeout(SagaTimeout sagaTimeout)
         {
-            Log.TraceFormat("Scheduling saga timeout for {0}", sagaTimeout);
+            Log.Trace("Scheduling saga timeout for {0}", sagaTimeout);
 
             lock (syncLock)
             {
                 ScheduleTimeoutInternal(sagaTimeout);
             }
 
-            Log.TraceFormat("Saga timeout scheduled for {0}", sagaTimeout);
+            Log.Trace("Saga timeout scheduled for {0}", sagaTimeout);
         }
 
         /// <summary>
@@ -156,14 +156,14 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaReference">The saga reference to clear a scheduled timeout.</param>
         public void ClearTimeout(SagaReference sagaReference)
         {
-            Log.TraceFormat("Clearing saga timeout for {0}", sagaReference);
+            Log.Trace("Clearing saga timeout for {0}", sagaReference);
 
             lock (syncLock)
             {
                 ClearTimeoutInternal(sagaReference);
             }
 
-            Log.TraceFormat("Saga timeout cleared for {0}", sagaReference);
+            Log.Trace("Saga timeout cleared for {0}", sagaReference);
         }
 
         /// <summary>

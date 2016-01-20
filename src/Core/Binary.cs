@@ -49,7 +49,7 @@ namespace Spark
         /// <param name="data">The underlying <see cref="Byte"/> array to wrap (underlying structure remains mutable).</param>
         public Binary(Byte[] data)
         {
-            Verify.NotNull(data, "data");
+            Verify.NotNull(data, nameof(data));
 
             this.data = data;
         }
@@ -116,8 +116,7 @@ namespace Spark
         /// <param name="other">Another object to compare.</param>
         public Boolean Equals(Byte[] other)
         {
-            if (other == null) return false;
-            if (other.Length != Length) return false;
+            if (other?.Length != Length) return false;
             if (ReferenceEquals(data, other)) return true;
 
             for (var i = 0; i < data.Length; i++)

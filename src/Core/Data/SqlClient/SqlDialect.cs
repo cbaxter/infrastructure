@@ -49,7 +49,7 @@ namespace Spark.Data.SqlClient
         /// <param name="connectionName">The connection name used by this sql dialect instance.</param>
         internal SqlDialect(String connectionName)
         {
-            Verify.NotNullOrWhiteSpace(connectionName, "connectionName");
+            Verify.NotNullOrWhiteSpace(connectionName, nameof(connectionName));
 
             var connectionStringSettings = ConfigurationManager.ConnectionStrings[connectionName];
             if(connectionStringSettings == null)

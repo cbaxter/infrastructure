@@ -37,7 +37,7 @@ namespace Spark.Cqrs.Eventing.Mappings
             /// <param name="serviceProvider">The underlying service provider (IoC Container).</param>
             internal HandleMethodMappingBuilder(IServiceProvider serviceProvider)
             {
-                Verify.NotNull(serviceProvider, "serviceProvider");
+                Verify.NotNull(serviceProvider, nameof(serviceProvider));
 
                 this.serviceProvider = serviceProvider;
             }
@@ -49,9 +49,9 @@ namespace Spark.Cqrs.Eventing.Mappings
             /// <param name="handleMethod">The handle method to be invoked for events of <paramref name="eventType"/>.</param>
             public void Register(Type eventType, Action<Object, Event> handleMethod)
             {
-                Verify.NotNull(eventType, "eventType");
-                Verify.NotNull(handleMethod, "handleMethod");
-                Verify.TypeDerivesFrom(typeof(Event), eventType, "eventType");
+                Verify.NotNull(eventType, nameof(eventType));
+                Verify.NotNull(handleMethod, nameof(handleMethod));
+                Verify.TypeDerivesFrom(typeof(Event), eventType, nameof(eventType));
 
                 handleMethods.Add(eventType, handleMethod);
             }
@@ -70,7 +70,7 @@ namespace Spark.Cqrs.Eventing.Mappings
             /// <param name="type">The service type to retrieve.</param>
             public Object GetService(Type type)
             {
-                Verify.NotNull(type, "type");
+                Verify.NotNull(type, nameof(type));
 
                 return serviceProvider.GetService(type);
             }

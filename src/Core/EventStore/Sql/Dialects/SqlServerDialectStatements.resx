@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DeleteStream" xml:space="preserve">
-    <value>DELETE FROM [dbo].[Commit] WHERE [StreamId] = @streamId;</value>
+    <value>DELETE FROM [Commit] WHERE [StreamId] = @streamId;</value>
   </data>
   <data name="EnsureCommitTableExists" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM sys.tables WHERE schema_id = SCHEMA_ID() AND name = 'Commit')
@@ -164,43 +164,43 @@ BEGIN
 END;</value>
   </data>
   <data name="GetRange" xml:space="preserve">
-    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];</value>
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [Id] &gt;= @skip ORDER BY [Id];</value>
   </data>
   <data name="GetSnapshot" xml:space="preserve">
-    <value>SELECT TOP(1) [StreamId],[Version],[State] FROM [dbo].[Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;</value>
+    <value>SELECT TOP(1) [StreamId],[Version],[State] FROM [Snapshot] WHERE [StreamId] = @streamId AND [Version] &lt;= @version ORDER BY [Version] DESC;</value>
   </data>
   <data name="GetStream" xml:space="preserve">
-    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];</value>
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [StreamId] = @streamId AND [Version] &gt;= @version ORDER BY [Version];</value>
   </data>
   <data name="GetStreams" xml:space="preserve">
-    <value>SELECT TOP (@take) [StreamId] FROM [dbo].[Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
+    <value>SELECT TOP (@take) [StreamId] FROM [Commit] WHERE [Version] = 1 AND [StreamId] &gt; @streamId ORDER BY [StreamId];</value>
   </data>
   <data name="GetUndispatched" xml:space="preserve">
-    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [dbo].[Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];</value>
+    <value>SELECT TOP (@take) [Id],[Timestamp],[CorrelationId],[StreamId],[Version],[Data] FROM [Commit] WHERE [Dispatched] = 0 AND [Id] &gt;= @skip ORDER BY [Id];</value>
   </data>
   <data name="InsertCommit" xml:space="preserve">
-    <value>INSERT INTO [dbo].[Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);</value>
+    <value>INSERT INTO [Commit] ([Timestamp], [CorrelationId], [StreamId], [Version], [Dispatched], [Data]) OUTPUT Inserted.Id VALUES (@timestamp, @correlationId, @streamId, @version, 0, @data);</value>
   </data>
   <data name="InsertSnapshot" xml:space="preserve">
-    <value>INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>
+    <value>INSERT INTO [Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);</value>
   </data>
   <data name="MarkDispatched" xml:space="preserve">
     <value>UPDATE [Commit] SET [Dispatched] = 1 WHERE [Id] = @id;</value>
   </data>
   <data name="PurgeCommits" xml:space="preserve">
-    <value>TRUNCATE TABLE [dbo].[Commit];</value>
+    <value>TRUNCATE TABLE [Commit];</value>
   </data>
   <data name="PurgeSnapshots" xml:space="preserve">
-    <value>TRUNCATE TABLE [dbo].[Snapshot];</value>
+    <value>TRUNCATE TABLE [Snapshot];</value>
   </data>
   <data name="ReplaceSnapshot" xml:space="preserve">
-    <value>UPDATE TOP(1) [dbo].[Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
+    <value>UPDATE TOP(1) [Snapshot] SET [Version] = @version, [State] = @state WHERE [StreamId] = @streamId;
 IF @@ROWCOUNT = 0
 BEGIN
-    INSERT INTO [dbo].[Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
+    INSERT INTO [Snapshot] ([StreamId],[Version],[State]) VALUES(@streamId, @version, @state);
 END;</value>
   </data>
   <data name="UpdateCommit" xml:space="preserve">
-    <value>UPDATE [dbo].[Commit] SET [Data] = @data WHERE [Id] = @id;</value>
+    <value>UPDATE [Commit] SET [Data] = @data WHERE [Id] = @id;</value>
   </data>
 </root>

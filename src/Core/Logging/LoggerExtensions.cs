@@ -27,7 +27,7 @@ namespace Spark.Logging
         /// <param name="log">The logger instance to extend.</param>
         public static IDisposable PushContext(this ILog log)
         {
-            Verify.NotNull(log, "log");
+            Verify.NotNull(log, nameof(log));
 
             return log.PushContext(Guid.NewGuid().ToString());
         }
@@ -41,7 +41,7 @@ namespace Spark.Logging
         [StringFormatMethod("format")]
         public static IDisposable PushContext(this ILog log, String format, Object arg0)
         {
-            Verify.NotNull(log, "log");
+            Verify.NotNull(log, nameof(log));
 
             return log.PushContext(String.Format(format, arg0));
         }
@@ -56,7 +56,7 @@ namespace Spark.Logging
         [StringFormatMethod("format")]
         public static IDisposable PushContext(this ILog log, String format, Object arg0, Object arg1)
         {
-            Verify.NotNull(log, "log");
+            Verify.NotNull(log, nameof(log));
 
             return log.PushContext(String.Format(format, arg0, arg1));
         }
@@ -72,7 +72,7 @@ namespace Spark.Logging
         [StringFormatMethod("format")]
         public static IDisposable PushContext(this ILog log, String format, Object arg0, Object arg1, Object arg2)
         {
-            Verify.NotNull(log, "log");
+            Verify.NotNull(log, nameof(log));
 
             return log.PushContext(String.Format(format, arg0, arg1, arg2));
         }
@@ -86,7 +86,7 @@ namespace Spark.Logging
         [StringFormatMethod("format")]
         public static IDisposable PushContext(this ILog log, String format, params Object[] args)
         {
-            Verify.NotNull(log, "log");
+            Verify.NotNull(log, nameof(log));
 
             return log.PushContext(String.Format(format, args));
         }

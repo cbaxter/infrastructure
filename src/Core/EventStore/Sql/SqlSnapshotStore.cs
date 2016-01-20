@@ -57,9 +57,9 @@ namespace Spark.EventStore.Sql
         /// <param name="dialect">The database dialect associated with this <see cref="SqlSnapshotStore"/>.</param>
         internal SqlSnapshotStore(ISnapshotStoreDialect dialect, ISerializeObjects serializer, IStoreSnapshotSettings settings)
         {
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNull(settings, "settings");
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(serializer, nameof(serializer));
+            Verify.NotNull(settings, nameof(settings));
+            Verify.NotNull(dialect, nameof(dialect));
 
             this.dialect = dialect;
             this.serializer = serializer;
@@ -120,12 +120,12 @@ namespace Spark.EventStore.Sql
         /// <param name="maximumVersion">The maximum snapshot version.</param>
         public Snapshot GetSnapshot(Type type, Guid streamId, Int32 maximumVersion)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
             Verify.NotDisposed(this, disposed);
 
             using (var command = dialect.CreateCommand(dialect.GetSnapshot))
             {
-                Log.TraceFormat("Getting stream {0} snapshot with version less than or equal to {1}", streamId, maximumVersion);
+                Log.Trace("Getting stream {0} snapshot with version less than or equal to {1}", streamId, maximumVersion);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(streamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(maximumVersion));
@@ -165,7 +165,7 @@ namespace Spark.EventStore.Sql
 
             using (var command = dialect.CreateCommand(dialect.InsertSnapshot))
             {
-                Log.TraceFormat("Inserting stream {0} snapshot for version {1}", snapshot.StreamId, snapshot.Version);
+                Log.Trace("Inserting stream {0} snapshot for version {1}", snapshot.StreamId, snapshot.Version);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(snapshot.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(snapshot.Version));
@@ -185,7 +185,7 @@ namespace Spark.EventStore.Sql
 
             using (var command = dialect.CreateCommand(dialect.ReplaceSnapshot))
             {
-                Log.TraceFormat("Updating stream {0} snapshot to version {1}", snapshot.StreamId, snapshot.Version);
+                Log.Trace("Updating stream {0} snapshot to version {1}", snapshot.StreamId, snapshot.Version);
 
                 command.Parameters.Add(dialect.CreateStreamIdParameter(snapshot.StreamId));
                 command.Parameters.Add(dialect.CreateVersionParameter(snapshot.Version));

@@ -72,7 +72,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void FatalFormat(String format, Object arg);
+        void Fatal(String format, Object arg);
 
         /// <summary>
         /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
@@ -80,7 +80,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void FatalFormat(String format, Object arg0, Object arg1);
+        void Fatal(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
@@ -89,14 +89,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void FatalFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Fatal(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void FatalFormat(String format, params Object[] args);
+        void Fatal(String format, params Object[] args);
 
         /// <summary>
         /// Writes a <value>FATAL</value> diagnostic message if <value>IsFatalEnabled</value> is <value>true</value>; otherwise ignored.
@@ -127,7 +127,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void ErrorFormat(String format, Object arg);
+        void Error(String format, Object arg);
 
         /// <summary>
         /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
@@ -135,7 +135,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void ErrorFormat(String format, Object arg0, Object arg1);
+        void Error(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
@@ -144,14 +144,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void ErrorFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Error(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void ErrorFormat(String format, params Object[] args);
+        void Error(String format, params Object[] args);
 
         /// <summary>
         /// Writes an <value>ERROR</value> diagnostic message if <value>IsErrorEnabled</value> is <value>true</value>; otherwise ignored.
@@ -182,7 +182,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void WarnFormat(String format, Object arg);
+        void Warn(String format, Object arg);
 
         /// <summary>
         /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
@@ -190,7 +190,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void WarnFormat(String format, Object arg0, Object arg1);
+        void Warn(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
@@ -199,14 +199,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void WarnFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Warn(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void WarnFormat(String format, params Object[] args);
+        void Warn(String format, params Object[] args);
 
         /// <summary>
         /// Writes a <value>WARN</value> diagnostic message if <value>IsWarnEnabled</value> is <value>true</value>; otherwise ignored.
@@ -237,7 +237,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void InfoFormat(String format, Object arg);
+        void Info(String format, Object arg);
 
         /// <summary>
         /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
@@ -245,7 +245,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void InfoFormat(String format, Object arg0, Object arg1);
+        void Info(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
@@ -254,14 +254,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void InfoFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Info(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void InfoFormat(String format, params Object[] args);
+        void Info(String format, params Object[] args);
 
         /// <summary>
         /// Writes an <value>INFO</value> diagnostic message if <value>IsInfoEnabled</value> is <value>true</value>; otherwise ignored.
@@ -292,7 +292,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void DebugFormat(String format, Object arg);
+        void Debug(String format, Object arg);
 
         /// <summary>
         /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
@@ -300,7 +300,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void DebugFormat(String format, Object arg0, Object arg1);
+        void Debug(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
@@ -309,14 +309,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void DebugFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Debug(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void DebugFormat(String format, params Object[] args);
+        void Debug(String format, params Object[] args);
 
         /// <summary>
         /// Writes a <value>DEBUG</value> diagnostic message if <value>IsDebugEnabled</value> is <value>true</value>; otherwise ignored.
@@ -347,7 +347,7 @@ namespace Spark.Logging
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg">The <see cref="Object"/> to format.</param>
-        void TraceFormat(String format, Object arg);
+        void Trace(String format, Object arg);
 
         /// <summary>
         /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
@@ -355,7 +355,7 @@ namespace Spark.Logging
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
-        void TraceFormat(String format, Object arg0, Object arg1);
+        void Trace(String format, Object arg0, Object arg1);
 
         /// <summary>
         /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
@@ -364,14 +364,14 @@ namespace Spark.Logging
         /// <param name="arg0">The first <see cref="Object"/> to format.</param>
         /// <param name="arg1">The second <see cref="Object"/> to format.</param>
         /// <param name="arg2">The third <see cref="Object"/> to format.</param>
-        void TraceFormat(String format, Object arg0, Object arg1, Object arg2);
+        void Trace(String format, Object arg0, Object arg1, Object arg2);
 
         /// <summary>
         /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.
         /// </summary>
         /// <param name="format">A composite format <see cref="String"/>.</param>
         /// <param name="args">An <see cref="Object"/> array that contains zero or more objects to format.</param>
-        void TraceFormat(String format, params Object[] args);
+        void Trace(String format, params Object[] args);
 
         /// <summary>
         /// Writes a <value>TRACE</value> diagnostic message if <value>IsTraceEnabled</value> is <value>true</value>; otherwise ignored.

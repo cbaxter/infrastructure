@@ -34,8 +34,8 @@ namespace Spark.EventStore
         /// <param name="events">The events associated with this commit.</param>
         public CommitData(HeaderCollection headers, EventCollection events)
         {
-            Verify.NotNull(headers, "headers");
-            Verify.NotNull(events, "events");
+            Verify.NotNull(headers, nameof(headers));
+            Verify.NotNull(events, nameof(events));
 
             Headers = headers;
             Events = events;

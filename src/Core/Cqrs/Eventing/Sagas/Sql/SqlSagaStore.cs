@@ -52,9 +52,9 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="typeLocator">The type locator use to retrieve all known <see cref="Saga"/> types.</param>
         public SqlSagaStore(ISagaStoreDialect dialect, ISerializeObjects serializer, ILocateTypes typeLocator)
         {
-            Verify.NotNull(typeLocator, "typeLocator");
-            Verify.NotNull(serializer, "serializer");
-            Verify.NotNull(dialect, "dialect");
+            Verify.NotNull(typeLocator, nameof(typeLocator));
+            Verify.NotNull(serializer, nameof(serializer));
+            Verify.NotNull(dialect, nameof(dialect));
 
             this.dialect = dialect;
             this.serializer = serializer;
@@ -165,11 +165,11 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="saga">The <see cref="Saga"/> instance if found; otherwise <value>null</value>.</param>
         public Boolean TryGetSaga(Type type, Guid id, out Saga saga)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             using (var command = dialect.CreateCommand(dialect.GetSaga))
             {
-                Log.TraceFormat("Getting saga {0} - {1}", type, id);
+                Log.Trace("Getting saga {0} - {1}", type, id);
 
                 command.Parameters.Add(dialect.CreateIdParameter(id));
                 command.Parameters.Add(dialect.CreateTypeIdParameter(GetSagaTypeId(type)));
@@ -188,7 +188,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         {
             using (var command = dialect.CreateCommand(dialect.GetScheduledTimeouts))
             {
-                Log.TraceFormat("Getting saga timeouts before {0}", maximumTimeout);
+                Log.Trace("Getting saga timeouts before {0}", maximumTimeout);
 
                 command.Parameters.Add(dialect.CreateTimeoutParameter(maximumTimeout));
 
@@ -203,7 +203,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
         /// <param name="context">The saga context containing the saga changes to be applied.</param>
         public Saga Save(Saga saga, SagaContext context)
         {
-            Verify.NotNull(saga, "saga");
+            Verify.NotNull(saga, nameof(saga));
 
             if (saga.Version == 0 && saga.Completed)
                 return saga;
@@ -235,7 +235,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             using (var command = dialect.CreateCommand(dialect.InsertSaga))
             {
-                Log.TraceFormat("Starting new saga {0}", saga);
+                Log.Trace("Starting new saga {0}", saga);
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
@@ -260,7 +260,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             using (var command = dialect.CreateCommand(dialect.UpdateSaga))
             {
-                Log.TraceFormat("Updating existing saga {0}", saga);
+                Log.Trace("Updating existing saga {0}", saga);
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));
@@ -285,7 +285,7 @@ namespace Spark.Cqrs.Eventing.Sagas.Sql
 
             using (var command = dialect.CreateCommand(dialect.DeleteSaga))
             {
-                Log.TraceFormat("Completing existing saga {0}", saga);
+                Log.Trace("Completing existing saga {0}", saga);
 
                 command.Parameters.Add(dialect.CreateTypeIdParameter(typeId));
                 command.Parameters.Add(dialect.CreateIdParameter(saga.CorrelationId));

@@ -38,7 +38,7 @@ namespace Spark.Threading
         /// <param name="action">An <see cref="Action"/> that represents the method to be executed.</param>
         public void QueueUserWorkItem(Action action)
         {
-            Verify.NotNull(action, "action");
+            Verify.NotNull(action, nameof(action));
 
             ThreadPool.QueueUserWorkItem(_ => action());
         }
@@ -51,7 +51,7 @@ namespace Spark.Threading
         /// <param name="state">An object containing data to be used by the method.</param>
         public void QueueUserWorkItem<T>(Action<T> action, T state)
         {
-            Verify.NotNull(action, "action");
+            Verify.NotNull(action, nameof(action));
 
             ThreadPool.QueueUserWorkItem(s => action((T)s), state);
         }
@@ -62,7 +62,7 @@ namespace Spark.Threading
         /// <param name="action">An <see cref="Action"/> that represents the method to be executed.</param>
         public void UnsafeQueueUserWorkItem(Action action)
         {
-            Verify.NotNull(action, "action");
+            Verify.NotNull(action, nameof(action));
 
             ThreadPool.UnsafeQueueUserWorkItem(_ => action(), null);
         }
@@ -76,7 +76,7 @@ namespace Spark.Threading
         /// <param name="state">An object containing data to be used by the method.</param>
         public void UnsafeQueueUserWorkItem<T>(Action<T> action, T state)
         {
-            Verify.NotNull(action, "action");
+            Verify.NotNull(action, nameof(action));
 
             ThreadPool.UnsafeQueueUserWorkItem(s => action((T)s), state);
         }

@@ -30,8 +30,8 @@ namespace Spark.Cqrs.Domain.Mappings
         /// <param name="type">The <see cref="ApplyMethodMapping"/> containing the explicit apply method mapping.</param>
         public ApplyByRegistrationAttribute(Type type)
         {
-            Verify.NotNull(type, "type");
-            Verify.TypeDerivesFrom(typeof(ApplyMethodMapping), type, "type");
+            Verify.NotNull(type, nameof(type));
+            Verify.TypeDerivesFrom(typeof(ApplyMethodMapping), type, nameof(type));
 
             applyMethodMappingType = type;
         }

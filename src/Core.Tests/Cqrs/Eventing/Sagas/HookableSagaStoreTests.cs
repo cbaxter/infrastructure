@@ -31,9 +31,9 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
                 var sagaStore = new HookableSagaStore(new Mock<IStoreSagas>().Object, pipelineHooks);
                 var preGetHooks = sagaStore.PreGetHooks.AsList();
 
-                Assert.IsType<PipelineHookB>(preGetHooks[0]);
-                Assert.IsType<PipelineHookC>(preGetHooks[1]);
-                Assert.IsType<PipelineHookA>(preGetHooks[2]);
+                Assert.IsType(typeof(PipelineHookB), preGetHooks[0]);
+                Assert.IsType(typeof(PipelineHookC), preGetHooks[1]);
+                Assert.IsType(typeof(PipelineHookA), preGetHooks[2]);
             }
 
             [Fact]
@@ -41,22 +41,22 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             {
                 var pipelineHooks = new PipelineHook[] { new PipelineHookC(), new PipelineHookA(), new PipelineHookB() };
                 var sagaStore = new HookableSagaStore(new Mock<IStoreSagas>().Object, pipelineHooks);
-                var preGetHooks = sagaStore.PostGetHooks.AsList();
+                var postGetHooks = sagaStore.PostGetHooks.AsList();
 
-                Assert.IsType<PipelineHookA>(preGetHooks[0]);
-                Assert.IsType<PipelineHookC>(preGetHooks[1]);
-                Assert.IsType<PipelineHookB>(preGetHooks[2]);
+                Assert.IsType(typeof(PipelineHookA), postGetHooks[0]);
+                Assert.IsType(typeof(PipelineHookC), postGetHooks[1]);
+                Assert.IsType(typeof(PipelineHookB), postGetHooks[2]);
             }
             [Fact]
             public void OrderPreSavePipelineHooksByOrderThenByName()
             {
                 var pipelineHooks = new PipelineHook[] { new PipelineHookC(), new PipelineHookA(), new PipelineHookB() };
                 var sagaStore = new HookableSagaStore(new Mock<IStoreSagas>().Object, pipelineHooks);
-                var preGetHooks = sagaStore.PreSaveHooks.AsList();
+                var preSaveHooks = sagaStore.PreSaveHooks.AsList();
 
-                Assert.IsType<PipelineHookB>(preGetHooks[0]);
-                Assert.IsType<PipelineHookC>(preGetHooks[1]);
-                Assert.IsType<PipelineHookA>(preGetHooks[2]);
+                Assert.IsType(typeof(PipelineHookB), preSaveHooks[0]);
+                Assert.IsType(typeof(PipelineHookC), preSaveHooks[1]);
+                Assert.IsType(typeof(PipelineHookA), preSaveHooks[2]);
             }
 
             [Fact]
@@ -64,11 +64,11 @@ namespace Test.Spark.Cqrs.Eventing.Sagas
             {
                 var pipelineHooks = new PipelineHook[] { new PipelineHookC(), new PipelineHookA(), new PipelineHookB() };
                 var sagaStore = new HookableSagaStore(new Mock<IStoreSagas>().Object, pipelineHooks);
-                var preGetHooks = sagaStore.PostSaveHooks.AsList();
+                var postSaveHooks = sagaStore.PostSaveHooks.AsList();
 
-                Assert.IsType<PipelineHookA>(preGetHooks[0]);
-                Assert.IsType<PipelineHookC>(preGetHooks[1]);
-                Assert.IsType<PipelineHookB>(preGetHooks[2]);
+                Assert.IsType(typeof(PipelineHookA), postSaveHooks[0]);
+                Assert.IsType(typeof(PipelineHookC), postSaveHooks[1]);
+                Assert.IsType(typeof(PipelineHookB), postSaveHooks[2]);
             }
 
             private class PipelineHookA : PipelineHook

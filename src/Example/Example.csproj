@@ -42,6 +42,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -55,9 +56,13 @@
     <Compile Include="Benchmarks\BenchmarkedSagaStore.cs" />
     <Compile Include="Benchmarks\BenchmarkedSnapshotStore.cs" />
     <Compile Include="Benchmarks\BenchmarkedEventStore.cs" />
+    <Compile Include="Benchmarks\EventProcessorWrapper.cs" />
+    <Compile Include="Benchmarks\CommandProcessorWrapper.cs" />
+    <Compile Include="Benchmarks\EventPublisherWrapper.cs" />
     <Compile Include="Benchmarks\SagaHook.cs" />
     <Compile Include="Benchmarks\CommandHook.cs" />
     <Compile Include="Benchmarks\Statistics.cs" />
+    <Compile Include="Benchmarks\CommandPublisherWrapper.cs" />
     <Compile Include="Denormalizers\AccountDenormalizer.cs" />
     <Compile Include="Domain\Account.cs" />
     <Compile Include="Domain\AccountStatus.cs" />
@@ -74,6 +79,7 @@
     <Compile Include="Modules\CommonModule.cs" />
     <Compile Include="Modules\EventingModule.cs" />
     <Compile Include="Modules\ExampleModule.cs" />
+    <Compile Include="Modules\MessageBusType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sagas\MoneyTransferSaga.cs" />

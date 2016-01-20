@@ -35,7 +35,7 @@ namespace Spark
         private static readonly ConstructorInfo MissingMemberExceptionConstructor = typeof(MissingMemberException).GetConstructor(new[] { typeof(String), typeof(String) });
         private static readonly ConstructorInfo DictionaryConstructor = typeof(Dictionary<String, Object>).GetConstructor(new[] { typeof(Int32) });
         private static readonly IDictionary<Type, ObjectBinding> Bindings = new ConcurrentDictionary<Type, ObjectBinding>();
-        
+
         /// <summary>
         /// Get the field type for the specified <paramref name="type"/> attribute <paramref name="name"/>.
         /// </summary>
@@ -43,8 +43,8 @@ namespace Spark
         /// <param name="name">The name of the field.</param>
         public static Type GetFieldType(Type type, String name)
         {
-            Verify.NotNull(type, "type");
-            Verify.NotNullOrWhiteSpace(name, "name");
+            Verify.NotNull(type, nameof(type));
+            Verify.NotNullOrWhiteSpace(name, nameof(name));
 
             return GetBinding(type).GetFieldType(name);
         }
@@ -55,7 +55,7 @@ namespace Spark
         /// <param name="value">The object graph for which fields/properties are to be mapped.</param>
         public static IDictionary<String, Object> GetState(Object value)
         {
-            Verify.NotNull(value, "value");
+            Verify.NotNull(value, nameof(value));
 
             return GetBinding(value.GetType()).GetState(value);
         }
@@ -67,12 +67,12 @@ namespace Spark
         /// <param name="state">The source state to be mapped on to <paramref name="value"/>.</param>
         public static void SetState(Object value, IDictionary<String, Object> state)
         {
-            Verify.NotNull(value, "value");
-            Verify.NotNull(state, "state");
+            Verify.NotNull(value, nameof(value));
+            Verify.NotNull(state, nameof(state));
 
             GetBinding(value.GetType()).SetState(value, state);
         }
-        
+
         /// <summary>
         /// Get the object binding for the specified object <paramref name="type"/>.
         /// </summary>
@@ -167,7 +167,7 @@ namespace Spark
                 var tryGetValue = Expression.Call(state, DictionaryTryGetValueMethod, Expression.Constant(binding.Metadata.Name), result);
                 var assignValue = Expression.Assign(Expression.Field(source, binding.Field), Expression.Convert(result, binding.Field.FieldType));
                 var expression = binding.Metadata.IsRequired
-                                     ? Expression.IfThenElse(tryGetValue, assignValue, Expression.Throw(Expression.New(MissingMemberExceptionConstructor, new Expression[] { Expression.Constant(type.FullName), Expression.Constant(binding.Metadata.Name) })))
+                                     ? Expression.IfThenElse(tryGetValue, assignValue, Expression.Throw(Expression.New(MissingMemberExceptionConstructor, Expression.Constant(type.FullName), Expression.Constant(binding.Metadata.Name))))
                                      : Expression.IfThen(tryGetValue, assignValue);
 
                 methodBody.Add(expression);
@@ -197,7 +197,7 @@ namespace Spark
             /// <param name="fieldInfo">The <see cref="FieldInfo"/> associated with this <see cref="FieldBinding"/>.</param>
             public FieldBinding(FieldInfo fieldInfo)
             {
-                Verify.NotNull(fieldInfo, "fieldInfo");
+                Verify.NotNull(fieldInfo, nameof(fieldInfo));
 
                 this.fieldInfo = fieldInfo;
                 this.propertyInfo = GetPropertyInfo(fieldInfo);
@@ -249,7 +249,7 @@ namespace Spark
                 return fieldInfo.IsInitOnly ||
                        fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null ||
                        fieldInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null ||
-                       propertyInfo != null && propertyInfo.GetCustomAttribute<IgnoreDataMemberAttribute>() != null;
+                       propertyInfo?.GetCustomAttribute<IgnoreDataMemberAttribute>() != null;
             }
         }
 
@@ -270,9 +270,9 @@ namespace Spark
             /// <param name="setState">The write binding.</param>
             public ObjectBinding(FieldBinding[] fields, Func<Object, IDictionary<String, Object>> getState, Action<Object, IDictionary<String, Object>> setState)
             {
-                Verify.NotNull(fields, "fields");
-                Verify.NotNull(getState, "getState");
-                Verify.NotNull(setState, "setState");
+                Verify.NotNull(fields, nameof(fields));
+                Verify.NotNull(getState, nameof(getState));
+                Verify.NotNull(setState, nameof(setState));
 
                 this.fields = fields.ToDictionary(binding => binding.Metadata.Name, binding => binding);
                 this.getState = getState;

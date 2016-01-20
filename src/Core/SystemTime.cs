@@ -60,8 +60,8 @@ namespace Spark
         /// <param name="timeRetriever">The replacement function to use when retrieving the UTC system time.</param>
         public static void OverrideWith(Func<DateTime> timeRetriever)
         {
-            Verify.NotNull(timeRetriever, "timeRetriever");
-            Verify.Equal(DateTimeKind.Utc, timeRetriever().Kind, "timeRetriever");
+            Verify.NotNull(timeRetriever, nameof(timeRetriever));
+            Verify.Equal(DateTimeKind.Utc, timeRetriever().Kind, nameof(timeRetriever));
 
             utcNowOverride = timeRetriever;
         }

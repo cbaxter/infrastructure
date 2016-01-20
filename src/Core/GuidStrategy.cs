@@ -28,7 +28,7 @@ namespace Spark
         /// <param name="guidGenerator"></param>
         public static void Initialize(Func<Guid> guidGenerator)
         {
-            Verify.NotNull(guidGenerator, "guidGenerator");
+            Verify.NotNull(guidGenerator, nameof(guidGenerator));
 
             guidFactory = guidGenerator;
         }

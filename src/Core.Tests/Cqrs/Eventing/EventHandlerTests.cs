@@ -93,7 +93,7 @@ namespace Test.Spark.Cqrs.Eventing
             {
                 var eventHandler = new EventHandler(typeof(Object), typeof(FakeEvent), (h, e) => { }, () => new Object());
 
-                Assert.Equal(String.Format("{0} Event Handler ({1})", typeof(FakeEvent), typeof(Object)), eventHandler.ToString());
+                Assert.Equal($"{typeof (FakeEvent)} Event Handler ({typeof (Object)})", eventHandler.ToString());
             }
         }
 

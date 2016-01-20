@@ -46,8 +46,8 @@ namespace Spark.Cqrs.Eventing
         /// <param name="settings">The current event store settings.</param>
         internal EventDispatcher(IStoreEvents eventStore, IPublishEvents eventPublisher, IStoreEventSettings settings)
         {
-            Verify.NotNull(eventStore, "eventStore");
-            Verify.NotNull(eventPublisher, "eventPublisher");
+            Verify.NotNull(eventStore, nameof(eventStore));
+            Verify.NotNull(eventPublisher, nameof(eventPublisher));
 
             this.eventStore = eventStore;
             this.eventPublisher = eventPublisher;
@@ -67,7 +67,7 @@ namespace Spark.Cqrs.Eventing
 
             foreach (var commit in eventStore.GetUndispatched())
             {
-                Log.WarnFormat("Processing undispatched commit {0}", commit.Id);
+                Log.Warn("Processing undispatched commit {0}", commit.Id);
                 DispatchCommit(commit);
             }
         }
@@ -80,10 +80,10 @@ namespace Spark.Cqrs.Eventing
         /// <param name="error">The <see cref="Exception"/> thrown if the save was unsuccessful; otherwise <value>null</value>.</param>
         public override void PostSave(Aggregate aggregate, Commit commit, Exception error)
         {
-            if (commit != null && commit.Id.HasValue)
+            if (commit?.Id != null)
                 DispatchCommit(commit);
             else
-                Log.WarnFormat("Commit not dispatched");
+                Log.Warn("Commit not dispatched");
         }
 
         /// <summary>

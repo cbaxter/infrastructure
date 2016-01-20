@@ -43,10 +43,10 @@ namespace Spark.Cqrs.Eventing
         /// <param name="commandPublisher">The command publisher used to publish saga commands.</param>
         public EventHandlerRegistry(ILocateTypes typeLocator, IServiceProvider serviceProvider, IStoreSagas sagaStore, Lazy<IPublishCommands> commandPublisher)
         {
-            Verify.NotNull(sagaStore, "sagaStore");
-            Verify.NotNull(typeLocator, "typeLocator");
-            Verify.NotNull(serviceProvider, "serviceProvider");
-            Verify.NotNull(commandPublisher, "commandPublisher");
+            Verify.NotNull(sagaStore, nameof(sagaStore));
+            Verify.NotNull(typeLocator, nameof(typeLocator));
+            Verify.NotNull(serviceProvider, nameof(serviceProvider));
+            Verify.NotNull(commandPublisher, nameof(commandPublisher));
 
             knownEventHandlers = DiscoverEventHandlers(typeLocator, serviceProvider, sagaStore, commandPublisher);
             knownSagaTimeoutHandlers = knownEventHandlers.Where(item => typeof(Timeout).IsAssignableFrom(item.Key))
@@ -201,7 +201,7 @@ namespace Spark.Cqrs.Eventing
         /// <param name="e">The event for which to retrieve all <see cref="EventHandler"/> instances.</param>
         public IEnumerable<EventHandler> GetHandlersFor(Event e)
         {
-            Verify.NotNull(e, "e");
+            Verify.NotNull(e, nameof(e));
 
             EventHandler[] eventHandlers;
             Timeout timeout = e as Timeout;

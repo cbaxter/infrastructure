@@ -105,7 +105,7 @@ namespace Spark
             var type = value.GetType().GetElementType();
 
             for (var i = 0; i < value.Rank; i++)
-                boundsExpressions.Add(Expression.Call(valueArgument, ArrayLengthMethod, new Expression[] { Expression.Constant(i) }));
+                boundsExpressions.Add(Expression.Call(valueArgument, ArrayLengthMethod, Expression.Constant(i)));
 
             return Expression.Lambda<Func<Array, Int32[], Array>>(Expression.NewArrayBounds(type, boundsExpressions), valueArgument, boundsArgument).Compile();
         }

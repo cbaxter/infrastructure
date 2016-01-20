@@ -45,7 +45,7 @@ namespace Spark.Messaging
         /// <param name="httpContextResolver">The HTTP context resolver.</param>
         internal WebMessageFactory(Func<HttpContextBase> httpContextResolver)
         {
-            Verify.NotNull(httpContextResolver, "httpContextResolver");
+            Verify.NotNull(httpContextResolver, nameof(httpContextResolver));
 
             this.httpContextResolver = httpContextResolver;
         }

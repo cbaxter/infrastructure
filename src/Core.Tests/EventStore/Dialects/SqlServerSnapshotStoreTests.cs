@@ -73,7 +73,7 @@ namespace Test.Spark.EventStore.Dialects
             private void DropExistingTable()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Snapshot') DROP TABLE [dbo].[Snapshot];", connection))
+                using (var command = new SqlCommand("IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Snapshot') DROP TABLE [Snapshot];", connection))
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -83,7 +83,7 @@ namespace Test.Spark.EventStore.Dialects
             private Boolean TableExists()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Snapshot';", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_NAME = 'Snapshot';", connection))
                 {
                     connection.Open();
 
@@ -152,7 +152,7 @@ namespace Test.Spark.EventStore.Dialects
             private Int32 CountSnapshots(Guid streamId)
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [Snapshot] WHERE [StreamId] = @StreamId;", connection))
                 {
                     command.Parameters.AddWithValue("@StreamId", streamId);
                     connection.Open();
@@ -192,7 +192,7 @@ namespace Test.Spark.EventStore.Dialects
             private Int32 CountSnapshots(Guid streamId)
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [Snapshot] WHERE [StreamId] = @StreamId;", connection))
                 {
                     command.Parameters.AddWithValue("@StreamId", streamId);
                     connection.Open();
@@ -226,7 +226,7 @@ namespace Test.Spark.EventStore.Dialects
             private Int32 CountSnapshots(Guid streamId)
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot] WHERE [StreamId] = @StreamId;", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [Snapshot] WHERE [StreamId] = @StreamId;", connection))
                 {
                     command.Parameters.AddWithValue("@StreamId", streamId);
                     connection.Open();
@@ -255,7 +255,7 @@ namespace Test.Spark.EventStore.Dialects
             private Int32 CountSnapshots()
             {
                 using (var connection = SqlServerConnection.Create())
-                using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[Snapshot];", connection))
+                using (var command = new SqlCommand("SELECT COUNT(*) FROM [Snapshot];", connection))
                 {
                     connection.Open();
 

@@ -32,8 +32,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="sagaType">The saga type associated with this configuration instance.</param>
         internal SagaConfiguration(Type sagaType)
         {
-            Verify.NotNull(sagaType, "sagaType");
-            Verify.TypeDerivesFrom(typeof(Saga), sagaType, "sagaType");
+            Verify.NotNull(sagaType, nameof(sagaType));
+            Verify.TypeDerivesFrom(typeof(Saga), sagaType, nameof(sagaType));
 
             this.sagaType = sagaType;
         }
@@ -46,7 +46,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public void CanStartWith<TEvent>(Func<TEvent, Guid> resolver)
             where TEvent : Event
         {
-            Verify.NotNull(resolver, "resolver");
+            Verify.NotNull(resolver, nameof(resolver));
 
             CanHandle(resolver);
 
@@ -61,7 +61,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public void CanHandle<TEvent>(Func<TEvent, Guid> resolver)
             where TEvent : Event
         {
-            Verify.NotNull(resolver, "resolver");
+            Verify.NotNull(resolver, nameof(resolver));
 
             if (handledEvents.ContainsKey(typeof(TEvent)))
                 throw new ArgumentException(Exceptions.EventTypeAlreadyConfigured.FormatWith(sagaType, typeof(TEvent)));

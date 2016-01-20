@@ -55,7 +55,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="entity">The entity to add to the collection.</param>
         internal void Add(Entity entity)
         {
-            Verify.NotNull(entity, "entity");
+            Verify.NotNull(entity, nameof(entity));
 
             Dictionary.Add(entity.Id, entity);
         }
@@ -157,7 +157,7 @@ namespace Spark.Cqrs.Domain
         /// </summary>
         public EntityCollection(IEnumerable<TEntity> entities)
         {
-            if (entities == null) throw new ArgumentNullException("entities");
+            if (entities == null) throw new ArgumentNullException(nameof(entities));
 
             foreach (var entity in entities.Where(entity => entity != null))
                 dictionary.Add(entity.Id, entity);
@@ -169,7 +169,7 @@ namespace Spark.Cqrs.Domain
         /// <param name="entity">The entity to add to the collection.</param>
         public void Add(TEntity entity)
         {
-            Verify.NotNull(entity, "entity");
+            Verify.NotNull(entity, nameof(entity));
 
             dictionary.Add(entity.Id, entity);
         }

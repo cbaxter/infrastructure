@@ -59,7 +59,7 @@ namespace Spark.Logging
         private static IReadOnlyDictionary<String, SourceSwitch> GetConfiguredSwitches(ConfigurationSection diagnosticsSection)
         {
             var switchSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["switches"] : null;
-            var switches = switchSection != null && switchSection.Value is IEnumerable ? (IEnumerable)switchSection.Value : Enumerable.Empty<ConfigurationElement>();
+            var switches = switchSection?.Value is IEnumerable ? (IEnumerable)switchSection.Value : Enumerable.Empty<ConfigurationElement>();
             var configuredSwitches = new Dictionary<String, SourceSwitch>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var name in switches.OfType<ConfigurationElement>().Select(element => GetPropertyValue(element, "name")).Where(name => name.IsNotNullOrWhiteSpace()))
@@ -75,7 +75,7 @@ namespace Spark.Logging
         private static IReadOnlyDictionary<String, TraceSource> GetConfiguredSources(ConfigurationSection diagnosticsSection)
         {
             var sourceSection = diagnosticsSection != null ? diagnosticsSection.ElementInformation.Properties["sources"] : null;
-            var sources = sourceSection != null && sourceSection.Value is IEnumerable ? (IEnumerable)sourceSection.Value : Enumerable.Empty<ConfigurationElement>();
+            var sources = sourceSection?.Value is IEnumerable ? (IEnumerable)sourceSection.Value : Enumerable.Empty<ConfigurationElement>();
             var configuredSources = new Dictionary<String, TraceSource>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var name in sources.OfType<ConfigurationElement>().Select(element => GetPropertyValue(element, "name")).Where(name => name.IsNotNullOrWhiteSpace()))
@@ -161,7 +161,7 @@ namespace Spark.Logging
         /// <param name="name">The name of the logger.</param>
         public static ILog GetLogger(String name)
         {
-            Verify.NotNullOrWhiteSpace(name, "name");
+            Verify.NotNullOrWhiteSpace(name, nameof(name));
 
             return Instance.CreateLogger(name);
         }
@@ -172,7 +172,7 @@ namespace Spark.Logging
         /// <param name="type">The type associated with the logger.</param>
         public static ILog GetLogger(Type type)
         {
-            Verify.NotNull(type, "type");
+            Verify.NotNull(type, nameof(type));
 
             return Instance.CreateLogger(type.FullName);
         }

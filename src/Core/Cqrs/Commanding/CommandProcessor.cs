@@ -52,8 +52,8 @@ namespace Spark.Cqrs.Commanding
         /// <param name="settings">The command processor configuration settings.</param>
         internal CommandProcessor(IRetrieveCommandHandlers commandHandlerRegistry, IDetectTransientErrors transientErrorRegistry, IProcessCommandSettings settings)
         {
-            Verify.NotNull(commandHandlerRegistry, "commandHandlerRegistry");
-            Verify.NotNull(settings, "settings");
+            Verify.NotNull(commandHandlerRegistry, nameof(commandHandlerRegistry));
+            Verify.NotNull(settings, nameof(settings));
 
             this.retryTimeout = settings.RetryTimeout;
             this.transientErrorRegistry = transientErrorRegistry;
@@ -78,9 +78,22 @@ namespace Spark.Cqrs.Commanding
         /// <param name="message">The <see cref="Command"/> message.</param>
         public Task ProcessAsync(Message<CommandEnvelope> message)
         {
-            Verify.NotNull(message, "message");
+            Verify.NotNull(message, nameof(message));
 
-            return Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+            return CreateTask(message);
+        }
+
+        /// <summary>
+        /// Create a new worker task that will be used to process the specified <see cref="Command"/> message.
+        /// </summary>
+        /// <param name="message">The <see cref="Command"/> message.</param>
+        private Task CreateTask(Message<CommandEnvelope> message)
+        {
+            var task = Task.Factory.StartNew(state => Process((Message<CommandEnvelope>)state), message, CancellationToken.None, TaskCreationOptions, taskScheduler);
+
+            task.ConfigureAwait(continueOnCapturedContext: false);
+
+            return task;
         }
 
         /// <summary>
@@ -123,7 +136,7 @@ namespace Spark.Cqrs.Commanding
 
                     backoffContext = backoffContext ?? new ExponentialBackoff(retryTimeout);
                     backoffContext.WaitOrTimeout(ex);
-                    Log.WarnFormat(ex.Message);
+                    Log.Warn(ex.Message);
                 }
             } while (!done);
         }

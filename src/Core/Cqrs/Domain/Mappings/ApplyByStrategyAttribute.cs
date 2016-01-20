@@ -48,8 +48,8 @@ namespace Spark.Cqrs.Domain.Mappings
         /// <param name="aggregateType">The aggregate type.</param>
         internal ApplyMethodCollection GetApplyMethods(Type aggregateType)
         {
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             return MapApplyMethodsFor(aggregateType);
         }
@@ -71,7 +71,7 @@ namespace Spark.Cqrs.Domain.Mappings
             var aggregateParameter = Expression.Parameter(typeof(Aggregate), "aggregate");
             var arguments = new Expression[] { Expression.Convert(eventParameter, eventType) };
             var body = Expression.Call(Expression.Convert(aggregateParameter, applyMethod.ReflectedType), applyMethod, arguments);
-            var expression = Expression.Lambda<Action<Aggregate, Event>>(body, new[] { aggregateParameter, eventParameter });
+            var expression = Expression.Lambda<Action<Aggregate, Event>>(body, aggregateParameter, eventParameter);
 
             return expression.Compile();
         }

@@ -45,7 +45,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="scheduled">The date/time of when the scheduled timeout occurred.</param>
         public Timeout(Type sagaType, DateTime scheduled)
         {
-            Verify.NotNull(sagaType, "sagaType");
+            Verify.NotNull(sagaType, nameof(sagaType));
 
             this.SagaType = sagaType;
             this.Scheduled = scheduled;

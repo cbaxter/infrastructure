@@ -34,8 +34,8 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="resolvers">The set of handled event resolvers used to lookup the saga correlation ID for a given event type.</param>
         public SagaMetadata(Type sagaType, IEnumerable<Type> initiatingEvents, IEnumerable<KeyValuePair<Type, Func<Event, Guid>>> resolvers)
         {
-            Verify.NotNull(sagaType, "sagaType");
-            Verify.TypeDerivesFrom(typeof(Saga), sagaType, "sagaType");
+            Verify.NotNull(sagaType, nameof(sagaType));
+            Verify.TypeDerivesFrom(typeof(Saga), sagaType, nameof(sagaType));
 
             this.sagaType = sagaType;
             this.initiatingEvents = new HashSet<Type>(initiatingEvents ?? Enumerable.Empty<Type>());
@@ -48,7 +48,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="eventType">The event type to test if can initiate a new saga instance.</param>
         public Boolean CanStartWith(Type eventType)
         {
-            Verify.NotNull(eventType, "eventType");
+            Verify.NotNull(eventType, nameof(eventType));
 
             return initiatingEvents.Contains(eventType);
         }
@@ -59,7 +59,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         /// <param name="eventType">The event type to test if can initiate a new saga instance.</param>
         public Boolean CanHandle(Type eventType)
         {
-            Verify.NotNull(eventType, "eventType");
+            Verify.NotNull(eventType, nameof(eventType));
 
             return resolvers.ContainsKey(eventType);
         }
@@ -72,7 +72,7 @@ namespace Spark.Cqrs.Eventing.Sagas
         public Guid GetCorrelationId<TEvent>(TEvent e)
             where TEvent : Event
         {
-            Verify.NotNull(e, "e");
+            Verify.NotNull(e, nameof(e));
 
             Func<Event, Guid> resolver;
             if (resolvers.TryGetValue(e.GetType(), out resolver))

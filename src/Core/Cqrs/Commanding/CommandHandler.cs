@@ -47,12 +47,12 @@ namespace Spark.Cqrs.Commanding
         /// <param name="executor">The command handler executor.</param>
         public CommandHandler(Type aggregateType, Type commandType, IStoreAggregates aggregateStore, Action<Aggregate, Command> executor)
         {
-            Verify.NotNull(executor, "executor");
-            Verify.NotNull(commandType, "commandType");
-            Verify.NotNull(aggregateType, "aggregateType");
-            Verify.NotNull(aggregateStore, "aggregateStore");
-            Verify.TypeDerivesFrom(typeof(Command), commandType, "commandType");
-            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, "aggregateType");
+            Verify.NotNull(executor, nameof(executor));
+            Verify.NotNull(commandType, nameof(commandType));
+            Verify.NotNull(aggregateType, nameof(aggregateType));
+            Verify.NotNull(aggregateStore, nameof(aggregateStore));
+            Verify.TypeDerivesFrom(typeof(Command), commandType, nameof(commandType));
+            Verify.TypeDerivesFrom(typeof(Aggregate), aggregateType, nameof(aggregateType));
 
             this.aggregateStore = aggregateStore;
             this.aggregateType = aggregateType;
@@ -69,7 +69,7 @@ namespace Spark.Cqrs.Commanding
             var command = context.Command;
             var aggregate = aggregateStore.Get(AggregateType, context.AggregateId);
 
-            Log.TraceFormat("Executing {0} command on aggregate {1}", command, aggregate);
+            Log.Trace("Executing {0} command on aggregate {1}", command, aggregate);
 
             aggregate.VerifyCanHandleCommand(command);
             executor(aggregate, command);
@@ -80,7 +80,7 @@ namespace Spark.Cqrs.Commanding
             }
             else
             {
-                Log.WarnFormat("Executing {0} command on aggregate {1} raised no events", command, aggregate);
+                Log.Warn("Executing {0} command on aggregate {1} raised no events", command, aggregate);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Spark.Cqrs.Commanding
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} Command Handler ({1})", CommandType, AggregateType);
+            return $"{CommandType} Command Handler ({AggregateType})";
         }
     }
 }

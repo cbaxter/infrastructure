@@ -30,8 +30,8 @@ namespace Spark.Cqrs.Eventing.Mappings
         /// <param name="type">The <see cref="HandleMethodMapping"/> containing the explicit handle method mapping.</param>
         public HandleByRegistrationAttribute(Type type)
         {
-            Verify.NotNull(type, "type");
-            Verify.TypeDerivesFrom(typeof(HandleMethodMapping), type, "type");
+            Verify.NotNull(type, nameof(type));
+            Verify.TypeDerivesFrom(typeof(HandleMethodMapping), type, nameof(type));
 
             handleMethodMappingType = type;
         }

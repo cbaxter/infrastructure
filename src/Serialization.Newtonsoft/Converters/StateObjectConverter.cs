@@ -142,8 +142,7 @@ namespace Spark.Serialization.Converters
                 }
             }
 
-            if (stateObject != null)
-                stateObject.SetState(state);
+            stateObject?.SetState(state);
 
             return stateObject;
         }

@@ -40,8 +40,8 @@ namespace Spark.EventStore
         /// <param name="take">The number of records to take.</param>
         public Page(Int64 skip, Int64 take)
         {
-            Verify.GreaterThanOrEqual(0, skip, "skip");
-            Verify.GreaterThan(0, take, "take");
+            Verify.GreaterThanOrEqual(0, skip, nameof(skip));
+            Verify.GreaterThan(0, take, nameof(take));
 
             this.skip = skip;
             this.take = take;
@@ -95,7 +95,7 @@ namespace Spark.EventStore
         /// </summary>
         public override String ToString()
         {
-            return String.Format("{0} - {1}", skip, take);
+            return $"{skip} - {take}";
         }
     }
 }

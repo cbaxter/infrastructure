@@ -33,8 +33,8 @@ namespace Spark.Cqrs.Commanding
         /// <param name="messageSender">The message sender.</param>
         public CommandPublisher(ICreateMessages messageFactory, ISendMessages<CommandEnvelope> messageSender)
         {
-            Verify.NotNull(messageFactory, "messageFactory");
-            Verify.NotNull(messageSender, "messageSender");
+            Verify.NotNull(messageFactory, nameof(messageFactory));
+            Verify.NotNull(messageSender, nameof(messageSender));
 
             this.messageFactory = messageFactory;
             this.messageSender = messageSender;
@@ -47,9 +47,9 @@ namespace Spark.Cqrs.Commanding
         /// <param name="payload">The command payload to be published.</param>
         public void Publish(IEnumerable<Header> headers, CommandEnvelope payload)
         {
-            Verify.NotNull(payload, "payload");
+            Verify.NotNull(payload, nameof(payload));
 
-            Log.TraceFormat("Publishing {0} to {1}", payload.Command, payload.AggregateId);
+            Log.Trace("Publishing {0} to {1}", payload.Command, payload.AggregateId);
 
             messageSender.Send(messageFactory.Create(headers, payload));
         }

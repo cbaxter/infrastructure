@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Test.Spark.Messaging
 {
-    namespace UsingInlineMessageBus
+    namespace UsingDirectMessageSender
     {
         public class WhenSendingMessages
         {
@@ -29,7 +29,7 @@ namespace Test.Spark.Messaging
             public void BlockUntilMessageProcessed()
             {
                 var messageProcessor = new FakeMessageProcessor();
-                var messageBus = new InlineMessageBus<Object>(messageProcessor);
+                var messageBus = new DirectMessageSender<Object>(messageProcessor);
                 var message = new Message<Object>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new Object());
 
                 messageBus.Send(message);
@@ -41,7 +41,7 @@ namespace Test.Spark.Messaging
             public void UnwwrapAggregateExceptionOnError()
             {
                 var messageProcessor = new Mock<IProcessMessages<Object>>();
-                var messageBus = new InlineMessageBus<Object>(messageProcessor.Object);
+                var messageBus = new DirectMessageSender<Object>(messageProcessor.Object);
                 var message = new Message<Object>(GuidStrategy.NewGuid(), HeaderCollection.Empty, new Object());
 
                 messageProcessor.Setup(mock => mock.Process(message)).Throws(new AggregateException(new InvalidOperationException()));
